@@ -10,11 +10,11 @@ import { RootState, useAppDispatch } from "@store/store.model";
 import { useSelector } from "react-redux";
 import { ResultState } from "@store/result-status";
 import LoadingDialog from "@components/LoadingPopup";
-import { addPAUrl, getPAUrl } from "@api/agreement.api";
 import { pxToRem } from "@utils/text-size";
 import { AutTextField } from "@components/Fields";
 import { AutButton } from "@components/buttons";
 import { AutHeader } from "@components/AutHeader";
+import { addPAUrl, getPAUrl } from "@api/community.api";
 
 function AlertDialog({ handleClose, open }) {
   return (

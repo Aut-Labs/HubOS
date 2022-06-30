@@ -13,12 +13,12 @@ import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '@store/store.model';
 import { ResultState } from '@store/result-status';
 import LoadingDialog from '@components/LoadingPopup';
-import { addPAContracts, getPAContracts } from '@api/agreement.api';
 import { pxToRem } from '@utils/text-size';
 import PartnerButton from '@components/Button';
 import './Contracts.scss';
 import ErrorDialog from '@components/ErrorPopup';
 import { getLockedContracts } from '@store/Partner/partner.reducer';
+import { addPAContracts, getPAContracts } from '@api/community.api';
 
 const tableColumns = (getRef: () => MutableRefObject<GridEditRowApi & GridRowApi>): GridColumns => {
   const handleEditClick = (id) => (event) => {
@@ -148,7 +148,6 @@ const Contracts = () => {
       setOpen(true);
       return;
     }
-
     dispatch(addPAContracts({ removedItems, newItems }));
   };
 

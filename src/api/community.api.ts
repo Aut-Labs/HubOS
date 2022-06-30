@@ -1,4 +1,5 @@
 import {
+  CommunityExtensionContractEventType,
   Web3AutIDProvider,
   Web3CommunityExtensionProvider,
 } from "@skill-wallet/sw-abi-types";
@@ -88,7 +89,7 @@ export const addNewWhitelistedAddresses = communityExtensionThunkProvider(
 
 export const updatePartnersCommunity = communityExtensionThunkProvider(
   {
-    type: "partner/community/update",
+    type: "community/update",
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
@@ -97,7 +98,7 @@ export const updatePartnersCommunity = communityExtensionThunkProvider(
   },
   async (contract, community) => {
     const uri = await storeMetadata(community);
-    // await contract.setMetadataUri(uri);
+    await contract.setMetadataUri(uri);
     return community;
   }
 );
@@ -173,10 +174,60 @@ export const getPAUrl = communityExtensionThunkProvider(
   }
 );
 
+export const getPAContracts = communityExtensionThunkProvider(
+  {
+    type: "partner/contracts/get",
+  },
+  (thunkAPI) => {
+    const state = thunkAPI.getState();
+    const community: Community = state.community.community;
+    return Promise.resolve(community.properties.address);
+  },
+  async (contract) => {
+    // const contracts = await contract.getImportedAddresses();
+    // return contracts;
+  }
+);
+
+export const addPAContracts = communityExtensionThunkProvider(
+  {
+    type: "partner/contracts/add",
+    // event: PartnersAgreementContractEventType.PartnersContractAdded,
+  },
+  (thunkAPI) => {
+    const state = thunkAPI.getState();
+    const community: Community = state.community.community;
+    return Promise.resolve(community.properties.address);
+  },
+  async (contract, payload, { dispatch }) => {
+    const { newItems } = payload;
+    for (const item of newItems) {
+      // await contract.addNewContractAddressToAgreement(item.address);
+    }
+    return dispatch(getPAContracts(null));
+  }
+);
+
+export const addDiscordToCommunity = communityExtensionThunkProvider(
+  {
+    type: "community/integrate/discord",
+    event: CommunityExtensionContractEventType.DiscordServerSet,
+  },
+  (thunkAPI) => {
+    const state = thunkAPI.getState();
+    const community: Community = state.community.community;
+    return Promise.resolve(community.properties.address);
+  },
+  async (contract, discordId) => {
+    const result = await contract.setDiscordServer(discordId);
+    return result;
+  }
+);
+
 export const addPAUrl = communityExtensionThunkProvider(
   {
     type: "community/url/add",
-    // event: PartnersAgreementContractEventType.UrlAdded,
+    event: CommunityExtensionContractEventType.UrlAdded,
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();

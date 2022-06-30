@@ -2,9 +2,9 @@
 import { memo, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '@store/store.model';
-import { getPAUrl } from '@api/agreement.api';
 import { CommunityData } from '@store/Community/community.reducer';
 import AutShare from '@components/Share';
+import { getPAUrl } from '@api/community.api';
 
 const AutCommunityShare = (props) => {
   const dispatch = useAppDispatch();

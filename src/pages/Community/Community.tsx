@@ -8,11 +8,11 @@ import { ReactComponent as Share } from '@assets/share.svg';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '@store/store.model';
-import { getPAUrl } from '@api/agreement.api';
 import { pxToRem } from '@utils/text-size';
 import PartnerButton from '@components/Button';
 import SwGrid from '@components/SwGrid';
 import { CommunityData } from '@store/Community/community.reducer';
+import { getPAUrl } from '@api/community.api';
 
 const Community = (props) => {
   const dispatch = useAppDispatch();

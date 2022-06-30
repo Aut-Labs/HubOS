@@ -167,19 +167,3 @@ const autIDThunkProvider = Web3ThunkProviderFactory(
   }
 );
 
-export const addDiscordToAutID = autIDThunkProvider(
-  {
-    type: "autID/integrate/discord",
-    event: AutIDContractEventType.DiscordIDConnectedToAutID,
-  },
-  () => {
-    return Promise.resolve('0xCeb3300b7de5061c633555Ac593C84774D160309');
-  },
-  async (
-    contract,
-    discordId
-  ) => {
-    const result = await contract.addDiscordIDToAutID(discordId);
-    return result;
-  }
-);

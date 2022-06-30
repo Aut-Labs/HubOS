@@ -5,10 +5,7 @@ import { openSnackbar } from '@store/ui-reducer';
 import { createSelector } from 'reselect';
 import { getPartnersAgreementByCommunity } from '@api/dito.api';
 import { ErrorParser } from '@utils/error-parser';
-import { getPAContracts, getPAUrl, addPAUrl, addPAContracts } from '@api/agreement.api';
-import { getWhitelistedAddresses, addNewWhitelistedAddresses } from '@api/community.api';
-import { addDiscordToAutID } from '@api/aut.api';
-
+import { getWhitelistedAddresses, addNewWhitelistedAddresses, addPAUrl, getPAUrl, addPAContracts, getPAContracts, addDiscordToCommunity } from '@api/community.api';
 export const fetchPartnersAgreementByCommunity = createAsyncThunk('partner/agreement/community', async (address: string, { dispatch }) => {
   try {
     return await getPartnersAgreementByCommunity(address);
@@ -68,10 +65,10 @@ export const partnerSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(addDiscordToAutID.pending, (state) => {
+      .addCase(addDiscordToCommunity.pending, (state) => {
         state.status = ResultState.Updating;
       })
-      .addCase(addDiscordToAutID.fulfilled, (state, action) => {
+      .addCase(addDiscordToCommunity.fulfilled, (state, action) => {
         state.paCommunity = {
           ...(state.paCommunity || {}),
           discordWebhookUrl: action.payload,
@@ -94,7 +91,7 @@ export const partnerSlice = createSlice({
         }
         state.status = ResultState.Idle;
       })
-      .addCase(addDiscordToAutID.rejected, (state) => {
+      .addCase(addDiscordToCommunity.rejected, (state) => {
         state.status = ResultState.Failed;
       })
       .addCase(getWhitelistedAddresses.pending, (state) => {
@@ -113,7 +110,7 @@ export const partnerSlice = createSlice({
         state.status = ResultState.Loading;
       })
       .addCase(getPAContracts.fulfilled, (state, action) => {
-        state.contracts = action.payload;
+        // state.contracts = action.payload;
         state.status = ResultState.Idle;
       })
       .addCase(getPAContracts.rejected, (state, action) => {

@@ -10,7 +10,7 @@ import { pxToRem } from "@utils/text-size";
 import { AutTextField } from "@components/Fields";
 import { AutButton } from "@components/buttons";
 import { AutHeader } from "@components/AutHeader";
-import { addDiscordToAutID } from "@api/aut.api";
+import { addDiscordToCommunity } from "@api/community.api";
 
 const DiscordIntegration = () => {
   const dispatch = useAppDispatch();
@@ -21,8 +21,7 @@ const DiscordIntegration = () => {
   );
 
   const submit = async () => {
-    console.log(discordUrl, 'discordUrl');
-    dispatch(addDiscordToAutID(discordUrl));
+    dispatch(addDiscordToCommunity(discordUrl));
   };
 
   const debouncedChangeHandler = useMemo(() => {
