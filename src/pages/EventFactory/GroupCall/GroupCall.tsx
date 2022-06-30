@@ -6,6 +6,7 @@ import { resetActivityGroupCall } from "@store/Activity/group-call.reducer";
 import CalendarStep from "./CalendarStep/CalendarStep";
 import CallInformationStep from "./CallInformationStep/CallInformationStep";
 import SuccessStep from "./SuccessStep/SuccessStep";
+import { setTitle } from "@store/ui-reducer";
 
 const GroupCall = () => {
   const dispatch = useDispatch();
@@ -13,6 +14,12 @@ const GroupCall = () => {
     return () => {
       dispatch(resetActivityGroupCall());
     };
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(
+      setTitle(`Community Calls - Sublime Here`)
+    );
   }, [dispatch]);
 
   return (

@@ -23,7 +23,7 @@ import Integrations from './ThirdPartyIntegrations/Integrations';
 import Contracts from './Contracts/Contracts';
 import DaoIntegration from './ThirdPartyIntegrations/DaoIntegration/DaoIntegration';
 import DiscordIntegration from './ThirdPartyIntegrations/DiscordIntegration/DiscordIntegration';
-import AutCommunityShare from './AutCommunityShare.tsx/AutCommunityShare';
+import AutCommunityShare from './AutCommunityShare/AutCommunityShare';
 
 const AutDashboard = (props) => {
   const dispatch = useAppDispatch();
