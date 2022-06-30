@@ -142,7 +142,7 @@ function App() {
             <div style={{ marginRight: pxToRem(50) }}>
               <d-aut
                 id="d-aut"
-                community-address="0x89fdb37aB5bf8E81c6b049b635244B8A58d5363c"
+                community-address="0x6A88d911D3371328AA0cC96302f27595A2Aa3831"
                 use-dev="true"
               ></d-aut>
             </div>

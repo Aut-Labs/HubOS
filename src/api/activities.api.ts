@@ -1,14 +1,19 @@
 import { ethers } from "ethers";
-import { CommunityCallContractEventType, Web3AutIDProvider, Web3CommunityCallProvider } from "@skill-wallet/sw-abi-types";
+import {
+  PollsContractEventType,
+  Web3CommunityCallProvider,
+  Web3CommunityExtensionProvider,
+  Web3PollsProvider
+} from "@skill-wallet/sw-abi-types";
 import { Task, TaskStatus } from "@store/model";
 import axios from "axios";
 import { dateToUnix } from "@utils/date-format";
-import { sendDiscordNotification, sendDiscordPoll } from "@store/ui-reducer";
+import { sendDiscordNotification } from "@store/ui-reducer";
 import { format } from "date-fns";
 import { ActivityTypes } from "./api.model";
 import { ipfsCIDToHttpUrl, storeAsBlob, storeMetadata } from "./textile.api";
 import { getAutAddress } from "./aut.api";
-import { deployActivities } from "./ProviderFactory/deploy-activities";
+import { deployPolls } from "./ProviderFactory/deploy-activities";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
 import { Community } from "./community.model";
 import {
@@ -26,25 +31,39 @@ const communityCallThunkProvider = Web3ThunkProviderFactory("CommunityCall", {
   provider: Web3CommunityCallProvider,
 });
 
+const pollsThunkProvider = Web3ThunkProviderFactory("Poll", {
+  provider: Web3PollsProvider,
+});
+
 const contractAddress = async (
   thunkAPI: GetThunkAPI<AsyncThunkConfig>,
   skipDeploy = false
 ) => {
-  const { partner } = thunkAPI.getState();
-  const paCommunity = partner?.paCommunity;
-  const contract = null;
-  let activitiesAddress = await contract.getActivitiesAddress();
-  if (!skipDeploy && activitiesAddress === ethers.constants.AddressZero) {
-    activitiesAddress = await deployActivities(
-      paCommunity.communityAddress,
+  const state = thunkAPI.getState();
+  const community: Community = state.community.community;
+  const contract = await Web3CommunityExtensionProvider(community.properties.address);
+  let activities = await contract.getActivitiesWhitelist() as any[];
+  let address = undefined;
+  if (activities || activities.length > 0) {
+    for (let i = 0; i < activities.length; i++) {
+      console.log(activities[i]);
+      if (activities[i]['actType'].toString() === '1') {
+        address = activities[i]['actAddr'];
+      }
+    }
+  }
+  if (!address) {
+    address = await deployPolls(
+      community.properties.address,
       environment.discordBotAddress
     );
-    await contract.setActivities(
-      activitiesAddress,
-      ethers.constants.AddressZero
+    await contract.addActivitiesAddress(
+      address,
+      1
     );
   }
-  return Promise.resolve(activitiesAddress);
+  console.log(address);
+  return Promise.resolve(address);
 };
 
 export const addActivityTask = activitiesThunkProvider(
@@ -92,9 +111,8 @@ export const addActivityTask = activitiesThunkProvider(
     const result = await contract.createTask(selectedRole.id, uri);
     const discordMessage: DiscordMessage = {
       title: `New Community Task`,
-      description: `${allParticipants ? "All" : participants} **${
-        selectedRole.roleName
-      }** participants can claim the task`,
+      description: `${allParticipants ? "All" : participants} **${selectedRole.roleName
+        }** participants can claim the task`,
       fields: [
         {
           name: "Title",
@@ -208,9 +226,8 @@ export const addGroupCall = activitiesThunkProvider(
     );
     const discordMessage: DiscordMessage = {
       title: "New Community Call",
-      description: `${allParticipants ? "All" : participants} **${
-        selectedRole.roleName
-      }** participants can join the call`,
+      description: `${allParticipants ? "All" : participants} **${selectedRole.roleName
+        }** participants can join the call`,
       fields: [
         {
           name: "Date",
@@ -240,13 +257,14 @@ export const publishPoll = (poll) => {
     .then((res) => res);
 };
 
-export const addPoll = communityCallThunkProvider(
+export const addPoll = pollsThunkProvider(
   {
     type: "partner/activities/poll/add",
-    event: CommunityCallContractEventType.CommunityCallCreated,
+    event: PollsContractEventType.PollCreated,
   },
   contractAddress,
   async (contract, callData, { getState, dispatch }) => {
+    console.log(contract.contract)
     const state = getState();
     const { title, description, duration, options, emojis, role, allRoles } =
       callData;
@@ -274,14 +292,32 @@ export const addPoll = communityCallThunkProvider(
       emojis,
     };
     const uri = await storeAsBlob(metadata);
-    
-    debugger;
+    console.log('polluri', uri)
+    let daysToAdd = 0;
+    switch (duration) {
+      case "1d":
+        daysToAdd = 1;
+        break;
+      case "1w":
+        daysToAdd = 7;
+        break;
+      case "1m":
+        daysToAdd = 30;
+        break;
+    }
+
+    const date = new Date();
+    const endTime = date.setDate(date.getDate() + daysToAdd);
+    const endTimeBlock = Math.floor(endTime / 1000);
+    console.log(roleId, endTimeBlock, uri);
+    console.log('ce', await contract.communityExtension());
     const result = await contract.create(
-      roleId,
-      22,
-      22,
-      uri
+      1,
+      endTimeBlock,
+      "ipfs://" + uri
     );
+
+    console.log(result);
 
     // publishPoll({
     //   ...metadata,
@@ -289,7 +325,7 @@ export const addPoll = communityCallThunkProvider(
     //   activityId: result[0].toString(),
     // });
 
-    return result;
+    return undefined;
   }
 );
 

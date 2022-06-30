@@ -17,7 +17,6 @@ import {
   activityUpdateTaskStatus,
 } from '@store/Activity/create-task.reducer';
 import './DescriptionStep.scss';
-import { openSnackbar } from '@store/ui-reducer';
 import { addActivityTask } from '@api/activities.api';
 import { countWords } from '@utils/helpers';
 import { pxToRem } from '@utils/text-size';
