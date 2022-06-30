@@ -64,36 +64,37 @@ function App() {
 
   useEffect(() => {
     const onSWLogin = async ({ detail }: any) => {
-      const isLoggedIn = true;
-      const autID = new AutID(detail)
-      if (isLoggedIn) {
-        dispatch(
-          setAuthenticated({
-            isAuthenticated: isLoggedIn,
-            userInfo: autID,
-          })
-        );
+      const autID = new AutID(detail);
+      dispatch(
+        setAuthenticated({
+          isAuthenticated: true,
+          userInfo: autID,
+        })
+      );
 
-        dispatch(
-          communityUpdateState({
-            communities: autID.properties.communities,
-            community: autID.properties.communities[0]
-          })
-        );
-        const shouldGoToDashboard = location.pathname === "/";
-        const goTo = shouldGoToDashboard ? "/aut-dashboard" : location.pathname;
-        const returnUrl = location.state?.from;
-        history.push(returnUrl || goTo);
-      } else {
-        dispatch(resetAuthState());
-        history.push("/");
-      }
+      dispatch(
+        communityUpdateState({
+          communities: autID.properties.communities,
+          community: autID.properties.communities[0],
+        })
+      );
+      const shouldGoToDashboard = location.pathname === "/";
+      const goTo = shouldGoToDashboard ? "/aut-dashboard" : location.pathname;
+      const returnUrl = location.state?.from;
+      history.push(returnUrl || goTo);
+    };
+
+    const onDisconnected = () => {
+      dispatch(resetAuthState());
+      history.push("/");
     };
 
     const onSWInit = async () => setLoading(false);
 
     window.addEventListener("aut-Init", onSWInit);
     window.addEventListener("aut-onConnected", onSWLogin);
+
+    window.addEventListener("aut-onDisconnected", onDisconnected);
 
     Init({
       container: document.querySelector("#connect-wallet-container"),
@@ -116,8 +117,8 @@ function App() {
           border: "0",
           p: 0,
           zIndex: (s) => s.zIndex.drawer + 1,
-          ml: pxToRem(350),
-          width: `calc(100% - ${pxToRem(350)})`,
+          ml: isAutheticated ? pxToRem(350) : 0,
+          width: isAutheticated ? `calc(100% - ${pxToRem(350)})` : "100%",
         }}
       >
         <Toolbar
@@ -142,33 +143,36 @@ function App() {
             <div style={{ marginRight: pxToRem(50) }}>
               <d-aut
                 id="d-aut"
-                community-address="0x6A88d911D3371328AA0cC96302f27595A2Aa3831"
+                community-address="0xc2d28f0084aA00538c0Cf1F27Da8137F20D963B6"
                 use-dev="true"
               ></d-aut>
             </div>
           </div>
-          <div
-            style={{
-              width: "100%",
-              borderStyle: "solid",
-              height: pxToRem(50),
-              borderImage:
-                "linear-gradient(160deg, #009fe3 0%, #0399de 8%, #0e8bd3 19%, #2072bf 30%, #3a50a4 41%, #5a2583 53%, #453f94 71%, #38519f 88%, #3458a4 100%) 1",
-              borderBottomWidth: "1px",
-              borderTopWidth: "1px",
-              borderLeft: 0,
-              borderRight: 0,
-            }}
-          >
-            <Typography
-              paddingLeft="10px"
-              lineHeight={pxToRem(50)}
-              fontSize={pxToRem(20)}
-              color="white"
+
+          {isAutheticated && (
+            <div
+              style={{
+                width: "100%",
+                borderStyle: "solid",
+                height: pxToRem(50),
+                borderImage:
+                  "linear-gradient(160deg, #009fe3 0%, #0399de 8%, #0e8bd3 19%, #2072bf 30%, #3a50a4 41%, #5a2583 53%, #453f94 71%, #38519f 88%, #3458a4 100%) 1",
+                borderBottomWidth: "1px",
+                borderTopWidth: "1px",
+                borderLeft: 0,
+                borderRight: 0,
+              }}
             >
-              {appTitle}
-            </Typography>
-          </div>
+              <Typography
+                paddingLeft="10px"
+                lineHeight={pxToRem(50)}
+                fontSize={pxToRem(20)}
+                color="white"
+              >
+                {appTitle}
+              </Typography>
+            </div>
+          )}
         </Toolbar>
       </AppBar>
       <Box

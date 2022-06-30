@@ -16,8 +16,6 @@ const Wrapper = styled('div')({
 });
 
 const GetStarted = () => {
-  const { isAutheticated } = useSelector((state: RootState) => state.auth);
-
   return (
     <Wrapper>
       <Box
@@ -45,7 +43,7 @@ const GetStarted = () => {
         erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus
       </Typography>
       <Box sx={{ gridGap: '30px', display: 'flex', justifyContent: 'center' }} className="right-box">
-        <AutButton
+        {/* <AutButton
           sx={{
             width: pxToRem(450),
             height: pxToRem(90),
@@ -57,7 +55,7 @@ const GetStarted = () => {
           to="/dashboard"
         >
           Connect Wallet
-        </AutButton>
+        </AutButton> */}
         {/* <AutButton
           sx={{
             width: pxToRem(450),

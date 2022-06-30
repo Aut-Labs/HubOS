@@ -20,25 +20,22 @@ import { ResultState } from "@store/result-status";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import ErrorDialog from "@components/ErrorPopup";
 import LoadingDialog from "@components/LoadingPopup";
-import RoleSkills from "./RoleSkills";
-import EditRole from "./EditRole";
-import "./Roles.scss";
 import { AutTextField, FormHelperText } from "@components/Fields";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
 import { setTitle } from "@store/ui-reducer";
+import "./Roles.scss";
 
 const errorTypes = {
   maxLength: `Characters cannot be more than 280`,
 };
 
-const Roles = (props) => {
+const Roles = () => {
   const dispatch = useAppDispatch();
   const { status, community } = useSelector(
     (state: RootState) => state.community
   );
   const roles = useSelector(allRoles);
-  const [activeRoleIndex, setActiveRoleIndex] = useState(0);
 
   const {
     control,
@@ -58,30 +55,19 @@ const Roles = (props) => {
   });
 
   useEffect(() => {
-    dispatch(
-      setTitle(`DAO Management - Sublime Here`)
-    );
+    dispatch(setTitle(`DAO Management - Sublime Here`));
   }, [dispatch]);
 
   const values = watch();
 
   const onSubmit = async (data: typeof values) => {
-    // const allRoles = community.properties.skills.roles.map((r) => {
-    //   const role = data.roles.find((updatedRole) => updatedRole.id === r.id);
-    //   if (role) {
-    //     return role;
-    //   }
-    //   return r;
-    // });
+    community.properties.rolesSets[0].roles = data.roles;
     await dispatch(
       updatePartnersCommunity(
         new Community({
           ...community,
           properties: {
             ...community.properties,
-            // skills: {
-            //   roles: allRoles,
-            // },
           },
         })
       )
@@ -89,7 +75,11 @@ const Roles = (props) => {
   };
 
   const handleDialogClose = () => {
-    dispatch(communityUpdateState(ResultState.Idle));
+    dispatch(
+      communityUpdateState({
+        status: ResultState.Idle,
+      })
+    );
   };
 
   return (

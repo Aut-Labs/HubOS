@@ -7,12 +7,8 @@ import axios from "axios";
 import { AutList } from "./api.model";
 import { Community, findRoleName } from "./community.model";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
-import {
-  getCoreTeamMemberNames,
-  addCoreTeamName,
-  getAutAddress,
-} from "./aut.api";
-import { storeMetadata, ipfsCIDToHttpUrl } from "./textile.api";
+import { getCoreTeamMemberNames } from "./aut.api";
+import { ipfsCIDToHttpUrl, storeAsBlob } from "./textile.api";
 import { environment } from "./environment";
 import { AutID } from "./aut.model";
 
@@ -114,7 +110,8 @@ export const updatePartnersCommunity = communityExtensionThunkProvider(
     return Promise.resolve(community.properties.address);
   },
   async (contract, community) => {
-    const uri = await storeMetadata(community);
+    const uri = await storeAsBlob(community);
+    console.log("New metadata: ->", ipfsCIDToHttpUrl(uri));
     await contract.setMetadataUri(uri);
     return community;
   }
