@@ -87,6 +87,23 @@ export const addNewWhitelistedAddresses = communityExtensionThunkProvider(
   }
 );
 
+export const whitelistAddress = communityExtensionThunkProvider(
+  {
+    type: "partner/addresses/add",
+    // event: CommunityExtensionContractEventType.MemberAdded,
+  },
+  (thunkAPI) => {
+    const state = thunkAPI.getState();
+    const community: Community = state.community.community;
+    return Promise.resolve(community.properties.address);
+  },
+  async (contract, newMembers, { dispatch, getState }) => {
+    const { auth } = getState();
+    // await contract.addNewCoreTeamMembers(newMember.address);
+    return dispatch(getWhitelistedAddresses(auth.userInfo.community));
+  }
+);
+
 export const updatePartnersCommunity = communityExtensionThunkProvider(
   {
     type: "community/update",

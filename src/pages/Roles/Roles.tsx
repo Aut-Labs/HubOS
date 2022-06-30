@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import {
   Box,
   CircularProgress,
@@ -26,6 +26,7 @@ import "./Roles.scss";
 import { AutTextField, FormHelperText } from "@components/Fields";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
+import { setTitle } from "@store/ui-reducer";
 
 const errorTypes = {
   maxLength: `Characters cannot be more than 280`,
@@ -56,7 +57,11 @@ const Roles = (props) => {
     name: "roles",
   });
 
-  console.log(fields, "fields");
+  useEffect(() => {
+    dispatch(
+      setTitle(`DAO Management - Sublime Here`)
+    );
+  }, [dispatch]);
 
   const values = watch();
 

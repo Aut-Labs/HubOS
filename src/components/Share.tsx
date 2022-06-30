@@ -1,90 +1,66 @@
 import { Dialog, DialogContent, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import {
-  TwitterShareButton,
-  LinkedinShareButton,
-  TelegramShareButton,
-} from "react-share";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import TelegramIcon from "@mui/icons-material/Telegram";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import ClipboardToCopy from "./CopyToClipboard";
+import { TwitterShareButton } from "react-share";
 import { pxToRem } from "@utils/text-size";
+import { AutButton } from "./buttons";
 
 export interface SimpleDialogProps {
-  open: boolean;
   title: string;
-  onClose: () => void;
-  sx?: any;
-  dialogsx?: any;
-  fullScreen?: boolean;
-  mode?: "light" | "dark";
   url: string;
+  description?: string;
+  open?: boolean;
+  onClose?: () => void;
   twitterProps?: any;
-  linkedinProps?: any;
-  telegramProps?: any;
+  rightSide: JSX.Element;
+  hideCloseBtn?: boolean;
 }
 
-function AutShare(props: SimpleDialogProps) {
-  const {
-    onClose,
-    title,
-    open,
-    sx,
-    dialogsx,
-    fullScreen,
-    mode,
-    url,
-    telegramProps,
-    linkedinProps,
-    twitterProps,
-  } = props;
-
-  const handleClose = () => {
-    onClose();
-  };
-
+const AutShare = (props: SimpleDialogProps) => {
+  const { onClose, title, description, url, twitterProps, hideCloseBtn } =
+    props;
   return (
-    <Dialog
-      onClose={handleClose}
-      fullScreen={fullScreen}
-      open={open}
-      sx={{ ...(dialogsx || {}) }}
+    <div
+      style={{
+        width: pxToRem(700),
+        minHeight: pxToRem(400),
+        display: "flex",
+        position: "relative",
+        flexDirection: "column",
+        borderWidth: "5px",
+        backgroundColor: "black",
+        borderColor: "#439EDD",
+        borderStyle: "solid",
+        padding: pxToRem(50),
+      }}
     >
-      <DialogContent
-        sx={{
-          width: pxToRem(600),
-          height: pxToRem(400),
-          display: "flex",
-          position: "relative",
-          flexDirection: "column",
-          borderWidth: "5px",
-          bgcolor: "black",
-        }}
-      >
+      {!hideCloseBtn && (
         <CloseIcon
-          onClick={handleClose}
+          onClick={onClose}
           sx={{
             position: "absolute",
             cursor: "pointer",
             top: 8,
             right: 8,
-            color: "white"
+            color: "white",
           }}
         />
+      )}
 
+      <div
+        style={{
+          display: "flex",
+        }}
+      >
         <div
           style={{
             display: "flex",
-            flexDirection: 'column'
+            flexDirection: "column",
+            textAlign: "left",
+            flex: 1,
+            width: "50%",
           }}
         >
-          <Typography
-            color="white"
-            textAlign="center"
-            component="span"
-            fontSize={pxToRem(30)}
-          >
+          <Typography color="white" component="span" fontSize={pxToRem(40)}>
             Share
           </Typography>
 
@@ -92,12 +68,22 @@ function AutShare(props: SimpleDialogProps) {
             sx={{
               mt: "20px",
             }}
-            variant="h2"
-            color={mode === "light" ? "primary.main" : "text.primary"}
-            textAlign="center"
+            color="white"
             component="span"
+            fontSize={pxToRem(25)}
           >
             {title}
+          </Typography>
+
+          <Typography
+            sx={{
+              mt: "20px",
+            }}
+            color="white"
+            component="span"
+            fontSize={pxToRem(18)}
+          >
+            {description}
           </Typography>
 
           <div
@@ -109,68 +95,57 @@ function AutShare(props: SimpleDialogProps) {
               margin: "10px auto 0 auto",
             }}
           >
-            {/* <LinkedinShareButton
-            url={url}
-            className="social-button"
-            {...linkedinProps}
-          >
-            <LinkedInIcon
-              sx={{
-                width: "85px",
-                height: "85px",
-                color: mode === "light" ? "primary.main" : "text.primary",
-              }}
-            />
-          </LinkedinShareButton> */}
-            {/* <TelegramShareButton
-            url={url}
-            className="social-button"
-            {...telegramProps}
-          >
-            <TelegramIcon
-              sx={{
-                width: "85px",
-                height: "85px",
-                color: mode === "light" ? "primary.main" : "text.primary",
-              }}
-            />
-          </TelegramShareButton> */}
             <TwitterShareButton
               url={url}
               className="social-button"
               {...twitterProps}
             >
-              <TwitterIcon
+              <AutButton
                 sx={{
-                  width: "85px",
-                  height: "85px",
-                  color: mode === "light" ? "primary.main" : "text.primary",
+                  width: pxToRem(250),
+                  height: pxToRem(50),
+                  mt: pxToRem(20),
+                  "&.MuiButton-root": {
+                    borderRadius: 0,
+                    borderWidth: "2px",
+                  },
                 }}
-              />
+                type="submit"
+                color="primary"
+                variant="outlined"
+              >
+                Share now
+              </AutButton>
             </TwitterShareButton>
           </div>
         </div>
 
-        {/* <div
-          className="copy-link"
+        <div
           style={{
-            width: "310px",
-            margin: "20px auto 0 auto",
+            flex: 1,
+            width: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <Typography
-            sx={{
-              marginTop: "20px",
-              marginBottom: "8px",
-            }}
-            variant="h3"
-            color={mode === "light" ? "primary.main" : "text.primary"}
-            component="span"
-          >
-            Copy link
-          </Typography>
-          <ClipboardToCopy mode={mode} url={url} />
-        </div> */}
+          {props.rightSide}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export function AutShareDialog(props: SimpleDialogProps) {
+  return (
+    <Dialog onClose={props.onClose} open={props.open}>
+      <DialogContent
+        sx={{
+          border: 0,
+          padding: 0,
+        }}
+      >
+        <AutShare {...props} />
       </DialogContent>
     </Dialog>
   );

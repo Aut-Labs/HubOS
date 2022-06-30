@@ -49,13 +49,12 @@ const IntegrationCards = [
 const Integrations = () => {
   const dispatch = useAppDispatch();
   const theme = useTheme();
-  const { userInfo } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     dispatch(
       setTitle(`Intergrations & Contracts - The Operating System for your DAO`)
     );
-  }, [dispatch, userInfo]);
+  }, [dispatch]);
 
   return (
     <Container

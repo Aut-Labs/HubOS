@@ -7,6 +7,7 @@ import CreatePollOptionsStep from "./CreatePollOptionsStep/CreatePollOptionsStep
 import CreatePollInfoStep from "./CreatePollInfoStep/CreatePollInfoStep";
 import CreatePollParticipantsStep from "./CreatePollParticipantsStep/CreatePollParticipantsStep";
 import SuccessStep from "./SuccessStep/SuccessStep";
+import { setTitle } from "@store/ui-reducer";
 
 const Polls = () => {
   const dispatch = useDispatch();
@@ -14,6 +15,12 @@ const Polls = () => {
     return () => {
       dispatch(resetCreatePollState());
     };
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(
+      setTitle(`Polls - Sublime Here`)
+    );
   }, [dispatch]);
 
   return (
