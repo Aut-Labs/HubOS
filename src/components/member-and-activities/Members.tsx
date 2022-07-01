@@ -2,8 +2,10 @@ import Typography from "@mui/material/Typography";
 import { List, ListItem, Avatar, useTheme } from "@mui/material";
 import { pxToRem } from "@utils/text-size";
 import { AutList } from "@api/api.model";
+import { Link } from "react-router-dom";
+import { AutID } from "@api/aut.model";
 
-const Members = ({ members }: { members:  AutList[] }) => {
+const Members = ({ members }: { members:  AutID[] }) => {
   const theme = useTheme();
   return (
     <List
@@ -17,9 +19,11 @@ const Members = ({ members }: { members:  AutList[] }) => {
         gridAutoRows: `minmax(${pxToRem(200)}, auto)`,
       }}
     >
-      {members.map(({ image, name, role }, subIndex) => {
+      {members.map(({ image, name, properties }, subIndex) => {
         return (
           <ListItem
+            component={Link}
+            to={`members/${properties.address}`}
             sx={{
               border: "2px solid",
               borderColor: "transparent",
@@ -49,7 +53,7 @@ const Members = ({ members }: { members:  AutList[] }) => {
                 width: `calc(${pxToRem(150)} - 4px)`,
                 height: pxToRem(150),
               }}
-              src={image}
+              src={image as string}
               variant="square"
             />
             <Typography

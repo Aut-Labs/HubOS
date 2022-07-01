@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unstable-nested-components */
-import PartnerButton from '@components/Button';
+import { AutButton } from '@components/buttons';
 import { Box, CircularProgress, ListItem, Typography } from '@mui/material';
 import { FilteredTasks, TasksRefreshStatus, TasksStatus } from '@store/Activity/tasks.reducer';
 import { GroupTask, Task, TaskStatus, TaskTypes } from '@store/model';
@@ -19,7 +19,7 @@ const TasksList = (props) => {
     switch (props.status) {
       case TaskTypes.Open:
         return (
-          <PartnerButton
+          <AutButton
             mode="light"
             btnStyles={{
               width: pxToRem(260),
@@ -37,7 +37,7 @@ const TasksList = (props) => {
       case TaskTypes.Ongoing:
         if (task.status === TaskStatus.Submitted) {
           return (
-            <PartnerButton
+            <AutButton
               mode="light"
               btnStyles={{
                 width: pxToRem(260),
@@ -54,7 +54,7 @@ const TasksList = (props) => {
           );
         }
         return (
-          <PartnerButton
+          <AutButton
             mode="light"
             btnStyles={{
               width: pxToRem(260),
@@ -110,7 +110,7 @@ const TasksList = (props) => {
           );
         }
         return (
-          <PartnerButton
+          <AutButton
             mode="light"
             btnStyles={{
               width: pxToRem(260),

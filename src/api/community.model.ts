@@ -1,4 +1,4 @@
-import { MarketTemplates } from "src/pages/Integrate/misc";
+import { MarketTemplates } from "@utils/misc";
 import { BaseNFTModel, Role, RoleSet } from "./api.model";
 
 export class CommunityProperties {

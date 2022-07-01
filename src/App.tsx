@@ -23,7 +23,6 @@ import GetStarted from "./pages/GetStarted/GetStarted";
 import { pxToRem } from "@utils/text-size";
 import "./App.scss";
 import { communityUpdateState } from "@store/Community/community.reducer";
-import Community from "./pages/Community/Community";
 import { AutID } from "@api/aut.model";
 
 const LoadingMessage = () => (
@@ -52,7 +51,7 @@ function App() {
         dispatch(
           openSnackbar({
             message:
-              "Please install MetaMask and refresh the page to use the full array of Partner features.",
+              "Please install MetaMask and refresh the page to use the full array of Aut Dashboard features.",
             severity: "error",
             duration: 30000,
           })
@@ -93,7 +92,6 @@ function App() {
 
     window.addEventListener("aut-Init", onSWInit);
     window.addEventListener("aut-onConnected", onSWLogin);
-
     window.addEventListener("aut-onDisconnected", onDisconnected);
 
     Init({
@@ -103,6 +101,7 @@ function App() {
     return () => {
       window.removeEventListener("aut-Init", onSWInit);
       window.removeEventListener("aut-onConnected", onSWLogin);
+      window.removeEventListener("aut-onDisconnected", onDisconnected);
     };
   }, [dispatch, history, location.pathname, location.state?.from]);
 

@@ -1,21 +1,18 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect } from "react";
 import {
   Box,
   CircularProgress,
   Container,
-  Divider,
-  Typography,
 } from "@mui/material";
 import { Community } from "@api/community.model";
 import { useSelector } from "react-redux";
-import PartnerButton from "@components/Button";
 import { pxToRem } from "@utils/text-size";
 import {
   allRoles,
   communityUpdateState,
 } from "@store/Community/community.reducer";
 import { RootState, useAppDispatch } from "@store/store.model";
-import { updatePartnersCommunity } from "@api/community.api";
+import { updateCommunity } from "@api/community.api";
 import { ResultState } from "@store/result-status";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import ErrorDialog from "@components/ErrorPopup";
@@ -63,7 +60,7 @@ const Roles = () => {
   const onSubmit = async (data: typeof values) => {
     community.properties.rolesSets[0].roles = data.roles;
     await dispatch(
-      updatePartnersCommunity(
+      updateCommunity(
         new Community({
           ...community,
           properties: {

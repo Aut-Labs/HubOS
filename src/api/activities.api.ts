@@ -1,7 +1,6 @@
 import { ethers } from "ethers";
 import {
   PollsContractEventType,
-  Web3CommunityCallProvider,
   Web3CommunityExtensionProvider,
   Web3PollsProvider
 } from "@skill-wallet/sw-abi-types";
@@ -12,7 +11,6 @@ import { sendDiscordNotification } from "@store/ui-reducer";
 import { format } from "date-fns";
 import { ActivityTypes } from "./api.model";
 import { ipfsCIDToHttpUrl, storeAsBlob, storeMetadata } from "./textile.api";
-import { getAutAddress } from "./aut.api";
 import { deployPolls } from "./ProviderFactory/deploy-activities";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
 import { Community } from "./community.model";
@@ -25,10 +23,6 @@ import { environment } from "./environment";
 
 const activitiesThunkProvider = Web3ThunkProviderFactory("Activities", {
   provider: null,
-});
-
-const communityCallThunkProvider = Web3ThunkProviderFactory("CommunityCall", {
-  provider: Web3CommunityCallProvider,
 });
 
 const pollsThunkProvider = Web3ThunkProviderFactory("Poll", {
@@ -68,7 +62,7 @@ const contractAddress = async (
 
 export const addActivityTask = activitiesThunkProvider(
   {
-    type: "partner/activities/task/add",
+    type: "aut-dashboard/activities/task/add",
     // event: ActivitiesContractEventType.ActivityCreated,
   },
   contractAddress,
@@ -131,7 +125,7 @@ export const addActivityTask = activitiesThunkProvider(
 
 export const takeActivityTask = activitiesThunkProvider(
   {
-    type: "partner/activities/task/take",
+    type: "aut-dashboard/activities/task/take",
     // event: ActivitiesContractEventType.TaskTaken,
   },
   contractAddress,
@@ -147,7 +141,7 @@ export const takeActivityTask = activitiesThunkProvider(
 
 export const finalizeActivityTask = activitiesThunkProvider(
   {
-    type: "partner/activities/task/finalize",
+    type: "aut-dashboard/activities/task/finalize",
     // event: ActivitiesContractEventType.TaskFinalized,
   },
   contractAddress,
@@ -163,7 +157,7 @@ export const finalizeActivityTask = activitiesThunkProvider(
 
 export const submitActivityTask = activitiesThunkProvider(
   {
-    type: "partner/activities/task/submit",
+    type: "aut-dashboard/activities/task/submit",
     // event: ActivitiesContractEventType.TaskSubmitted,
   },
   contractAddress,
@@ -184,7 +178,7 @@ export const submitActivityTask = activitiesThunkProvider(
 
 export const addGroupCall = activitiesThunkProvider(
   {
-    type: "partner/activities/group-call/add",
+    type: "aut-dashboard/activities/group-call/add",
     // event: ActivitiesContractEventType.ActivityCreated,
   },
   contractAddress,
@@ -259,7 +253,7 @@ export const publishPoll = (poll) => {
 
 export const addPoll = pollsThunkProvider(
   {
-    type: "partner/activities/poll/add",
+    type: "aut-dashboard/activities/poll/add",
     event: PollsContractEventType.PollCreated,
   },
   contractAddress,
@@ -331,7 +325,7 @@ export const addPoll = pollsThunkProvider(
 
 export const getAllTasks = activitiesThunkProvider(
   {
-    type: "partner/activities/tasks/getall",
+    type: "aut-dashboard/activities/tasks/getall",
   },
   (thunkAPI: GetThunkAPI<AsyncThunkConfig>) => contractAddress(thunkAPI, true),
   async (contract, type: ActivityTypes) => {
@@ -363,7 +357,7 @@ export const getAllTasks = activitiesThunkProvider(
 
 export const getTaskById = activitiesThunkProvider(
   {
-    type: "partner/activities/tasks/get",
+    type: "aut-dashboard/activities/tasks/get",
   },
   contractAddress,
   async (contract, activityID: string, { getState }) => {
@@ -432,12 +426,11 @@ export const getTaskById = activitiesThunkProvider(
     };
 
     if (taskDetails.task.status > 0) {
-      const swAddress = await getAutAddress();
-      const swContract = null;
-      const takerTokenId = await swContract.getSkillWalletIdByOwner(
+      const autContract = null;
+      const takerTokenId = await autContract.getAutIdByOwner(
         taskDetails.task.taker
       );
-      const jsonUriCID = await swContract.tokenURI(takerTokenId);
+      const jsonUriCID = await autContract.tokenURI(takerTokenId);
       const response = await axios.get(ipfsCIDToHttpUrl(jsonUriCID, true));
       taskDetails.taker = {
         tokenId: takerTokenId.toString(),

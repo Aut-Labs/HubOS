@@ -7,11 +7,12 @@ import { getPAUrl } from "@api/community.api";
 import { Avatar, Container } from "@mui/material";
 import { pxToRem } from "@utils/text-size";
 import { setTitle } from "@store/ui-reducer";
+import { PaUrl } from "@store/AutDashboard/aut-dashboard.reducer";
 
-const AutCommunityShare = (props) => {
+const AutCommunityShare = () => {
   const dispatch = useAppDispatch();
   const community = useSelector(CommunityData);
-  const { paUrl } = useSelector((state: RootState) => state.partner);
+  const paUrl = useSelector(PaUrl);
 
   useEffect(() => {
     const promise = dispatch(getPAUrl(null));

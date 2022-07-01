@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { Typography, Slider, SliderProps } from '@mui/material';
 import { pxToRem } from '@utils/text-size';
 import { FieldErrors } from 'react-hook-form';
-import { CommitmentMessages } from 'src/pages/Integrate/misc';
+import { CommitmentMessages } from '@utils/misc';
 import { FormHelperText } from './Fields';
 
 /* eslint-disable max-len */

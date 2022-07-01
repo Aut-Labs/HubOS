@@ -5,7 +5,6 @@ import { RootState, useAppDispatch } from "@store/store.model";
 import { useSelector } from "react-redux";
 import { ResultState } from "@store/result-status";
 import LoadingDialog from "@components/LoadingPopup";
-import { environment } from "@api/environment";
 import { pxToRem } from "@utils/text-size";
 import { AutTextField } from "@components/Fields";
 import { AutButton } from "@components/buttons";
@@ -16,8 +15,8 @@ const DiscordIntegration = () => {
   const dispatch = useAppDispatch();
   const [discordUrl, setDiscordUrl] = useState("");
   const input = useRef<any>();
-  const { status, paCommunity } = useSelector(
-    (state: RootState) => state.partner
+  const { status } = useSelector(
+    (state: RootState) => state.dashboard
   );
 
   const submit = async () => {
@@ -39,7 +38,7 @@ const DiscordIntegration = () => {
     // if (paCommunity.discordWebhookUrl && input.current) {
     //   // input.current.value = paCommunity.discordWebhookUrl;
     // }
-  }, [input, paCommunity]);
+  }, [input]);
 
   return (
     <Container
@@ -62,7 +61,7 @@ const DiscordIntegration = () => {
             Create Tasks and let your community contribute - directly on
             Discord!
             <br />
-            SkillWallet’s Discord Bot is a bridge between Web2 and Web3
+            Aut’s Discord Bot is a bridge between Web2 and Web3
             <br />- to track like a wizard, and react like a witch.
           </>
         }

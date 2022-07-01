@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { CurrentStep } from '@store/model';
 import { ResultState } from '@store/result-status';
 
-export interface ActivityTaskState {
+export interface TaskState {
   currentStep: CurrentStep;
   status: ResultState;
   taskInfo: {
@@ -16,7 +16,7 @@ export interface ActivityTaskState {
   };
 }
 
-const initialState: ActivityTaskState = {
+const initialState: TaskState = {
   status: ResultState.Idle,
   currentStep: {} as CurrentStep,
   taskInfo: {
@@ -29,8 +29,8 @@ const initialState: ActivityTaskState = {
   },
 };
 
-export const activityTaskSlice = createSlice({
-  name: 'activityTask',
+export const taskSlice = createSlice({
+  name: 'task',
   initialState,
   reducers: {
     activitySetCurrentStep(state, action) {
@@ -61,10 +61,10 @@ export const activityTaskSlice = createSlice({
   },
 });
 
-export const { activityUpdateTaskStatus, resetActivityTaskState, activityUpdateTask, activitySetCurrentStep } = activityTaskSlice.actions;
+export const { activityUpdateTaskStatus, resetActivityTaskState, activityUpdateTask, activitySetCurrentStep } = taskSlice.actions;
 
-export const ActivityCurrentStep = (state: any) => state.activityTask.currentStep as CurrentStep;
-export const ActivityStatus = (state: any) => state.activityTask.status as ResultState;
-export const ActivityCurrentTask = (state: any) => state.activityTask.taskInfo as typeof initialState.taskInfo;
+export const ActivityCurrentStep = (state: any) => state.task.currentStep as CurrentStep;
+export const ActivityStatus = (state: any) => state.task.status as ResultState;
+export const ActivityCurrentTask = (state: any) => state.task.taskInfo as typeof initialState.taskInfo;
 
-export default activityTaskSlice.reducer;
+export default taskSlice.reducer;

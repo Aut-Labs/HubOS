@@ -11,7 +11,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import {
   CreatePollData,
   pollUpdateData,
-} from "@store/Activity/create-poll.reducer";
+} from "@store/Activity/poll.reducer";
 import { useSelector } from "react-redux";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";

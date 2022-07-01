@@ -26,7 +26,7 @@ import {
   ActivityGroupCallStatus,
   activityUpdateGroupCallData,
   activityUpdateGroupCallStatus,
-} from "@store/Activity/group-call.reducer";
+} from "@store/Activity/call.reducer";
 import { format } from "date-fns";
 import { allRoles } from "@store/Community/community.reducer";
 import { addGroupCall } from "@api/activities.api";

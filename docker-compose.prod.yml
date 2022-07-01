@@ -2,8 +2,8 @@ version: '3.7'
 
 services:
 
-  partners-app:
-    container_name: partners-app
+  aut-dashboard:
+    container_name: aut-dashboard
     build:
       context: .
       dockerfile: Dockerfile

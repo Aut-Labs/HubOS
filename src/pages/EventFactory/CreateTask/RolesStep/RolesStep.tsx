@@ -5,10 +5,10 @@ import { TextField, Typography } from '@mui/material';
 import { ReactComponent as TagIcon } from '@assets/tag.svg';
 import { allRoles } from '@store/Community/community.reducer';
 import { useForm, Controller } from 'react-hook-form';
-import { ActivityCurrentStep, ActivityCurrentTask, activitySetCurrentStep, activityUpdateTask } from '@store/Activity/create-task.reducer';
+import { ActivityCurrentStep, ActivityCurrentTask, activitySetCurrentStep, activityUpdateTask } from '@store/Activity/task.reducer';
 import { pxToRem } from '@utils/text-size';
-import PartnerButton from '@components/Button';
 import './RolesStep.scss';
+import { AutButton } from '@components/buttons';
 
 const RolesStep = () => {
   const dispatch = useDispatch();
@@ -74,7 +74,7 @@ const RolesStep = () => {
                   control={control}
                   render={({ field: { name, value, onChange } }) => {
                     return (
-                      <PartnerButton
+                      <AutButton
                         mode="light"
                         name={name}
                         type="button"
@@ -96,7 +96,7 @@ const RolesStep = () => {
                         }}
                       >
                         <Typography variant="body2">{roleName}</Typography>
-                      </PartnerButton>
+                      </AutButton>
                     );
                   }}
                 />
@@ -164,7 +164,7 @@ const RolesStep = () => {
                 control={control}
                 render={({ field: { name, value, onChange } }) => {
                   return (
-                    <PartnerButton
+                    <AutButton
                       name={name}
                       mode="light"
                       type="button"
@@ -180,7 +180,7 @@ const RolesStep = () => {
                       className={value ? 'active-link' : ''}
                     >
                       <Typography variant="body2">All</Typography>
-                    </PartnerButton>
+                    </AutButton>
                   );
                 }}
               />
@@ -189,7 +189,7 @@ const RolesStep = () => {
         </div>
 
         <div className="bottom-action" style={{ marginTop: '80px' }}>
-          <PartnerButton
+          <AutButton
             type="submit"
             btnStyles={{
               width: pxToRem(630),

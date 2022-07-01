@@ -2,7 +2,7 @@ import { addPoll } from '@api/activities.api';
 import { createSlice } from '@reduxjs/toolkit';
 import { ResultState } from '@store/result-status';
 
-export interface CreatePollState {
+export interface PollState {
   status: ResultState;
   errorMessage: string;
   pollData: {
@@ -15,7 +15,7 @@ export interface CreatePollState {
   };
 }
 
-const initialState: CreatePollState = {
+const initialState: PollState = {
   status: ResultState.Idle,
   errorMessage: '',
   pollData: {
@@ -37,8 +37,8 @@ const initialState: CreatePollState = {
   },
 };
 
-export const createPollSlice = createSlice({
-  name: 'createPoll',
+export const pollSlice = createSlice({
+  name: 'poll',
   initialState,
   reducers: {
     pollUpdateData(state, action) {
@@ -47,10 +47,10 @@ export const createPollSlice = createSlice({
         ...action.payload,
       };
     },
-    createPollUpdateStatus(state, action) {
+    pollUpdateStatus(state, action) {
       state.status = action.payload;
     },
-    resetCreatePollState: () => initialState,
+    resetPollState: () => initialState,
   },
   extraReducers: (builder) => {
     builder
@@ -67,10 +67,10 @@ export const createPollSlice = createSlice({
   },
 });
 
-export const { pollUpdateData, createPollUpdateStatus, resetCreatePollState } = createPollSlice.actions;
+export const { pollUpdateData, pollUpdateStatus, resetPollState } = pollSlice.actions;
 
-export const CreatePollStatus = (state: any) => state.createPoll.status as ResultState;
-export const CreatePollError = (state: any) => state.createPoll.errorMessage as string;
-export const CreatePollData = (state: any) => state.createPoll.pollData as typeof initialState.pollData;
+export const CreatePollStatus = (state: any) => state.poll.status as ResultState;
+export const CreatePollError = (state: any) => state.poll.errorMessage as string;
+export const CreatePollData = (state: any) => state.poll.pollData as typeof initialState.pollData;
 
-export default createPollSlice.reducer;
+export default pollSlice.reducer;

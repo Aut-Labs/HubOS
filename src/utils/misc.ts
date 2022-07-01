@@ -1,22 +1,3 @@
-export const ContractTypes = [
-  {
-    label: 'Moloch DAO V1',
-    value: 2,
-  },
-  {
-    label: 'Moloch DAO V2',
-    value: 3,
-  },
-  {
-    label: 'Moloch DAO V3',
-    value: 4,
-  },
-  {
-    label: 'SkillWallet (Legacy)',
-    value: 1,
-  },
-];
-
 export const MarketTemplates = [
   {
     title: 'Open-Source & DeFi',

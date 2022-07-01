@@ -4,13 +4,12 @@ import {
   Web3CommunityExtensionProvider,
 } from "@skill-wallet/sw-abi-types";
 import axios from "axios";
-import { AutList } from "./api.model";
 import { Community, findRoleName } from "./community.model";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
-import { getCoreTeamMemberNames } from "./aut.api";
 import { ipfsCIDToHttpUrl, storeAsBlob } from "./textile.api";
 import { environment } from "./environment";
 import { AutID } from "./aut.model";
+import { CommitmentMessages } from "@utils/misc";
 
 const communityExtensionThunkProvider = Web3ThunkProviderFactory(
   "CommunityExtension",
@@ -39,7 +38,7 @@ export const fetchCommunity = communityExtensionThunkProvider(
 
 export const getWhitelistedAddresses = communityExtensionThunkProvider(
   {
-    type: "partner/addresses/get",
+    type: "aut-dashboard/addresses/get",
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
@@ -49,19 +48,19 @@ export const getWhitelistedAddresses = communityExtensionThunkProvider(
   async (contract, _, { getState }) => {
     const { auth } = getState();
     const memberAddresses = await contract.getAllMembers();
-    const names = await getCoreTeamMemberNames(auth.userInfo.community);
-    return memberAddresses.map((a) => ({
-      address: a,
-      name:
-        names.coreTeamMembers.find((c) => c.memberAddress === a)?.memberName ||
-        "N/A",
-    }));
+    // const names = await getCoreTeamMemberNames(auth.userInfo.community);
+    // return memberAddresses.map((a) => ({
+    //   address: a,
+    //   name:
+    //     names.coreTeamMembers.find((c) => c.memberAddress === a)?.memberName ||
+    //     "N/A",
+    // }));
   }
 );
 
 export const addNewWhitelistedAddresses = communityExtensionThunkProvider(
   {
-    type: "partner/addresses/add",
+    type: "aut-dashboard/addresses/add",
     // event: AutIDCommunityContractEventType.CoreTeamMemberAdded,
   },
   (thunkAPI) => {
@@ -85,7 +84,7 @@ export const addNewWhitelistedAddresses = communityExtensionThunkProvider(
 
 export const whitelistAddress = communityExtensionThunkProvider(
   {
-    type: "partner/addresses/add",
+    type: "aut-dashboard/addresses/add",
     // event: CommunityExtensionContractEventType.MemberAdded,
   },
   (thunkAPI) => {
@@ -100,7 +99,7 @@ export const whitelistAddress = communityExtensionThunkProvider(
   }
 );
 
-export const updatePartnersCommunity = communityExtensionThunkProvider(
+export const updateCommunity = communityExtensionThunkProvider(
   {
     type: "community/update",
   },
@@ -128,7 +127,7 @@ export const fetchMembers = communityExtensionThunkProvider(
   },
   async (contract, _, thunkAPI) => {
     const state = thunkAPI.getState();
-    const AutIDsResponse: { [role: string]: AutList[] } = {};
+    const AutIDsResponse: { [role: string]: AutID[] } = {};
 
     let community: Community = state.community.community;
 
@@ -144,12 +143,15 @@ export const fetchMembers = communityExtensionThunkProvider(
     }
 
     const memberIds = await contract.getAllMembers();
-    const swContract = await Web3AutIDProvider(environment.autIDAddress);
+    const autContract = await Web3AutIDProvider(environment.autIDAddress);
+
     for (let i = 0; i < memberIds.length; i += 1) {
       const memberAddress = memberIds[i];
-      const tokenId = await swContract.getAutIDByOwner(memberAddress);
-      const metadataCID = await swContract.tokenURI(Number(tokenId.toString()));
-      const [, role, commitment] = await swContract.getCommunityData(
+      const tokenId = await autContract.getAutIDByOwner(memberAddress);
+      const metadataCID = await autContract.tokenURI(
+        Number(tokenId.toString())
+      );
+      const [, role, commitment] = await autContract.getCommunityData(
         memberAddress,
         community.properties.address
       );
@@ -160,13 +162,23 @@ export const fetchMembers = communityExtensionThunkProvider(
         community.properties.rolesSets
       );
 
-      AutIDsResponse[roleName].push({
-        role: roleName,
-        tokenId: tokenId.toString(),
-        image: ipfsCIDToHttpUrl(jsonMetadata.properties.avatar, false),
-        name: jsonMetadata.name,
-        commitment: commitment.toString(),
+      const isWhitelisted = await contract.isCoreTeam(memberAddress);
+      const member = new AutID({
+        ...jsonMetadata,
+        properties: {
+          ...jsonMetadata.properties,
+          address: memberAddress,
+          role: role.toString(),
+          roleName,
+          tokenId: tokenId.toString(),
+          commitmentDescription: CommitmentMessages(commitment),
+          commitment: commitment.toString(),
+          isWhitelisted,
+        },
       });
+     
+
+      AutIDsResponse[roleName].push(member);
     }
 
     return AutIDsResponse;
@@ -190,7 +202,7 @@ export const getPAUrl = communityExtensionThunkProvider(
 
 export const getPAContracts = communityExtensionThunkProvider(
   {
-    type: "partner/contracts/get",
+    type: "aut-dashboard/contracts/get",
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
@@ -205,8 +217,8 @@ export const getPAContracts = communityExtensionThunkProvider(
 
 export const addPAContracts = communityExtensionThunkProvider(
   {
-    type: "partner/contracts/add",
-    // event: PartnersAgreementContractEventType.PartnersContractAdded,
+    type: "aut-dashboard/contracts/add",
+    // event: CommunityExtensionContractEventType.ActivitiesAddressAdded,
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();

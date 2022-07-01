@@ -1,25 +1,10 @@
 import { ResultState } from '@store/result-status';
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { LockDatatableItems } from '@components/datatable/DatatableHelpers';
-import { openSnackbar } from '@store/ui-reducer';
 import { createSelector } from 'reselect';
-import { getPartnersAgreementByCommunity } from '@api/dito.api';
-import { ErrorParser } from '@utils/error-parser';
 import { getWhitelistedAddresses, addNewWhitelistedAddresses, addPAUrl, getPAUrl, addPAContracts, getPAContracts, addDiscordToCommunity } from '@api/community.api';
-export const fetchPartnersAgreementByCommunity = createAsyncThunk('partner/agreement/community', async (address: string, { dispatch }) => {
-  try {
-    return await getPartnersAgreementByCommunity(address);
-  } catch (error) {
-    const message = ErrorParser(error);
-    dispatch(openSnackbar({ message, severity: 'error' }));
-    throw new Error(message);
-  }
-});
-
-// export const addDiscordWebhook = createAsyncThunk('partner/discord/addurl', async (payload: any, { dispatch }) => {
+// export const addDiscordWebhook = createAsyncThunk('aut-dashboard/discord/addurl', async (payload: any, { dispatch }) => {
 //   try {
-//     const { partnerKey, discordWebhook } = payload;
-//     const url = await addDiscordUrl(partnerKey, discordWebhook);
 //     dispatch(openSnackbar({ message: 'Discord webhook was updated successfully', severity: 'success' }));
 //     return url;
 //   } catch (error) {
@@ -29,39 +14,27 @@ export const fetchPartnersAgreementByCommunity = createAsyncThunk('partner/agree
 //   }
 // });
 
-export interface PartnerState {
-  partner: any;
-  paCommunity: any;
+export interface AutDashboardState {
   whitelistedAddresses: any[];
   contracts: any[];
   status: ResultState;
   paUrl: string;
-  selectedDashboardBtn: string;
   errorMessage: string;
 }
 
 const initialState = {
-  partner: null,
-  paCommunity: null,
   contracts: [],
   whitelistedAddresses: [],
   paUrl: null,
-  selectedDashboardBtn: null,
   status: ResultState.Idle,
   errorMessage: '',
 };
 
-export const partnerSlice = createSlice({
-  name: 'partner',
+export const dashboardSlice = createSlice({
+  name: 'dashboard',
   initialState,
   reducers: {
-    resetPartnerState: () => initialState,
-    setDashboardBtn(state, action) {
-      state.selectedDashboardBtn = action.payload;
-    },
-    setPartnersAgreementCommunity(state, action) {
-      state.paCommunity = action.payload;
-    },
+    resetAutDashboardState: () => initialState,
   },
   extraReducers: (builder) => {
     builder
@@ -69,26 +42,6 @@ export const partnerSlice = createSlice({
         state.status = ResultState.Updating;
       })
       .addCase(addDiscordToCommunity.fulfilled, (state, action) => {
-        state.paCommunity = {
-          ...(state.paCommunity || {}),
-          discordWebhookUrl: action.payload,
-        };
-
-        try {
-          const authState = JSON.parse(sessionStorage.getItem('Aut'));
-          sessionStorage.setItem(
-            'Aut',
-            JSON.stringify({
-              ...authState,
-              partnersAgreementKey: {
-                ...(authState.partnersAgreementKey || {}),
-                discordWebhookUrl: action.payload,
-              },
-            })
-          );
-        } catch (error) {
-          console.log(error);
-        }
         state.status = ResultState.Idle;
       })
       .addCase(addDiscordToCommunity.rejected, (state) => {
@@ -98,7 +51,7 @@ export const partnerSlice = createSlice({
         state.status = ResultState.Loading;
       })
       .addCase(getWhitelistedAddresses.fulfilled, (state, action) => {
-        state.whitelistedAddresses = action.payload;
+        // state.whitelistedAddresses = action.payload;
         state.status = ResultState.Idle;
       })
       .addCase(getWhitelistedAddresses.rejected, (state, action) => {
@@ -143,18 +96,6 @@ export const partnerSlice = createSlice({
         state.errorMessage = action.payload as string;
       })
 
-      .addCase(fetchPartnersAgreementByCommunity.pending, (state) => {
-        state.status = ResultState.Updating;
-      })
-      .addCase(fetchPartnersAgreementByCommunity.fulfilled, (state, action) => {
-        state.paCommunity = action.payload;
-        state.status = ResultState.Idle;
-      })
-      .addCase(fetchPartnersAgreementByCommunity.rejected, (state, action) => {
-        state.status = ResultState.Failed;
-        state.errorMessage = action.payload as string;
-      })
-
       .addCase(addNewWhitelistedAddresses.pending, (state) => {
         state.status = ResultState.Updating;
       })
@@ -179,12 +120,12 @@ export const partnerSlice = createSlice({
   },
 });
 
-export const { setDashboardBtn, setPartnersAgreementCommunity } = partnerSlice.actions;
+const addresses = (state) => state.dashboard.whitelistedAddresses;
+const contracts = (state) => state.dashboard.contracts;
 
-const addresses = (state) => state.partner.whitelistedAddresses;
-const contracts = (state) => state.partner.contracts;
+export const PaUrl = (state) => state.dashboard.paUrl as string;
 
-export const DiscordWebHookUrl = (state) => state.partner?.paCommunity?.discordWebhookUrl;
+export const DiscordWebHookUrl = (state) => state.dashboard?.paCommunity?.discordWebhookUrl;
 
 export const getLockedContracts = createSelector(contracts, (x1) => {
   let lockedData = LockDatatableItems(
@@ -219,4 +160,4 @@ export const getLockedWhitelistedAddresses = createSelector(addresses, (x1) => {
   return lockedData;
 });
 
-export default partnerSlice.reducer;
+export default dashboardSlice.reducer;

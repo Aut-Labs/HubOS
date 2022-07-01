@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { ReactComponent as CoreTeam } from '@assets/core-team.svg';
 import { ReactComponent as Community } from '@assets/community.svg';
-import { ActivityCurrentStep, ActivityCurrentTask, activitySetCurrentStep, activityUpdateTask } from '@store/Activity/create-task.reducer';
+import { ActivityCurrentStep, ActivityCurrentTask, activitySetCurrentStep, activityUpdateTask } from '@store/Activity/task.reducer';
 import { Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { pxToRem } from '@utils/text-size';
-import PartnerButton from '@components/Button';
 import './CategoryStep.scss';
+import { AutButton } from '@components/buttons';
 
 const CategoryStep = () => {
   const history = useHistory();
@@ -80,7 +80,7 @@ const CategoryStep = () => {
             control={control}
             render={({ field: { name, value, onChange } }) => {
               return (
-                <PartnerButton
+                <AutButton
                   name={name}
                   mode="light"
                   onClick={() => onChange(true)}
@@ -102,7 +102,7 @@ const CategoryStep = () => {
             control={control}
             render={({ field: { name, value, onChange } }) => {
               return (
-                <PartnerButton
+                <AutButton
                   name={name}
                   mode="light"
                   onClick={() => onChange(false)}
@@ -122,7 +122,7 @@ const CategoryStep = () => {
         </div>
 
         <div className="bottom-action" style={{ marginTop: '80px' }}>
-          <PartnerButton
+          <AutButton
             type="submit"
             btnStyles={{
               width: pxToRem(630),

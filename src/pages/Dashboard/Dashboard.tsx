@@ -71,8 +71,6 @@ const Dashboard = () => {
   const userInfo = useSelector(UserInfo);
   const community = useSelector(CommunityData);
 
-  console.log(community, "community");
-
   useEffect(() => {
     dispatch(setTitle(`Good Morning, ${userInfo?.name}`));
   }, [dispatch, userInfo]);

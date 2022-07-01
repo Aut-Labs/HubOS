@@ -15,12 +15,12 @@ import {
   activitySetCurrentStep,
   activityUpdateTask,
   activityUpdateTaskStatus,
-} from '@store/Activity/create-task.reducer';
+} from '@store/Activity/task.reducer';
 import './DescriptionStep.scss';
 import { addActivityTask } from '@api/activities.api';
 import { countWords } from '@utils/helpers';
 import { pxToRem } from '@utils/text-size';
-import { DiscordWebHookUrl } from '@store/Partner/partner.reducer';
+import { DiscordWebHookUrl } from '@store/AutDashboard/aut-dashboard.reducer';
 
 const DescriptionStep = () => {
   const dispatch = useAppDispatch();

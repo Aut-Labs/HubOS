@@ -14,11 +14,11 @@ import { RootState, useAppDispatch } from '@store/store.model';
 import { ResultState } from '@store/result-status';
 import LoadingDialog from '@components/LoadingPopup';
 import { pxToRem } from '@utils/text-size';
-import PartnerButton from '@components/Button';
 import './Contracts.scss';
 import ErrorDialog from '@components/ErrorPopup';
-import { getLockedContracts } from '@store/Partner/partner.reducer';
 import { addPAContracts, getPAContracts } from '@api/community.api';
+import { getLockedContracts } from '@store/AutDashboard/aut-dashboard.reducer';
+import { AutButton } from '@components/buttons';
 
 const tableColumns = (getRef: () => MutableRefObject<GridEditRowApi & GridRowApi>): GridColumns => {
   const handleEditClick = (id) => (event) => {
@@ -128,7 +128,7 @@ const Contracts = () => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [open, setOpen] = useState(false);
   const lockedContracts = useSelector(getLockedContracts);
-  const { status, errorMessage } = useSelector((state: RootState) => state.partner);
+  const { status, errorMessage } = useSelector((state: RootState) => state.dashboard);
 
   const handleClose = () => {
     setOpen(false);
@@ -215,7 +215,7 @@ const Contracts = () => {
         }}
       />
       <div className="sw-table-actions">
-        <PartnerButton
+        <AutButton
           mode="light"
           disabled={isDisabled || status === ResultState.Loading}
           onClick={submit}
@@ -227,7 +227,7 @@ const Contracts = () => {
           }}
         >
           Save changes
-        </PartnerButton>
+        </AutButton>
       </div>
     </Container>
   );

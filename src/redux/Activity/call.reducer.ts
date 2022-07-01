@@ -30,8 +30,8 @@ const initialState: ActivityTaskState = {
   },
 };
 
-export const activityGroupCallSlice = createSlice({
-  name: 'groupCall',
+export const callSlice = createSlice({
+  name: 'call',
   initialState,
   reducers: {
     activityUpdateGroupCallData(state, action) {
@@ -60,10 +60,10 @@ export const activityGroupCallSlice = createSlice({
   },
 });
 
-export const { activityUpdateGroupCallStatus, resetActivityGroupCall, activityUpdateGroupCallData } = activityGroupCallSlice.actions;
+export const { activityUpdateGroupCallStatus, resetActivityGroupCall, activityUpdateGroupCallData } = callSlice.actions;
 
-export const ActivityGroupCallStatus = (state: any) => state.groupCall.status as ResultState;
-export const ActivityGroupCallError = (state: any) => state.groupCall.errorMessage as string;
-export const ActivityGroupCallData = (state: any) => state.groupCall.callData as typeof initialState.callData;
+export const ActivityGroupCallStatus = (state: any) => state.call.status as ResultState;
+export const ActivityGroupCallError = (state: any) => state.call.errorMessage as string;
+export const ActivityGroupCallData = (state: any) => state.call.callData as typeof initialState.callData;
 
-export default activityGroupCallSlice.reducer;
+export default callSlice.reducer;

@@ -5,11 +5,11 @@ import { getLogs } from "@api/aut.api";
 import {
   fetchCommunity,
   fetchMembers,
-  updatePartnersCommunity,
+  updateCommunity,
 } from "@api/community.api";
 import { createSelector } from "reselect";
 import { Community } from "@api/community.model";
-import { Role } from "@api/api.model";
+import { AutID } from "@api/aut.model";
 
 export const fetchLogs = createAsyncThunk(
   "community/logs",
@@ -25,7 +25,7 @@ export const fetchLogs = createAsyncThunk(
 export interface CommunityState {
   community: Community;
   communities: Community[];
-  members: any;
+  members: { [key: string]: AutID[] };
   activeRoleName: string;
   status: ResultState;
   logs: any[];
@@ -76,14 +76,14 @@ export const communitySlice = createSlice({
         state.members = {};
       })
       // update community
-      .addCase(updatePartnersCommunity.pending, (state) => {
+      .addCase(updateCommunity.pending, (state) => {
         state.status = ResultState.Updating;
       })
-      .addCase(updatePartnersCommunity.fulfilled, (state, action) => {
+      .addCase(updateCommunity.fulfilled, (state, action) => {
         state.community = action.payload;
         state.status = ResultState.Idle;
       })
-      .addCase(updatePartnersCommunity.rejected, (state) => {
+      .addCase(updateCommunity.rejected, (state) => {
         state.status = ResultState.Failed;
       })
       // update community logs
@@ -103,21 +103,29 @@ export const communitySlice = createSlice({
 
 export const { communityUpdateState } = communitySlice.actions;
 
-const generateSkills = (skills: any[] = []) =>
-  [0, 1, 2, 3].map((_, i) => {
-    const skill = skills[i];
-    if (skill && "name" in skill) {
-      return skill;
-    }
-    return {
-      name: "",
-    };
-  });
-
+export const CommunityStatus = (state) => state.community.status as ResultState;
 export const CommunityData = (state) => state.community.community as Community;
+export const CommunityMembers = (state) =>
+  state.community.members as { [key: string]: AutID[] };
 
 export const allRoles = createSelector(CommunityData, (c) => {
   return c.properties?.rolesSets[0]?.roles || [];
 });
+
+export const SelectedMember = (memberAddress: string) =>
+  createSelector(CommunityMembers, (c) => {
+    const membersKey = Object.keys(c).find((key) =>
+      c[key].some(
+        (member: AutID) => member.properties.address === memberAddress
+      )
+    );
+
+    return (
+      c[membersKey] &&
+      c[membersKey].find(
+        (member) => member.properties.address === memberAddress
+      )
+    );
+  });
 
 export default communitySlice.reducer;

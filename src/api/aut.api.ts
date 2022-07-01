@@ -20,27 +20,10 @@ export const getUsersData = () => {
     .then((res) => res.data);
 };
 
-export const getCoreTeamMemberNames = async (communityAddress) => {
-  return axios.get(`${environment.apiUrl}/community/${communityAddress}/coreTeamMembers`).then((res) => res.data);
-};
 
-export const addCoreTeamName = async (communityAddress, memberAddress, memberName) => {
+export const addDiscordUrl = async (communityAddress: string, discordWebhook: string) => {
   return axios
-    .post(`${environment.apiUrl}/community/${communityAddress}/coreTeamMembers`, {
-      memberAddress,
-      memberName,
-    })
-    .then((res) => res.data)
-    .catch(() => false);
-};
-
-export const getPartnersAgreementByKey = async (partnerKey) => {
-  return axios.get(`${environment.apiUrl}/community/key/${partnerKey}`);
-};
-
-export const addDiscordUrl = async (partnerKey, discordWebhook) => {
-  return axios
-    .post(`${environment.apiUrl}/community/key/${partnerKey}/discordWebhook`, {
+    .post(`${environment.apiUrl}/community/key/${communityAddress}/discordWebhook`, {
       discordWebhook,
     })
     .then(() => discordWebhook);
@@ -48,40 +31,6 @@ export const addDiscordUrl = async (partnerKey, discordWebhook) => {
 
 export const getAutAddress = (): Promise<string> => {
   return axios.get(`${environment.apiUrl}/Aut/config`, {}).then((res) => res.data.AutAddress);
-};
-
-export const partnerAgreementAccess = (partnerKey: string): Promise<boolean> => {
-  return axios
-    .post(
-      `${environment.apiUrl}/Aut/access`,
-      {},
-      {
-        headers: {
-          authorization: partnerKey,
-        },
-      }
-    )
-    .then((res) => res.data)
-    .catch(() => false);
-};
-
-export const activatePaCommunity = (data) => {
-  const event = new CustomEvent('activateAutCommunity', {
-    detail: data,
-  });
-  window.dispatchEvent(event);
-  return new Promise((resolve, reject) => {
-    const handleResponse = ({ detail }: any) => {
-      resolve(detail);
-      window.removeEventListener('activateAutCommunitySuccess', handleResponse);
-    };
-    const handleError = ({ detail }: any) => {
-      reject(detail || 'Could not activate community, please try again');
-      window.removeEventListener('activateAutCommunityError', handleError);
-    };
-    window.addEventListener('activateAutCommunitySuccess', handleResponse);
-    window.addEventListener('activateAutCommunityError', handleError);
-  });
 };
 
 // @OTOD: Milena to implement method for fetching logs

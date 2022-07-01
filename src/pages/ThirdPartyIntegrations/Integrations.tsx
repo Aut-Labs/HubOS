@@ -23,7 +23,7 @@ const IntegrationCards = [
   {
     icon: SwAuthIcon,
     title: "dAut",
-    description: `This is where your DAO lives.  Add the URL where you’ll be integrating our Decentralized Authentication System using  your Partner Key.`,
+    description: `This is where your DAO lives.  Add the URL where you’ll be integrating our Decentralized Authentication System using  your Community Address.`,
     route: "/aut-dashboard/integrations-and-contracts/dao-integration",
     routeDesc: "Set your DAO URL",
   },

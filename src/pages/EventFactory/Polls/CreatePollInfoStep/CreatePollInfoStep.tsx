@@ -6,7 +6,7 @@ import { pxToRem } from "@utils/text-size";
 import {
   CreatePollData,
   pollUpdateData,
-} from "@store/Activity/create-poll.reducer";
+} from "@store/Activity/poll.reducer";
 import { countWords } from "@utils/helpers";
 import { Fragment } from "react";
 import { useSelector } from "react-redux";

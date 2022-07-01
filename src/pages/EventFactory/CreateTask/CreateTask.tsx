@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { SwStepper } from 'sw-web-shared';
 import { Route, Switch } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { ActivityCurrentStep } from '@store/Activity/create-task.reducer';
+import { ActivityCurrentStep } from '@store/Activity/task.reducer';
 import { pxToRem } from '@utils/text-size';
 import CategoryStep from './CategoryStep/CategoryStep';
 import DescriptionStep from './DescriptionStep/DescriptionStep';

@@ -10,7 +10,7 @@ import {
 import { useAppDispatch } from "@store/store.model";
 import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { SwButton, SwScrollbar } from "sw-web-shared";
+import { SwScrollbar } from "sw-web-shared";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
@@ -21,9 +21,8 @@ import { generateTimeSlots } from "@utils/helpers";
 import {
   ActivityGroupCallData,
   activityUpdateGroupCallData,
-} from "@store/Activity/group-call.reducer";
+} from "@store/Activity/call.reducer";
 import { format, isEqual } from "date-fns";
-import PartnerButton from "@components/Button";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
 

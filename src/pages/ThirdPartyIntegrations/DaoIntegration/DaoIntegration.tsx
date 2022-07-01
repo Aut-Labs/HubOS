@@ -53,7 +53,7 @@ const DaoIntegration = () => {
   const [daoUrl, setDaoUrl] = useState("");
   const [open, setOpen] = useState(false);
   const input = useRef<any>();
-  const { status, paUrl } = useSelector((state: RootState) => state.partner);
+  const { status, paUrl } = useSelector((state: RootState) => state.dashboard);
 
   const handleClose = () => {
     setOpen(false);
@@ -108,7 +108,7 @@ const DaoIntegration = () => {
           <>
             This is where your DAO lives. Add the URL where you’ll be
             integrating <br />
-            dAut’s Decentralized Authentication System using your Partner Key.
+            dAut’s Decentralized Authentication System using your Community Address.
           </>
         }
       />

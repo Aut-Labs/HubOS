@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Route, Switch } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Container } from "@mui/material";
-import { resetActivityGroupCall } from "@store/Activity/group-call.reducer";
+import { resetActivityGroupCall } from "@store/Activity/call.reducer";
 import CalendarStep from "./CalendarStep/CalendarStep";
 import CallInformationStep from "./CallInformationStep/CallInformationStep";
 import SuccessStep from "./SuccessStep/SuccessStep";

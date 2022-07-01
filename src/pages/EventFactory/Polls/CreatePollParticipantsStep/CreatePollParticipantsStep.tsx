@@ -7,9 +7,9 @@ import {
   CreatePollData,
   CreatePollError,
   CreatePollStatus,
-  createPollUpdateStatus,
+  pollUpdateStatus,
   pollUpdateData,
-} from "@store/Activity/create-poll.reducer";
+} from "@store/Activity/poll.reducer";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import ErrorDialog from "@components/ErrorPopup";
@@ -46,7 +46,7 @@ const CreatePollParticipantsStep = () => {
 
   const values = watch();
   const handleDialogClose = () => {
-    dispatch(createPollUpdateStatus(ResultState.Idle));
+    dispatch(pollUpdateStatus(ResultState.Idle));
   };
 
   const onSubmit = async () => {

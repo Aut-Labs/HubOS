@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Route, Switch } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Container } from "@mui/material";
-import { resetCreatePollState } from "@store/Activity/create-poll.reducer";
+import { resetPollState } from "@store/Activity/poll.reducer";
 import CreatePollOptionsStep from "./CreatePollOptionsStep/CreatePollOptionsStep";
 import CreatePollInfoStep from "./CreatePollInfoStep/CreatePollInfoStep";
 import CreatePollParticipantsStep from "./CreatePollParticipantsStep/CreatePollParticipantsStep";
@@ -13,7 +13,7 @@ const Polls = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     return () => {
-      dispatch(resetCreatePollState());
+      dispatch(resetPollState());
     };
   }, [dispatch]);
 

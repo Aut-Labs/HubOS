@@ -10,13 +10,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 export const sendDiscordNotification = createAsyncThunk('discord/notification', async (message: DiscordMessage, { dispatch, getState }) => {
   try {
-    const state = getState() as any;
-    const agreement = state.partner.paCommunity;
-
-    if (!agreement.discordWebhookUrl) {
-      throw new Error('Webhook url missing');
-    }
-
+    const state: any = getState();
     const community = state.community.community as Community;
     const { userInfo } = state.auth;
     const discordMsg = new MessageEmbed({
@@ -30,7 +24,7 @@ export const sendDiscordNotification = createAsyncThunk('discord/notification', 
         image: community.image as string,
       },
     });
-    return await sendNotification(agreement.discordWebhookUrl, discordMsg);
+    // return await sendNotification(community.discordWebhookUrl, discordMsg);
   } catch (error) {
     const message = 'Could not send notification to discord';
     // eslint-disable-next-line @typescript-eslint/no-use-before-define

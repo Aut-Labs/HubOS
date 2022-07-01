@@ -2,7 +2,6 @@ import { Alert, AlertTitle, Box, CircularProgress, Container, Typography } from 
 import { SingleTask, TaskErrorMessage, TasksStatus, tasksUpdateStatus } from '@store/Activity/tasks.reducer';
 import { Task, TaskStatus } from '@store/model';
 import { useAppDispatch } from '@store/store.model';
-import PartnerButton from '@components/Button';
 import { finalizeActivityTask, getTaskById } from '@api/activities.api';
 import LoadingDialog from '@components/LoadingPopup';
 import { pxToRem } from '@utils/text-size';
@@ -14,6 +13,7 @@ import { SwScrollbar } from 'sw-web-shared';
 import { ResultState } from '@store/result-status';
 import UserTaskDetail from './UserTaskDetail';
 import './Tasks.scss';
+import { AutButton } from '@components/buttons';
 
 const TaskFinalise = () => {
   const dispatch = useAppDispatch();
@@ -125,7 +125,7 @@ const TaskFinalise = () => {
                 {selectedTask?.description}
               </Typography>
 
-              <PartnerButton
+              <AutButton
                 mode="light"
                 btnStyles={{
                   width: pxToRem(390),
@@ -141,7 +141,7 @@ const TaskFinalise = () => {
                 label="Finalize"
               />
 
-              <PartnerButton
+              <AutButton
                 mode="light"
                 btnStyles={{
                   width: pxToRem(390),
