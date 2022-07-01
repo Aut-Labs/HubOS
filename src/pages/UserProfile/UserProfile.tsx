@@ -14,35 +14,11 @@ const UserProfile = () => {
 
   return (
     <>
-      {status === ResultState.Loading ? (
-        <div className="sw-loading-spinner">
-          <CircularProgress
-            sx={{
-              justifyContent: 'center',
-              alignContent: 'center',
-            }}
-          />
-        </div>
-      ) : (
-        <SwGrid
-          left={
-            <>
-              <div
-                className="sw-user-info"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                }}
-              >
-                <LeftProfile member={member} />
-              </div>
-            </>
-          }
-          right={
+      <SwGrid
+        left={
+          <>
             <div
+              className="sw-user-info"
               style={{
                 width: '100%',
                 height: '100%',
@@ -51,11 +27,24 @@ const UserProfile = () => {
                 justifyContent: 'center',
               }}
             >
-              <RightProfile member={member} />
+              <LeftProfile member={member} />
             </div>
-          }
-        />
-      )}
+          </>
+        }
+        right={
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}
+          >
+            <RightProfile member={member} />
+          </div>
+        }
+      />
     </>
   );
 };

@@ -221,7 +221,6 @@ const LeftProfile = ({ member }: { member: AutID }) => {
             height: pxToRem(70),
             mt: pxToRem(100),
           }}
-          disabled={member?.properties?.isCoreTeam}
           type="button"
           onClick={whitelistMember}
           color="primary"
