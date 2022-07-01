@@ -1,88 +1,85 @@
-import { ethers } from "ethers";
+import { ethers } from 'ethers';
 import {
   PollsContractEventType,
+  Web3CommunityCallProvider,
   Web3CommunityExtensionProvider,
-  Web3PollsProvider
-} from "@skill-wallet/sw-abi-types";
-import { Task, TaskStatus } from "@store/model";
-import axios from "axios";
-import { dateToUnix } from "@utils/date-format";
-import { sendDiscordNotification } from "@store/ui-reducer";
-import { format } from "date-fns";
-import { ActivityTypes } from "./api.model";
-import { ipfsCIDToHttpUrl, storeAsBlob, storeMetadata } from "./textile.api";
-import { deployPolls } from "./ProviderFactory/deploy-activities";
-import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
-import { Community } from "./community.model";
-import {
-  AsyncThunkConfig,
-  GetThunkAPI,
-} from "./ProviderFactory/web3.thunk.type";
-import { DiscordMessage } from "./discord.api";
-import { environment } from "./environment";
+  Web3PollsProvider,
+} from '@skill-wallet/sw-abi-types';
+import { Task, TaskStatus } from '@store/model';
+import axios from 'axios';
+import { dateToUnix } from '@utils/date-format';
+import { sendDiscordNotification } from '@store/ui-reducer';
+import { format } from 'date-fns';
+import { ActivityTypes } from './api.model';
+import { ipfsCIDToHttpUrl, storeAsBlob, storeMetadata } from './textile.api';
+import { deployPolls } from './ProviderFactory/deploy-activities';
+import { Web3ThunkProviderFactory } from './ProviderFactory/web3-thunk.provider';
+import { Community } from './community.model';
+import { AsyncThunkConfig, GetThunkAPI } from './ProviderFactory/web3.thunk.type';
+import { DiscordMessage } from './discord.api';
+import { environment } from './environment';
 
-const activitiesThunkProvider = Web3ThunkProviderFactory("Activities", {
+const callThunkProvider = Web3ThunkProviderFactory('Call', {
+  provider: Web3CommunityCallProvider,
+});
+
+const taskThunkProvider = Web3ThunkProviderFactory('Task', {
   provider: null,
 });
 
-const pollsThunkProvider = Web3ThunkProviderFactory("Poll", {
+const pollsThunkProvider = Web3ThunkProviderFactory('Poll', {
   provider: Web3PollsProvider,
 });
 
-const contractAddress = async (
-  thunkAPI: GetThunkAPI<AsyncThunkConfig>,
-  skipDeploy = false
-) => {
+const contractAddress = async (thunkAPI: GetThunkAPI<AsyncThunkConfig>, skipDeploy = false) => {
   const state = thunkAPI.getState();
-  const community: Community = state.community.community;
+  const { community } = state.community;
+  debugger;
   const contract = await Web3CommunityExtensionProvider(community.properties.address);
-  let activities = await contract.getActivitiesWhitelist() as any[];
-  let address = undefined;
+  const activities = (await contract.getActivitiesWhitelist()) as any[];
+  let address;
   if (activities || activities.length > 0) {
-    for (let i = 0; i < activities.length; i++) {
-      console.log(activities[i]);
-      if (activities[i]['actType'].toString() === '1') {
-        address = activities[i]['actAddr'];
-      }
-    }
+    // for (let i = 0; i < activities.length; i++) {
+    //   console.log(activities[i]);
+    //   if (activities[i].actType.toString() === '1') {
+    //     address = activities[i].actAddr;
+    //   }
+    // }
   }
   if (!address) {
-    address = await deployPolls(
-      community.properties.address,
-      environment.discordBotAddress
-    );
-    await contract.addActivitiesAddress(
-      address,
-      1
-    );
+    address = await deployPolls(community.properties.address, environment.discordBotAddress);
+    await contract.addActivitiesAddress(address, 1);
   }
   console.log(address);
   return Promise.resolve(address);
 };
 
-export const addActivityTask = activitiesThunkProvider(
+export const getPolls = pollsThunkProvider(
   {
-    type: "aut-dashboard/activities/task/add",
+    type: 'aut-dashboard/polls/get',
+  },
+  contractAddress,
+  async (contract, task, { getState, dispatch }) => {
+    const state = getState();
+  }
+);
+
+export const addActivityTask = taskThunkProvider(
+  {
+    type: 'aut-dashboard/activities/task/add',
     // event: ActivitiesContractEventType.ActivityCreated,
   },
   contractAddress,
   async (contract, task, { getState, dispatch }) => {
     const state = getState();
     const { userInfo } = state.auth;
-    const {
-      role,
-      isCoreTeamMembersOnly,
-      allParticipants,
-      participants,
-      description,
-      title,
-    } = task;
+    const { role, isCoreTeamMembersOnly, allParticipants, participants, description, title } = task;
     const community = state.community.community as Community;
     // const selectedRole = community.properties.skills.roles.find(({ roleName }) => roleName === role);
 
     const selectedRole = null;
     if (!selectedRole) {
-      throw new Error("Role is missing!");
+      throw new Error('Role is missing!');
     }
 
     const metadata = {
@@ -105,15 +102,14 @@ export const addActivityTask = activitiesThunkProvider(
     const result = await contract.createTask(selectedRole.id, uri);
     const discordMessage: DiscordMessage = {
       title: `New Community Task`,
-      description: `${allParticipants ? "All" : participants} **${selectedRole.roleName
-        }** participants can claim the task`,
+      description: `${allParticipants ? 'All' : participants} **${selectedRole.roleName}** participants can claim the task`,
       fields: [
         {
-          name: "Title",
+          name: 'Title',
           value: title,
         },
         {
-          name: "Description",
+          name: 'Description',
           value: description,
         },
       ],
@@ -123,9 +119,9 @@ export const addActivityTask = activitiesThunkProvider(
   }
 );
 
-export const takeActivityTask = activitiesThunkProvider(
+export const takeActivityTask = taskThunkProvider(
   {
-    type: "aut-dashboard/activities/task/take",
+    type: 'aut-dashboard/activities/task/take',
     // event: ActivitiesContractEventType.TaskTaken,
   },
   contractAddress,
@@ -139,9 +135,9 @@ export const takeActivityTask = activitiesThunkProvider(
   }
 );
 
-export const finalizeActivityTask = activitiesThunkProvider(
+export const finalizeActivityTask = taskThunkProvider(
   {
-    type: "aut-dashboard/activities/task/finalize",
+    type: 'aut-dashboard/activities/task/finalize',
     // event: ActivitiesContractEventType.TaskFinalized,
   },
   contractAddress,
@@ -155,9 +151,9 @@ export const finalizeActivityTask = activitiesThunkProvider(
   }
 );
 
-export const submitActivityTask = activitiesThunkProvider(
+export const submitActivityTask = taskThunkProvider(
   {
-    type: "aut-dashboard/activities/task/submit",
+    type: 'aut-dashboard/activities/task/submit',
     // event: ActivitiesContractEventType.TaskSubmitted,
   },
   contractAddress,
@@ -176,28 +172,21 @@ export const submitActivityTask = activitiesThunkProvider(
   }
 );
 
-export const addGroupCall = activitiesThunkProvider(
+export const addGroupCall = taskThunkProvider(
   {
-    type: "aut-dashboard/activities/group-call/add",
+    type: 'aut-dashboard/activities/group-call/add',
     // event: ActivitiesContractEventType.ActivityCreated,
   },
   contractAddress,
   async (contract, callData, { getState, dispatch }) => {
     const state = getState();
-    const {
-      startDate,
-      startTime,
-      duration,
-      allParticipants,
-      participants,
-      role,
-    } = callData;
+    const { startDate, startTime, duration, allParticipants, participants, role } = callData;
     const community = state.community.community as Community;
     // const selectedRole = community.properties.skills.roles.find(({ roleName }) => roleName === role);
 
     const selectedRole = null;
     if (!selectedRole) {
-      throw new Error("Role is missing!");
+      throw new Error('Role is missing!');
     }
 
     const start = new Date(startDate);
@@ -213,28 +202,23 @@ export const addGroupCall = activitiesThunkProvider(
       participants,
     };
     const uri = await storeAsBlob(metadata);
-    const result = await contract.createActivity(
-      ActivityTypes.CommunityCall,
-      selectedRole.id,
-      uri
-    );
+    const result = await contract.createActivity(ActivityTypes.CommunityCall, selectedRole.id, uri);
     const discordMessage: DiscordMessage = {
-      title: "New Community Call",
-      description: `${allParticipants ? "All" : participants} **${selectedRole.roleName
-        }** participants can join the call`,
+      title: 'New Community Call',
+      description: `${allParticipants ? 'All' : participants} **${selectedRole.roleName}** participants can join the call`,
       fields: [
         {
-          name: "Date",
-          value: format(start, "PPPP"),
+          name: 'Date',
+          value: format(start, 'PPPP'),
           inline: true,
         },
         {
-          name: "Time",
-          value: format(time, "hh:mm a"),
+          name: 'Time',
+          value: format(time, 'hh:mm a'),
           inline: true,
         },
         {
-          name: "Duration",
+          name: 'Duration',
           value: duration,
           inline: true,
         },
@@ -246,34 +230,31 @@ export const addGroupCall = activitiesThunkProvider(
 );
 
 export const publishPoll = (poll) => {
-  return axios
-    .post(`${environment.discordBotUrl}/poll`, poll)
-    .then((res) => res);
+  return axios.post(`${environment.discordBotUrl}/poll`, poll).then((res) => res);
 };
 
 export const addPoll = pollsThunkProvider(
   {
-    type: "aut-dashboard/activities/poll/add",
+    type: 'aut-dashboard/activities/poll/add',
     event: PollsContractEventType.PollCreated,
   },
   contractAddress,
   async (contract, callData, { getState, dispatch }) => {
-    console.log(contract.contract)
+    console.log(contract.contract);
     const state = getState();
-    const { title, description, duration, options, emojis, role, allRoles } =
-      callData;
+    const { title, description, duration, options, emojis, role, allRoles } = callData;
 
     const community = state.community.community as Community;
     const selectedRole = community.properties.rolesSets[0].roles.find(({ roleName }) => roleName === role);
     let roleId = 0;
-    let roleName = "All";
+    let roleName = 'All';
     if (!allRoles) {
       roleId = selectedRole.id;
       roleName = selectedRole.roleName;
     }
 
     if (roleId === undefined || roleId === null) {
-      throw new Error("RoleId missing!");
+      throw new Error('RoleId missing!');
     }
 
     const metadata = {
@@ -286,18 +267,20 @@ export const addPoll = pollsThunkProvider(
       emojis,
     };
     const uri = await storeAsBlob(metadata);
-    console.log('polluri', uri)
+    console.log('polluri', uri);
     let daysToAdd = 0;
     switch (duration) {
-      case "1d":
+      case '1d':
         daysToAdd = 1;
         break;
-      case "1w":
+      case '1w':
         daysToAdd = 7;
         break;
-      case "1m":
+      case '1m':
         daysToAdd = 30;
         break;
+      default:
+        daysToAdd = 1;
     }
 
     const date = new Date();
@@ -305,11 +288,7 @@ export const addPoll = pollsThunkProvider(
     const endTimeBlock = Math.floor(endTime / 1000);
     console.log(roleId, endTimeBlock, uri);
     console.log('ce', await contract.communityExtension());
-    const result = await contract.create(
-      1,
-      endTimeBlock,
-      "ipfs://" + uri
-    );
+    const result = await contract.create(1, endTimeBlock, `ipfs://${uri}`);
 
     console.log(result);
 
@@ -323,9 +302,9 @@ export const addPoll = pollsThunkProvider(
   }
 );
 
-export const getAllTasks = activitiesThunkProvider(
+export const getAllTasks = taskThunkProvider(
   {
-    type: "aut-dashboard/activities/tasks/getall",
+    type: 'aut-dashboard/activities/tasks/getall',
   },
   (thunkAPI: GetThunkAPI<AsyncThunkConfig>) => contractAddress(thunkAPI, true),
   async (contract, type: ActivityTypes) => {
@@ -355,9 +334,9 @@ export const getAllTasks = activitiesThunkProvider(
   }
 );
 
-export const getTaskById = activitiesThunkProvider(
+export const getTaskById = taskThunkProvider(
   {
-    type: "aut-dashboard/activities/tasks/get",
+    type: 'aut-dashboard/activities/tasks/get',
   },
   contractAddress,
   async (contract, activityID: string, { getState }) => {
@@ -378,18 +357,13 @@ export const getTaskById = activitiesThunkProvider(
     }
 
     if (!task) {
-      const existingTask: Task = tasks.find(
-        (t: Task) => t.activityId === activityID
-      );
+      const existingTask: Task = tasks.find((t: Task) => t.activityId === activityID);
       if (existingTask?.owner) {
         task = {
           task: existingTask,
           taker: existingTask.owner,
         };
-      } else if (
-        existingTask?.taker?.toLowerCase() ===
-        window.ethereum.selectedAddress?.toLowerCase()
-      ) {
+      } else if (existingTask?.taker?.toLowerCase() === window.ethereum.selectedAddress?.toLowerCase()) {
         task = {
           task: existingTask,
           taker: {
@@ -427,9 +401,7 @@ export const getTaskById = activitiesThunkProvider(
 
     if (taskDetails.task.status > 0) {
       const autContract = null;
-      const takerTokenId = await autContract.getAutIdByOwner(
-        taskDetails.task.taker
-      );
+      const takerTokenId = await autContract.getAutIdByOwner(taskDetails.task.taker);
       const jsonUriCID = await autContract.tokenURI(takerTokenId);
       const response = await axios.get(ipfsCIDToHttpUrl(jsonUriCID, true));
       taskDetails.taker = {

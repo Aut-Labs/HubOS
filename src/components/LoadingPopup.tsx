@@ -5,9 +5,9 @@ const LoadingDialog = ({ mode = 'light', open, handleClose, subtitle, message, f
   const dialogSize = fullScreen
     ? {}
     : {
-        maxWidth: pxToRem(400),
-        minWidth: pxToRem(400),
-        minHeight: pxToRem(250),
+        maxWidth: pxToRem(550),
+        minWidth: pxToRem(550),
+        minHeight: pxToRem(550),
       };
   return (
     <Dialog open={open} fullScreen={fullScreen}>
@@ -36,14 +36,22 @@ const LoadingDialog = ({ mode = 'light', open, handleClose, subtitle, message, f
             }}
           />
           <Typography
-            sx={{ color: mode === 'light' ? 'primary.main' : 'text.primary', textAlign: 'center', mt: 2 }}
+            sx={{
+              color: mode === 'light' ? 'primary.main' : 'text.primary',
+              textAlign: 'center',
+              mt: 2,
+            }}
             component="div"
             variant="h2"
           >
             {message}
           </Typography>
           <Typography
-            sx={{ color: mode === 'light' ? 'primary.main' : 'text.primary', textAlign: 'center', mt: 2 }}
+            sx={{
+              color: mode === 'light' ? 'primary.main' : 'text.primary',
+              textAlign: 'center',
+              mt: 2,
+            }}
             component="div"
             variant="body2"
           >

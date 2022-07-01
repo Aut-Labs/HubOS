@@ -2,7 +2,15 @@ import { ResultState } from '@store/result-status';
 import { createSlice } from '@reduxjs/toolkit';
 import { LockDatatableItems } from '@components/datatable/DatatableHelpers';
 import { createSelector } from 'reselect';
-import { getWhitelistedAddresses, addNewWhitelistedAddresses, addPAUrl, getPAUrl, addPAContracts, getPAContracts, addDiscordToCommunity } from '@api/community.api';
+import {
+  getWhitelistedAddresses,
+  addNewWhitelistedAddresses,
+  addPAUrl,
+  getPAUrl,
+  addPAContracts,
+  getPAContracts,
+  addDiscordToCommunity,
+} from '@api/community.api';
 // export const addDiscordWebhook = createAsyncThunk('aut-dashboard/discord/addurl', async (payload: any, { dispatch }) => {
 //   try {
 //     dispatch(openSnackbar({ message: 'Discord webhook was updated successfully', severity: 'success' }));

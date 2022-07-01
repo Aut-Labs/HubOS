@@ -1,5 +1,13 @@
-import { MarketTemplates } from "@utils/misc";
-import { BaseNFTModel, Role, RoleSet } from "./api.model";
+import { MarketTemplates } from '@utils/misc';
+import { BaseNFTModel, Role, RoleSet } from './api.model';
+
+export const findRoleName = (roleId: string, rolesSets: RoleSet[]) => {
+  const roleSet = rolesSets.find((s) => s.roles.some((r) => r.id.toString() === roleId));
+  if (roleSet) {
+    const role = roleSet?.roles.find((r) => r.id.toString() === roleId);
+    return role?.roleName;
+  }
+};
 
 export class CommunityProperties {
   market: number | string;
@@ -9,6 +17,8 @@ export class CommunityProperties {
   commitment: number;
 
   address?: string;
+
+  isCoreTeam?: boolean;
 
   userData?: {
     role: string;
@@ -24,6 +34,7 @@ export class CommunityProperties {
       this.commitment = data.commitment;
       this.rolesSets = data.rolesSets;
       this.address = data.address;
+      this.isCoreTeam = data.isCoreTeam;
       this.userData = data.userData || ({} as typeof this.userData);
 
       if (this.userData?.role) {
@@ -32,16 +43,6 @@ export class CommunityProperties {
     }
   }
 }
-
-export const findRoleName = (roleId: string, rolesSets: RoleSet[]) => {
-  const roleSet = rolesSets.find((s) =>
-    s.roles.some((r) => r.id.toString() === roleId)
-  );
-  if (roleSet) {
-    const role = roleSet?.roles.find((r) => r.id.toString() === roleId);
-    return role?.roleName;
-  }
-};
 
 export class Community extends BaseNFTModel<CommunityProperties> {
   constructor(data: Community = {} as Community) {
@@ -53,14 +54,14 @@ export class Community extends BaseNFTModel<CommunityProperties> {
 export const DefaultRoles: Role[] = [
   {
     id: 4,
-    roleName: "Core Team",
+    roleName: 'Core Team',
   },
   {
     id: 5,
-    roleName: "Advisor",
+    roleName: 'Advisor',
   },
   {
     id: 6,
-    roleName: "Investor",
+    roleName: 'Investor',
   },
 ];

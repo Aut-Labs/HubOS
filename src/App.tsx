@@ -1,29 +1,23 @@
-import { useEffect, useState } from "react";
-import {
-  withRouter,
-  Switch,
-  Route,
-  Redirect as RedirectRoute,
-  useLocation,
-  useHistory,
-} from "react-router-dom";
-import { useSelector } from "react-redux";
-import { AppBar, Box, CssBaseline, Toolbar, Typography } from "@mui/material";
-import { ReactComponent as AutLogo } from "@assets/aut/logo.svg";
-import Redirect from "@components/Redirect";
-import { resetAuthState, setAuthenticated } from "@auth/auth.reducer";
-import { RootState, useAppDispatch } from "@store/store.model";
-import NotFound from "@components/NotFound";
-import { Init } from "d-aut-alpha";
-import detectEthereumProvider from "@metamask/detect-provider";
-import { AppTitle, openSnackbar } from "@store/ui-reducer";
-import AutDashboard from "./pages/AutDashboard";
-import SWSnackbar from "./components/snackbar";
-import GetStarted from "./pages/GetStarted/GetStarted";
-import { pxToRem } from "@utils/text-size";
-import "./App.scss";
-import { communityUpdateState } from "@store/Community/community.reducer";
-import { AutID } from "@api/aut.model";
+/* eslint-disable max-len */
+import { useEffect, useState } from 'react';
+import { withRouter, Switch, Route, Redirect as RedirectRoute, useLocation, useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { AppBar, Box, CssBaseline, Toolbar, Typography } from '@mui/material';
+import { ReactComponent as AutLogo } from '@assets/aut/logo.svg';
+import Redirect from '@components/Redirect';
+import { resetAuthState, setAuthenticated } from '@auth/auth.reducer';
+import { RootState, useAppDispatch } from '@store/store.model';
+import NotFound from '@components/NotFound';
+import { Init } from 'd-aut-alpha';
+import detectEthereumProvider from '@metamask/detect-provider';
+import { AppTitle, openSnackbar } from '@store/ui-reducer';
+import { pxToRem } from '@utils/text-size';
+import AutDashboard from './pages/AutDashboard';
+import SWSnackbar from './components/snackbar';
+import GetStarted from './pages/GetStarted/GetStarted';
+import './App.scss';
+import { communityUpdateState } from '@store/Community/community.reducer';
+import { AutID } from '@api/aut.model';
 
 const LoadingMessage = () => (
   <div className="app-loading">
@@ -50,9 +44,8 @@ function App() {
       if (!ethereum) {
         dispatch(
           openSnackbar({
-            message:
-              "Please install MetaMask and refresh the page to use the full array of Aut Dashboard features.",
-            severity: "error",
+            message: 'Please install MetaMask and refresh the page to use the full array of Aut Dashboard features.',
+            severity: 'error',
             duration: 30000,
           })
         );
@@ -77,31 +70,31 @@ function App() {
           community: autID.properties.communities[0],
         })
       );
-      const shouldGoToDashboard = location.pathname === "/";
-      const goTo = shouldGoToDashboard ? "/aut-dashboard" : location.pathname;
+      const shouldGoToDashboard = location.pathname === '/';
+      const goTo = shouldGoToDashboard ? '/aut-dashboard' : location.pathname;
       const returnUrl = location.state?.from;
       history.push(returnUrl || goTo);
     };
 
     const onDisconnected = () => {
       dispatch(resetAuthState());
-      history.push("/");
+      history.push('/');
     };
 
     const onSWInit = async () => setLoading(false);
 
-    window.addEventListener("aut-Init", onSWInit);
-    window.addEventListener("aut-onConnected", onSWLogin);
-    window.addEventListener("aut-onDisconnected", onDisconnected);
+    window.addEventListener('aut-Init', onSWInit);
+    window.addEventListener('aut-onConnected', onSWLogin);
+    window.addEventListener('aut-onDisconnected', onDisconnected);
 
     Init({
-      container: document.querySelector("#connect-wallet-container"),
+      container: document.querySelector('#connect-wallet-container'),
     });
 
     return () => {
-      window.removeEventListener("aut-Init", onSWInit);
-      window.removeEventListener("aut-onConnected", onSWLogin);
-      window.removeEventListener("aut-onDisconnected", onDisconnected);
+      window.removeEventListener('aut-Init', onSWInit);
+      window.removeEventListener('aut-onConnected', onSWLogin);
+      window.removeEventListener('aut-onDisconnected', onDisconnected);
     };
   }, [dispatch, history, location.pathname, location.state?.from]);
 
@@ -113,61 +106,52 @@ function App() {
       <AppBar
         position="fixed"
         sx={{
-          border: "0",
+          border: '0',
           p: 0,
           zIndex: (s) => s.zIndex.drawer + 1,
           ml: isAutheticated ? pxToRem(350) : 0,
-          width: isAutheticated ? `calc(100% - ${pxToRem(350)})` : "100%",
+          width: isAutheticated ? `calc(100% - ${pxToRem(350)})` : '100%',
         }}
       >
         <Toolbar
           sx={{
-            p: "0px !important",
-            backgroundColor: "black",
-            border: "0",
-            minHeight: `${pxToRem(130)} !important`,
-            justifyContent: "flex-end",
-            flexDirection: "column",
+            p: '0px !important',
+            backgroundColor: 'black',
+            border: '0',
+            minHeight: `${pxToRem(150)} !important`,
+            justifyContent: 'flex-end',
+            flexDirection: 'column',
           }}
         >
           <div
             style={{
               flex: 1,
-              display: "flex",
-              width: "100%",
-              alignItems: "center",
-              justifyContent: "flex-end",
+              display: 'flex',
+              width: '100%',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
             }}
           >
             <div style={{ marginRight: pxToRem(50) }}>
-              <d-aut
-                id="d-aut"
-                community-address="0xc2d28f0084aA00538c0Cf1F27Da8137F20D963B6"
-                use-dev="true"
-              ></d-aut>
+              <d-aut id="d-aut" use-dev="true" />
             </div>
           </div>
 
           {isAutheticated && (
             <div
               style={{
-                width: "100%",
-                borderStyle: "solid",
+                width: '100%',
+                borderStyle: 'solid',
                 height: pxToRem(50),
                 borderImage:
-                  "linear-gradient(160deg, #009fe3 0%, #0399de 8%, #0e8bd3 19%, #2072bf 30%, #3a50a4 41%, #5a2583 53%, #453f94 71%, #38519f 88%, #3458a4 100%) 1",
-                borderBottomWidth: "1px",
-                borderTopWidth: "1px",
+                  'linear-gradient(160deg, #009fe3 0%, #0399de 8%, #0e8bd3 19%, #2072bf 30%, #3a50a4 41%, #5a2583 53%, #453f94 71%, #38519f 88%, #3458a4 100%) 1',
+                borderBottomWidth: '1px',
+                borderTopWidth: '1px',
                 borderLeft: 0,
                 borderRight: 0,
               }}
             >
-              <Typography
-                paddingLeft="10px"
-                lineHeight={pxToRem(50)}
-                fontSize={pxToRem(20)}
-                color="white"
-              >
+              <Typography paddingLeft="10px" lineHeight={pxToRem(50)} fontSize={pxToRem(20)} color="white">
                 {appTitle}
               </Typography>
             </div>
@@ -177,9 +161,9 @@ function App() {
       <Box
         sx={{
           height: `calc(100%)`,
-          backgroundColor: "#000",
+          backgroundColor: '#000',
         }}
-        className={isLoading ? "sw-loading" : ""}
+        className={isLoading ? 'sw-loading' : ''}
       >
         {isLoading ? (
           <LoadingMessage />
@@ -187,16 +171,8 @@ function App() {
           <Switch>
             <Route exact component={GetStarted} path="/" />
             <Route path="/redirect" component={Redirect} />
-            {isAutheticated && (
-              <Route path="/aut-dashboard" component={AutDashboard} />
-            )}
-            {isAutheticated ? (
-              <Route component={NotFound} />
-            ) : (
-              <RedirectRoute
-                to={{ pathname: "/", state: { from: location.pathname } }}
-              />
-            )}
+            {isAutheticated && <Route path="/aut-dashboard" component={AutDashboard} />}
+            {isAutheticated ? <Route component={NotFound} /> : <RedirectRoute to={{ pathname: '/', state: { from: location.pathname } }} />}
           </Switch>
         )}
       </Box>

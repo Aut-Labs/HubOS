@@ -1,27 +1,20 @@
-import { memo, useEffect } from "react";
-import {
-  Box,
-  CircularProgress,
-  Container,
-} from "@mui/material";
-import { Community } from "@api/community.model";
-import { useSelector } from "react-redux";
-import { pxToRem } from "@utils/text-size";
-import {
-  allRoles,
-  communityUpdateState,
-} from "@store/Community/community.reducer";
-import { RootState, useAppDispatch } from "@store/store.model";
-import { updateCommunity } from "@api/community.api";
-import { ResultState } from "@store/result-status";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
-import ErrorDialog from "@components/ErrorPopup";
-import LoadingDialog from "@components/LoadingPopup";
-import { AutTextField, FormHelperText } from "@components/Fields";
-import { AutHeader } from "@components/AutHeader";
-import { AutButton } from "@components/buttons";
-import { setTitle } from "@store/ui-reducer";
-import "./Roles.scss";
+import { memo, useEffect } from 'react';
+import { Box, CircularProgress, Container } from '@mui/material';
+import { Community } from '@api/community.model';
+import { useSelector } from 'react-redux';
+import { pxToRem } from '@utils/text-size';
+import { allRoles, communityUpdateState } from '@store/Community/community.reducer';
+import { RootState, useAppDispatch } from '@store/store.model';
+import { updateCommunity } from '@api/community.api';
+import { ResultState } from '@store/result-status';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import ErrorDialog from '@components/ErrorPopup';
+import LoadingDialog from '@components/LoadingPopup';
+import { AutTextField, FormHelperText } from '@components/Fields';
+import { AutHeader } from '@components/AutHeader';
+import { AutButton } from '@components/buttons';
+import { setTitle } from '@store/ui-reducer';
+import './Roles.scss';
 
 const errorTypes = {
   maxLength: `Characters cannot be more than 280`,
@@ -29,9 +22,7 @@ const errorTypes = {
 
 const Roles = () => {
   const dispatch = useAppDispatch();
-  const { status, community } = useSelector(
-    (state: RootState) => state.community
-  );
+  const { status, community } = useSelector((state: RootState) => state.community);
   const roles = useSelector(allRoles);
 
   const {
@@ -40,7 +31,7 @@ const Roles = () => {
     watch,
     formState: { errors },
   } = useForm({
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
       roles,
     },
@@ -48,7 +39,7 @@ const Roles = () => {
 
   const { fields } = useFieldArray({
     control,
-    name: "roles",
+    name: 'roles',
   });
 
   useEffect(() => {
@@ -83,40 +74,31 @@ const Roles = () => {
     <form
       style={{
         flexGrow: 1,
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
       }}
       autoComplete="off"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <ErrorDialog
-        handleClose={handleDialogClose}
-        open={status === ResultState.Failed}
-        message="Something went wrong"
-      />
-      <LoadingDialog
-        handleClose={handleDialogClose}
-        open={status === ResultState.Updating}
-        message="Updating community roles..."
-      />
+      <ErrorDialog handleClose={handleDialogClose} open={status === ResultState.Failed} message="Something went wrong" />
+      <LoadingDialog handleClose={handleDialogClose} open={status === ResultState.Updating} message="Updating community roles..." />
       <Container
         className="sw-roles-wrapper"
         maxWidth="md"
         sx={{
-          width: "100%",
+          width: '100%',
           flexGrow: 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
         }}
       >
         <AutHeader
           title="Manage Your Roles"
           subtitle={
             <>
-              Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam{" "}
-              <br />
+              Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam <br />
               nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam
             </>
           }
@@ -125,16 +107,16 @@ const Roles = () => {
           <div className="sw-loading-spinner">
             <CircularProgress
               sx={{
-                justifyContent: "center",
-                alignContent: "center",
+                justifyContent: 'center',
+                alignContent: 'center',
               }}
             />
           </div>
         ) : (
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "column",
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
             {fields.map((_, index) => (
@@ -162,15 +144,8 @@ const Roles = () => {
                         }}
                         inputProps={{ maxLength: 20 }}
                         helperText={
-                          <FormHelperText
-                            errorTypes={errorTypes}
-                            value={value}
-                            name={name}
-                            errors={errors}
-                          >
-                            <span>
-                              {20 - (value?.length || 0)} of 20 characters left
-                            </span>
+                          <FormHelperText errorTypes={errorTypes} value={value} name={name} errors={errors}>
+                            <span>{20 - (value?.length || 0)} of 20 characters left</span>
                           </FormHelperText>
                         }
                       />

@@ -1,5 +1,5 @@
-import { Typography } from "@mui/material";
-import { pxToRem } from "@utils/text-size";
+import { Typography } from '@mui/material';
+import { pxToRem } from '@utils/text-size';
 
 export const AutHeader = ({ title, subtitle, titleStyles = {}, subtitleStyles = {} }) => {
   return (
@@ -7,7 +7,7 @@ export const AutHeader = ({ title, subtitle, titleStyles = {}, subtitleStyles = 
       <Typography
         sx={{
           mb: pxToRem(50),
-          ...titleStyles
+          ...titleStyles,
         }}
         fontSize={pxToRem(40)}
         letterSpacing="6px"

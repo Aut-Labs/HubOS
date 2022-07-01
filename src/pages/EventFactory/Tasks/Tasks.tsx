@@ -95,7 +95,13 @@ const Tasks = () => {
     <Container maxWidth="md" sx={{ mt: pxToRem(20) }}>
       <ErrorDialog handleClose={handleDialogClose} open={status === ResultState.Failed} message="Something went wrong" />
       <LoadingDialog handleClose={handleDialogClose} open={status === ResultState.Updating} message={message} />
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', height: pxToRem(60) }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          height: pxToRem(60),
+        }}
+      >
         <Box>
           {refreshStatus === ResultState.Loading && (
             <div className="refreshing-loading-spinner">

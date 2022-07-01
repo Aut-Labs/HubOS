@@ -85,7 +85,16 @@ function Redirect() {
   }, []);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height: '100%',
+      }}
+    >
       <Typography variant="h2">Discord Integration Redirect Page</Typography>
       {loading && <CircularProgress />}
     </Box>

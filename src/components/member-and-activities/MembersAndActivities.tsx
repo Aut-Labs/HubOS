@@ -1,61 +1,61 @@
-import { useState, useEffect } from "react";
-import Box from "@mui/material/Box";
-import { RootState, useAppDispatch } from "@store/store.model";
-import { CircularProgress, Container, styled } from "@mui/material";
-import { useSelector } from "react-redux";
-import { fetchLogs } from "@store/Community/community.reducer";
-import { ResultState } from "@store/result-status";
-import { setTitle } from "@store/ui-reducer";
-import { fetchMembers } from "@api/community.api";
-import Members from "./Members";
-import ActivityAndLogs from "./ActivityAndLogs";
-import SwTabs from "../tabs/SwTabs";
-import "./member-and-activities.scss";
-import { AutHeader } from "@components/AutHeader";
-import { pxToRem } from "@utils/text-size";
-import { AutList } from "@api/api.model";
-import { ReactComponent as LineVertical } from "@assets/line-vertical.svg";
-import { ReactComponent as LineHorizontal } from "@assets/line-horizontal.svg";
-import LineTo from "react-lineto";
+import { useState, useEffect } from 'react';
+import Box from '@mui/material/Box';
+import { RootState, useAppDispatch } from '@store/store.model';
+import { CircularProgress, Container, styled } from '@mui/material';
+import { useSelector } from 'react-redux';
+import { fetchLogs } from '@store/Community/community.reducer';
+import { ResultState } from '@store/result-status';
+import { setTitle } from '@store/ui-reducer';
+import { fetchMembers } from '@api/community.api';
+import './member-and-activities.scss';
+import { AutHeader } from '@components/AutHeader';
+import { pxToRem } from '@utils/text-size';
+import { AutList } from '@api/api.model';
+import { ReactComponent as LineVertical } from '@assets/line-vertical.svg';
+import { ReactComponent as LineHorizontal } from '@assets/line-horizontal.svg';
+import LineTo from 'react-lineto';
+import SwTabs from '../tabs/SwTabs';
+import ActivityAndLogs from './ActivityAndLogs';
+import Members from './Members';
 
-const CardTilt = styled("div")(({ theme }) => ({
+const CardTilt = styled('div')(({ theme }) => ({
   borderRadius: 0,
-  border: "1px solid white",
+  border: '1px solid white',
   background: theme.palette.background.paper,
   boxShadow: theme.shadows[1],
-  position: "relative",
-  width: "calc(100%)",
-  height: "calc(100%)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
+  position: 'relative',
+  width: 'calc(100%)',
+  height: 'calc(100%)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   // marginLeft: "15px",
   // marginTop: "15px",
-  backgroundColor: "black",
-  "@keyframes sw-card-tilt": {
-    "0%": {
-      transform: " perspective(1200px) rotate3d(0, -0.5, 0, 0deg)",
-      transformstyle: "preserve-3d",
+  backgroundColor: 'black',
+  '@keyframes sw-card-tilt': {
+    '0%': {
+      transform: ' perspective(1200px) rotate3d(0, -0.5, 0, 0deg)',
+      transformstyle: 'preserve-3d',
     },
-    "25%": {
-      transform: "perspective(1200px) rotate3d(0, -1, 0, 15deg)",
-      transformstyle: "preserve-3d",
+    '25%': {
+      transform: 'perspective(1200px) rotate3d(0, -1, 0, 15deg)',
+      transformstyle: 'preserve-3d',
     },
-    "50%": {
-      transform: "perspective(1200px) rotate3d(0, -0.5, 0, 0deg)",
-      transformstyle: "preserve-3d",
+    '50%': {
+      transform: 'perspective(1200px) rotate3d(0, -0.5, 0, 0deg)',
+      transformstyle: 'preserve-3d',
     },
-    "75%": {
-      transform: "perspective(1200px) rotate3d(0, -1, 0, 15deg)",
-      transformstyle: "preserve-3d",
+    '75%': {
+      transform: 'perspective(1200px) rotate3d(0, -1, 0, 15deg)',
+      transformstyle: 'preserve-3d',
     },
-    "100%": {
-      transform: "perspective(1200px) rotate3d(0, -1, 0, 0deg)",
-      transformstyle: "preserve-3d",
+    '100%': {
+      transform: 'perspective(1200px) rotate3d(0, -1, 0, 0deg)',
+      transformstyle: 'preserve-3d',
     },
   },
   animation: `sw-card-tilt 3s linear infinite`,
-  animationDirection: "normal",
+  animationDirection: 'normal',
 }));
 
 const AutIdCard = () => {
@@ -64,8 +64,8 @@ const AutIdCard = () => {
       <img
         alt="id"
         style={{
-          width: "100%",
-          height: "100%",
+          width: '100%',
+          height: '100%',
         }}
         src="https://infura-ipfs.io/ipfs/bafybeiaok5esvbdym2othwvxt2wcsanrd4bmyu64p7f25gg7dvtp6bbodq"
       />
@@ -107,14 +107,14 @@ const LayerOne = () => {
   return (
     <div
       style={{
-        position: "relative",
-        width: "100%",
-        height: "100%",
+        position: 'relative',
+        width: '100%',
+        height: '100%',
       }}
     >
       <LineVertical
         style={{
-          position: "absolute",
+          position: 'absolute',
           left: 0,
         }}
         height="100%"
@@ -127,33 +127,33 @@ const LayerTwo = () => {
   return (
     <div
       style={{
-        position: "absolute",
+        position: 'absolute',
         maxWidth: pxToRem(575),
         maxHeight: pxToRem(680),
         width: `calc(100%)`,
         height: `calc(100%)`,
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
       }}
     >
       <div
         style={{
-          position: "relative",
-          width: "100%",
-          height: "100%",
+          position: 'relative',
+          width: '100%',
+          height: '100%',
         }}
       >
         <LineVertical
           style={{
-            position: "absolute",
+            position: 'absolute',
             left: 0,
           }}
           height="100%"
         />
         <LineHorizontal
           style={{
-            position: "absolute",
+            position: 'absolute',
             top: 0,
           }}
           width="100%"
@@ -161,7 +161,7 @@ const LayerTwo = () => {
 
         <LineVertical
           style={{
-            position: "absolute",
+            position: 'absolute',
             right: 0,
           }}
           height="100%"
@@ -175,33 +175,33 @@ const LayerThree = () => {
   return (
     <div
       style={{
-        position: "absolute",
+        position: 'absolute',
         maxWidth: pxToRem(435),
         maxHeight: pxToRem(535),
         width: `calc(100%)`,
         height: `calc(100%)`,
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
       }}
     >
       <div
         style={{
-          position: "relative",
-          width: "100%",
-          height: "100%",
+          position: 'relative',
+          width: '100%',
+          height: '100%',
         }}
       >
         <LineVertical
           style={{
-            position: "absolute",
+            position: 'absolute',
             left: 0,
           }}
           height="100%"
         />
         <LineHorizontal
           style={{
-            position: "absolute",
+            position: 'absolute',
             top: 0,
           }}
           width="100%"
@@ -209,7 +209,7 @@ const LayerThree = () => {
 
         <LineVertical
           style={{
-            position: "absolute",
+            position: 'absolute',
             right: 0,
           }}
           height="100%"
@@ -224,7 +224,7 @@ const LeftBorder = ({ className } = {} as any) => {
     <LineVertical
       className={className}
       style={{
-        position: "absolute",
+        position: 'absolute',
         left: 0,
       }}
       height="100%"
@@ -236,7 +236,7 @@ const RightBorder = () => {
   return (
     <LineVertical
       style={{
-        position: "absolute",
+        position: 'absolute',
         right: 0,
       }}
       height="100%"
@@ -248,7 +248,7 @@ const TopBorder = () => {
   return (
     <LineHorizontal
       style={{
-        position: "absolute",
+        position: 'absolute',
         top: 0,
       }}
       width="100%"
@@ -259,9 +259,7 @@ const TopBorder = () => {
 function MembersAndActivities(props) {
   const dispatch = useAppDispatch();
   const { userInfo } = useSelector((state: RootState) => state.auth);
-  const { members, logs, status } = useSelector(
-    (state: RootState) => state.community
-  );
+  const { members, logs, status } = useSelector((state: RootState) => state.community);
   const [tabs, setTabs] = useState([]);
 
   useEffect(() => {
@@ -277,7 +275,7 @@ function MembersAndActivities(props) {
       const allMembers = getAllMembers(members);
       memberTabs = [
         {
-          label: "All",
+          label: 'All',
           props: {
             total: allMembers?.length,
             members: allMembers,
@@ -292,7 +290,7 @@ function MembersAndActivities(props) {
     setTabs([
       ...(memberTabs || []),
       {
-        label: "Activity & Logs",
+        label: 'Activity & Logs',
         props: {
           total: logs?.length,
           logs,
@@ -303,26 +301,23 @@ function MembersAndActivities(props) {
   }, [members, logs, props]);
 
   useEffect(() => {
-    const promises = [
-      dispatch(fetchMembers(props.isCoreTeamMembers)),
-      dispatch(fetchLogs(userInfo?.community)),
-    ];
+    const promises = [dispatch(fetchMembers(props.isCoreTeamMembers)), dispatch(fetchLogs(userInfo?.community))];
     return () => promises.forEach((p) => p.abort());
   }, [dispatch, userInfo, props.isCoreTeamMembers]);
 
   useEffect(() => {
-    dispatch(setTitle("DAO Management - Sublime Here"));
+    dispatch(setTitle('DAO Management - Sublime Here'));
   }, []);
 
   return (
     <Container
       maxWidth="lg"
       sx={{
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
         flexGrow: 1,
-        boxSizing: "border-box",
+        boxSizing: 'border-box',
       }}
     >
       {/* <div
@@ -418,8 +413,8 @@ function MembersAndActivities(props) {
         <div className="sw-loading-spinner">
           <CircularProgress
             sx={{
-              justifyContent: "center",
-              alignContent: "center",
+              justifyContent: 'center',
+              alignContent: 'center',
             }}
           />
         </div>
@@ -427,29 +422,27 @@ function MembersAndActivities(props) {
         <Box
           sx={{
             flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            my: pxToRem(50)
+            display: 'flex',
+            flexDirection: 'column',
+            my: pxToRem(50),
           }}
         >
           <AutHeader
             title="Members"
             titleStyles={{
-              m: 0
+              m: 0,
             }}
             subtitle={
               <>
-                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
-                diam nonumy
+                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
                 <br />
-                eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
-                sed diam
+                eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
               </>
             }
           />
           <SwTabs
             tabPanelStyles={{
-              border: "2px solid #439EDD",
+              border: '2px solid #439EDD',
             }}
             tabs={tabs}
           />

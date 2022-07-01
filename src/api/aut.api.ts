@@ -2,7 +2,7 @@ import { AutIDContractEventType, Web3AutIDProvider } from '@skill-wallet/sw-abi-
 import axios from 'axios';
 import { environment } from './environment';
 import { EnableAndChangeNetwork } from './ProviderFactory/web3.network';
-import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
+import { Web3ThunkProviderFactory } from './ProviderFactory/web3-thunk.provider';
 
 export const getUsersData = () => {
   const params = {
@@ -19,7 +19,6 @@ export const getUsersData = () => {
     })
     .then((res) => res.data);
 };
-
 
 export const addDiscordUrl = async (communityAddress: string, discordWebhook: string) => {
   return axios
@@ -93,7 +92,9 @@ export const AutExists = async () => {
   try {
     const AutAddress = await getAutAddress();
 
-    const contract = await Web3AutIDProvider(AutAddress, { beforeRequest: () => EnableAndChangeNetwork() });
+    const contract = await Web3AutIDProvider(AutAddress, {
+      beforeRequest: () => EnableAndChangeNetwork(),
+    });
 
     if (window.ethereum.selectedAddress) {
       const { selectedAddress } = window.ethereum;
@@ -108,11 +109,6 @@ export const AutExists = async () => {
   }
 };
 
-
-const autIDThunkProvider = Web3ThunkProviderFactory(
-  "AutID",
-  {
-    provider: Web3AutIDProvider,
-  }
-);
-
+const autIDThunkProvider = Web3ThunkProviderFactory('AutID', {
+  provider: Web3AutIDProvider,
+});

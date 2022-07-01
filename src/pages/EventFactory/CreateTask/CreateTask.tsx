@@ -32,7 +32,14 @@ const CreateTask = () => {
       className="sw-create-task-base-container"
     >
       <Box
-        sx={{ maxWidth: pxToRem(820), flex: 1, display: 'flex', flexDirection: 'column', m: '0 auto', width: '100%' }}
+        sx={{
+          maxWidth: pxToRem(820),
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          m: '0 auto',
+          width: '100%',
+        }}
         className="sw-box-right-inner"
       >
         <SwStepper

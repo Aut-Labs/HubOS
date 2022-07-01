@@ -1,3 +1,4 @@
+import { AutID } from '@api/aut.model';
 import { ipfsCIDToHttpUrl } from '@api/textile.api';
 import { createSlice } from '@reduxjs/toolkit';
 
@@ -32,6 +33,7 @@ export const authSlice = createSlice({
 
 export const { setAuthenticated, setUserAddress, resetAuthState } = authSlice.actions;
 
-export const UserInfo = (state) => state.auth.userInfo as any;
+export const UserInfo = (state) => state.auth.userInfo as AutID;
+export const IsAuthenticated = (state) => state.auth.isAuthenticated as boolean;
 
 export default authSlice.reducer;

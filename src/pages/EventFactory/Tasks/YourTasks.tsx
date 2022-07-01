@@ -47,7 +47,13 @@ const YourTasks = () => {
 
   return (
     <Container maxWidth="md" sx={{ mt: pxToRem(20) }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <Box sx={{ display: 'flex', alignItems: 'center', gridGap: '10px' }}>
           <Typography color="primary.main" fontSize={pxToRem(50)} component="div">
             Your Tasks

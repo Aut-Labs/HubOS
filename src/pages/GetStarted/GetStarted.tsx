@@ -5,6 +5,7 @@ import { ReactComponent as AutLogo } from '@assets/aut/logo.svg';
 import { pxToRem } from '@utils/text-size';
 import { Link } from 'react-router-dom';
 import { AutButton } from '@components/buttons';
+import { IsAuthenticated } from '@auth/auth.reducer';
 
 const Wrapper = styled('div')({
   textAlign: 'center',
@@ -16,6 +17,7 @@ const Wrapper = styled('div')({
 });
 
 const GetStarted = () => {
+  const isAuthenticated = useSelector(IsAuthenticated);
   return (
     <Wrapper>
       <Box

@@ -1,6 +1,6 @@
-import { BaseNFTModel } from "./api.model";
-import { Community } from "./community.model";
-import { ipfsCIDToHttpUrl } from "./textile.api";
+import { BaseNFTModel } from './api.model';
+import { Community } from './community.model';
+import { ipfsCIDToHttpUrl } from './textile.api';
 
 export class AutIDProperties {
   avatar: string;
@@ -21,7 +21,7 @@ export class AutIDProperties {
 
   commitmentDescription?: string;
 
-  isWhitelisted?: boolean;
+  isCoreTeam?: boolean;
 
   constructor(data: AutIDProperties) {
     if (!data) {
@@ -29,15 +29,13 @@ export class AutIDProperties {
     } else {
       this.timestamp = data.timestamp;
       this.avatar = ipfsCIDToHttpUrl(data.avatar);
-      this.communities = (data.communities || []).map(
-        (community) => new Community(community)
-      );
+      this.communities = (data.communities || []).map((community) => new Community(community));
       this.address = data.address;
       this.role = data.role;
       this.roleName = data.roleName;
       this.commitment = data.commitment;
       this.commitmentDescription = data.commitmentDescription;
-      this.isWhitelisted = data.isWhitelisted;
+      this.isCoreTeam = data.isCoreTeam;
     }
   }
 }

@@ -178,7 +178,15 @@ export default (props: StepperProps) => {
   }, [instance]);
 
   return (
-    <Container maxWidth="md" sx={{ width: '100%', flexGrow: 1, boxSizing: 'border-box', position: 'relative' }}>
+    <Container
+      maxWidth="md"
+      sx={{
+        width: '100%',
+        flexGrow: 1,
+        boxSizing: 'border-box',
+        position: 'relative',
+      }}
+    >
       <StepperWrapper>
         <StepWizard
           transitions={{

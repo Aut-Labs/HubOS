@@ -82,7 +82,7 @@ const CustomSwCalendarPicker = styled(CalendarPicker)(({ theme }) => ({
   '.MuiButtonBase-root .MuiSvgIcon-root': {
     width: pxToRem(40),
     height: pxToRem(40),
-    color: 'white'
+    color: 'white',
   },
   '.PrivatePickersSlideTransition-root': {
     minHeight: pxToRem(300),
@@ -281,7 +281,7 @@ const StyledSelectField = styled((props: SelectProps & { width: string }) => {
     '.MuiInputBase-input': {
       paddingTop: 0,
       paddingBottom: 0,
-      color: "#fff !important",
+      color: '#fff !important',
     },
     '.MuiSvgIcon-root': {
       fontSize: '20px',

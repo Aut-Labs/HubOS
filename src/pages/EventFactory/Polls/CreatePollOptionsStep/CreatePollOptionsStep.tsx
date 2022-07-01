@@ -1,26 +1,21 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { Box, Link, styled, Typography } from "@mui/material";
-import { useAppDispatch } from "@store/store.model";
-import { useHistory } from "react-router-dom";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { pxToRem } from "@utils/text-size";
-import EmojiInputPicker, {
-  hasEmoji,
-} from "@components/EmojiInputPicker/EmojiInputPicker";
-import DeleteIcon from "@mui/icons-material/Delete";
-import {
-  CreatePollData,
-  pollUpdateData,
-} from "@store/Activity/poll.reducer";
-import { useSelector } from "react-redux";
-import { AutHeader } from "@components/AutHeader";
-import { AutButton } from "@components/buttons";
+import { Box, Link, styled, Typography } from '@mui/material';
+import { useAppDispatch } from '@store/store.model';
+import { useHistory } from 'react-router-dom';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { pxToRem } from '@utils/text-size';
+import EmojiInputPicker, { hasEmoji } from '@components/EmojiInputPicker/EmojiInputPicker';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { CreatePollData, pollUpdateData } from '@store/Activity/poll.reducer';
+import { useSelector } from 'react-redux';
+import { AutHeader } from '@components/AutHeader';
+import { AutButton } from '@components/buttons';
 
-const StepWrapper = styled("form")({
-  textAlign: "center",
-  display: "flex",
-  justifyContent: "center",
-  flexDirection: "column",
+const StepWrapper = styled('form')({
+  textAlign: 'center',
+  display: 'flex',
+  justifyContent: 'center',
+  flexDirection: 'column',
 });
 
 const errorTypes = {
@@ -28,38 +23,31 @@ const errorTypes = {
 };
 
 function FormArrayHelperText({ errors, name, children = null, value }) {
-  const [key, index] = name.split(".");
+  const [key, index] = name.split('.');
 
-  const error =
-    errors && errors[key] && errors[key][+index] && errors[key][+index];
+  const error = errors && errors[key] && errors[key][+index] && errors[key][+index];
   if (error) {
-    let message = "";
+    let message = '';
     const { type } = error;
     switch (type) {
-      case "required":
-        message = "Field is required!";
+      case 'required':
+        message = 'Field is required!';
         break;
-      case "missingEmoji":
+      case 'missingEmoji':
         message = `Whoops! You forgot to add an emoji 🤭`;
         break;
       default:
         return null;
     }
     return (
-      <Typography
-        whiteSpace="nowrap"
-        color="red"
-        align="right"
-        component="span"
-        variant="body2"
-      >
+      <Typography whiteSpace="nowrap" color="red" align="right" component="span" variant="body2">
         {message}
       </Typography>
     );
   }
   return (
     <Typography color="primary" align="right" component="span" variant="body2">
-      {children || ""}
+      {children || ''}
     </Typography>
   );
 }
@@ -75,7 +63,7 @@ const CreatePollOptionsStep = () => {
     watch,
     formState: { errors },
   } = useForm({
-    mode: "onSubmit",
+    mode: 'onSubmit',
     defaultValues: {
       options: data.options,
     },
@@ -83,14 +71,14 @@ const CreatePollOptionsStep = () => {
 
   const { fields, append, remove } = useFieldArray<any>({
     control,
-    name: "options",
+    name: 'options',
   });
 
   const values = watch();
 
   const onSubmit = async () => {
     await dispatch(pollUpdateData(values));
-    history.push("/aut-dashboard/event-factory/polls/participants");
+    history.push('/aut-dashboard/event-factory/polls/participants');
   };
 
   return (
@@ -104,11 +92,7 @@ const CreatePollOptionsStep = () => {
       />
       <StepWrapper autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         {fields.map((field, index) => (
-          <div
-            style={{ display: "flex" }}
-            className="field-with-delete-btn"
-            key={field.id}
-          >
+          <div style={{ display: 'flex' }} className="field-with-delete-btn" key={field.id}>
             <Controller
               control={control}
               rules={{
@@ -132,13 +116,7 @@ const CreatePollOptionsStep = () => {
                     sx={{
                       mb: pxToRem(45),
                     }}
-                    helperText={
-                      <FormArrayHelperText
-                        value={value}
-                        name={`options.${index}`}
-                        errors={errors}
-                      />
-                    }
+                    helperText={<FormArrayHelperText value={value} name={`options.${index}`} errors={errors} />}
                   />
                 );
               }}
@@ -150,7 +128,7 @@ const CreatePollOptionsStep = () => {
                   color="error"
                   onClick={() => remove(index)}
                   sx={{
-                    cursor: "pointer",
+                    cursor: 'pointer',
                     ml: pxToRem(15),
                     width: pxToRem(25),
                     height: pxToRem(25),
@@ -177,7 +155,7 @@ const CreatePollOptionsStep = () => {
           type="button"
           fontSize={pxToRem(18)}
           onClick={() => {
-            append({ option: "", emoji: "" });
+            append({ option: '', emoji: '' });
           }}
         >
           + Add Option

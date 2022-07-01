@@ -44,11 +44,7 @@ const EventFactory = () => {
       dispatch(resetActivityTaskState());
     };
   }, [dispatch]);
-  return (
-    <Container maxWidth="lg" className="sw-integration-dashboard">
-      
-    </Container>
-  );
+  return <Container maxWidth="lg" className="sw-integration-dashboard" />;
 };
 
 export default memo(EventFactory);

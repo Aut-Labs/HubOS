@@ -31,14 +31,22 @@ const SuccessDialog = ({ mode = 'light', open, handleClose, subtitle, message, f
           }}
         >
           <Typography
-            sx={{ color: mode === 'light' ? 'primary.main' : 'text.primary', textAlign: 'center', mt: 2 }}
+            sx={{
+              color: mode === 'light' ? 'primary.main' : 'text.primary',
+              textAlign: 'center',
+              mt: 2,
+            }}
             component="div"
             variant="h1"
           >
             {message}
           </Typography>
           <Typography
-            sx={{ color: mode === 'light' ? 'primary.main' : 'text.primary', textAlign: 'center', mt: 2 }}
+            sx={{
+              color: mode === 'light' ? 'primary.main' : 'text.primary',
+              textAlign: 'center',
+              mt: 2,
+            }}
             component="div"
             variant="h2"
           >

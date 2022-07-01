@@ -7,9 +7,9 @@ const ErrorDialog = ({ mode = 'light', open, hasRetry = false, handleClose, subt
   const dialogSize = fullScreen
     ? {}
     : {
-        maxWidth: pxToRem(400),
-        minWidth: pxToRem(400),
-        minHeight: pxToRem(250),
+        maxWidth: pxToRem(550),
+        minWidth: pxToRem(550),
+        minHeight: pxToRem(550),
       };
   return (
     <Dialog open={open} fullScreen={fullScreen}>
@@ -36,7 +36,11 @@ const ErrorDialog = ({ mode = 'light', open, hasRetry = false, handleClose, subt
             {message}
           </Typography>
           <Typography
-            sx={{ color: mode === 'light' ? 'primary.main' : 'text.primary', textAlign: 'center', mt: 2 }}
+            sx={{
+              color: mode === 'light' ? 'primary.main' : 'text.primary',
+              textAlign: 'center',
+              mt: 2,
+            }}
             component="div"
             variant="body2"
           >

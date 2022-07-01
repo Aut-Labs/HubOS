@@ -1,26 +1,19 @@
-import { ResultState } from "@store/result-status";
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { ErrorParser } from "@utils/error-parser";
-import { getLogs } from "@api/aut.api";
-import {
-  fetchCommunity,
-  fetchMembers,
-  updateCommunity,
-} from "@api/community.api";
-import { createSelector } from "reselect";
-import { Community } from "@api/community.model";
-import { AutID } from "@api/aut.model";
+import { ResultState } from '@store/result-status';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { ErrorParser } from '@utils/error-parser';
+import { getLogs } from '@api/aut.api';
+import { fetchCommunity, fetchMembers, setAsCoreTeam, updateCommunity } from '@api/community.api';
+import { createSelector } from 'reselect';
+import { Community } from '@api/community.model';
+import { AutID } from '@api/aut.model';
 
-export const fetchLogs = createAsyncThunk(
-  "community/logs",
-  async (address: string, { dispatch }) => {
-    try {
-      return await getLogs();
-    } catch (error) {
-      return ErrorParser(error, dispatch);
-    }
+export const fetchLogs = createAsyncThunk('community/logs', async (address: string, { dispatch }) => {
+  try {
+    return await getLogs();
+  } catch (error) {
+    return ErrorParser(error, dispatch);
   }
-);
+});
 
 export interface CommunityState {
   community: Community;
@@ -40,7 +33,7 @@ const initialState = {
 };
 
 export const communitySlice = createSlice({
-  name: "community",
+  name: 'community',
   initialState,
   reducers: {
     resetCommunityState: () => initialState,
@@ -52,6 +45,16 @@ export const communitySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // get community
+      .addCase(setAsCoreTeam.pending, (state) => {
+        state.status = ResultState.Loading;
+      })
+      .addCase(setAsCoreTeam.fulfilled, (state, action) => {
+        state.status = ResultState.Idle;
+      })
+      .addCase(setAsCoreTeam.rejected, (state) => {
+        state.status = ResultState.Failed;
+      })
       // get community
       .addCase(fetchCommunity.pending, (state) => {
         state.status = ResultState.Loading;
@@ -105,8 +108,8 @@ export const { communityUpdateState } = communitySlice.actions;
 
 export const CommunityStatus = (state) => state.community.status as ResultState;
 export const CommunityData = (state) => state.community.community as Community;
-export const CommunityMembers = (state) =>
-  state.community.members as { [key: string]: AutID[] };
+export const Communities = (state) => state.community.communities as Community[];
+export const CommunityMembers = (state) => state.community.members as { [key: string]: AutID[] };
 
 export const allRoles = createSelector(CommunityData, (c) => {
   return c.properties?.rolesSets[0]?.roles || [];
@@ -114,18 +117,9 @@ export const allRoles = createSelector(CommunityData, (c) => {
 
 export const SelectedMember = (memberAddress: string) =>
   createSelector(CommunityMembers, (c) => {
-    const membersKey = Object.keys(c).find((key) =>
-      c[key].some(
-        (member: AutID) => member.properties.address === memberAddress
-      )
-    );
+    const membersKey = Object.keys(c).find((key) => c[key].some((member: AutID) => member.properties.address === memberAddress));
 
-    return (
-      c[membersKey] &&
-      c[membersKey].find(
-        (member) => member.properties.address === memberAddress
-      )
-    );
+    return c[membersKey] && c[membersKey].find((member) => member.properties.address === memberAddress);
   });
 
 export default communitySlice.reducer;

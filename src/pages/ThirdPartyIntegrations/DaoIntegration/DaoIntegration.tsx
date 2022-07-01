@@ -1,39 +1,32 @@
-import { useState, useMemo, useEffect, useRef, memo } from "react";
-import { Typography, Container } from "@mui/material";
-import debounce from "lodash.debounce";
-import { SwButton } from "sw-web-shared";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import { RootState, useAppDispatch } from "@store/store.model";
-import { useSelector } from "react-redux";
-import { ResultState } from "@store/result-status";
-import LoadingDialog from "@components/LoadingPopup";
-import { pxToRem } from "@utils/text-size";
-import { AutTextField } from "@components/Fields";
-import { AutButton } from "@components/buttons";
-import { AutHeader } from "@components/AutHeader";
-import { addPAUrl, getPAUrl } from "@api/community.api";
+import { useState, useMemo, useEffect, useRef, memo } from 'react';
+import { Typography, Container } from '@mui/material';
+import debounce from 'lodash.debounce';
+import { SwButton } from 'sw-web-shared';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import { RootState, useAppDispatch } from '@store/store.model';
+import { useSelector } from 'react-redux';
+import { ResultState } from '@store/result-status';
+import LoadingDialog from '@components/LoadingPopup';
+import { pxToRem } from '@utils/text-size';
+import { AutTextField } from '@components/Fields';
+import { AutButton } from '@components/buttons';
+import { AutHeader } from '@components/AutHeader';
+import { addPAUrl, getPAUrl } from '@api/community.api';
 
 function AlertDialog({ handleClose, open }) {
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogContent
-        sx={{ maxWidth: "420px", minWidth: "420px", minHeight: "120px" }}
-      >
+      <DialogContent sx={{ maxWidth: '420px', minWidth: '420px', minHeight: '120px' }}>
         <DialogContentText
           sx={{
-            textAlign: "center",
+            textAlign: 'center',
           }}
           id="alert-dialog-description"
         >
-          <Typography
-            variant="h1"
-            textAlign="center"
-            component="span"
-            color="green"
-          >
+          <Typography variant="h1" textAlign="center" component="span" color="green">
             Transaction was successful
           </Typography>
         </DialogContentText>
@@ -50,7 +43,7 @@ function AlertDialog({ handleClose, open }) {
 const DaoIntegration = () => {
   const dispatch = useAppDispatch();
   const [disabled, setDisabled] = useState(false);
-  const [daoUrl, setDaoUrl] = useState("");
+  const [daoUrl, setDaoUrl] = useState('');
   const [open, setOpen] = useState(false);
   const input = useRef<any>();
   const { status, paUrl } = useSelector((state: RootState) => state.dashboard);
@@ -90,24 +83,20 @@ const DaoIntegration = () => {
     <Container
       sx={{
         flexGrow: 1,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
       }}
       maxWidth="md"
     >
-      <LoadingDialog
-        open={status === ResultState.Updating}
-        message="Adding dao url..."
-      />
+      <LoadingDialog open={status === ResultState.Updating} message="Adding dao url..." />
       <AlertDialog handleClose={handleClose} open={open} />
 
       <AutHeader
         title="Your dāut"
         subtitle={
           <>
-            This is where your DAO lives. Add the URL where you’ll be
-            integrating <br />
+            This is where your DAO lives. Add the URL where you’ll be integrating <br />
             dAut’s Decentralized Authentication System using your Community Address.
           </>
         }
@@ -127,7 +116,7 @@ const DaoIntegration = () => {
             Required Field
           </Typography>
         }
-      ></AutTextField>
+      />
       <AutButton
         sx={{
           minWidth: pxToRem(325),

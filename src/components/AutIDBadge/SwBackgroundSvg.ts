@@ -1,7 +1,8 @@
 /* eslint-disable max-len */
 
-import { FindTextWidth } from "./FindCenter";
-const fontSize = FindTextWidth("Helvetica");
+import { FindTextWidth } from './FindCenter';
+
+const fontSize = FindTextWidth('Helvetica');
 
 export const SwBackgroundSvg = ({ timestamp, title, width }): string => {
   const SVGDomElement = new DOMParser().parseFromString(
@@ -70,7 +71,9 @@ export const SwBackgroundSvg = ({ timestamp, title, width }): string => {
           <rect x="0.5" y="0.5" width="439" height="693" fill="none"/>
         </g>
       </g>
-      <text id="${title}" data-name="${title}" transform="translate(${width - fontSize(title, "20px") - 30} 600)" fill="#fff" font-size="20" font-family="Helvetica"><tspan x="0" y="0">${title}</tspan></text>
+      <text id="${title}" data-name="${title}" transform="translate(${
+      width - fontSize(title, '20px') - 30
+    } 600)" fill="#fff" font-size="20" font-family="Helvetica"><tspan x="0" y="0">${title}</tspan></text>
       <text id="${timestamp}" data-name="#${timestamp}" transform="translate(294 630)" fill="#009fe3" font-size="12" font-family="Helvetica" letter-spacing="0.075em" style="isolation: isolate"><tspan x="-44.122" y="0">${timestamp}</tspan></text>
       <g id="Layer_1" data-name="Layer 1" transform="translate(25.262 27.538)">
         <path id="Path_1603" data-name="Path 1603" d="M29.668,57.009a1.036,1.036,0,0,1-1.159-1.159V49.47a16.88,16.88,0,0,1-5.273,5.28,14.339,14.339,0,0,1-7.855,2.259A14.979,14.979,0,0,1,9.406,55.8a15.526,15.526,0,0,1-8.2-8.2A14.979,14.979,0,0,1,0,41.628,15.213,15.213,0,0,1,1.208,35.62a15.439,15.439,0,0,1,8.2-8.23,15.3,15.3,0,0,1,11.92,0,15.888,15.888,0,0,1,4.925,3.272,15.673,15.673,0,0,1,3.335,4.862A14.657,14.657,0,0,1,30.826,41.5v14.35a1.036,1.036,0,0,1-1.159,1.159Zm-.855-8.643V55.85c0,.591.264.855.855.855a.743.743,0,0,0,.855-.855V41.5a14.349,14.349,0,0,0-1.215-5.854,15.214,15.214,0,0,0-8.1-7.978,15.017,15.017,0,0,0-11.682,0A15.124,15.124,0,0,0,1.483,35.74,14.888,14.888,0,0,0,.3,41.628a14.692,14.692,0,0,0,1.182,5.856,15.2,15.2,0,0,0,8.039,8.039,14.655,14.655,0,0,0,5.856,1.182,14.023,14.023,0,0,0,7.69-2.211,16.554,16.554,0,0,0,5.457-5.644l.282-.485ZM15.381,54.994a13.087,13.087,0,0,1-5.189-1.05,13.34,13.34,0,0,1-7.129-7.129,13.342,13.342,0,0,1,0-10.378,13.53,13.53,0,0,1,2.865-4.264,14.015,14.015,0,0,1,4.262-2.9,12.985,12.985,0,0,1,10.382,0,13.738,13.738,0,0,1,7.158,7.158,12.984,12.984,0,0,1,0,10.382,13.989,13.989,0,0,1-2.9,4.262,13.578,13.578,0,0,1-4.264,2.865,13.1,13.1,0,0,1-5.189,1.05Zm0-26.495a12.458,12.458,0,0,0-5.068,1.057,13.692,13.692,0,0,0-4.171,2.833,13.244,13.244,0,0,0-2.8,4.169,13.033,13.033,0,0,0,0,10.14,13.03,13.03,0,0,0,6.969,6.969,13.033,13.033,0,0,0,10.14,0,13.219,13.219,0,0,0,4.169-2.8A13.691,13.691,0,0,0,27.452,46.7a12.678,12.678,0,0,0,0-10.135,13.431,13.431,0,0,0-7-7A12.465,12.465,0,0,0,15.381,28.5Zm7.993-4.972H7.389a1.036,1.036,0,0,1-1.159-1.159,1.163,1.163,0,0,1,.323-.793,1.082,1.082,0,0,1,.836-.366H23.374a1.16,1.16,0,1,1,0,2.317ZM7.389,21.513a.779.779,0,0,0-.611.264.863.863,0,0,0-.245.591c0,.591.264.855.855.855H23.374c.626,0,.918-.271.918-.855s-.292-.855-.918-.855Z" transform="translate(0 -16.617)" fill="url(#linear-gradient)"/>
@@ -134,7 +137,7 @@ export const SwBackgroundSvg = ({ timestamp, title, width }): string => {
     </g>
   </svg>
   `,
-    "application/xml"
+    'application/xml'
   );
   const serializedSVG = new XMLSerializer().serializeToString(SVGDomElement);
   return `data:image/svg+xml;base64, ${window.btoa(serializedSVG)}`;

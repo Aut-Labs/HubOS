@@ -11,7 +11,7 @@ const drawCanvasElements = (canvas: HTMLCanvasElement, ctx: CanvasRenderingConte
     const url = SwBackgroundSvg({
       title: title.text,
       width,
-      timestamp: timestamp.text
+      timestamp: timestamp.text,
     });
     const backgroundImage = await LoadImage(url);
     ctx.drawImage(backgroundImage, 0, 0);
@@ -91,14 +91,7 @@ const defaulConfig = (config: ContentConfig, avatar: string, tokenId: string, ti
   };
 };
 
-export const AutIDBadgeGenerator = async ({
-  canvas,
-  avatar,
-  tokenId,
-  title,
-  timestamp,
-  config,
-}: SWIDParams): Promise<SWIDOutput> => {
+export const AutIDBadgeGenerator = async ({ canvas, avatar, tokenId, title, timestamp, config }: SWIDParams): Promise<SWIDOutput> => {
   canvas = canvas || document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = true;

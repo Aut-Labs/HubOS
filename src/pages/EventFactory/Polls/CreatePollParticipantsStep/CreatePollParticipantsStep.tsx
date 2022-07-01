@@ -1,31 +1,25 @@
-import { MenuItem, styled, Typography } from "@mui/material";
-import { useAppDispatch } from "@store/store.model";
-import { useHistory } from "react-router-dom";
-import { Controller, useForm } from "react-hook-form";
-import { pxToRem } from "@utils/text-size";
-import {
-  CreatePollData,
-  CreatePollError,
-  CreatePollStatus,
-  pollUpdateStatus,
-  pollUpdateData,
-} from "@store/Activity/poll.reducer";
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import ErrorDialog from "@components/ErrorPopup";
-import LoadingDialog from "@components/LoadingPopup";
-import { ResultState } from "@store/result-status";
-import { addPoll } from "@api/activities.api";
-import { AutHeader } from "@components/AutHeader";
-import { AutSelectField } from "@components/Fields";
-import { AutButton } from "@components/buttons";
-import { allRoles } from "@store/Community/community.reducer";
+import { MenuItem, styled, Typography } from '@mui/material';
+import { useAppDispatch } from '@store/store.model';
+import { useHistory } from 'react-router-dom';
+import { Controller, useForm } from 'react-hook-form';
+import { pxToRem } from '@utils/text-size';
+import { CreatePollData, CreatePollError, CreatePollStatus, pollUpdateStatus, pollUpdateData } from '@store/Activity/poll.reducer';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import ErrorDialog from '@components/ErrorPopup';
+import LoadingDialog from '@components/LoadingPopup';
+import { ResultState } from '@store/result-status';
+import { addPoll } from '@api/activities.api';
+import { AutHeader } from '@components/AutHeader';
+import { AutSelectField } from '@components/Fields';
+import { AutButton } from '@components/buttons';
+import { allRoles } from '@store/Community/community.reducer';
 
-const StepWrapper = styled("form")({
-  textAlign: "center",
-  display: "flex",
-  justifyContent: "center",
-  flexDirection: "column",
+const StepWrapper = styled('form')({
+  textAlign: 'center',
+  display: 'flex',
+  justifyContent: 'center',
+  flexDirection: 'column',
 });
 
 const CreatePollParticipantsStep = () => {
@@ -37,7 +31,7 @@ const CreatePollParticipantsStep = () => {
   const data = useSelector(CreatePollData);
 
   const { control, handleSubmit, watch, reset } = useForm({
-    mode: "onSubmit",
+    mode: 'onSubmit',
     defaultValues: {
       role: data.role,
       allRoles: data.allRoles,
@@ -70,23 +64,15 @@ const CreatePollParticipantsStep = () => {
 
     await dispatch(pollUpdateData(values));
     const result = await dispatch(addPoll(metadata));
-    if (result.meta.requestStatus === "fulfilled") {
-      history.push("/aut-dashboard/event-factory/polls/success");
+    if (result.meta.requestStatus === 'fulfilled') {
+      history.push('/aut-dashboard/event-factory/polls/success');
     }
   };
 
   return (
     <>
-      <ErrorDialog
-        handleClose={handleDialogClose}
-        open={status === ResultState.Failed}
-        message={errorMessage || "Something went wrong"}
-      />
-      <LoadingDialog
-        handleClose={handleDialogClose}
-        open={status === ResultState.Updating}
-        message="Creating community poll..."
-      />
+      <ErrorDialog handleClose={handleDialogClose} open={status === ResultState.Failed} message={errorMessage || 'Something went wrong'} />
+      <LoadingDialog handleClose={handleDialogClose} open={status === ResultState.Updating} message="Creating community poll..." />
       <AutHeader
         title=" Polls"
         titleStyles={{
@@ -94,16 +80,11 @@ const CreatePollParticipantsStep = () => {
         }}
         subtitle={
           <>
-            Decide whether this is a Poll for the entire Community, or for a
-            specific Role. <br /> Who will participate in this Poll?
+            Decide whether this is a Poll for the entire Community, or for a specific Role. <br /> Who will participate in this Poll?
           </>
         }
       />
-      <StepWrapper
-        className="sw-poll-participants-wrapper"
-        autoComplete="off"
-        onSubmit={handleSubmit(onSubmit)}
-      >
+      <StepWrapper className="sw-poll-participants-wrapper" autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <Controller
           rules={{
             required: !values.allRoles,
@@ -117,25 +98,21 @@ const CreatePollParticipantsStep = () => {
                 autoFocus
                 renderValue={(selected) => {
                   if (!selected) {
-                    return "Select One";
+                    return 'Select One';
                   }
                   return selected;
                 }}
                 width="450"
                 name={name}
                 color="primary"
-                value={value || ""}
+                value={value || ''}
                 displayEmpty
                 disabled={values.allRoles}
                 required={!values.allRoles}
                 onChange={onChange}
               >
                 {roles.map((r, index) => (
-                  <MenuItem
-                    color="primary"
-                    key={`role-option-key-${r.roleName}-${index}`}
-                    value={r.roleName}
-                  >
+                  <MenuItem color="primary" key={`role-option-key-${r.roleName}-${index}`} value={r.roleName}>
                     {r.roleName}
                   </MenuItem>
                 ))}
@@ -158,13 +135,13 @@ const CreatePollParticipantsStep = () => {
                     allRoles: !value,
                   });
                 }}
-                className={value ? "active-link" : ""}
+                className={value ? 'active-link' : ''}
                 sx={{
                   maxWidth: pxToRem(450),
                   minHeight: pxToRem(50),
-                  "&.MuiButton-root": {
+                  '&.MuiButton-root': {
                     borderRadius: 0,
-                    borderWidth: "2px",
+                    borderWidth: '2px',
                   },
                 }}
               >
