@@ -3,7 +3,7 @@ import axios from 'axios';
 import { CommitmentMessages } from '@utils/misc';
 import { Community, findRoleName } from './community.model';
 import { Web3ThunkProviderFactory } from './ProviderFactory/web3-thunk.provider';
-import { ipfsCIDToHttpUrl, storeAsBlob } from './textile.api';
+import { ipfsCIDToHttpUrl, storeAsBlob } from './storage.api';
 import { environment } from './environment';
 import { AutID } from './aut.model';
 
@@ -94,7 +94,7 @@ export const whitelistAddress = communityExtensionThunkProvider(
 
 export const setAsCoreTeam = communityExtensionThunkProvider(
   {
-    type: 'aut-dashboard/addresses/add',
+    type: 'aut-dashboard/core-team/add',
     event: CommunityExtensionContractEventType.CoreTeamMemberAdded,
   },
   (thunkAPI) => {
@@ -104,6 +104,23 @@ export const setAsCoreTeam = communityExtensionThunkProvider(
   },
   async (contract, memberAddress) => {
     const result = await contract.addToCoreTeam(memberAddress);
+    return memberAddress;
+  }
+);
+
+export const removeAsCoreTeam = communityExtensionThunkProvider(
+  {
+    type: 'aut-dashboard/core-team/remove',
+    event: CommunityExtensionContractEventType.CoreTeamMemberRemoved,
+  },
+  (thunkAPI) => {
+    const state = thunkAPI.getState();
+    const { community } = state.community;
+    return Promise.resolve(community.properties.address);
+  },
+  async (contract, memberAddress) => {
+    const result = await contract.removeFromCoreTeam(memberAddress);
+    return memberAddress;
   }
 );
 
@@ -114,7 +131,6 @@ export const updateCommunity = communityExtensionThunkProvider(
   (thunkAPI) => {
     const state = thunkAPI.getState();
     const { community } = state.community;
-    debugger;
     return Promise.resolve(community.properties.address);
   },
   async (contract, community) => {
@@ -151,6 +167,8 @@ export const fetchMembers = communityExtensionThunkProvider(
       AutIDsResponse[filteredRoles[i].roleName] = [];
     }
 
+    AutIDsResponse.Admins = [];
+
     const memberIds = await contract.getAllMembers();
     const autContract = await Web3AutIDProvider(environment.autIDAddress);
 
@@ -177,10 +195,70 @@ export const fetchMembers = communityExtensionThunkProvider(
           isCoreTeam,
         },
       });
-
+      if (isCoreTeam) {
+        AutIDsResponse.Admins.push(member);
+      }
       AutIDsResponse[roleName].push(member);
     }
 
+    return AutIDsResponse;
+  }
+);
+
+export const fetchMember = communityExtensionThunkProvider(
+  {
+    type: 'community/member/get',
+  },
+  async (thunkAPI) => {
+    const state = thunkAPI.getState();
+    const { community } = state.community;
+    return Promise.resolve(community.properties.address);
+  },
+  async (contract, memberAddress, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const AutIDsResponse: { [role: string]: AutID[] } = {};
+
+    let { community } = state.community;
+
+    if (!community) {
+      const response = await thunkAPI.dispatch(fetchCommunity(null));
+      community = response.payload as Community;
+    }
+
+    const filteredRoles = community.properties.rolesSets[0].roles;
+
+    for (let i = 0; i < filteredRoles.length; i += 1) {
+      AutIDsResponse[filteredRoles[i].roleName] = [];
+    }
+
+    AutIDsResponse.Admins = [];
+
+    const autContract = await Web3AutIDProvider(environment.autIDAddress);
+    const tokenId = await autContract.getAutIDByOwner(memberAddress);
+    const metadataCID = await autContract.tokenURI(Number(tokenId.toString()));
+    const [, role, commitment] = await autContract.getCommunityData(memberAddress, community.properties.address);
+    const jsonUri = ipfsCIDToHttpUrl(metadataCID);
+    const jsonMetadata: AutID = (await axios.get(jsonUri)).data;
+    const roleName = findRoleName(role.toString(), community.properties.rolesSets);
+
+    const isCoreTeam = await contract.isCoreTeam(memberAddress);
+    const member = new AutID({
+      ...jsonMetadata,
+      properties: {
+        ...jsonMetadata.properties,
+        address: memberAddress,
+        role: role.toString(),
+        roleName,
+        tokenId: tokenId.toString(),
+        commitmentDescription: CommitmentMessages(commitment),
+        commitment: commitment.toString(),
+        isCoreTeam,
+      },
+    });
+    if (isCoreTeam) {
+      AutIDsResponse.Admins.push(member);
+    }
+    AutIDsResponse[roleName].push(member);
     return AutIDsResponse;
   }
 );

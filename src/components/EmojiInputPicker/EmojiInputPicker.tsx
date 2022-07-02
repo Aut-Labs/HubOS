@@ -69,7 +69,6 @@ const EmojiInputPicker = ({ emojiButtonProps, value, onChange, ...inputProps }: 
           });
         }}
         width="450"
-        autoFocus
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -84,7 +83,6 @@ const EmojiInputPicker = ({ emojiButtonProps, value, onChange, ...inputProps }: 
                 }}
                 disabled={emojiButtonProps?.disabled}
                 onClick={openMenu}
-                color="primary"
                 component="span"
               >
                 <SvgIcon

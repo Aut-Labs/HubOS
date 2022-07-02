@@ -7,6 +7,7 @@ import { setTitle } from '@store/ui-reducer';
 import CalendarStep from './CalendarStep/CalendarStep';
 import CallInformationStep from './CallInformationStep/CallInformationStep';
 import SuccessStep from './SuccessStep/SuccessStep';
+import { pxToRem } from '@utils/text-size';
 
 const GroupCall = () => {
   const dispatch = useDispatch();
@@ -17,7 +18,7 @@ const GroupCall = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(setTitle(`Community Calls - Sublime Here`));
+    dispatch(setTitle(`Community Events - the lifeblood of your Community.`));
   }, [dispatch]);
 
   return (
@@ -28,6 +29,7 @@ const GroupCall = () => {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
+        py: pxToRem(30),
       }}
     >
       <Switch>

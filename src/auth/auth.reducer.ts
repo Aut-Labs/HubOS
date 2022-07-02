@@ -1,5 +1,5 @@
 import { AutID } from '@api/aut.model';
-import { ipfsCIDToHttpUrl } from '@api/textile.api';
+import { ipfsCIDToHttpUrl } from '@api/storage.api';
 import { createSlice } from '@reduxjs/toolkit';
 
 export interface AuthState {

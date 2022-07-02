@@ -49,11 +49,15 @@ export const dashboardSlice = createSlice({
       .addCase(addDiscordToCommunity.pending, (state) => {
         state.status = ResultState.Updating;
       })
-      .addCase(addDiscordToCommunity.fulfilled, (state, action) => {
+      .addCase(addDiscordToCommunity.fulfilled, (state) => {
         state.status = ResultState.Idle;
       })
-      .addCase(addDiscordToCommunity.rejected, (state) => {
-        state.status = ResultState.Failed;
+      .addCase(addDiscordToCommunity.rejected, (state, action) => {
+        if (!action.meta.aborted) {
+          state.status = ResultState.Failed;
+        } else {
+          state.status = ResultState.Idle;
+        }
       })
       .addCase(getWhitelistedAddresses.pending, (state) => {
         state.status = ResultState.Loading;
@@ -64,7 +68,11 @@ export const dashboardSlice = createSlice({
       })
       .addCase(getWhitelistedAddresses.rejected, (state, action) => {
         state.whitelistedAddresses = [];
-        state.status = ResultState.Failed;
+        if (!action.meta.aborted) {
+          state.status = ResultState.Failed;
+        } else {
+          state.status = ResultState.Idle;
+        }
         state.errorMessage = action.payload as string;
       })
       .addCase(getPAContracts.pending, (state) => {
@@ -76,7 +84,11 @@ export const dashboardSlice = createSlice({
       })
       .addCase(getPAContracts.rejected, (state, action) => {
         state.contracts = [];
-        state.status = ResultState.Failed;
+        if (!action.meta.aborted) {
+          state.status = ResultState.Failed;
+        } else {
+          state.status = ResultState.Idle;
+        }
         state.errorMessage = action.payload as string;
       })
 
@@ -89,7 +101,11 @@ export const dashboardSlice = createSlice({
       })
       .addCase(getPAUrl.rejected, (state, action) => {
         state.paUrl = null;
-        state.status = ResultState.Failed;
+        if (!action.meta.aborted) {
+          state.status = ResultState.Failed;
+        } else {
+          state.status = ResultState.Idle;
+        }
         state.errorMessage = action.payload as string;
       })
 
@@ -100,7 +116,11 @@ export const dashboardSlice = createSlice({
         state.status = ResultState.Idle;
       })
       .addCase(addPAUrl.rejected, (state, action) => {
-        state.status = ResultState.Failed;
+        if (!action.meta.aborted) {
+          state.status = ResultState.Failed;
+        } else {
+          state.status = ResultState.Idle;
+        }
         state.errorMessage = action.payload as string;
       })
 
@@ -111,7 +131,11 @@ export const dashboardSlice = createSlice({
         state.status = ResultState.Idle;
       })
       .addCase(addNewWhitelistedAddresses.rejected, (state, action) => {
-        state.status = ResultState.Failed;
+        if (!action.meta.aborted) {
+          state.status = ResultState.Failed;
+        } else {
+          state.status = ResultState.Idle;
+        }
         state.errorMessage = action.payload as string;
       })
 
@@ -122,7 +146,11 @@ export const dashboardSlice = createSlice({
         state.status = ResultState.Idle;
       })
       .addCase(addPAContracts.rejected, (state, action) => {
-        state.status = ResultState.Failed;
+        if (!action.meta.aborted) {
+          state.status = ResultState.Failed;
+        } else {
+          state.status = ResultState.Idle;
+        }
         state.errorMessage = action.payload as string;
       });
   },

@@ -5,8 +5,8 @@ import { useSelector } from 'react-redux';
 import { SwButton } from 'sw-web-shared';
 import { useEffect } from 'react';
 import { ResultState } from '@store/result-status';
-import LoadingDialog from '@components/LoadingPopup';
-import ErrorDialog from '@components/ErrorPopup';
+import LoadingDialog from '@components/Dialog/LoadingPopup';
+import ErrorDialog from '@components/Dialog/ErrorPopup';
 import { useForm, Controller } from 'react-hook-form';
 import {
   ActivityCurrentStep,

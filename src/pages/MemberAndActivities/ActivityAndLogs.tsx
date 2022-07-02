@@ -53,7 +53,7 @@ const ActivityAndLogs = ({ logs }) => {
               />
               <Typography
                 sx={{
-                  color: 'primary.main',
+                  color: 'white',
                   textAlign: 'center',
                 }}
                 variant="body1"
@@ -62,7 +62,7 @@ const ActivityAndLogs = ({ logs }) => {
               </Typography>
               <Typography
                 sx={{
-                  color: 'primary.main',
+                  color: 'white',
                   textAlign: 'center',
                 }}
                 variant="body1"
@@ -79,7 +79,7 @@ const ActivityAndLogs = ({ logs }) => {
               >
                 <Typography
                   sx={{
-                    color: 'primary.main',
+                    color: 'white',
                     textAlign: 'center',
                   }}
                   variant="body2"
@@ -108,7 +108,7 @@ const ActivityAndLogs = ({ logs }) => {
               />
               <Typography
                 sx={{
-                  color: 'primary.main',
+                  color: 'white',
                   textAlign: 'center',
                   mt: '4px',
                 }}

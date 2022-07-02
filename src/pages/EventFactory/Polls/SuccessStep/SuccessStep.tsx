@@ -1,43 +1,63 @@
-import { Box, Typography, Button } from '@mui/material';
-import { Link } from 'react-router-dom';
-import './SuccessStep.scss';
+import { Box, Container, styled, Typography } from '@mui/material';
+import { pxToRem } from '@utils/text-size';
+import { ReactComponent as CutLogo } from '@assets/aut/cut.svg';
+import { AutButton } from '@components/buttons';
+import { Link, useParams } from 'react-router-dom';
+
+const StepWrapper = styled(Container)({
+  textAlign: 'center',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexDirection: 'column',
+});
 
 const SuccessStep = () => {
+  const params = useParams<{ address: string }>();
   return (
-    <>
-      <div className="sw-success-wrapper">
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            my: 'auto',
-          }}
-        >
-          <Typography align="center" color="primary.main" variant="h2" component="div">
-            Success! Your Community Poll has been created and deployed on the Blockchain 🎉
-          </Typography>
-          <Typography align="center" color="primary.main" variant="h2" component="div">
-            Now just share it with your [Team/Community] to get things started!
-          </Typography>
+    <StepWrapper maxWidth="md" sx={{ width: '100%', flexGrow: 1, boxSizing: 'border-box', position: 'relative' }}>
+      <Typography letterSpacing="10.5px" textTransform="uppercase" marginTop={pxToRem(50)} fontSize={pxToRem(70)} color="white">
+        Congratulations
+      </Typography>
+      <CutLogo />
 
-          <Button
-            disabled
-            sx={{
-              my: '40px',
-            }}
-            component={Link}
-            to="/aut-dashboard/dashboard/core-team/polls"
-            size="small"
-            color="primary"
-          >
-            See all Community Polls
-          </Button>
-        </Box>
-      </div>
-    </>
+      <Typography
+        letterSpacing="1.25px"
+        minHeight={pxToRem(240)}
+        maxWidth="80%"
+        marginTop={pxToRem(40)}
+        fontSize={pxToRem(25)}
+        color="white"
+      >
+        Great, your Poll now exists on the Blockchain. Just share it on Discord to kick it off and get your Members onboard!
+      </Typography>
+      <Box sx={{ gridGap: '30px', display: 'flex', justifyContent: 'center' }} className="right-box">
+        <AutButton
+          sx={{
+            width: pxToRem(450),
+            height: pxToRem(90),
+          }}
+          type="submit"
+          color="primary"
+          variant="outlined"
+        >
+          Share
+        </AutButton>
+        <AutButton
+          sx={{
+            width: pxToRem(450),
+            height: pxToRem(90),
+          }}
+          component={Link}
+          to="/aut-dashboard/event-factory/polls"
+          type="submit"
+          color="primary"
+          variant="outlined"
+        >
+          Create another Poll
+        </AutButton>
+      </Box>
+    </StepWrapper>
   );
 };
 

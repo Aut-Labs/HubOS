@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unstable-nested-components */
 import { AutButton } from '@components/buttons';
+import AutLoading from '@components/AutLoading';
 import { Box, CircularProgress, ListItem, Typography } from '@mui/material';
 import { FilteredTasks, TasksRefreshStatus, TasksStatus } from '@store/Activity/tasks.reducer';
 import { GroupTask, Task, TaskStatus, TaskTypes } from '@store/model';
@@ -220,12 +221,7 @@ const TasksList = (props) => {
       >
         {status === ResultState.Loading ? (
           <div className="tasks-loading-spinner">
-            <CircularProgress
-              sx={{
-                justifyContent: 'center',
-                alignContent: 'center',
-              }}
-            />
+            <AutLoading />
           </div>
         ) : (
           groupedTasks.map((group, index) => {

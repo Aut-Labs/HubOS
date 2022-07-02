@@ -1,5 +1,5 @@
 import { TokenInput } from 'nft.storage/dist/src/lib/interface';
-import { ipfsCIDToHttpUrl } from './textile.api';
+import { ipfsCIDToHttpUrl } from './storage.api';
 
 /* eslint-disable no-shadow */
 export enum ActivityTypes {
@@ -7,6 +7,12 @@ export enum ActivityTypes {
   CoreTeamTask,
   DiscordPoll,
   CommunityCall,
+}
+
+export enum CommunityEventTypes {
+  Ongoing,
+  Upcoming,
+  Past,
 }
 
 export class BaseNFTModel<Properties> implements Omit<TokenInput, 'image'> {
@@ -42,6 +48,28 @@ export interface ActivityTask {
     isCoreTeamMembersOnly: boolean;
   };
 }
+
+export interface ActivityPoll {
+  timestamp: number;
+  pollData: ActivityPollData;
+  results: string;
+  isFinalized: boolean;
+  role: number;
+  dueDate: number;
+}
+
+export interface ActivityPollData {
+  title: string;
+  description: string;
+  duration: string;
+  options: {
+    option: string;
+    emoji: string;
+  }[];
+  role: string;
+  roleName?: string;
+  allRoles: boolean;
+}
 export interface CommunityContractError {
   code: number;
   message: string;
@@ -52,49 +80,12 @@ export interface CommunityContractError {
   };
 }
 
-export interface Aut {
-  tokenId: string;
-  nickname: string;
-  imageUrl: string;
-  diToCredits: number;
-  repScore: number;
-  currentCommunities: CommunityList[];
-  pastCommunities: CommunityList[];
-  skills: Skill[];
-}
 export interface AutTask {
   tokenId: string;
   nickname: string;
   imageUrl: string;
   timestamp: string;
 }
-export interface AutList {
-  role: string;
-  tokenId: string;
-  name: string;
-  image: string;
-  commitment: string;
-}
-export interface AutListPerRole {
-  role: string;
-  Auts: AutList[];
-}
-
-interface CommunityList {
-  name: string;
-  address: string;
-  members?: number;
-  description?: string;
-  scarcityScore?: number;
-  comScore?: number;
-  repCredits?: number;
-}
-
-interface Skill {
-  name: string;
-  value: number;
-}
-
 export interface Role {
   roleName: string;
   id: number;

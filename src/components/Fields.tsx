@@ -65,6 +65,10 @@ export function FormHelperText({ errors, name, errorTypes, children = null, valu
 }
 
 const CustomSwCalendarPicker = styled(CalendarPicker)(({ theme }) => ({
+  '&.MuiCalendarPicker-root': {
+    width: pxToRem(376),
+    minHeight: pxToRem(450),
+  },
   '.MuiTypography-caption': {
     color: theme.palette.primary.main,
   },
@@ -79,13 +83,17 @@ const CustomSwCalendarPicker = styled(CalendarPicker)(({ theme }) => ({
       color: theme.palette.primary.main,
     },
   },
+  '.MuiPickersDay-hiddenDaySpacingFiller': {
+    width: '3.125rem',
+    height: '3.125rem',
+  },
   '.MuiButtonBase-root .MuiSvgIcon-root': {
     width: pxToRem(40),
     height: pxToRem(40),
     color: 'white',
   },
   '.PrivatePickersSlideTransition-root': {
-    minHeight: pxToRem(300),
+    minHeight: pxToRem(320),
     '.MuiButtonBase-root.Mui-disabled': {
       color: '#777777',
       backgroundColor: 'black',
@@ -118,7 +126,9 @@ export const SwDatePicker = ({ control, name, minDate, maxDate = null, otherProp
             maxDate={maxDate}
             PaperProps={{
               sx: {
-                '.MuiCalendarPicker-root': {
+                '&.MuiCalendarPicker-root': {
+                  width: pxToRem(480),
+                  background: 'red',
                   'div[role="presentation"], .MuiButtonBase-root, .MuiTypography-root, .PrivatePickersYear-yearButton': {
                     fontSize: pxToRem(18),
                     color: 'primary.main',

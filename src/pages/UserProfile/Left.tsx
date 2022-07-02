@@ -7,13 +7,14 @@ import { ReactComponent as TelegramIcon } from '@assets/SocialIcons/TelegramIcon
 import { ReactComponent as TwitterIcon } from '@assets/SocialIcons/TwitterIcon.svg';
 import { AutID } from '@api/aut.model';
 import { AutButton } from '@components/buttons';
-import { RootState, useAppDispatch } from '@store/store.model';
-import { setAsCoreTeam } from '@api/community.api';
-import ErrorDialog from '@components/ErrorPopup';
-import LoadingDialog from '@components/LoadingPopup';
-import { communityUpdateState } from '@store/Community/community.reducer';
+import { useAppDispatch } from '@store/store.model';
+import { setAsCoreTeam, removeAsCoreTeam } from '@api/community.api';
+import ErrorDialog from '@components/Dialog/ErrorPopup';
+import LoadingDialog from '@components/Dialog/LoadingPopup';
+import { CommunityStatus, communityUpdateState } from '@store/Community/community.reducer';
 import { ResultState } from '@store/result-status';
 import { useSelector } from 'react-redux';
+import CopyAddress from '@components/CopyAddress';
 
 const IconContainer = styled('div')(({ theme }) => ({
   paddingTop: pxToRem(40),
@@ -41,8 +42,8 @@ const Stat = styled('div')({
 });
 
 const StatWrapper = styled('div')({
-  maxWidth: pxToRem(670),
-  minWidth: pxToRem(670),
+  maxWidth: pxToRem(550),
+  minWidth: pxToRem(550),
   margin: '0 auto',
 });
 
@@ -77,10 +78,14 @@ const AutCard = styled(Card)(({ theme }) => ({
 
 const LeftProfile = ({ member }: { member: AutID }) => {
   const dispatch = useAppDispatch();
-  const { status } = useSelector((state: RootState) => state.community);
+  const status = useSelector(CommunityStatus);
 
-  const whitelistMember = () => {
-    dispatch(setAsCoreTeam(member.properties.address));
+  const addOrRemoveAsCoreTeam = () => {
+    if (member.properties.isCoreTeam) {
+      dispatch(removeAsCoreTeam(member.properties.address));
+    } else {
+      dispatch(setAsCoreTeam(member.properties.address));
+    }
   };
 
   const handleDialogClose = () => {
@@ -94,7 +99,7 @@ const LeftProfile = ({ member }: { member: AutID }) => {
   return (
     <Box style={{ display: 'flex', flexDirection: 'column', flex: '1' }}>
       <ErrorDialog handleClose={handleDialogClose} open={status === ResultState.Failed} message="Something went wrong" />
-      <LoadingDialog handleClose={handleDialogClose} open={status === ResultState.Updating} message="Setting member as core team" />
+      <LoadingDialog handleClose={handleDialogClose} open={status === ResultState.Loading} message="Setting member as core team" />
       <Box
         sx={{
           paddingLeft: pxToRem(100),
@@ -129,9 +134,7 @@ const LeftProfile = ({ member }: { member: AutID }) => {
               </Typography>
             </div>
 
-            <Typography variant="h2" color="background.paper" textAlign="left" sx={{ textDecoration: 'underline', wordBreak: 'break-all' }}>
-              {member?.properties?.address}
-            </Typography>
+            <CopyAddress address={member?.properties?.address} />
             <IconContainer>
               <SvgIcon
                 sx={{
@@ -214,20 +217,22 @@ const LeftProfile = ({ member }: { member: AutID }) => {
           justifyContent: 'center',
         }}
       >
-        <AutButton
-          sx={{
-            minWidth: pxToRem(325),
-            maxWidth: pxToRem(325),
-            height: pxToRem(70),
-            mt: pxToRem(100),
-          }}
-          type="button"
-          onClick={whitelistMember}
-          color="primary"
-          variant="outlined"
-        >
-          Set as Admin
-        </AutButton>
+        {window?.ethereum?.selectedAddress?.toLowerCase() !== member?.properties?.address?.toLowerCase() && (
+          <AutButton
+            sx={{
+              minWidth: pxToRem(325),
+              maxWidth: pxToRem(325),
+              height: pxToRem(70),
+              my: pxToRem(50),
+            }}
+            type="button"
+            onClick={addOrRemoveAsCoreTeam}
+            color="primary"
+            variant="outlined"
+          >
+            {member?.properties?.isCoreTeam ? 'Remove as Admin' : 'Set as Admin'}
+          </AutButton>
+        )}
       </Box>
     </Box>
   );

@@ -16,9 +16,9 @@ export const swEnvVariables = {
   registryAdress: 'REACT_APP_COMMUNITY_REGISTRY_ADDRESS',
   autIDAddress: 'REACT_APP_AUT_ID_ADDRESS',
 
-  // dito
-  ditoApiUrl: 'REACT_APP_DITO_API_URL',
-  ditoBucketName: 'REACT_APP_DITO_BUCKET_NAME',
+  // NFT storage
+  nftStorageKey: 'REACT_APP_NFT_STORAGE_KEY',
+  nftStorageUrl: 'REACT_APP_IPFS_URL',
 
   // discord
   discordClientId: 'REACT_APP_DISCORD_CLIENT_ID',

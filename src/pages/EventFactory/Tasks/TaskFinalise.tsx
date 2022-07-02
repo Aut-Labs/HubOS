@@ -3,10 +3,10 @@ import { SingleTask, TaskErrorMessage, TasksStatus, tasksUpdateStatus } from '@s
 import { Task, TaskStatus } from '@store/model';
 import { useAppDispatch } from '@store/store.model';
 import { finalizeActivityTask, getTaskById } from '@api/activities.api';
-import LoadingDialog from '@components/LoadingPopup';
+import LoadingDialog from '@components/Dialog/LoadingPopup';
 import { pxToRem } from '@utils/text-size';
 import { useEffect } from 'react';
-import ErrorDialog from '@components/ErrorPopup';
+import ErrorDialog from '@components/Dialog/ErrorPopup';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { SwScrollbar } from 'sw-web-shared';
@@ -14,6 +14,7 @@ import { ResultState } from '@store/result-status';
 import UserTaskDetail from './UserTaskDetail';
 import './Tasks.scss';
 import { AutButton } from '@components/buttons';
+import AutLoading from '@components/AutLoading';
 
 const TaskFinalise = () => {
   const dispatch = useAppDispatch();
@@ -49,12 +50,7 @@ const TaskFinalise = () => {
       <ErrorDialog handleClose={handleDialogClose} open={status === ResultState.Failed} message={errorMessage || 'Something went wrong'} />
       {status === ResultState.Loading ? (
         <div className="tasks-loading-spinner">
-          <CircularProgress
-            sx={{
-              justifyContent: 'center',
-              alignContent: 'center',
-            }}
-          />
+          <AutLoading />
         </div>
       ) : (
         <SwScrollbar

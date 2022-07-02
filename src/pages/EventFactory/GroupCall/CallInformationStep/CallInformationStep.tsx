@@ -31,8 +31,8 @@ import { format } from 'date-fns';
 import { allRoles } from '@store/Community/community.reducer';
 import { addGroupCall } from '@api/activities.api';
 import { ResultState } from '@store/result-status';
-import ErrorDialog from '@components/ErrorPopup';
-import LoadingDialog from '@components/LoadingPopup';
+import ErrorDialog from '@components/Dialog/ErrorPopup';
+import LoadingDialog from '@components/Dialog/LoadingPopup';
 import { AutHeader } from '@components/AutHeader';
 import { AutButton } from '@components/buttons';
 import { AutSelectField, AutTextField } from '@components/Fields';
@@ -148,8 +148,10 @@ const CallInformationStep = () => {
                           >
                             <ListItemText
                               sx={{
-                                color: 'white',
-                                fontSize: pxToRem(21),
+                                '.MuiTypography-root': {
+                                  color: 'white',
+                                  fontSize: pxToRem(21),
+                                },
                               }}
                               primary={slot.label}
                             />
@@ -194,6 +196,11 @@ const CallInformationStep = () => {
                   render={({ field: { value, onChange } }) => (
                     <RadioGroup
                       value={value}
+                      sx={{
+                        '.MuiRadio-root': {
+                          color: 'white',
+                        },
+                      }}
                       onChange={(e) => {
                         onChange(e.target.defaultValue === 'true');
                         resetField('role');

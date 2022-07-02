@@ -1,20 +1,20 @@
-import { memo, useEffect } from 'react';
-import { Box, CircularProgress, Container } from '@mui/material';
+import { memo, useEffect, useState } from 'react';
+import { Box, Container } from '@mui/material';
 import { Community } from '@api/community.model';
 import { useSelector } from 'react-redux';
 import { pxToRem } from '@utils/text-size';
-import { allRoles, communityUpdateState } from '@store/Community/community.reducer';
+import { allRoles, CommunityData, CommunityStatus, communityUpdateState } from '@store/Community/community.reducer';
 import { RootState, useAppDispatch } from '@store/store.model';
 import { updateCommunity } from '@api/community.api';
 import { ResultState } from '@store/result-status';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
-import ErrorDialog from '@components/ErrorPopup';
-import LoadingDialog from '@components/LoadingPopup';
+import ErrorDialog from '@components/Dialog/ErrorPopup';
+import LoadingDialog from '@components/Dialog/LoadingPopup';
 import { AutTextField, FormHelperText } from '@components/Fields';
 import { AutHeader } from '@components/AutHeader';
 import { AutButton } from '@components/buttons';
 import { setTitle } from '@store/ui-reducer';
-import './Roles.scss';
+import AutLoading from '@components/AutLoading';
 
 const errorTypes = {
   maxLength: `Characters cannot be more than 280`,
@@ -22,7 +22,9 @@ const errorTypes = {
 
 const Roles = () => {
   const dispatch = useAppDispatch();
-  const { status, community } = useSelector((state: RootState) => state.community);
+  const [promises, setPromises] = useState([]);
+  const community = useSelector(CommunityData);
+  const status = useSelector(CommunityStatus);
   const roles = useSelector(allRoles);
 
   const {
@@ -36,21 +38,16 @@ const Roles = () => {
       roles,
     },
   });
+  const values = watch();
 
   const { fields } = useFieldArray({
     control,
     name: 'roles',
   });
 
-  useEffect(() => {
-    dispatch(setTitle(`DAO Management - Sublime Here`));
-  }, [dispatch]);
-
-  const values = watch();
-
   const onSubmit = async (data: typeof values) => {
     community.properties.rolesSets[0].roles = data.roles;
-    await dispatch(
+    const promise = dispatch(
       updateCommunity(
         new Community({
           ...community,
@@ -60,6 +57,7 @@ const Roles = () => {
         })
       )
     );
+    setPromises([promise]);
   };
 
   const handleDialogClose = () => {
@@ -69,6 +67,16 @@ const Roles = () => {
       })
     );
   };
+
+  useEffect(() => {
+    dispatch(setTitle(`DAO Management - Members & Roles in your Community.`));
+  }, [dispatch]);
+
+  useEffect(() => {
+    return () => {
+      promises.forEach((p) => p.abort());
+    };
+  }, [dispatch, promises]);
 
   return (
     <form
@@ -87,6 +95,7 @@ const Roles = () => {
         className="sw-roles-wrapper"
         maxWidth="md"
         sx={{
+          py: pxToRem(30),
           width: '100%',
           flexGrow: 1,
           display: 'flex',
@@ -105,12 +114,7 @@ const Roles = () => {
         />
         {status === ResultState.Loading ? (
           <div className="sw-loading-spinner">
-            <CircularProgress
-              sx={{
-                justifyContent: 'center',
-                alignContent: 'center',
-              }}
-            />
+            <AutLoading />
           </div>
         ) : (
           <Box

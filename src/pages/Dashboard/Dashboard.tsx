@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { Avatar, Card, CardContent, CardHeader, Typography } from '@mui/material';
+import { Avatar, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
 import { CommunityData } from '@store/Community/community.reducer';
 import { pxToRem } from '@utils/text-size';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { UserInfo } from '@auth/auth.reducer';
 import SwGrid from '@components/SwGrid';
 import { styled } from '@mui/system';
+import CopyAddress from '@components/CopyAddress';
 
 const Stat = styled('div')({
   width: '100%',
@@ -154,7 +155,7 @@ const Dashboard = () => {
               background: '#000',
               borderImage:
                 'linear-gradient(45deg, #009fe3 0%, #0399de 8%, #0e8bd3 19%, #2072bf 30%, #3a50a4 41%, #5a2583 53%, #453f94 71%, #38519f 88%, #3458a4 100%) 1',
-              borderWidth: '5px',
+              borderWidth: '10px',
             }}
           >
             <CardHeader
@@ -179,6 +180,7 @@ const Dashboard = () => {
                   <Typography sx={{ color: 'white' }} component="div" fontSize={pxToRem(32)}>
                     {community.name}
                   </Typography>
+                  <CopyAddress address={community.properties.address} />
                   <Typography sx={{ color: 'white' }} component="div" fontSize={pxToRem(19)}>
                     {community.properties.market}
                   </Typography>

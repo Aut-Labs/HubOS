@@ -1,6 +1,6 @@
 import { BaseNFTModel } from './api.model';
 import { Community } from './community.model';
-import { ipfsCIDToHttpUrl } from './textile.api';
+import { ipfsCIDToHttpUrl } from './storage.api';
 
 export class AutIDProperties {
   avatar: string;

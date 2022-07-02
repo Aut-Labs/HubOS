@@ -8,6 +8,7 @@ import CreatePollOptionsStep from './CreatePollOptionsStep/CreatePollOptionsStep
 import CreatePollInfoStep from './CreatePollInfoStep/CreatePollInfoStep';
 import CreatePollParticipantsStep from './CreatePollParticipantsStep/CreatePollParticipantsStep';
 import SuccessStep from './SuccessStep/SuccessStep';
+import { pxToRem } from '@utils/text-size';
 
 const Polls = () => {
   const dispatch = useDispatch();
@@ -18,7 +19,7 @@ const Polls = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(setTitle(`Polls - Sublime Here`));
+    dispatch(setTitle(`Community Events - the lifeblood of your Community.`));
   }, [dispatch]);
 
   return (
@@ -29,6 +30,7 @@ const Polls = () => {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
+        py: pxToRem(30),
       }}
     >
       <Switch>

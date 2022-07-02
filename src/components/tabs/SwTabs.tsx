@@ -32,7 +32,15 @@ function TabPanel(props) {
   );
 }
 
-export default function SwTabs({ tabs, selectedTabIndex = 0, selectedTab = (e, v) => null, scrollbarStyles = {}, tabPanelStyles = {} }) {
+export default function SwTabs({
+  tabs,
+  selectedTabIndex = 0,
+  selectedTab = (e, v) => null,
+  scrollbarStyles = {},
+  tabPanelStyles = {},
+  width = 260,
+  height = 60,
+}) {
   const [value, setValue] = React.useState(selectedTabIndex);
 
   const handleChange = (event, newValue) => {
@@ -55,8 +63,8 @@ export default function SwTabs({ tabs, selectedTabIndex = 0, selectedTab = (e, v
               gridGap: '10px',
             },
             '.MuiButtonBase-root': {
-              height: pxToRem(60),
-              width: pxToRem(260),
+              height: pxToRem(height),
+              width: pxToRem(width),
               borderColor: 'primary.main',
               textTransform: 'inherit',
               borderWidth: '2px',

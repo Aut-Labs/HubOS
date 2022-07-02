@@ -87,9 +87,7 @@ function App() {
     window.addEventListener('aut-onConnected', onSWLogin);
     window.addEventListener('aut-onDisconnected', onDisconnected);
 
-    Init({
-      container: document.querySelector('#connect-wallet-container'),
-    });
+    Init();
 
     return () => {
       window.removeEventListener('aut-Init', onSWInit);
@@ -100,7 +98,6 @@ function App() {
 
   return (
     <>
-      <div id="connect-wallet-container" />
       <CssBaseline />
       <SWSnackbar />
       <AppBar
@@ -118,7 +115,7 @@ function App() {
             p: '0px !important',
             backgroundColor: 'black',
             border: '0',
-            minHeight: `${pxToRem(150)} !important`,
+            minHeight: `${pxToRem(160)} !important`,
             justifyContent: 'flex-end',
             flexDirection: 'column',
           }}
@@ -137,25 +134,24 @@ function App() {
             </div>
           </div>
 
-          {isAutheticated && (
-            <div
-              style={{
-                width: '100%',
-                borderStyle: 'solid',
-                height: pxToRem(50),
-                borderImage:
-                  'linear-gradient(160deg, #009fe3 0%, #0399de 8%, #0e8bd3 19%, #2072bf 30%, #3a50a4 41%, #5a2583 53%, #453f94 71%, #38519f 88%, #3458a4 100%) 1',
-                borderBottomWidth: '1px',
-                borderTopWidth: '1px',
-                borderLeft: 0,
-                borderRight: 0,
-              }}
-            >
-              <Typography paddingLeft="10px" lineHeight={pxToRem(50)} fontSize={pxToRem(20)} color="white">
-                {appTitle}
-              </Typography>
-            </div>
-          )}
+          <div
+            style={{
+              visibility: !isAutheticated ? 'hidden' : 'visible',
+              width: '100%',
+              borderStyle: 'solid',
+              height: pxToRem(50),
+              borderImage:
+                'linear-gradient(160deg, #009fe3 0%, #0399de 8%, #0e8bd3 19%, #2072bf 30%, #3a50a4 41%, #5a2583 53%, #453f94 71%, #38519f 88%, #3458a4 100%) 1',
+              borderBottomWidth: '1px',
+              borderTopWidth: '1px',
+              borderLeft: 0,
+              borderRight: 0,
+            }}
+          >
+            <Typography paddingLeft="10px" lineHeight={pxToRem(50)} fontSize={pxToRem(20)} color="white">
+              {appTitle}
+            </Typography>
+          </div>
         </Toolbar>
       </AppBar>
       <Box

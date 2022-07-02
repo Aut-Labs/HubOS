@@ -8,10 +8,11 @@ import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { SwButton, SwScrollbar } from 'sw-web-shared';
 import { ResultState } from '@store/result-status';
-import LoadingDialog from '@components/LoadingPopup';
-import ErrorDialog from '@components/ErrorPopup';
+import LoadingDialog from '@components/Dialog/LoadingPopup';
+import ErrorDialog from '@components/Dialog/ErrorPopup';
 import UserTaskDetail from './UserTaskDetail';
 import './Tasks.scss';
+import AutLoading from '@components/AutLoading';
 
 const TaskDetails = () => {
   const dispatch = useAppDispatch();
@@ -51,12 +52,7 @@ const TaskDetails = () => {
       />{' '}
       {status === ResultState.Loading ? (
         <div className="tasks-loading-spinner">
-          <CircularProgress
-            sx={{
-              justifyContent: 'center',
-              alignContent: 'center',
-            }}
-          />
+          <AutLoading />
         </div>
       ) : (
         <SwScrollbar

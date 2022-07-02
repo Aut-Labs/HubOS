@@ -7,6 +7,7 @@ import tasksReducer from './Activity/tasks.reducer';
 import callReducer from './Activity/call.reducer';
 import pollReducer from './Activity/poll.reducer';
 import autDashboardReducer from './AutDashboard/aut-dashboard.reducer';
+import upcomingReducer from './Activity/upcoming.reducer';
 
 export const reducers = combineReducers({
   community: communityReducer,
@@ -17,6 +18,7 @@ export const reducers = combineReducers({
   tasks: tasksReducer,
   call: callReducer,
   poll: pollReducer,
+  upcoming: upcomingReducer,
 });
 
 const rootReducer = (state, action) => {

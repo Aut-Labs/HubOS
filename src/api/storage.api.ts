@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { NFTStorage } from 'nft.storage';
+import { environment } from './environment';
 
-const client = new NFTStorage({ token: process.env.REACT_APP_NFT_STORAGE_KEY });
+const client = new NFTStorage({ token: environment.nftStorageKey });
 
 const isValidUrl = (uri: string) => {
   let url = null;
@@ -13,14 +14,22 @@ const isValidUrl = (uri: string) => {
   return url.protocol === 'ipfs:' || url.protocol === 'http:' || url.protocol === 'https:';
 };
 
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
+function replaceAll(str, find, replace) {
+  return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+}
+
 export function ipfsCIDToHttpUrl(url: string, isJson = false) {
   if (!url) {
     return url;
   }
   if (!url.includes('https://'))
     return isJson
-      ? `https://infura-ipfs.io/ipfs/${url.replace('ipfs://', '')}/metadata.json`
-      : `https://infura-ipfs.io/ipfs/${url.replace('ipfs://', '')}`;
+      ? `${environment.nftStorageUrl}/${replaceAll(url, 'ipfs://', '')}/metadata.json`
+      : `${environment.nftStorageUrl}/${replaceAll(url, 'ipfs://', '')}`;
   return url;
 }
 

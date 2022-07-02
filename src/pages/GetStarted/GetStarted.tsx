@@ -34,15 +34,17 @@ const GetStarted = () => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          letterSpacing: '8px',
+          fontWeight: 'bold',
+          textTransform: 'uppercase',
           color: 'white',
           mt: pxToRem(50),
           mb: pxToRem(50),
           maxWidth: pxToRem(650),
-          fontSize: pxToRem(16),
+          fontSize: pxToRem(70),
         }}
       >
-        Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam
-        erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus
+        Dashboard
       </Typography>
       <Box sx={{ gridGap: '30px', display: 'flex', justifyContent: 'center' }} className="right-box">
         {/* <AutButton

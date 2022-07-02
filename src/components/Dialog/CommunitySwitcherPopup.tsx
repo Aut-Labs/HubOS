@@ -1,28 +1,13 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable max-len */
-import {
-  Avatar,
-  Dialog,
-  DialogContent,
-  IconButton,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  styled,
-  SvgIcon,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Avatar, Dialog, DialogContent, styled, Typography } from '@mui/material';
 import { Communities, communityUpdateState } from '@store/Community/community.reducer';
 import { pxToRem } from '@utils/text-size';
 import { useSelector } from 'react-redux';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { trimAddress } from '@utils/helpers';
 import { useAppDispatch } from '@store/store.model';
 import { Community } from '@api/community.model';
 import { ReactComponent as Logo } from '@assets/daut-logo.svg';
+import CopyAddress from '@components/CopyAddress';
 
 const CommunityItem = styled('div')({
   width: '100%',
@@ -96,7 +81,7 @@ const CommunitySwitcherPopup = ({ open, onClose }: any) => {
         </Typography>
         <CommunityItemWrapper>
           {communities.map((community) => (
-            <CommunityItem className="stat" onClick={() => selectCommunity(community)}>
+            <CommunityItem key={`community-select-item-${community.name}`} className="stat" onClick={() => selectCommunity(community)}>
               <Avatar
                 variant="square"
                 sx={{
@@ -112,18 +97,7 @@ const CommunitySwitcherPopup = ({ open, onClose }: any) => {
                 <Typography sx={{ color: 'white', fontSize: pxToRem(21), mb: '3px' }} component="div">
                   {community.name}
                 </Typography>
-                <CopyToClipboard text={community.properties.address}>
-                  <div style={{ width: '100%', color: 'white' }}>
-                    <Tooltip title="Copy Address">
-                      <Typography sx={{ color: 'white', fontSize: pxToRem(12) }} component="div">
-                        {trimAddress(community.properties.address)}
-                        <IconButton sx={{ color: 'white', p: 0 }}>
-                          <ContentCopyIcon sx={{ cursor: 'pointer', width: pxToRem(12), ml: '5px' }} />
-                        </IconButton>
-                      </Typography>
-                    </Tooltip>
-                  </div>
-                </CopyToClipboard>
+                <CopyAddress address={community.properties.address} />
               </div>
             </CommunityItem>
           ))}

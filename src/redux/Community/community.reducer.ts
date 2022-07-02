@@ -2,7 +2,7 @@ import { ResultState } from '@store/result-status';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { ErrorParser } from '@utils/error-parser';
 import { getLogs } from '@api/aut.api';
-import { fetchCommunity, fetchMembers, setAsCoreTeam, updateCommunity } from '@api/community.api';
+import { fetchCommunity, fetchMember, fetchMembers, removeAsCoreTeam, setAsCoreTeam, updateCommunity } from '@api/community.api';
 import { createSelector } from 'reselect';
 import { Community } from '@api/community.model';
 import { AutID } from '@api/aut.model';
@@ -21,15 +21,17 @@ export interface CommunityState {
   members: { [key: string]: AutID[] };
   activeRoleName: string;
   status: ResultState;
+  memberStatus: ResultState;
   logs: any[];
 }
 
 const initialState = {
   community: new Community(),
-  members: {},
+  members: {} as { [key: string]: AutID[] },
   logs: [],
   activeRole: null,
   status: ResultState.Idle,
+  memberStatus: ResultState.Idle,
 };
 
 export const communitySlice = createSlice({
@@ -50,10 +52,55 @@ export const communitySlice = createSlice({
         state.status = ResultState.Loading;
       })
       .addCase(setAsCoreTeam.fulfilled, (state, action) => {
+        const address = action.payload as string;
+        state.members = Object.keys(state.members).reduce((prev, curr) => {
+          const members = state.members[curr].map((member: AutID) => {
+            if (member.properties.address === address) {
+              member.properties.isCoreTeam = true;
+              prev.Admins.push(member);
+            }
+            return member;
+          });
+          return {
+            ...prev,
+            [curr]: members,
+          };
+        }, state.members);
         state.status = ResultState.Idle;
       })
-      .addCase(setAsCoreTeam.rejected, (state) => {
-        state.status = ResultState.Failed;
+      .addCase(setAsCoreTeam.rejected, (state, action) => {
+        if (!action.meta.aborted) {
+          state.status = ResultState.Failed;
+        } else {
+          state.status = ResultState.Idle;
+        }
+      })
+      .addCase(removeAsCoreTeam.pending, (state) => {
+        state.status = ResultState.Loading;
+      })
+      .addCase(removeAsCoreTeam.fulfilled, (state, action) => {
+        const address = action.payload as string;
+        state.status = ResultState.Idle;
+        state.members = Object.keys(state.members).reduce((prev, curr) => {
+          const members = state.members[curr].map((member: AutID) => {
+            if (member.properties.address === address) {
+              member.properties.isCoreTeam = false;
+              prev.Admins.filter((m: AutID) => m.properties.address !== address);
+            }
+            return member;
+          });
+          return {
+            ...prev,
+            [curr]: members,
+          };
+        }, state.members);
+      })
+      .addCase(removeAsCoreTeam.rejected, (state, action) => {
+        if (!action.meta.aborted) {
+          state.status = ResultState.Failed;
+        } else {
+          state.status = ResultState.Idle;
+        }
       })
       // get community
       .addCase(fetchCommunity.pending, (state) => {
@@ -63,8 +110,12 @@ export const communitySlice = createSlice({
         state.community = action.payload;
         state.status = ResultState.Idle;
       })
-      .addCase(fetchCommunity.rejected, (state) => {
-        state.status = ResultState.Failed;
+      .addCase(fetchCommunity.rejected, (state, action) => {
+        if (!action.meta.aborted) {
+          state.status = ResultState.Failed;
+        } else {
+          state.status = ResultState.Idle;
+        }
       })
       // get community members
       .addCase(fetchMembers.pending, (state) => {
@@ -74,8 +125,31 @@ export const communitySlice = createSlice({
         state.members = action.payload;
         state.status = ResultState.Idle;
       })
-      .addCase(fetchMembers.rejected, (state) => {
-        state.status = ResultState.Failed;
+      .addCase(fetchMembers.rejected, (state, action) => {
+        if (!action.meta.aborted) {
+          state.status = ResultState.Failed;
+        } else {
+          state.status = ResultState.Idle;
+        }
+        state.members = {};
+      })
+      // get community members
+      .addCase(fetchMember.pending, (state) => {
+        state.memberStatus = ResultState.Loading;
+      })
+      .addCase(fetchMember.fulfilled, (state, action) => {
+        state.members = {
+          ...state.members,
+          ...action.payload,
+        };
+        state.memberStatus = ResultState.Idle;
+      })
+      .addCase(fetchMember.rejected, (state, action) => {
+        if (!action.meta.aborted) {
+          state.memberStatus = ResultState.Failed;
+        } else {
+          state.memberStatus = ResultState.Idle;
+        }
         state.members = {};
       })
       // update community
@@ -86,8 +160,12 @@ export const communitySlice = createSlice({
         state.community = action.payload;
         state.status = ResultState.Idle;
       })
-      .addCase(updateCommunity.rejected, (state) => {
-        state.status = ResultState.Failed;
+      .addCase(updateCommunity.rejected, (state, action) => {
+        if (!action.meta.aborted) {
+          state.status = ResultState.Failed;
+        } else {
+          state.status = ResultState.Idle;
+        }
       })
       // update community logs
       .addCase(fetchLogs.pending, (state) => {
@@ -107,6 +185,7 @@ export const communitySlice = createSlice({
 export const { communityUpdateState } = communitySlice.actions;
 
 export const CommunityStatus = (state) => state.community.status as ResultState;
+export const MemberStatus = (state) => state.community.memberStatus as ResultState;
 export const CommunityData = (state) => state.community.community as Community;
 export const Communities = (state) => state.community.communities as Community[];
 export const CommunityMembers = (state) => state.community.members as { [key: string]: AutID[] };

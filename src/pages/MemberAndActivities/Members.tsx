@@ -1,7 +1,6 @@
 import Typography from '@mui/material/Typography';
 import { List, ListItem, Avatar, useTheme } from '@mui/material';
 import { pxToRem } from '@utils/text-size';
-import { AutList } from '@api/api.model';
 import { Link } from 'react-router-dom';
 import { AutID } from '@api/aut.model';
 

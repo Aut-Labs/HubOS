@@ -3,11 +3,11 @@ import { useAppDispatch } from '@store/store.model';
 import { useHistory } from 'react-router-dom';
 import { Controller, useForm } from 'react-hook-form';
 import { pxToRem } from '@utils/text-size';
-import { CreatePollData, CreatePollError, CreatePollStatus, pollUpdateStatus, pollUpdateData } from '@store/Activity/poll.reducer';
-import { useState } from 'react';
+import { CreatePollData, PollError, PollStatus, pollUpdateStatus, pollUpdateData, resetPollState } from '@store/Activity/poll.reducer';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import ErrorDialog from '@components/ErrorPopup';
-import LoadingDialog from '@components/LoadingPopup';
+import ErrorDialog from '@components/Dialog/ErrorPopup';
+import LoadingDialog from '@components/Dialog/LoadingPopup';
 import { ResultState } from '@store/result-status';
 import { addPoll } from '@api/activities.api';
 import { AutHeader } from '@components/AutHeader';
@@ -26,8 +26,8 @@ const CreatePollParticipantsStep = () => {
   const dispatch = useAppDispatch();
   const history = useHistory();
   const [roles] = useState(useSelector(allRoles));
-  const status = useSelector(CreatePollStatus);
-  const errorMessage = useSelector(CreatePollError);
+  const status = useSelector(PollStatus);
+  const errorMessage = useSelector(PollError);
   const data = useSelector(CreatePollData);
 
   const { control, handleSubmit, watch, reset } = useForm({
@@ -68,6 +68,12 @@ const CreatePollParticipantsStep = () => {
       history.push('/aut-dashboard/event-factory/polls/success');
     }
   };
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetPollState());
+    };
+  }, [dispatch]);
 
   return (
     <>

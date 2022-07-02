@@ -4,7 +4,7 @@ import debounce from 'lodash.debounce';
 import { RootState, useAppDispatch } from '@store/store.model';
 import { useSelector } from 'react-redux';
 import { ResultState } from '@store/result-status';
-import LoadingDialog from '@components/LoadingPopup';
+import LoadingDialog from '@components/Dialog/LoadingPopup';
 import { pxToRem } from '@utils/text-size';
 import { AutTextField } from '@components/Fields';
 import { AutButton } from '@components/buttons';

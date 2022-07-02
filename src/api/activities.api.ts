@@ -10,8 +10,8 @@ import axios from 'axios';
 import { dateToUnix } from '@utils/date-format';
 import { sendDiscordNotification } from '@store/ui-reducer';
 import { format } from 'date-fns';
-import { ActivityTypes } from './api.model';
-import { ipfsCIDToHttpUrl, storeAsBlob, storeMetadata } from './textile.api';
+import { ActivityPoll, ActivityTypes } from './api.model';
+import { ipfsCIDToHttpUrl, storeAsBlob, storeMetadata } from './storage.api';
 import { deployPolls } from './ProviderFactory/deploy-activities';
 import { Web3ThunkProviderFactory } from './ProviderFactory/web3-thunk.provider';
 import { Community } from './community.model';
@@ -34,17 +34,16 @@ const pollsThunkProvider = Web3ThunkProviderFactory('Poll', {
 const contractAddress = async (thunkAPI: GetThunkAPI<AsyncThunkConfig>, skipDeploy = false) => {
   const state = thunkAPI.getState();
   const { community } = state.community;
-  debugger;
   const contract = await Web3CommunityExtensionProvider(community.properties.address);
   const activities = (await contract.getActivitiesWhitelist()) as any[];
   let address;
   if (activities || activities.length > 0) {
-    // for (let i = 0; i < activities.length; i++) {
-    //   console.log(activities[i]);
-    //   if (activities[i].actType.toString() === '1') {
-    //     address = activities[i].actAddr;
-    //   }
-    // }
+    for (let i = 0; i < activities.length; i += 1) {
+      console.log(activities[i]);
+      if (activities[i].actType.toString() === '1') {
+        address = activities[i].actAddr;
+      }
+    }
   }
   if (!address) {
     address = await deployPolls(community.properties.address, environment.discordBotAddress);
@@ -59,8 +58,26 @@ export const getPolls = pollsThunkProvider(
     type: 'aut-dashboard/polls/get',
   },
   contractAddress,
-  async (contract, task, { getState, dispatch }) => {
+  async (contract, _, { getState }) => {
     const state = getState();
+    const lastId = Number((await contract.getIDCounter()).toString());
+    return Promise.all(
+      Array.from({ length: lastId }).map((_, index) => {
+        const currentId = index + 1;
+        return contract.getById(currentId).then(async ([timestamp, pollData, results, isFinalized, role, dueDate]) => {
+          const metadataUri = ipfsCIDToHttpUrl(pollData);
+          const response = (await axios.get(metadataUri)).data;
+          return {
+            timestamp: timestamp.toString(),
+            pollData: response,
+            results: results.toString(),
+            isFinalized: isFinalized.toString(),
+            role: role.toString(),
+            dueDate: dueDate.toString(),
+          } as unknown as ActivityPoll;
+        });
+      })
+    );
   }
 );
 

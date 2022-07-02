@@ -20,7 +20,7 @@ import { useSelector } from 'react-redux';
 import { Communities, CommunityData } from '@store/Community/community.reducer';
 import { AutSelectField } from './Fields';
 import { AutButton } from './buttons';
-import CommunitySwitcherPopup from './CommunitySwitcherPopup';
+import CommunitySwitcherPopup from './Dialog/CommunitySwitcherPopup';
 
 const menuItems: any[] = [
   {
@@ -53,18 +53,19 @@ const menuItems: any[] = [
     ],
   },
   {
-    title: 'Event Factory',
+    title: 'Community Events',
+    route: '/aut-dashboard/event-factory',
     icon: TasksIcon,
-    children: [
-      {
-        title: '- Community Calls',
-        route: '/aut-dashboard/event-factory/group-call',
-      },
-      {
-        title: '- Polls',
-        route: '/aut-dashboard/event-factory/polls',
-      },
-    ],
+    // children: [
+    //   {
+    //     title: '- Community Calls',
+    //     route: '/aut-dashboard/event-factory/group-call',
+    //   },
+    //   {
+    //     title: '- Polls',
+    //     route: '/aut-dashboard/event-factory/polls',
+    //   },
+    // ],
   },
   // {
   //   title: "Tasks",
@@ -86,7 +87,7 @@ const menuItems: any[] = [
 ];
 
 const drawerWidth = 350;
-const toolbarHeight = 150;
+const toolbarHeight = 160;
 
 const AutDrawer = styled(Drawer)({
   width: pxToRem(drawerWidth),

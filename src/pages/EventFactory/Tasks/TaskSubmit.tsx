@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, Box, CircularProgress, Container, TextField, Typography } from '@mui/material';
+import { Alert, AlertTitle, Box, Container, TextField, Typography } from '@mui/material';
 import { SingleTask, TaskErrorMessage, TasksStatus, tasksUpdateStatus } from '@store/Activity/tasks.reducer';
 import { Task, TaskStatus } from '@store/model';
 import { useAppDispatch } from '@store/store.model';
@@ -7,12 +7,13 @@ import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { SwButton, SwScrollbar } from 'sw-web-shared';
 import { ResultState } from '@store/result-status';
-import ErrorDialog from '@components/ErrorPopup';
-import LoadingDialog from '@components/LoadingPopup';
-import SuccessDialog from '@components/SuccessPopup';
+import ErrorDialog from '@components/Dialog/ErrorPopup';
+import LoadingDialog from '@components/Dialog/LoadingPopup';
+import SuccessDialog from '@components/Dialog/SuccessPopup';
 import { getTaskById, submitActivityTask } from '@api/activities.api';
 import { Controller, useForm } from 'react-hook-form';
 import './Tasks.scss';
+import AutLoading from '@components/AutLoading';
 
 const TaskSubmit = () => {
   const dispatch = useAppDispatch();
@@ -62,12 +63,7 @@ const TaskSubmit = () => {
       >
         {status === ResultState.Loading ? (
           <div className="tasks-loading-spinner">
-            <CircularProgress
-              sx={{
-                justifyContent: 'center',
-                alignContent: 'center',
-              }}
-            />
+            <AutLoading />
           </div>
         ) : (
           <>
