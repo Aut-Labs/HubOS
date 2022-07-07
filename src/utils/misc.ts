@@ -34,7 +34,7 @@ export const CommitmentMessages = (value: number) => {
     case 8:
     case 9:
     case 10:
-      return `It's a Soulbound ⛓️`;
+      return `Soulbound ⛓️`;
     default:
       return `Minimum Commitment Level for new Members.`;
   }
