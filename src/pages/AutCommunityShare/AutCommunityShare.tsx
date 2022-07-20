@@ -9,6 +9,7 @@ import { Avatar, Container } from '@mui/material';
 import { pxToRem } from '@utils/text-size';
 import { setTitle } from '@store/ui-reducer';
 import { PaUrl } from '@store/AutDashboard/aut-dashboard.reducer';
+import { ipfsCIDToHttpUrl } from '@api/storage.api';
 
 const AutCommunityShare = () => {
   const dispatch = useAppDispatch();
@@ -53,7 +54,7 @@ const AutCommunityShare = () => {
                 width: pxToRem(165),
               }}
               variant="square"
-              src={community?.image as string}
+              src={ipfsCIDToHttpUrl(community.image as string)}
             />
           }
         />

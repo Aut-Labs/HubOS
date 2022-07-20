@@ -15,6 +15,7 @@ import { CommunityStatus, communityUpdateState } from '@store/Community/communit
 import { ResultState } from '@store/result-status';
 import { useSelector } from 'react-redux';
 import CopyAddress from '@components/CopyAddress';
+import { ipfsCIDToHttpUrl } from '@api/storage.api';
 
 const IconContainer = styled('div')(({ theme }) => ({
   paddingTop: pxToRem(40),
@@ -111,7 +112,7 @@ const LeftProfile = ({ member }: { member: AutID }) => {
           <CardHeader
             avatar={
               <Avatar
-                src={member?.image as string}
+                src={ipfsCIDToHttpUrl(member?.image as string)}
                 sx={{
                   bgcolor: 'background.default',
                   width: pxToRem(150),

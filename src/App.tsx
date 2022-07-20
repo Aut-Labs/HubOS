@@ -67,7 +67,7 @@ function App() {
       dispatch(
         communityUpdateState({
           communities: autID.properties.communities,
-          community: autID.properties.communities[0],
+          selectedCommunityAddress: autID.properties.communities[0].properties.address,
         })
       );
       const shouldGoToDashboard = location.pathname === '/';

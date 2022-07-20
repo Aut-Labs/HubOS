@@ -3,6 +3,7 @@ import { List, ListItem, Avatar, useTheme } from '@mui/material';
 import { pxToRem } from '@utils/text-size';
 import { Link } from 'react-router-dom';
 import { AutID } from '@api/aut.model';
+import { ipfsCIDToHttpUrl } from '@api/storage.api';
 
 const Members = ({ members }: { members: AutID[] }) => {
   const theme = useTheme();
@@ -52,7 +53,7 @@ const Members = ({ members }: { members: AutID[] }) => {
                 width: `calc(${pxToRem(150)} - 4px)`,
                 height: pxToRem(150),
               }}
-              src={image as string}
+              src={ipfsCIDToHttpUrl(image as string)}
               variant="square"
             />
             <Typography

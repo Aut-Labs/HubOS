@@ -11,7 +11,9 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 export const sendDiscordNotification = createAsyncThunk('discord/notification', async (message: DiscordMessage, { dispatch, getState }) => {
   try {
     const state: any = getState();
-    const community = state.community.community as Community;
+    const communities = state.community.communities as Community[];
+    const communityAddress = state.community.selectedCommunityAddress as string;
+    const community = communities.find((c) => c.properties.address === communityAddress);
     const { userInfo } = state.auth;
     const discordMsg = new MessageEmbed({
       author: {
@@ -35,7 +37,9 @@ export const sendDiscordNotification = createAsyncThunk('discord/notification', 
 export const sendDiscordPoll = createAsyncThunk('discord/poll', async (input: DiscordPollInput, { dispatch, getState }) => {
   try {
     const state = getState() as any;
-    const community = state.community.community as Community;
+    const communities = state.community.communities as Community[];
+    const communityAddress = state.community.selectedCommunityAddress as string;
+    const community = communities.find((c) => c.properties.address === communityAddress);
     const { userInfo } = state.auth;
 
     const discordMsg = new MessageEmbed({

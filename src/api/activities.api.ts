@@ -33,8 +33,8 @@ const pollsThunkProvider = Web3ThunkProviderFactory('Poll', {
 
 const contractAddress = async (thunkAPI: GetThunkAPI<AsyncThunkConfig>, skipDeploy = false) => {
   const state = thunkAPI.getState();
-  const { community } = state.community;
-  const contract = await Web3CommunityExtensionProvider(community.properties.address);
+  const communityAddress = state.community.selectedCommunityAddress;
+  const contract = await Web3CommunityExtensionProvider(communityAddress);
   const activities = (await contract.getActivitiesWhitelist()) as any[];
   let address;
   if (activities || activities.length > 0) {
@@ -46,7 +46,7 @@ const contractAddress = async (thunkAPI: GetThunkAPI<AsyncThunkConfig>, skipDepl
     }
   }
   if (!address) {
-    address = await deployPolls(community.properties.address, environment.discordBotAddress);
+    address = await deployPolls(communityAddress, environment.discordBotAddress);
     await contract.addActivitiesAddress(address, 1);
   }
   console.log(address);
@@ -91,7 +91,10 @@ export const addActivityTask = taskThunkProvider(
     const state = getState();
     const { userInfo } = state.auth;
     const { role, isCoreTeamMembersOnly, allParticipants, participants, description, title } = task;
-    const community = state.community.community as Community;
+    const communities = state.community.communities as Community[];
+    const communityAddress = state.community.selectedCommunityAddress as string;
+    const community = communities.find((c) => c.properties.address === communityAddress);
+
     // const selectedRole = community.properties.skills.roles.find(({ roleName }) => roleName === role);
 
     const selectedRole = null;
@@ -198,8 +201,6 @@ export const addGroupCall = taskThunkProvider(
   async (contract, callData, { getState, dispatch }) => {
     const state = getState();
     const { startDate, startTime, duration, allParticipants, participants, role } = callData;
-    const community = state.community.community as Community;
-    // const selectedRole = community.properties.skills.roles.find(({ roleName }) => roleName === role);
 
     const selectedRole = null;
     if (!selectedRole) {
@@ -256,12 +257,12 @@ export const addPoll = pollsThunkProvider(
     event: PollsContractEventType.PollCreated,
   },
   contractAddress,
-  async (contract, callData, { getState, dispatch }) => {
-    console.log(contract.contract);
+  async (contract, callData, { getState }) => {
     const state = getState();
     const { title, description, duration, options, emojis, role, allRoles } = callData;
-
-    const community = state.community.community as Community;
+    const communities = state.community.communities as Community[];
+    const communityAddress = state.community.selectedCommunityAddress as string;
+    const community = communities.find((c) => c.properties.address === communityAddress);
     const selectedRole = community.properties.rolesSets[0].roles.find(({ roleName }) => roleName === role);
     let roleId = 0;
     let roleName = 'All';
@@ -423,7 +424,7 @@ export const getTaskById = taskThunkProvider(
       const response = await axios.get(ipfsCIDToHttpUrl(jsonUriCID, true));
       taskDetails.taker = {
         tokenId: takerTokenId.toString(),
-        imageUrl: ipfsCIDToHttpUrl(response.data.image, false),
+        imageUrl: response.data.image,
         nickname: response.data.properties.username,
         timestamp: undefined,
       };

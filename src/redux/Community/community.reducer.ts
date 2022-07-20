@@ -16,20 +16,19 @@ export const fetchLogs = createAsyncThunk('community/logs', async (address: stri
 });
 
 export interface CommunityState {
-  community: Community;
+  selectedCommunityAddress: string;
   communities: Community[];
   members: { [key: string]: AutID[] };
-  activeRoleName: string;
   status: ResultState;
   memberStatus: ResultState;
   logs: any[];
 }
 
-const initialState = {
-  community: new Community(),
+const initialState: CommunityState = {
+  selectedCommunityAddress: null,
   members: {} as { [key: string]: AutID[] },
+  communities: [],
   logs: [],
-  activeRole: null,
   status: ResultState.Idle,
   memberStatus: ResultState.Idle,
 };
@@ -107,7 +106,14 @@ export const communitySlice = createSlice({
         state.status = ResultState.Loading;
       })
       .addCase(fetchCommunity.fulfilled, (state, action) => {
-        state.community = action.payload;
+        state.communities = state.communities.reduce((prev, curr) => {
+          if (curr.properties.address === action.payload.properties.address) {
+            prev = [...prev, action.payload];
+          } else {
+            prev = [...prev, curr];
+          }
+          return prev;
+        }, []);
         state.status = ResultState.Idle;
       })
       .addCase(fetchCommunity.rejected, (state, action) => {
@@ -157,7 +163,12 @@ export const communitySlice = createSlice({
         state.status = ResultState.Updating;
       })
       .addCase(updateCommunity.fulfilled, (state, action) => {
-        state.community = action.payload;
+        state.communities = state.communities.map((c) => {
+          if (c.properties.address === state.selectedCommunityAddress) {
+            return action.payload;
+          }
+          return c;
+        });
         state.status = ResultState.Idle;
       })
       .addCase(updateCommunity.rejected, (state, action) => {
@@ -186,9 +197,13 @@ export const { communityUpdateState } = communitySlice.actions;
 
 export const CommunityStatus = (state) => state.community.status as ResultState;
 export const MemberStatus = (state) => state.community.memberStatus as ResultState;
-export const CommunityData = (state) => state.community.community as Community;
 export const Communities = (state) => state.community.communities as Community[];
 export const CommunityMembers = (state) => state.community.members as { [key: string]: AutID[] };
+
+const CommunityAddress = (state) => state.community.selectedCommunityAddress as string;
+export const CommunityData = createSelector(Communities, CommunityAddress, (communities, address) => {
+  return communities.find((c) => c.properties.address === address) || new Community();
+});
 
 export const allRoles = createSelector(CommunityData, (c) => {
   return c.properties?.rolesSets[0]?.roles || [];

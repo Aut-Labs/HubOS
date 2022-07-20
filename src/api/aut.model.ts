@@ -1,6 +1,5 @@
 import { BaseNFTModel } from './api.model';
 import { Community } from './community.model';
-import { ipfsCIDToHttpUrl } from './storage.api';
 
 export class AutIDProperties {
   avatar: string;
@@ -28,7 +27,7 @@ export class AutIDProperties {
       this.communities = [];
     } else {
       this.timestamp = data.timestamp;
-      this.avatar = ipfsCIDToHttpUrl(data.avatar);
+      this.avatar = data.avatar;
       this.communities = (data.communities || []).map((community) => new Community(community));
       this.address = data.address;
       this.role = data.role;

@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { Avatar, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
+import { Avatar, Box, Card, CardContent, CardHeader, IconButton, SvgIcon, Typography } from '@mui/material';
 import { CommunityData } from '@store/Community/community.reducer';
 import { pxToRem } from '@utils/text-size';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,6 +9,9 @@ import { UserInfo } from '@auth/auth.reducer';
 import SwGrid from '@components/SwGrid';
 import { styled } from '@mui/system';
 import CopyAddress from '@components/CopyAddress';
+import { ReactComponent as EditPencil } from '@assets/pencil-edit.svg';
+import { ipfsCIDToHttpUrl } from '@api/storage.api';
+import { Link, useRouteMatch } from 'react-router-dom';
 
 const Stat = styled('div')({
   width: '100%',
@@ -66,6 +69,7 @@ const Dashboard = () => {
   const dispatch = useDispatch();
   const userInfo = useSelector(UserInfo);
   const community = useSelector(CommunityData);
+  const match = useRouteMatch();
 
   useEffect(() => {
     dispatch(setTitle(`Good Morning, ${userInfo?.name}`));
@@ -88,7 +92,7 @@ const Dashboard = () => {
             <Avatar
               className="sw-profile-pic"
               variant="square"
-              src={userInfo?.image as string}
+              src={ipfsCIDToHttpUrl(userInfo?.image as string)}
               sx={{
                 width: pxToRem(150),
                 height: pxToRem(150),
@@ -167,7 +171,7 @@ const Dashboard = () => {
                     border: '1px solid white',
                   }}
                   variant="square"
-                  src={community?.image as string}
+                  src={ipfsCIDToHttpUrl(community?.image as string)}
                 />
               }
               sx={{
@@ -177,9 +181,20 @@ const Dashboard = () => {
               }}
               title={
                 <>
-                  <Typography sx={{ color: 'white' }} component="div" fontSize={pxToRem(32)}>
-                    {community.name}
-                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gridGap: '4px',
+                    }}
+                  >
+                    <Typography sx={{ color: 'white' }} component="div" fontSize={pxToRem(32)}>
+                      {community.name}
+                    </Typography>
+                    <IconButton component={Link} to={`${match.url}/edit-community/${community?.properties?.address}`}>
+                      <SvgIcon component={EditPencil} />
+                    </IconButton>
+                  </Box>
                   <CopyAddress address={community.properties.address} />
                   <Typography sx={{ color: 'white' }} component="div" fontSize={pxToRem(19)}>
                     {community.properties.market}

@@ -21,7 +21,6 @@ export const authSlice = createSlice({
     setAuthenticated(state, action) {
       const { isAuthenticated, userInfo } = action.payload;
       state.isAutheticated = isAuthenticated;
-      userInfo.image = ipfsCIDToHttpUrl(userInfo.image);
       state.userInfo = userInfo;
     },
     setUserAddress(state, action) {

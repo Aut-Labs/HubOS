@@ -2,6 +2,7 @@ import { styled, SvgIcon, Typography, useMediaQuery } from '@mui/material';
 import { ReactComponent as ShareIcon } from '@assets/ShareIcon.svg';
 import { pxToRem } from '@utils/text-size';
 import { AutID } from '@api/aut.model';
+import { ipfsCIDToHttpUrl } from '@api/storage.api';
 
 const CardTilt = styled('div')(({ theme }) => ({
   borderRadius: 0,
@@ -64,7 +65,7 @@ const AutIdCard = ({ avatar }) => {
           width: '100%',
           height: '100%',
         }}
-        src={avatar}
+        src={ipfsCIDToHttpUrl(avatar)}
       />
       <div style={{ position: 'fixed', bottom: '15px', right: '15px' }}>
         <Typography fontSize={pxToRem(50)} color="background.paper" textAlign="left">

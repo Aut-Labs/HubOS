@@ -47,16 +47,7 @@ const Roles = () => {
 
   const onSubmit = async (data: typeof values) => {
     community.properties.rolesSets[0].roles = data.roles;
-    const promise = dispatch(
-      updateCommunity(
-        new Community({
-          ...community,
-          properties: {
-            ...community.properties,
-          },
-        })
-      )
-    );
+    const promise = dispatch(updateCommunity(new Community(community)));
     setPromises([promise]);
   };
 

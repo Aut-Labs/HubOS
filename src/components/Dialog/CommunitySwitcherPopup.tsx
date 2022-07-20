@@ -8,6 +8,7 @@ import { useAppDispatch } from '@store/store.model';
 import { Community } from '@api/community.model';
 import { ReactComponent as Logo } from '@assets/daut-logo.svg';
 import CopyAddress from '@components/CopyAddress';
+import { ipfsCIDToHttpUrl } from '@api/storage.api';
 
 const CommunityItem = styled('div')({
   width: '100%',
@@ -39,7 +40,7 @@ const CommunitySwitcherPopup = ({ open, onClose }: any) => {
   const selectCommunity = (community: Community) => {
     dispatch(
       communityUpdateState({
-        community,
+        selectedCommunityAddress: community.properties.address,
       })
     );
     onClose();
@@ -91,7 +92,7 @@ const CommunitySwitcherPopup = ({ open, onClose }: any) => {
                   backgroundColor: 'white',
                   mr: pxToRem(50),
                 }}
-                src={community.image as string}
+                src={ipfsCIDToHttpUrl(community.image as string)}
               />
               <div>
                 <Typography sx={{ color: 'white', fontSize: pxToRem(21), mb: '3px' }} component="div">

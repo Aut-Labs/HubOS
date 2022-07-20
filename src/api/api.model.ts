@@ -1,5 +1,4 @@
 import { TokenInput } from 'nft.storage/dist/src/lib/interface';
-import { ipfsCIDToHttpUrl } from './storage.api';
 
 /* eslint-disable no-shadow */
 export enum ActivityTypes {
@@ -27,7 +26,7 @@ export class BaseNFTModel<Properties> implements Omit<TokenInput, 'image'> {
   constructor(data: BaseNFTModel<Properties>) {
     this.name = data.name;
     this.description = data.description;
-    this.image = ipfsCIDToHttpUrl(data.image as string) as string;
+    this.image = data.image as string;
     this.properties = data.properties;
   }
 }

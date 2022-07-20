@@ -3,9 +3,10 @@ import axios from 'axios';
 import { CommitmentMessages } from '@utils/misc';
 import { Community, findRoleName } from './community.model';
 import { Web3ThunkProviderFactory } from './ProviderFactory/web3-thunk.provider';
-import { ipfsCIDToHttpUrl, storeAsBlob } from './storage.api';
+import { httpUrlToIpfsCID, ipfsCIDToHttpUrl, isValidUrl, storeAsBlob, storeImageAsBlob } from './storage.api';
 import { environment } from './environment';
 import { AutID } from './aut.model';
+import { base64toFile, isBase64 } from 'sw-web-shared';
 
 const communityExtensionThunkProvider = Web3ThunkProviderFactory('CommunityExtension', {
   provider: Web3CommunityExtensionProvider,
@@ -17,14 +18,13 @@ export const fetchCommunity = communityExtensionThunkProvider(
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
-    const { community } = state.community;
-    return Promise.resolve(community.properties.address);
+    const { selectedCommunityAddress } = state.community;
+    return Promise.resolve(selectedCommunityAddress);
   },
   async (contract, _) => {
-    const [, uri] = await contract.getComData();
+    const [, , uri] = await contract.getComData();
     const metadata: Community = (await axios.get(ipfsCIDToHttpUrl(uri))).data;
     const community = new Community(metadata);
-    community.image = ipfsCIDToHttpUrl(community.image as string);
     return community;
   }
 );
@@ -35,8 +35,8 @@ export const getWhitelistedAddresses = communityExtensionThunkProvider(
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
-    const { community } = state.community;
-    return Promise.resolve(community.properties.address);
+    const { selectedCommunityAddress } = state.community;
+    return Promise.resolve(selectedCommunityAddress);
   },
   async (contract, _, { getState }) => {
     const { auth } = getState();
@@ -58,8 +58,8 @@ export const addNewWhitelistedAddresses = communityExtensionThunkProvider(
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
-    const { community } = state.community;
-    return Promise.resolve(community.properties.address);
+    const { selectedCommunityAddress } = state.community;
+    return Promise.resolve(selectedCommunityAddress);
   },
   async (contract, newMembers, { dispatch, getState }) => {
     const { auth } = getState();
@@ -82,8 +82,8 @@ export const whitelistAddress = communityExtensionThunkProvider(
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
-    const { community } = state.community;
-    return Promise.resolve(community.properties.address);
+    const { selectedCommunityAddress } = state.community;
+    return Promise.resolve(selectedCommunityAddress);
   },
   async (contract, newMembers, { dispatch, getState }) => {
     const { auth } = getState();
@@ -99,8 +99,8 @@ export const setAsCoreTeam = communityExtensionThunkProvider(
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
-    const { community } = state.community;
-    return Promise.resolve(community.properties.address);
+    const { selectedCommunityAddress } = state.community;
+    return Promise.resolve(selectedCommunityAddress);
   },
   async (contract, memberAddress) => {
     const result = await contract.addToCoreTeam(memberAddress);
@@ -115,8 +115,8 @@ export const removeAsCoreTeam = communityExtensionThunkProvider(
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
-    const { community } = state.community;
-    return Promise.resolve(community.properties.address);
+    const { selectedCommunityAddress } = state.community;
+    return Promise.resolve(selectedCommunityAddress);
   },
   async (contract, memberAddress) => {
     const result = await contract.removeFromCoreTeam(memberAddress);
@@ -130,11 +130,17 @@ export const updateCommunity = communityExtensionThunkProvider(
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
-    const { community } = state.community;
-    return Promise.resolve(community.properties.address);
+    const { selectedCommunityAddress } = state.community;
+    return Promise.resolve(selectedCommunityAddress);
   },
   async (contract, community) => {
-    const uri = await storeAsBlob(community);
+    if (community.image && !isValidUrl(community.image as string)) {
+      const file = base64toFile(community.image as string, 'image');
+      community.image = await storeImageAsBlob(file as File);
+      console.log('New image: ->', ipfsCIDToHttpUrl(community.image));
+    }
+
+    const uri = await storeAsBlob(Community.updateCommunity(community));
     console.log('New metadata: ->', ipfsCIDToHttpUrl(uri));
     await contract.setMetadataUri(uri);
     return community;
@@ -147,19 +153,16 @@ export const fetchMembers = communityExtensionThunkProvider(
   },
   async (thunkAPI) => {
     const state = thunkAPI.getState();
-    const { community } = state.community;
-    return Promise.resolve(community.properties.address);
+    const { selectedCommunityAddress } = state.community;
+    return Promise.resolve(selectedCommunityAddress);
   },
   async (contract, _, thunkAPI) => {
     const state = thunkAPI.getState();
     const AutIDsResponse: { [role: string]: AutID[] } = {};
 
-    let { community } = state.community;
-
-    if (!community) {
-      const response = await thunkAPI.dispatch(fetchCommunity(null));
-      community = response.payload as Community;
-    }
+    const communities = state.community.communities as Community[];
+    const communityAddress = state.community.selectedCommunityAddress as string;
+    const community = communities.find((c) => c.properties.address === communityAddress);
 
     const filteredRoles = community.properties.rolesSets[0].roles;
 
@@ -211,19 +214,15 @@ export const fetchMember = communityExtensionThunkProvider(
   },
   async (thunkAPI) => {
     const state = thunkAPI.getState();
-    const { community } = state.community;
-    return Promise.resolve(community.properties.address);
+    const { selectedCommunityAddress } = state.community;
+    return Promise.resolve(selectedCommunityAddress);
   },
   async (contract, memberAddress, thunkAPI) => {
     const state = thunkAPI.getState();
     const AutIDsResponse: { [role: string]: AutID[] } = {};
-
-    let { community } = state.community;
-
-    if (!community) {
-      const response = await thunkAPI.dispatch(fetchCommunity(null));
-      community = response.payload as Community;
-    }
+    const communities = state.community.communities as Community[];
+    const communityAddress = state.community.selectedCommunityAddress as string;
+    const community = communities.find((c) => c.properties.address === communityAddress);
 
     const filteredRoles = community.properties.rolesSets[0].roles;
 
@@ -269,8 +268,8 @@ export const getPAUrl = communityExtensionThunkProvider(
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
-    const { community } = state.community;
-    return Promise.resolve(community.properties.address);
+    const { selectedCommunityAddress } = state.community;
+    return Promise.resolve(selectedCommunityAddress);
   },
   async (contract) => {
     const urls = await contract.getURLs();
@@ -284,8 +283,8 @@ export const getPAContracts = communityExtensionThunkProvider(
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
-    const { community } = state.community;
-    return Promise.resolve(community.properties.address);
+    const { selectedCommunityAddress } = state.community;
+    return Promise.resolve(selectedCommunityAddress);
   },
   async (contract) => {
     // const contracts = await contract.getImportedAddresses();
@@ -300,8 +299,8 @@ export const addPAContracts = communityExtensionThunkProvider(
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
-    const { community } = state.community;
-    return Promise.resolve(community.properties.address);
+    const { selectedCommunityAddress } = state.community;
+    return Promise.resolve(selectedCommunityAddress);
   },
   async (contract, payload, { dispatch }) => {
     const { newItems } = payload;
@@ -319,8 +318,8 @@ export const addDiscordToCommunity = communityExtensionThunkProvider(
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
-    const { community } = state.community;
-    return Promise.resolve(community.properties.address);
+    const { selectedCommunityAddress } = state.community;
+    return Promise.resolve(selectedCommunityAddress);
   },
   async (contract, discordId) => {
     const result = await contract.setDiscordServer(discordId);
@@ -335,8 +334,8 @@ export const addPAUrl = communityExtensionThunkProvider(
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
-    const { community } = state.community;
-    return Promise.resolve(community.properties.address);
+    const { selectedCommunityAddress } = state.community;
+    return Promise.resolve(selectedCommunityAddress);
   },
   async (contract, daoUrl, { dispatch }) => {
     await contract.addURL(daoUrl);

@@ -4,7 +4,7 @@ import { environment } from './environment';
 
 const client = new NFTStorage({ token: environment.nftStorageKey });
 
-const isValidUrl = (uri: string) => {
+export const isValidUrl = (uri: string) => {
   let url = null;
   try {
     url = new URL(uri);
@@ -30,6 +30,21 @@ export function ipfsCIDToHttpUrl(url: string, isJson = false) {
     return isJson
       ? `${environment.nftStorageUrl}/${replaceAll(url, 'ipfs://', '')}/metadata.json`
       : `${environment.nftStorageUrl}/${replaceAll(url, 'ipfs://', '')}`;
+  return url;
+}
+
+export function httpUrlToIpfsCID(url: string) {
+  if (!url) {
+    return url;
+  }
+  if (url.includes('https://')) {
+    const notHttpsUrl = `${replaceAll(url, 'https://', '')}`;
+    const [_, __, cid, name] = notHttpsUrl.split('/');
+    if (name) {
+      return `ipfs://${cid}/${name}`;
+    }
+    return `ipfs://${cid}`;
+  }
   return url;
 }
 

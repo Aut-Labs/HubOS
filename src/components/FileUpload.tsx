@@ -3,7 +3,7 @@
 import { Avatar } from '@mui/material';
 import { styled } from '@mui/system';
 import { pxToRem } from '@utils/text-size';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { ReactComponent as UploadIcon } from '@assets/aut/upload-icon.svg';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -50,8 +50,8 @@ const Action = styled('div')(({ theme }) => ({
   },
 }));
 
-const AFileUpload = ({ fileChange = (file: File) => null, initialPreviewUrl = null }) => {
-  const [preview, setPreview] = useState(initialPreviewUrl);
+const AFileUpload = ({ fileChange = (file: File) => null, initialPreviewUrl = null, styles = {} }) => {
+  const [preview, setPreview] = useState(null);
   const [showAction, setShowAction] = useState(false);
   const { getRootProps, getInputProps, open } = useDropzone({
     noClick: true,
@@ -81,12 +81,17 @@ const AFileUpload = ({ fileChange = (file: File) => null, initialPreviewUrl = nu
     setShowAction(show);
   };
 
+  useEffect(() => {
+    setPreview(initialPreviewUrl);
+  }, [initialPreviewUrl]);
+
   return (
     <UploadWrapper
       onMouseEnter={() => toggleActions(true)}
       onMouseLeave={() => toggleActions(false)}
       onClick={handleActionClick}
       className="container"
+      sx={styles}
     >
       <div {...getRootProps({ className: 'dropzone' })}>
         <input {...getInputProps()} />

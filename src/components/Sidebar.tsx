@@ -21,6 +21,7 @@ import { Communities, CommunityData } from '@store/Community/community.reducer';
 import { AutSelectField } from './Fields';
 import { AutButton } from './buttons';
 import CommunitySwitcherPopup from './Dialog/CommunitySwitcherPopup';
+import { ipfsCIDToHttpUrl } from '@api/storage.api';
 
 const menuItems: any[] = [
   {
@@ -305,7 +306,7 @@ export default function SidebarDrawer({ children }) {
                 height: pxToRem(50),
                 backgroundColor: 'white',
               }}
-              src={community.image as string}
+              src={ipfsCIDToHttpUrl(community.image as string)}
             />
             <span
               style={{

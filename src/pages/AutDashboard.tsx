@@ -24,6 +24,7 @@ import DaoIntegration from './ThirdPartyIntegrations/DaoIntegration/DaoIntegrati
 import DiscordIntegration from './ThirdPartyIntegrations/DiscordIntegration/DiscordIntegration';
 import AutCommunityShare from './AutCommunityShare/AutCommunityShare';
 import UserProfile from './UserProfile/UserProfile';
+import CommunityEdit from './CommunityEdit/CommunityEdit';
 
 const AutDashboard = (props) => {
   const dispatch = useAppDispatch();
@@ -42,6 +43,7 @@ const AutDashboard = (props) => {
         <Switch>
           {/* Aut Dashboard */}
           <Route exact path="/aut-dashboard" component={Dashboard} {...props} />
+          <Route path="/aut-dashboard/edit-community/:communityAddress" component={CommunityEdit} {...props} />
 
           {/* Core Team Routes */}
           {/* <Route exact path="/aut-dashboard/core-team" component={CoreTeam} {...props} /> */}
