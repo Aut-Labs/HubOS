@@ -1,5 +1,4 @@
-/* eslint-disable max-len */
-import { fetchCommunity, updateCommunity } from '@api/community.api';
+import { updateCommunity } from '@api/community.api';
 import { Community } from '@api/community.model';
 import { ipfsCIDToHttpUrl } from '@api/storage.api';
 import { AutButton } from '@components/buttons';
@@ -16,7 +15,6 @@ import { pxToRem } from '@utils/text-size';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom';
 import { toBase64 } from 'sw-web-shared';
 
 const errorTypes = {
@@ -35,8 +33,6 @@ const StepWrapper = styled('form')({
 
 const CommunityEdit = () => {
   const dispatch = useAppDispatch();
-  const params = useParams<{ communityAddress: string }>();
-  const history = useHistory();
   const community = useSelector(CommunityData);
   const status = useSelector(CommunityStatus);
   const [promises, setPromises] = useState([]);
@@ -70,19 +66,12 @@ const CommunityEdit = () => {
   };
 
   useEffect(() => {
-    if (community?.properties?.address && community?.properties?.address !== params.communityAddress) {
-      const load = async () => {
-        await dispatch(fetchCommunity(null));
-        history.push(`${community.properties.address}`);
-        reset({
-          name: community.name,
-          image: community.image,
-          description: community.description,
-        });
-      };
-      load();
-    }
-  }, [dispatch, community?.properties?.address, params.communityAddress]);
+    reset({
+      name: community.name,
+      image: community.image,
+      description: community.description,
+    });
+  }, [dispatch, community?.properties?.address]);
 
   useEffect(() => {
     return () => {

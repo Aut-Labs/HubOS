@@ -191,7 +191,7 @@ const Dashboard = () => {
                     <Typography sx={{ color: 'white' }} component="div" fontSize={pxToRem(32)}>
                       {community.name}
                     </Typography>
-                    <IconButton component={Link} to={`${match.url}/edit-community/${community?.properties?.address}`}>
+                    <IconButton component={Link} to={`${match.url}/edit-community`}>
                       <SvgIcon component={EditPencil} />
                     </IconButton>
                   </Box>

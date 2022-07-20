@@ -1,9 +1,5 @@
-import { useEffect } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import SidebarDrawer from '@components/Sidebar';
-import { useSelector } from 'react-redux';
-import { fetchCommunity } from '@api/community.api';
-import { RootState, useAppDispatch } from '@store/store.model';
 import NotFound from '@components/NotFound';
 import MembersAndActivities from 'src/pages/MemberAndActivities/MembersAndActivities';
 import Dashboard from './Dashboard/Dashboard';
@@ -27,23 +23,13 @@ import UserProfile from './UserProfile/UserProfile';
 import CommunityEdit from './CommunityEdit/CommunityEdit';
 
 const AutDashboard = (props) => {
-  const dispatch = useAppDispatch();
-  const { userInfo } = useSelector((state: RootState) => state.auth);
-
-  useEffect(() => {
-    if (userInfo?.community) {
-      const promise = dispatch(fetchCommunity(userInfo?.community));
-      return () => promise.abort();
-    }
-  }, [dispatch, userInfo]);
-
   return (
     <>
       <SidebarDrawer>
         <Switch>
           {/* Aut Dashboard */}
           <Route exact path="/aut-dashboard" component={Dashboard} {...props} />
-          <Route path="/aut-dashboard/edit-community/:communityAddress" component={CommunityEdit} {...props} />
+          <Route path="/aut-dashboard/edit-community" component={CommunityEdit} {...props} />
 
           {/* Core Team Routes */}
           {/* <Route exact path="/aut-dashboard/core-team" component={CoreTeam} {...props} /> */}
