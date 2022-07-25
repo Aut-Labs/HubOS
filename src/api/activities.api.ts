@@ -7,7 +7,7 @@ import {
   Web3CommunityExtensionProvider,
   Web3PollsProvider,
   Web3TasksProvider,
-} from '@skill-wallet/sw-abi-types';
+} from '@aut-protocol/abi-types';
 import { Task, TaskStatus } from '@store/model';
 import axios from 'axios';
 import { dateToUnix } from '@utils/date-format';

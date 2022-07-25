@@ -1,4 +1,4 @@
-import { CommunityCallABI, CommunityCallByteCode, PollsABI, PollsByteCode, TasksABI, TasksByteCode } from '@skill-wallet/sw-abi-types';
+import { CommunityCallABI, CommunityCallByteCode, PollsABI, PollsByteCode, TasksABI, TasksByteCode } from '@aut-protocol/abi-types';
 import { ethers } from 'ethers';
 import { EnableAndChangeNetwork } from './web3.network';
 

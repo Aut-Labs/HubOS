@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { getUser, oauthGetToken } from '@api/discord.api';
-import { AutIDContractEventType, Web3AutIDProvider } from '@skill-wallet/sw-abi-types';
+import { AutIDContractEventType, Web3AutIDProvider } from '@aut-protocol/abi-types';
 import { getAutAddress, AutExists } from '@api/aut.api';
 import { useDispatch } from 'react-redux';
 import { openSnackbar } from '@store/ui-reducer';

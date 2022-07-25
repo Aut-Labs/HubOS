@@ -1,7 +1,7 @@
 import { AnyAction, AsyncThunkPayloadCreatorReturnValue, ThunkDispatch } from '@reduxjs/toolkit';
 import { BaseThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import { FallbackIfUnknown } from '@reduxjs/toolkit/dist/tsHelpers';
-import { Web3ProviderExtras } from '@skill-wallet/sw-abi-types';
+import { Web3ProviderExtras } from '@aut-protocol/abi-types';
 
 export type AppDispatch = ThunkDispatch<any, any, AnyAction>;
 

@@ -1,4 +1,4 @@
-import { AutIDContractEventType, Web3AutIDProvider } from '@skill-wallet/sw-abi-types';
+import { AutIDContractEventType, Web3AutIDProvider } from '@aut-protocol/abi-types';
 import axios from 'axios';
 import { environment } from './environment';
 import { EnableAndChangeNetwork } from './ProviderFactory/web3.network';

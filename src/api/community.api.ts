@@ -1,4 +1,4 @@
-import { CommunityExtensionContractEventType, Web3AutIDProvider, Web3CommunityExtensionProvider } from '@skill-wallet/sw-abi-types';
+import { CommunityExtensionContractEventType, Web3AutIDProvider, Web3CommunityExtensionProvider } from '@aut-protocol/abi-types';
 import axios from 'axios';
 import { CommitmentMessages } from '@utils/misc';
 import { Community, findRoleName } from './community.model';
