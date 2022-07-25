@@ -2,10 +2,9 @@ import { TokenInput } from 'nft.storage/dist/src/lib/interface';
 
 /* eslint-disable no-shadow */
 export enum ActivityTypes {
-  None,
-  CoreTeamTask,
-  DiscordPoll,
-  CommunityCall,
+  Polls = 1,
+  Gatherings,
+  Tasks,
 }
 
 export enum CommunityEventTypes {

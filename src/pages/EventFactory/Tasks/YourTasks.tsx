@@ -39,7 +39,7 @@ const YourTasks = () => {
   };
 
   useEffect(() => {
-    dispatch(getAllTasks(ActivityTypes.CoreTeamTask));
+    dispatch(getAllTasks(ActivityTypes.Tasks));
     return () => {
       dispatch(resetActivityTaskState());
     };

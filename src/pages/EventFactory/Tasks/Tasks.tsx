@@ -85,7 +85,7 @@ const Tasks = () => {
       //   component: TasksList,
       // },
     ]);
-    dispatch(getAllTasks(ActivityTypes.CoreTeamTask));
+    dispatch(getAllTasks(ActivityTypes.Tasks));
     return () => {
       dispatch(resetActivityTaskState());
     };
