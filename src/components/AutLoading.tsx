@@ -1,5 +1,5 @@
 // @ts-ignore
-import Lottie from 'react-lottie';
+import { Player } from '@lottiefiles/react-lottie-player';
 import * as animationData from '@assets/aut-load.json';
 
 const defaultOptions = {
@@ -24,7 +24,13 @@ const AutLoading = ({ width = 300, height = 300 }) => {
         transform: `translate(-50%, -50%)`,
       }}
     >
-      <Lottie options={defaultOptions} height={width} width={height} />
+      <Player
+        loop
+        autoplay
+        rendererSettings={{ preserveAspectRatio: 'xMidYMid slice' }}
+        src={animationData}
+        style={{ height: '300px', width: '300px' }}
+      />
     </div>
   );
 };
