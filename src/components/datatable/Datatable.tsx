@@ -1,9 +1,16 @@
-import React, { useCallback } from 'react';
-import { DataGrid } from '@mui/x-data-grid';
-import { useTheme } from '@mui/material';
+import React, { useCallback } from "react";
+import { DataGrid } from "@mui/x-data-grid";
+import { useTheme } from "@mui/material";
 
 // @TODO: Move to sw-web-shared
-const Datatable = ({ apiRef, data, loading, columns, onStateChange, ...rest }: any) => {
+const Datatable = ({
+  apiRef,
+  data,
+  loading,
+  columns,
+  onStateChange,
+  ...rest
+}: any) => {
   const theme = useTheme();
 
   const handleDoubleCellClick = useCallback((params, event) => {
@@ -11,13 +18,13 @@ const Datatable = ({ apiRef, data, loading, columns, onStateChange, ...rest }: a
   }, []);
 
   const handleCellKeyDown = useCallback((params, event) => {
-    if (['Escape', 'Delete', 'Backspace', 'Enter'].includes(event.key)) {
+    if (["Escape", "Delete", "Backspace", "Enter"].includes(event.key)) {
       event.defaultMuiPrevented = true;
     }
   }, []);
 
   const handleCellFocusOut = useCallback((params, event) => {
-    if (params.cellMode === 'edit' && event) {
+    if (params.cellMode === "edit" && event) {
       event.defaultMuiPrevented = true;
     }
   }, []);
@@ -27,7 +34,7 @@ const Datatable = ({ apiRef, data, loading, columns, onStateChange, ...rest }: a
       className="sw-datatable"
       style={{
         border: `3px solid ${theme.palette.primary.main}`,
-        padding: '35px',
+        padding: "35px"
       }}
     >
       <DataGrid
@@ -49,40 +56,40 @@ const Datatable = ({ apiRef, data, loading, columns, onStateChange, ...rest }: a
         disableColumnSelector
         density="compact"
         sx={{
-          border: 'none',
-          color: 'primary.main',
-          '.MuiInputBase-input': {
-            color: 'info.dark',
-            fontSize: '16px',
-            textAlign: 'center',
+          border: "none",
+          color: "primary.main",
+          ".MuiInputBase-input": {
+            color: "info.dark",
+            fontSize: "16px",
+            textAlign: "center"
           },
-          '.MuiDataGrid-columnHeaders': {
-            borderBottom: '2px solid',
-            borderColor: 'primary.main',
+          ".MuiDataGrid-columnHeaders": {
+            borderBottom: "2px solid",
+            borderColor: "primary.main"
           },
-          '.MuiDataGrid-columnSeparator': {
-            display: 'none',
+          ".MuiDataGrid-columnSeparator": {
+            display: "none"
           },
-          '.MuiDataGrid-cell': {
-            fontSize: '16px',
-            textAlign: 'center',
+          ".MuiDataGrid-cell": {
+            fontSize: "16px",
+            textAlign: "center"
           },
-          '.MuiDataGrid-columnHeaderTitle': {
-            width: '100%',
-            textAlign: 'center',
+          ".MuiDataGrid-columnHeaderTitle": {
+            width: "100%",
+            textAlign: "center"
           },
-          '.MuiDataGrid-columnHeader': {
-            fontSize: '20px',
+          ".MuiDataGrid-columnHeader": {
+            fontSize: "20px"
           },
-          '& .actions': {
-            color: 'primary.main',
+          "& .actions": {
+            color: "primary.main"
           },
-          '& .textPrimary': {
-            color: 'primary.main',
+          "& .textPrimary": {
+            color: "primary.main"
           },
-          '.MuiDataGrid-columnHeaderTitleContainer': {
-            padding: 0,
-          },
+          ".MuiDataGrid-columnHeaderTitleContainer": {
+            padding: 0
+          }
         }}
         headerHeight={70}
         columns={columns}
@@ -93,6 +100,8 @@ const Datatable = ({ apiRef, data, loading, columns, onStateChange, ...rest }: a
   );
 };
 
-const SWDatatable = React.forwardRef((props: any, ref) => <Datatable innerRef={ref} {...props} />);
+const SWDatatable = React.forwardRef((props: any, ref) => (
+  <Datatable innerRef={ref} {...props} />
+));
 
 export default SWDatatable;

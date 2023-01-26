@@ -1,6 +1,6 @@
-import { AutID } from '@api/aut.model';
-import { ipfsCIDToHttpUrl } from '@api/storage.api';
-import { createSlice } from '@reduxjs/toolkit';
+import { AutID } from "@api/aut.model";
+import { ipfsCIDToHttpUrl } from "@api/storage.api";
+import { createSlice } from "@reduxjs/toolkit";
 
 export interface AuthState {
   isAutheticated: boolean;
@@ -11,11 +11,11 @@ export interface AuthState {
 const initialState: AuthState = {
   isAutheticated: false,
   userAddress: null,
-  userInfo: null,
+  userInfo: null
 };
 
 export const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
     setAuthenticated(state, action) {
@@ -26,11 +26,12 @@ export const authSlice = createSlice({
     setUserAddress(state, action) {
       state.userAddress = action.payload;
     },
-    resetAuthState: () => initialState,
-  },
+    resetAuthState: () => initialState
+  }
 });
 
-export const { setAuthenticated, setUserAddress, resetAuthState } = authSlice.actions;
+export const { setAuthenticated, setUserAddress, resetAuthState } =
+  authSlice.actions;
 
 export const UserInfo = (state) => state.auth.userInfo as AutID;
 export const IsAuthenticated = (state) => state.auth.isAuthenticated as boolean;

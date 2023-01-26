@@ -1,12 +1,19 @@
-import { AnyAction, AsyncThunkPayloadCreatorReturnValue, ThunkDispatch } from '@reduxjs/toolkit';
-import { BaseThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
-import { FallbackIfUnknown } from '@reduxjs/toolkit/dist/tsHelpers';
-import { Web3ProviderExtras } from '@aut-protocol/abi-types';
+import {
+  AnyAction,
+  AsyncThunkPayloadCreatorReturnValue,
+  ThunkDispatch
+} from "@reduxjs/toolkit";
+import { BaseThunkAPI } from "@reduxjs/toolkit/dist/createAsyncThunk";
+import { FallbackIfUnknown } from "@reduxjs/toolkit/dist/tsHelpers";
+import { Web3ProviderExtras } from "@aut-protocol/abi-types";
 
 export type AppDispatch = ThunkDispatch<any, any, AnyAction>;
 
 export interface BaseThunkArgs<FunctionsTypes, EventType> {
-  provider: (addressOrName: string, extras?: Partial<Web3ProviderExtras<EventType>>) => Promise<FunctionsTypes>;
+  provider: (
+    addressOrName: string,
+    extras?: Partial<Web3ProviderExtras<EventType>>
+  ) => Promise<FunctionsTypes>;
   updateTransactionStateAction?: (state: string, dispatch: AppDispatch) => void;
   updateErrorStateAction?: (error: string, dispatch: AppDispatch) => void;
 }
@@ -46,8 +53,19 @@ type GetExtra<ThunkApiConfig> = ThunkApiConfig extends {
 type GetDispatch<ThunkApiConfig> = ThunkApiConfig extends {
   dispatch: AppDispatch;
 }
-  ? FallbackIfUnknown<AppDispatch, ThunkDispatch<GetState<ThunkApiConfig>, GetExtra<ThunkApiConfig>, AnyAction>>
-  : ThunkDispatch<GetState<ThunkApiConfig>, GetExtra<ThunkApiConfig>, AnyAction>;
+  ? FallbackIfUnknown<
+      AppDispatch,
+      ThunkDispatch<
+        GetState<ThunkApiConfig>,
+        GetExtra<ThunkApiConfig>,
+        AnyAction
+      >
+    >
+  : ThunkDispatch<
+      GetState<ThunkApiConfig>,
+      GetExtra<ThunkApiConfig>,
+      AnyAction
+    >;
 
 export type GetThunkAPI<ThunkApiConfig> = BaseThunkAPI<
   GetState<ThunkApiConfig>,
@@ -73,7 +91,12 @@ type GetRejectedMeta<ThunkApiConfig> = ThunkApiConfig extends {
   ? RejectedMeta
   : any;
 
-export type AsyncThunkPayloadCreator<ContractFunction, Returned, ThunkArg, ThunkApiConfig extends AsyncThunkConfig = any> = (
+export type AsyncThunkPayloadCreator<
+  ContractFunction,
+  Returned,
+  ThunkArg,
+  ThunkApiConfig extends AsyncThunkConfig = any
+> = (
   contract: ContractFunction,
   arg?: ThunkArg,
   thunkAPI?: GetThunkAPI<ThunkApiConfig>

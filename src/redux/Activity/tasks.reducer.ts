@@ -1,8 +1,14 @@
-import { finalizeActivityTask, getAllTasks, getTaskById, submitActivityTask, takeActivityTask } from '@api/activities.api';
-import { createSelector, createSlice } from '@reduxjs/toolkit';
-import { GroupTask, Task, TaskStatus, TaskTypes } from '@store/model';
-import { ResultState } from '@store/result-status';
-import { ethers } from 'ethers';
+import {
+  finalizeActivityTask,
+  getAllTasks,
+  getTaskById,
+  submitActivityTask,
+  takeActivityTask
+} from "@api/activities.api";
+import { createSelector, createSlice } from "@reduxjs/toolkit";
+import { GroupTask, Task, TaskStatus, TaskTypes } from "@store/model";
+import { ResultState } from "@store/result-status";
+import { ethers } from "ethers";
 
 export interface ActivityTaskState {
   status: ResultState;
@@ -19,11 +25,11 @@ const initialState: ActivityTaskState = {
   tasks: [],
   selectedTabIndex: TaskTypes.Open,
   selectedTask: null,
-  errorMessage: '',
+  errorMessage: ""
 };
 
 export const tasksSlice = createSlice({
-  name: 'tasks',
+  name: "tasks",
   initialState,
   reducers: {
     tasksUpdateStatus(state, action) {
@@ -32,7 +38,7 @@ export const tasksSlice = createSlice({
     tasksUpdateSelectedTab(state, action) {
       state.selectedTabIndex = action.payload;
     },
-    resetTasksState: () => initialState,
+    resetTasksState: () => initialState
   },
   extraReducers: (builder) => {
     builder
@@ -64,7 +70,7 @@ export const tasksSlice = createSlice({
 
         const selectedTask = {
           ...task,
-          owner: taker,
+          owner: taker
         };
 
         state.selectedTask = selectedTask;
@@ -129,7 +135,7 @@ export const tasksSlice = createSlice({
         state.status = ResultState.Failed;
         state.errorMessage = action.payload as string;
       });
-  },
+  }
 });
 
 export const { tasksUpdateStatus, tasksUpdateSelectedTab } = tasksSlice.actions;
@@ -137,11 +143,14 @@ export const { tasksUpdateStatus, tasksUpdateSelectedTab } = tasksSlice.actions;
 const NotTaken = ethers.constants.AddressZero;
 
 export const Tasks = (state: any) => state.tasks.tasks as Task[];
-export const TasksSelectedTab = (state: any) => state.tasks.selectedTabIndex as number;
+export const TasksSelectedTab = (state: any) =>
+  state.tasks.selectedTabIndex as number;
 export const TasksStatus = (state: any) => state.tasks.status as ResultState;
-export const TasksRefreshStatus = (state: any) => state.tasks.refreshingStatus as ResultState;
+export const TasksRefreshStatus = (state: any) =>
+  state.tasks.refreshingStatus as ResultState;
 export const SingleTask = (state: any) => state.tasks.selectedTask as Task;
-export const TaskErrorMessage = (state: any) => state.tasks.errorMessage as string;
+export const TaskErrorMessage = (state: any) =>
+  state.tasks.errorMessage as string;
 
 export const FilteredTasks = (status: TaskTypes) =>
   createSelector(Tasks, (state: Task[]): GroupTask[] => {
@@ -149,7 +158,10 @@ export const FilteredTasks = (status: TaskTypes) =>
       switch (status) {
         case TaskTypes.MyTasks:
           // the taker is current logged user
-          return task.taker.toLocaleLowerCase() === window.ethereum.selectedAddress.toLocaleLowerCase();
+          return (
+            task.taker.toLocaleLowerCase() ===
+            window.ethereum.selectedAddress.toLocaleLowerCase()
+          );
         case TaskTypes.Ongoing:
           // someone has claimed it therefore is in progress
           return task.taker !== NotTaken && task.status !== TaskStatus.Finished;
@@ -175,26 +187,26 @@ export const FilteredTasks = (status: TaskTypes) =>
         },
         {
           openTasks: [],
-          closedTasks: [],
+          closedTasks: []
         }
       );
       return [
         {
-          label: 'Your Open Tasks',
-          tasks: openTasks,
+          label: "Your Open Tasks",
+          tasks: openTasks
         },
         {
-          label: 'Your Closed Tasks',
-          tasks: closedTasks,
-        },
+          label: "Your Closed Tasks",
+          tasks: closedTasks
+        }
       ];
     }
 
     return [
       {
-        label: '',
-        tasks: allTasks,
-      },
+        label: "",
+        tasks: allTasks
+      }
     ];
   });
 

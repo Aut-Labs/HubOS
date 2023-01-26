@@ -1,22 +1,11 @@
-import { TextField } from '@mui/material';
-import { useFieldArray, Controller } from 'react-hook-form';
-import { makeStyles } from '@mui/styles';
-import { pxToRem } from '@utils/text-size';
-
-const useStyles = makeStyles(() => ({
-  input: {
-    // '&::placeholder': {
-    //   color: '#000',
-    //   opacity: 0.6,
-    // },
-  },
-}));
+import { TextField } from "@mui/material";
+import { useFieldArray, Controller } from "react-hook-form";
+import { pxToRem } from "@utils/text-size";
 
 const RoleSkills = ({ control, activeRoleIndex }) => {
-  const classes = useStyles();
   const skillsFields = useFieldArray({
     control,
-    name: `roles[${activeRoleIndex}].skills`,
+    name: `roles[${activeRoleIndex}].skills`
   });
 
   return (
@@ -33,23 +22,22 @@ const RoleSkills = ({ control, activeRoleIndex }) => {
                   variant="standard"
                   sx={{
                     width: pxToRem(330),
-                    '& + .MuiFormControl-root': {
-                      mt: pxToRem(50),
+                    "& + .MuiFormControl-root": {
+                      mt: pxToRem(50)
                     },
-                    '.MuiInput-root': {
+                    ".MuiInput-root": {
                       width: pxToRem(330),
-                      color: 'primary.main',
+                      color: "primary.main",
                       fontSize: pxToRem(21),
-                      '&:hover:not(.Mui-disabled):before': {
-                        borderBottom: '1px solid #000000',
-                      },
-                    },
+                      "&:hover:not(.Mui-disabled):before": {
+                        borderBottom: "1px solid #000000"
+                      }
+                    }
                   }}
                   placeholder="Add a skill"
                   name={name}
-                  value={value || ''}
+                  value={value || ""}
                   onChange={onChange}
-                  InputProps={{ classes: { input: classes.input } }}
                   color="primary"
                 />
               );

@@ -1,4 +1,8 @@
-export const LoadImage = (url: string, width: number = null, height: number = null): Promise<HTMLImageElement> => {
+export const LoadImage = (
+  url: string,
+  width: number = null,
+  height: number = null
+): Promise<HTMLImageElement> => {
   const image = new Image();
   return new Promise<HTMLImageElement>((resolve, reject) => {
     if (width) {
@@ -12,7 +16,7 @@ export const LoadImage = (url: string, width: number = null, height: number = nu
     image.onload = () => {
       resolve(image);
     };
-    image.crossOrigin = 'Anonymous';
+    image.crossOrigin = "Anonymous";
     image.src = url;
   });
 };

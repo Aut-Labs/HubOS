@@ -1,25 +1,25 @@
-import { styled, Typography } from '@mui/material';
-import { useAppDispatch } from '@store/store.model';
-import { useHistory } from 'react-router-dom';
-import { Controller, useForm } from 'react-hook-form';
-import { pxToRem } from '@utils/text-size';
-import { CreatePollData, pollUpdateData } from '@store/Activity/poll.reducer';
-import { countWords } from '@utils/helpers';
-import { Fragment } from 'react';
-import { useSelector } from 'react-redux';
-import { AutHeader } from '@components/AutHeader';
-import { AutTextField, FormHelperText } from '@components/Fields';
-import { AutButton } from '@components/buttons';
+import { styled, Typography } from "@mui/material";
+import { useAppDispatch } from "@store/store.model";
+import { useHistory } from "react-router-dom";
+import { Controller, useForm } from "react-hook-form";
+import { pxToRem } from "@utils/text-size";
+import { CreatePollData, pollUpdateData } from "@store/Activity/poll.reducer";
+import { countWords } from "@utils/helpers";
+import { Fragment } from "react";
+import { useSelector } from "react-redux";
+import { AutHeader } from "@components/AutHeader";
+import { AutTextField, FormHelperText } from "@components/Fields";
+import { AutButton } from "@components/buttons";
 
-const StepWrapper = styled('form')({
-  textAlign: 'center',
-  display: 'flex',
-  justifyContent: 'center',
-  flexDirection: 'column',
+const StepWrapper = styled("form")({
+  textAlign: "center",
+  display: "flex",
+  justifyContent: "center",
+  flexDirection: "column"
 });
 
 const errorTypes = {
-  maxLength: `Characters cannot be more than 280`,
+  maxLength: `Characters cannot be more than 280`
 };
 
 const CreatePollInfoStep = () => {
@@ -31,27 +31,27 @@ const CreatePollInfoStep = () => {
     control,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors }
   } = useForm({
-    mode: 'onSubmit',
+    mode: "onSubmit",
     defaultValues: {
       title,
       description,
-      duration,
-    },
+      duration
+    }
   });
 
   const durations = [
-    { durationName: '1 Day', durationValue: '1d' },
-    { durationName: '1 Week', durationValue: '1w' },
-    { durationName: '1 Month', durationValue: '1mo' },
+    { durationName: "1 Day", durationValue: "1d" },
+    { durationName: "1 Week", durationValue: "1w" },
+    { durationName: "1 Month", durationValue: "1mo" }
   ];
 
   const values = watch();
 
   const onSubmit = async (data: any) => {
     await dispatch(pollUpdateData(data));
-    history.push('/aut-dashboard/event-factory/polls/options');
+    history.push("/aut-dashboard/event-factory/polls/options");
   };
 
   return (
@@ -59,9 +59,11 @@ const CreatePollInfoStep = () => {
       <AutHeader
         title="Polls"
         titleStyles={{
-          m: 0,
+          m: 0
         }}
-        subtitle={<>Add Title, Description and Duration for your Community Proposal.</>}
+        subtitle={
+          <>Add Title, Description and Duration for your Community Proposal.</>
+        }
       />
       <StepWrapper autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <Controller
@@ -70,8 +72,8 @@ const CreatePollInfoStep = () => {
           rules={{
             required: true,
             validate: {
-              maxWords: (v: string) => countWords(v) <= 6,
-            },
+              maxWords: (v: string) => countWords(v) <= 6
+            }
           }}
           render={({ field: { name, value, onChange } }) => {
             return (
@@ -88,10 +90,15 @@ const CreatePollInfoStep = () => {
                   onChange={onChange}
                   inputProps={{ maxLength: 20 }}
                   sx={{
-                    mb: pxToRem(45),
+                    mb: pxToRem(45)
                   }}
                   helperText={
-                    <FormHelperText errorTypes={errorTypes} value={value} name={name} errors={errors}>
+                    <FormHelperText
+                      errorTypes={errorTypes}
+                      value={value}
+                      name={name}
+                      errors={errors}
+                    >
                       <span>{6 - countWords(value)} Words left</span>
                     </FormHelperText>
                   }
@@ -110,17 +117,22 @@ const CreatePollInfoStep = () => {
               <AutTextField
                 width="450"
                 name={name}
-                value={value || ''}
+                value={value || ""}
                 onChange={onChange}
                 color="primary"
                 multiline
                 rows={5}
                 sx={{
-                  mb: pxToRem(45),
+                  mb: pxToRem(45)
                 }}
                 placeholder="Poll Description"
                 helperText={
-                  <FormHelperText errorTypes={errorTypes} value={value} name={name} errors={errors}>
+                  <FormHelperText
+                    errorTypes={errorTypes}
+                    value={value}
+                    name={name}
+                    errors={errors}
+                  >
                     <span>Max characters {280 - (value?.length || 0)}</span>
                   </FormHelperText>
                 }
@@ -131,8 +143,8 @@ const CreatePollInfoStep = () => {
         <div
           className="sw-duration-options"
           style={{
-            display: 'flex',
-            gridGap: pxToRem(25),
+            display: "flex",
+            gridGap: pxToRem(25)
           }}
         >
           {durations.map(({ durationName, durationValue }, index) => {
@@ -140,7 +152,7 @@ const CreatePollInfoStep = () => {
               <Fragment key={durationValue}>
                 <Controller
                   rules={{
-                    required: true,
+                    required: true
                   }}
                   name="duration"
                   control={control}
@@ -151,12 +163,12 @@ const CreatePollInfoStep = () => {
                         type="button"
                         onClick={() => onChange(durationValue)}
                         sx={{
-                          '&.MuiButton-root': {
+                          "&.MuiButton-root": {
                             borderRadius: 0,
-                            borderWidth: '2px',
-                          },
+                            borderWidth: "2px"
+                          }
                         }}
-                        className={value === durationValue ? 'active-link' : ''}
+                        className={value === durationValue ? "active-link" : ""}
                       >
                         <Typography variant="body2">{durationName}</Typography>
                       </AutButton>
@@ -173,7 +185,7 @@ const CreatePollInfoStep = () => {
             minWidth: pxToRem(325),
             maxWidth: pxToRem(325),
             height: pxToRem(70),
-            mt: pxToRem(100),
+            mt: pxToRem(100)
           }}
           type="submit"
           color="primary"

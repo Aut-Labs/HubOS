@@ -1,10 +1,10 @@
-import * as React from 'react';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
-import { Typography } from '@mui/material';
-import { pxToRem } from '@utils/text-size';
-import './tabs.scss';
+import * as React from "react";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import { Typography } from "@mui/material";
+import { pxToRem } from "@utils/text-size";
+import "./tabs.scss";
 
 function TabPanel(props) {
   const { children, value, index, sx, ...other } = props;
@@ -20,9 +20,9 @@ function TabPanel(props) {
       {value === index && (
         <Box
           sx={{
-            p: '10px 30px 0 30px',
-            height: 'calc(100%)',
-            ...(sx || {}),
+            p: "10px 30px 0 30px",
+            height: "calc(100%)",
+            ...(sx || {})
           }}
         >
           {children}
@@ -39,7 +39,7 @@ export default function SwTabs({
   scrollbarStyles = {},
   tabPanelStyles = {},
   width = 260,
-  height = 60,
+  height = 60
 }) {
   const [value, setValue] = React.useState(selectedTabIndex);
 
@@ -49,33 +49,33 @@ export default function SwTabs({
   };
 
   return (
-    <Box className="sw-tabs" sx={{ width: '100%' }}>
+    <Box className="sw-tabs" sx={{ width: "100%" }}>
       <Box>
         <Tabs
           // variant="fullWidth"
           value={value}
           onChange={handleChange}
           sx={{
-            '.MuiTabs-indicator': {
-              display: 'none',
+            ".MuiTabs-indicator": {
+              display: "none"
             },
-            '.MuiTabs-flexContainer': {
-              gridGap: '10px',
+            ".MuiTabs-flexContainer": {
+              gridGap: "10px"
             },
-            '.MuiButtonBase-root': {
+            ".MuiButtonBase-root": {
               height: pxToRem(height),
               width: pxToRem(width),
-              borderColor: 'primary.main',
-              textTransform: 'inherit',
-              borderWidth: '2px',
+              borderColor: "primary.main",
+              textTransform: "inherit",
+              borderWidth: "2px",
               fontSize: pxToRem(25),
-              color: 'white',
-              letterSpacing: '1.25px',
-              '&.Mui-selected': {
-                bgcolor: 'primary.main',
-                color: 'white',
-              },
-            },
+              color: "white",
+              letterSpacing: "1.25px",
+              "&.Mui-selected": {
+                bgcolor: "primary.main",
+                color: "white"
+              }
+            }
           }}
         >
           {tabs.map(({ label }) => (

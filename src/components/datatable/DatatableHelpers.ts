@@ -14,7 +14,7 @@ export const GetDatatableItems = (state) => {
     },
     {
       newItems: [],
-      allItems: [],
+      allItems: []
     }
   );
 };
@@ -37,7 +37,7 @@ export const GetDatatableChangedItems = (allItems, initialData) => {
     {
       removedItems: [],
       updatedItems: [],
-      noChangedItems: [],
+      noChangedItems: []
     }
   );
 };
@@ -47,7 +47,7 @@ export const LockDatatableItems = (items) => {
     return {
       ...member,
       id: index,
-      locked: true,
+      locked: true
     };
   });
 };

@@ -1,8 +1,8 @@
-import { addPoll, getPolls } from '@api/activities.api';
-import { ActivityPoll, ActivityPollData } from '@api/api.model';
-import { createSelector, createSlice } from '@reduxjs/toolkit';
-import { ResultState } from '@store/result-status';
-import { addDays, isBefore } from 'date-fns';
+import { addPoll, getPolls } from "@api/activities.api";
+import { ActivityPoll, ActivityPollData } from "@api/api.model";
+import { createSelector, createSlice } from "@reduxjs/toolkit";
+import { ResultState } from "@store/result-status";
+import { addDays, isBefore } from "date-fns";
 
 export interface PollState {
   status: ResultState;
@@ -13,41 +13,41 @@ export interface PollState {
 
 const initialState: PollState = {
   status: ResultState.Idle,
-  errorMessage: '',
+  errorMessage: "",
   polls: [],
   pollData: {
-    title: '',
-    description: '',
-    duration: '',
+    title: "",
+    description: "",
+    duration: "",
     options: [
       {
-        option: '',
-        emoji: null,
+        option: "",
+        emoji: null
       },
       {
-        option: '',
-        emoji: null,
-      },
+        option: "",
+        emoji: null
+      }
     ],
     role: null,
-    allRoles: null,
-  },
+    allRoles: null
+  }
 };
 
 export const pollSlice = createSlice({
-  name: 'poll',
+  name: "poll",
   initialState,
   reducers: {
     pollUpdateData(state, action) {
       state.pollData = {
         ...state.pollData,
-        ...action.payload,
+        ...action.payload
       };
     },
     pollUpdateStatus(state, action) {
       state.status = action.payload;
     },
-    resetPollState: () => initialState,
+    resetPollState: () => initialState
   },
   extraReducers: (builder) => {
     builder
@@ -72,15 +72,16 @@ export const pollSlice = createSlice({
         state.status = ResultState.Failed;
         state.errorMessage = action.payload as string;
       });
-  },
+  }
 });
 
-export const { pollUpdateData, pollUpdateStatus, resetPollState } = pollSlice.actions;
+export const { pollUpdateData, pollUpdateStatus, resetPollState } =
+  pollSlice.actions;
 
 const pollDurations = {
-  '1d': '1',
-  '1w': '7',
-  '1mo': '30',
+  "1d": "1",
+  "1w": "7",
+  "1mo": "30"
 };
 
 export const PollStatus = (state: any) => state.poll.status as ResultState;
@@ -105,6 +106,7 @@ export const PastPolls = createSelector(Polls, (polls) => {
     return isBefore(endDate, today);
   });
 });
-export const CreatePollData = (state: any) => state.poll.pollData as typeof initialState.pollData;
+export const CreatePollData = (state: any) =>
+  state.poll.pollData as typeof initialState.pollData;
 
 export default pollSlice.reducer;

@@ -1,36 +1,42 @@
-import { Fragment, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
-import { TextField, Typography } from '@mui/material';
-import { ReactComponent as TagIcon } from '@assets/tag.svg';
-import { allRoles } from '@store/Community/community.reducer';
-import { useForm, Controller } from 'react-hook-form';
-import { ActivityCurrentStep, ActivityCurrentTask, activitySetCurrentStep, activityUpdateTask } from '@store/Activity/task.reducer';
-import { pxToRem } from '@utils/text-size';
-import './RolesStep.scss';
-import { AutButton } from '@components/buttons';
+import { Fragment, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
+import { TextField, Typography } from "@mui/material";
+import { ReactComponent as TagIcon } from "@assets/tag.svg";
+import { allRoles } from "@store/Community/community.reducer";
+import { useForm, Controller } from "react-hook-form";
+import {
+  ActivityCurrentStep,
+  ActivityCurrentTask,
+  activitySetCurrentStep,
+  activityUpdateTask
+} from "@store/Activity/task.reducer";
+import { pxToRem } from "@utils/text-size";
+import "./RolesStep.scss";
+import { AutButton } from "@components/buttons";
 
 const RolesStep = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const { activeStep } = useSelector(ActivityCurrentStep);
-  const { role, allParticipants, participants } = useSelector(ActivityCurrentTask);
+  const { role, allParticipants, participants } =
+    useSelector(ActivityCurrentTask);
   const [roles] = useState(useSelector(allRoles));
 
   const { control, handleSubmit, watch } = useForm({
-    mode: 'onChange',
+    mode: "onChange",
     defaultValues: {
       role,
       participants,
-      allParticipants,
-    },
+      allParticipants
+    }
   });
 
   const values = watch();
 
   const onSubmit = (data: any) => {
     dispatch(activityUpdateTask(data));
-    history.push('/aut-dashboard/event-factory/create-task/description');
+    history.push("/aut-dashboard/event-factory/create-task/description");
   };
 
   useEffect(() => {
@@ -40,8 +46,8 @@ const RolesStep = () => {
           activeStep: 1,
           title: null,
           description: null,
-          toPrevBtnPath: '/aut-dashboard/event-factory/create-task',
-          left: null,
+          toPrevBtnPath: "/aut-dashboard/event-factory/create-task",
+          left: null
         })
       );
     }
@@ -52,10 +58,10 @@ const RolesStep = () => {
       <form className="sw-task-roles-wrapper" onSubmit={handleSubmit(onSubmit)}>
         <Typography
           sx={{
-            color: 'primary.main',
-            textAlign: 'center',
+            color: "primary.main",
+            textAlign: "center",
             mb: pxToRem(35),
-            fontSize: pxToRem(22),
+            fontSize: pxToRem(22)
           }}
           component="div"
           variant="h4"
@@ -68,32 +74,18 @@ const RolesStep = () => {
               <Fragment key={roleName}>
                 <Controller
                   rules={{
-                    required: true,
+                    required: true
                   }}
                   name="role"
                   control={control}
                   render={({ field: { name, value, onChange } }) => {
                     return (
                       <AutButton
-                        mode="light"
                         name={name}
                         type="button"
                         startIcon={<TagIcon />}
                         onClick={() => onChange(roleName)}
-                        className={value === roleName ? 'active-link' : ''}
-                        btnStyles={{
-                          width: pxToRem(160),
-                          height: pxToRem(50),
-                          fontSize: pxToRem(19),
-                          padding: `0 ${pxToRem(24)}`,
-                          '.MuiButton-startIcon': {
-                            mr: pxToRem(22),
-                            svg: {
-                              width: pxToRem(22),
-                              height: pxToRem(22),
-                            },
-                          },
-                        }}
+                        className={value === roleName ? "active-link" : ""}
                       >
                         <Typography variant="body2">{roleName}</Typography>
                       </AutButton>
@@ -107,11 +99,11 @@ const RolesStep = () => {
 
         <Typography
           sx={{
-            color: 'primary.main',
-            textAlign: 'center',
+            color: "primary.main",
+            textAlign: "center",
             mt: pxToRem(70),
             mb: pxToRem(35),
-            fontSize: pxToRem(22),
+            fontSize: pxToRem(22)
           }}
           component="div"
         >
@@ -121,7 +113,7 @@ const RolesStep = () => {
         <div
           className="form-fields"
           style={{
-            gridGap: pxToRem(92),
+            gridGap: pxToRem(92)
           }}
         >
           <div className="sw-form-field">
@@ -146,10 +138,10 @@ const RolesStep = () => {
                       color="primary"
                       placeholder="Number"
                       sx={{
-                        '.MuiInputBase-root': {
+                        ".MuiInputBase-root": {
                           width: pxToRem(135),
-                          height: pxToRem(40),
-                        },
+                          height: pxToRem(40)
+                        }
                       }}
                     />
                   );
@@ -166,18 +158,9 @@ const RolesStep = () => {
                   return (
                     <AutButton
                       name={name}
-                      mode="light"
                       type="button"
-                      btnStyles={{
-                        width: pxToRem(135),
-                        height: pxToRem(40),
-                        fontSize: pxToRem(22),
-                        '.sw-btn-label': {
-                          textAlign: 'center',
-                        },
-                      }}
                       onClick={() => onChange(!value)}
-                      className={value ? 'active-link' : ''}
+                      className={value ? "active-link" : ""}
                     >
                       <Typography variant="body2">All</Typography>
                     </AutButton>
@@ -188,21 +171,16 @@ const RolesStep = () => {
           </div>
         </div>
 
-        <div className="bottom-action" style={{ marginTop: '80px' }}>
+        <div className="bottom-action" style={{ marginTop: "80px" }}>
           <AutButton
             type="submit"
-            btnStyles={{
-              width: pxToRem(630),
-              height: pxToRem(100),
-              fontSize: pxToRem(28),
-              '.sw-btn-label': {
-                textAlign: 'center',
-              },
-            }}
-            disabled={!values.role || (values.allParticipants ? false : +values.participants === 0)}
-            mode="light"
-            label="Next: Describe the Task"
-          />
+            disabled={
+              !values.role ||
+              (values.allParticipants ? false : +values.participants === 0)
+            }
+          >
+            Next: Describe the Task
+          </AutButton>
         </div>
       </form>
     </>

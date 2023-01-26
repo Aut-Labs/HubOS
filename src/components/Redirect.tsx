@@ -1,14 +1,16 @@
 /* eslint-disable no-alert */
-/* eslint-disable react-hooks/exhaustive-deps */
 
-import { useEffect, useState } from 'react';
-import { getUser, oauthGetToken } from '@api/discord.api';
-import { AutIDContractEventType, Web3AutIDProvider } from '@aut-protocol/abi-types';
-import { getAutAddress, AutExists } from '@api/aut.api';
-import { useDispatch } from 'react-redux';
-import { openSnackbar } from '@store/ui-reducer';
-import { Box } from '@mui/system';
-import { CircularProgress, Typography } from '@mui/material';
+import { useEffect, useState } from "react";
+import { getUser, oauthGetToken } from "@api/discord.api";
+import {
+  AutIDContractEventType,
+  Web3AutIDProvider
+} from "@aut-protocol/abi-types";
+import { getAutAddress, AutExists } from "@api/aut.api";
+import { useDispatch } from "react-redux";
+import { openSnackbar } from "@store/ui-reducer";
+import { Box } from "@mui/system";
+import { CircularProgress, Typography } from "@mui/material";
 
 function Redirect() {
   const dispatch = useDispatch();
@@ -24,23 +26,23 @@ function Redirect() {
     const AutAddress = await getAutAddress();
 
     const contract = await Web3AutIDProvider(AutAddress, {
-      event: AutIDContractEventType.DiscordIDConnectedToAutID,
+      event: AutIDContractEventType.DiscordIDConnectedToAutID
     });
     const response = await contract.addDiscordIDToAutID(discordId);
     if (response) {
       dispatch(
         openSnackbar({
           message: `Congrats, you've connected your Aut to your Discord ID!`,
-          severity: 'success',
-          duration: 30000,
+          severity: "success",
+          duration: 30000
         })
       );
     } else {
       dispatch(
         openSnackbar({
           message: `Please try again.`,
-          severity: 'error',
-          duration: 30000,
+          severity: "error",
+          duration: 30000
         })
       );
     }
@@ -59,8 +61,8 @@ function Redirect() {
         dispatch(
           openSnackbar({
             message: `Aut not found. Make sure the correct address is selected.`,
-            severity: 'error',
-            duration: 30000,
+            severity: "error",
+            duration: 30000
           })
         );
       }
@@ -69,8 +71,8 @@ function Redirect() {
       dispatch(
         openSnackbar({
           message: `'Please authetnicate with Discord again!'`,
-          severity: 'error',
-          duration: 30000,
+          severity: "error",
+          duration: 30000
         })
       );
     }
@@ -79,7 +81,7 @@ function Redirect() {
   useEffect(() => {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
-    const code = urlParams.get('code');
+    const code = urlParams.get("code");
     if (!code) return;
     connectSWToDiscord(code);
   }, []);
@@ -87,12 +89,12 @@ function Redirect() {
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%',
-        height: '100%',
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        height: "100%"
       }}
     >
       <Typography variant="h2">Discord Integration Redirect Page</Typography>

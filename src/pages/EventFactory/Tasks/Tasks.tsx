@@ -1,32 +1,32 @@
-import { Box, CircularProgress, Container, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { resetActivityTaskState } from '@store/Activity/task.reducer';
-import { SwButton } from 'sw-web-shared';
-import { Link } from 'react-router-dom';
-import SwTabs from '@components/tabs/SwTabs';
-import AddIcon from '@mui/icons-material/Add';
+import { Box, CircularProgress, Container, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { resetActivityTaskState } from "@store/Activity/task.reducer";
+import { SwButton } from "sw-web-shared";
+import { Link } from "react-router-dom";
+import SwTabs from "@components/tabs/SwTabs";
+import AddIcon from "@mui/icons-material/Add";
 import {
   TasksRefreshStatus,
   TasksSelectedTab,
   TasksStatus,
   tasksUpdateSelectedTab,
-  tasksUpdateStatus,
-} from '@store/Activity/tasks.reducer';
-import { pxToRem } from '@utils/text-size';
-import { getAllTasks, takeActivityTask } from '@api/activities.api';
-import { Task, TaskTypes } from '@store/model';
-import { ActivityTypes } from '@api/api.model';
-import { useAppDispatch } from '@store/store.model';
-import ErrorDialog from '@components/Dialog/ErrorPopup';
-import LoadingDialog from '@components/Dialog/LoadingPopup';
-import { ResultState } from '@store/result-status';
-import TasksList from './TasksList';
-import './Tasks.scss';
+  tasksUpdateStatus
+} from "@store/Activity/tasks.reducer";
+import { pxToRem } from "@utils/text-size";
+import { getAllTasks, takeActivityTask } from "@api/activities.api";
+import { Task, TaskTypes } from "@store/model";
+import { ActivityTypes } from "@api/api.model";
+import { useAppDispatch } from "@store/store.model";
+import ErrorDialog from "@components/Dialog/ErrorPopup";
+import LoadingDialog from "@components/Dialog/LoadingPopup";
+import { ResultState } from "@store/result-status";
+import TasksList from "./TasksList";
+import "./Tasks.scss";
 
 const Tasks = () => {
   const [tabs, setTabs] = useState([]);
-  const [message, setLoadingMessage] = useState('');
+  const [message, setLoadingMessage] = useState("");
   const dispatch = useAppDispatch();
   const selectedTabIndex = useSelector(TasksSelectedTab);
   const status = useSelector(TasksStatus);
@@ -40,7 +40,7 @@ const Tasks = () => {
     const handleTask = async (s: TaskTypes, task: Task) => {
       switch (s) {
         case TaskTypes.Open:
-          setLoadingMessage('Claiming task...');
+          setLoadingMessage("Claiming task...");
           await dispatch(takeActivityTask(task));
           break;
         default:
@@ -49,32 +49,32 @@ const Tasks = () => {
     };
     setTabs([
       {
-        label: 'Open Tasks',
+        label: "Open Tasks",
         hideTop: true,
         props: {
           status: TaskTypes.Open,
-          handleTask,
+          handleTask
         },
-        component: TasksList,
+        component: TasksList
       },
       {
-        label: 'Ongoing Tasks',
+        label: "Ongoing Tasks",
         hideTop: true,
         props: {
           status: TaskTypes.Ongoing,
-          handleTask,
+          handleTask
         },
-        component: TasksList,
+        component: TasksList
       },
       {
-        label: 'Closed Tasks',
+        label: "Closed Tasks",
         hideTop: true,
         props: {
           status: TaskTypes.Closed,
-          handleTask,
+          handleTask
         },
-        component: TasksList,
-      },
+        component: TasksList
+      }
       // {
       //   label: 'Your Tasks',
       //   hideTop: true,
@@ -93,13 +93,21 @@ const Tasks = () => {
 
   return (
     <Container maxWidth="md" sx={{ mt: pxToRem(20) }}>
-      <ErrorDialog handleClose={handleDialogClose} open={status === ResultState.Failed} message="Something went wrong" />
-      <LoadingDialog handleClose={handleDialogClose} open={status === ResultState.Updating} message={message} />
+      <ErrorDialog
+        handleClose={handleDialogClose}
+        open={status === ResultState.Failed}
+        message="Something went wrong"
+      />
+      <LoadingDialog
+        handleClose={handleDialogClose}
+        open={status === ResultState.Updating}
+        message={message}
+      />
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          height: pxToRem(60),
+          display: "flex",
+          justifyContent: "space-between",
+          height: pxToRem(60)
         }}
       >
         <Box>
@@ -108,13 +116,13 @@ const Tasks = () => {
               <CircularProgress
                 size="30px"
                 sx={{
-                  justifyContent: 'center',
-                  alignContent: 'center',
+                  justifyContent: "center",
+                  alignContent: "center"
                 }}
               />
               <Typography
                 sx={{
-                  color: 'primary.main',
+                  color: "primary.main"
                 }}
                 variant="h6"
               >
@@ -126,11 +134,10 @@ const Tasks = () => {
 
         <div className="create-task-btn">
           <SwButton
-            mode="light"
             startIcon={<AddIcon />}
             sx={{
               width: pxToRem(180),
-              height: pxToRem(50),
+              height: pxToRem(50)
             }}
             to="/aut-dashboard/event-factory/create-task"
             component={Link}
@@ -143,7 +150,7 @@ const Tasks = () => {
           sx={{
             p: 0,
             m: 0,
-            gridGap: '0',
+            gridGap: "0"
           }}
           className="sw-box"
         >
@@ -154,11 +161,11 @@ const Tasks = () => {
               dispatch(tasksUpdateSelectedTab(selectedIndex));
             }}
             tabPanelStyles={{
-              p: 0,
+              p: 0
             }}
             scrollbarStyles={{
-              border: '0px',
-              p: 0,
+              border: "0px",
+              p: 0
             }}
           />
         </Box>

@@ -1,68 +1,77 @@
 /* eslint-disable max-len */
-import { Avatar, Box, Card, CardContent, CardHeader, IconButton, SvgIcon, Typography } from '@mui/material';
-import { CommunityData } from '@store/Community/community.reducer';
-import { pxToRem } from '@utils/text-size';
-import { useDispatch, useSelector } from 'react-redux';
-import { setTitle } from '@store/ui-reducer';
-import { useEffect } from 'react';
-import { UserInfo } from '@auth/auth.reducer';
-import SwGrid from '@components/SwGrid';
-import { styled } from '@mui/system';
-import CopyAddress from '@components/CopyAddress';
-import { ReactComponent as EditPencil } from '@assets/pencil-edit.svg';
-import { ipfsCIDToHttpUrl } from '@api/storage.api';
-import { Link, useRouteMatch } from 'react-router-dom';
+import {
+  Avatar,
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  IconButton,
+  SvgIcon,
+  Typography
+} from "@mui/material";
+import { CommunityData } from "@store/Community/community.reducer";
+import { pxToRem } from "@utils/text-size";
+import { useDispatch, useSelector } from "react-redux";
+import { setTitle } from "@store/ui-reducer";
+import { useEffect } from "react";
+import { UserInfo } from "@auth/auth.reducer";
+import SwGrid from "@components/SwGrid";
+import { styled } from "@mui/system";
+import CopyAddress from "@components/CopyAddress";
+import { ReactComponent as EditPencil } from "@assets/pencil-edit.svg";
+import { ipfsCIDToHttpUrl } from "@api/storage.api";
+import { Link, useRouteMatch } from "react-router-dom";
 
-const Stat = styled('div')({
-  width: '100%',
+const Stat = styled("div")({
+  width: "100%",
   height: pxToRem(80),
-  borderStyle: 'solid',
-  borderWidth: '1px',
-  borderTopColor: 'white',
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
+  borderStyle: "solid",
+  borderWidth: "1px",
+  borderTopColor: "white",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
   padding: `0 ${pxToRem(40)}`,
-  margin: '0 auto',
-  '&.stat:last-child': {
-    borderBottomColor: 'white',
-  },
+  margin: "0 auto",
+  "&.stat:last-child": {
+    borderBottomColor: "white"
+  }
 });
 
-const StatWrapper = styled('div')({
+const StatWrapper = styled("div")({
   maxWidth: pxToRem(670),
   minWidth: pxToRem(670),
-  margin: '0 auto',
+  margin: "0 auto"
 });
 
 const userStats = [
   {
-    title: 'Your Interactions',
-    value: '0',
+    title: "Your Interactions",
+    value: "0"
   },
   {
-    title: 'Your Open Tasks',
-    value: '0',
+    title: "Your Open Tasks",
+    value: "0"
   },
   {
-    title: 'Total Completed Tasks',
-    value: '0',
-  },
+    title: "Total Completed Tasks",
+    value: "0"
+  }
 ];
 
 const communityStats = [
   {
-    title: 'Total Members',
-    value: '0',
+    title: "Total Members",
+    value: "0"
   },
   {
-    title: 'Total Members',
-    value: '0',
+    title: "Total Members",
+    value: "0"
   },
   {
-    title: 'Total Members',
-    value: '0',
-  },
+    title: "Total Members",
+    value: "0"
+  }
 ];
 
 const Dashboard = () => {
@@ -82,11 +91,11 @@ const Dashboard = () => {
           <div
             className="sw-user-info"
             style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center"
             }}
           >
             <Avatar
@@ -96,15 +105,15 @@ const Dashboard = () => {
               sx={{
                 width: pxToRem(150),
                 height: pxToRem(150),
-                margin: '0 auto',
+                margin: "0 auto"
               }}
             />
             <Typography
               sx={{
-                color: 'white',
-                textAlign: 'center',
+                color: "white",
+                textAlign: "center",
                 mb: pxToRem(15),
-                fontSize: pxToRem(50),
+                fontSize: pxToRem(50)
               }}
               component="div"
             >
@@ -113,10 +122,10 @@ const Dashboard = () => {
 
             <Typography
               sx={{
-                color: 'white',
-                textAlign: 'center',
+                color: "white",
+                textAlign: "center",
                 fontSize: pxToRem(21),
-                mb: pxToRem(70),
+                mb: pxToRem(70)
               }}
               component="div"
             >
@@ -126,10 +135,16 @@ const Dashboard = () => {
             <StatWrapper>
               {userStats.map(({ title, value }) => (
                 <Stat className="stat">
-                  <Typography sx={{ color: 'white', fontSize: pxToRem(21) }} component="div">
+                  <Typography
+                    sx={{ color: "white", fontSize: pxToRem(21) }}
+                    component="div"
+                  >
                     {title}
                   </Typography>
-                  <Typography sx={{ color: 'white', fontSize: pxToRem(21) }} component="div">
+                  <Typography
+                    sx={{ color: "white", fontSize: pxToRem(21) }}
+                    component="div"
+                  >
                     {value}
                   </Typography>
                 </Stat>
@@ -141,25 +156,25 @@ const Dashboard = () => {
       right={
         <div
           style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center"
           }}
         >
           <Card
             sx={{
               maxWidth: pxToRem(585),
-              width: '100%',
-              margin: '0 auto',
+              width: "100%",
+              margin: "0 auto",
               p: pxToRem(50),
-              display: 'flex',
-              flexDirection: 'column',
-              background: '#000',
+              display: "flex",
+              flexDirection: "column",
+              background: "#000",
               borderImage:
-                'linear-gradient(45deg, #009fe3 0%, #0399de 8%, #0e8bd3 19%, #2072bf 30%, #3a50a4 41%, #5a2583 53%, #453f94 71%, #38519f 88%, #3458a4 100%) 1',
-              borderWidth: '10px',
+                "linear-gradient(45deg, #009fe3 0%, #0399de 8%, #0e8bd3 19%, #2072bf 30%, #3a50a4 41%, #5a2583 53%, #453f94 71%, #38519f 88%, #3458a4 100%) 1",
+              borderWidth: "10px"
             }}
           >
             <CardHeader
@@ -168,35 +183,46 @@ const Dashboard = () => {
                   sx={{
                     height: pxToRem(75),
                     width: pxToRem(75),
-                    border: '1px solid white',
+                    border: "1px solid white"
                   }}
                   variant="square"
                   src={ipfsCIDToHttpUrl(community?.image as string)}
                 />
               }
               sx={{
-                '.MuiAvatar-root': {
-                  backgroundColor: 'transparent',
-                },
+                ".MuiAvatar-root": {
+                  backgroundColor: "transparent"
+                }
               }}
               title={
                 <>
                   <Box
                     sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gridGap: '4px',
+                      display: "flex",
+                      alignItems: "center",
+                      gridGap: "4px"
                     }}
                   >
-                    <Typography sx={{ color: 'white' }} component="div" fontSize={pxToRem(32)}>
+                    <Typography
+                      sx={{ color: "white" }}
+                      component="div"
+                      fontSize={pxToRem(32)}
+                    >
                       {community.name}
                     </Typography>
-                    <IconButton component={Link} to={`${match.url}/edit-community`}>
+                    <IconButton
+                      component={Link}
+                      to={`${match.url}/edit-community`}
+                    >
                       <SvgIcon component={EditPencil} />
                     </IconButton>
                   </Box>
                   <CopyAddress address={community.properties.address} />
-                  <Typography sx={{ color: 'white' }} component="div" fontSize={pxToRem(19)}>
+                  <Typography
+                    sx={{ color: "white" }}
+                    component="div"
+                    fontSize={pxToRem(19)}
+                  >
                     {community.properties.market}
                   </Typography>
                 </>
@@ -211,20 +237,31 @@ const Dashboard = () => {
             <CardContent
               sx={{
                 flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between"
               }}
             >
-              <Typography color="white" marginBottom={pxToRem(30)} fontSize={pxToRem(18)} component="div">
+              <Typography
+                color="white"
+                marginBottom={pxToRem(30)}
+                fontSize={pxToRem(18)}
+                component="div"
+              >
                 {community.description}
               </Typography>
               {communityStats.map(({ title, value }) => (
                 <Stat className="stat">
-                  <Typography sx={{ color: 'white', fontSize: pxToRem(21) }} component="div">
+                  <Typography
+                    sx={{ color: "white", fontSize: pxToRem(21) }}
+                    component="div"
+                  >
                     {title}
                   </Typography>
-                  <Typography sx={{ color: 'white', fontSize: pxToRem(21) }} component="div">
+                  <Typography
+                    sx={{ color: "white", fontSize: pxToRem(21) }}
+                    component="div"
+                  >
                     {value}
                   </Typography>
                 </Stat>

@@ -1,20 +1,32 @@
-import { Alert, AlertTitle, Box, CircularProgress, Container, Typography } from '@mui/material';
-import { SingleTask, TaskErrorMessage, TasksStatus, tasksUpdateStatus } from '@store/Activity/tasks.reducer';
-import { Task, TaskStatus } from '@store/model';
-import { useAppDispatch } from '@store/store.model';
-import { finalizeActivityTask, getTaskById } from '@api/activities.api';
-import LoadingDialog from '@components/Dialog/LoadingPopup';
-import { pxToRem } from '@utils/text-size';
-import { useEffect } from 'react';
-import ErrorDialog from '@components/Dialog/ErrorPopup';
-import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
-import { SwScrollbar } from 'sw-web-shared';
-import { ResultState } from '@store/result-status';
-import UserTaskDetail from './UserTaskDetail';
-import './Tasks.scss';
-import { AutButton } from '@components/buttons';
-import AutLoading from '@components/AutLoading';
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  CircularProgress,
+  Container,
+  Typography
+} from "@mui/material";
+import {
+  SingleTask,
+  TaskErrorMessage,
+  TasksStatus,
+  tasksUpdateStatus
+} from "@store/Activity/tasks.reducer";
+import { Task, TaskStatus } from "@store/model";
+import { useAppDispatch } from "@store/store.model";
+import { finalizeActivityTask, getTaskById } from "@api/activities.api";
+import LoadingDialog from "@components/Dialog/LoadingPopup";
+import { pxToRem } from "@utils/text-size";
+import { useEffect } from "react";
+import ErrorDialog from "@components/Dialog/ErrorPopup";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { SwScrollbar } from "sw-web-shared";
+import { ResultState } from "@store/result-status";
+import UserTaskDetail from "./UserTaskDetail";
+import "./Tasks.scss";
+import { AutButton } from "@components/buttons";
+import AutLoading from "@components/AutLoading";
 
 const TaskFinalise = () => {
   const dispatch = useAppDispatch();
@@ -40,14 +52,22 @@ const TaskFinalise = () => {
       maxWidth="md"
       className="sw-tasks-base-container"
       sx={{
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between"
       }}
     >
-      <LoadingDialog handleClose={handleDialogClose} open={status === ResultState.Updating} message="Finalising task" />
-      <ErrorDialog handleClose={handleDialogClose} open={status === ResultState.Failed} message={errorMessage || 'Something went wrong'} />
+      <LoadingDialog
+        handleClose={handleDialogClose}
+        open={status === ResultState.Updating}
+        message="Finalising task"
+      />
+      <ErrorDialog
+        handleClose={handleDialogClose}
+        open={status === ResultState.Failed}
+        message={errorMessage || "Something went wrong"}
+      />
       {status === ResultState.Loading ? (
         <div className="tasks-loading-spinner">
           <AutLoading />
@@ -55,36 +75,36 @@ const TaskFinalise = () => {
       ) : (
         <SwScrollbar
           sx={{
-            height: '100%',
-            flex: 1,
+            height: "100%",
+            flex: 1
           }}
         >
           <Box
             sx={{
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between"
             }}
           >
             <Box
               sx={{
                 flex: 1,
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
+                height: "100%",
+                display: "flex",
+                flexDirection: "column"
               }}
               className="sw-box"
             >
               <Typography
                 sx={{
-                  color: 'primary.main',
-                  mb: '25px',
+                  color: "primary.main",
+                  mb: "25px"
                 }}
                 fontSize={pxToRem(50)}
               >
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  {selectedTask?.title || 'N/A'}
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  {selectedTask?.title || "N/A"}
                   {selectedTask?.status === TaskStatus.Finished && (
                     <Alert
                       sx={{
@@ -92,17 +112,17 @@ const TaskFinalise = () => {
                         py: 0,
                         m: 0,
                         ml: 2,
-                        height: '30px',
-                        width: '134px',
-                        display: 'flex',
-                        alignItems: 'center',
+                        height: "30px",
+                        width: "134px",
+                        display: "flex",
+                        alignItems: "center"
                       }}
                       severity="success"
                     >
                       <AlertTitle
                         sx={{
                           p: 0,
-                          m: 0,
+                          m: 0
                         }}
                       >
                         Completed
@@ -113,8 +133,8 @@ const TaskFinalise = () => {
               </Typography>
               <Typography
                 sx={{
-                  color: 'primary.main',
-                  mb: '50px',
+                  color: "primary.main",
+                  mb: "50px"
                 }}
                 fontSize={pxToRem(20)}
               >
@@ -122,50 +142,34 @@ const TaskFinalise = () => {
               </Typography>
 
               <AutButton
-                mode="light"
-                btnStyles={{
-                  width: pxToRem(390),
-                  height: pxToRem(120),
-                  marginBottom: '40px',
-                  p: 0,
-                  '.sw-btn-label': {
-                    textAlign: 'center',
-                  },
-                }}
-                disabled={selectedTask && selectedTask.creator.toLowerCase() === window.ethereum.selectedAddress}
+                disabled={
+                  selectedTask &&
+                  selectedTask.creator.toLowerCase() ===
+                    window.ethereum.selectedAddress
+                }
                 onClick={handleFinalizeClick}
-                label="Finalize"
-              />
+              >
+                Finalize
+              </AutButton>
 
-              <AutButton
-                mode="light"
-                btnStyles={{
-                  width: pxToRem(390),
-                  height: pxToRem(120),
-                  marginBottom: '40px',
-                  p: 0,
-                  '.sw-btn-label': {
-                    textAlign: 'center',
-                  },
-                }}
-                disabled
-                label="Decline"
-              />
+              <AutButton disabled>Decline</AutButton>
             </Box>
             <Box
               sx={{
                 flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                my: 'auto',
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                my: "auto"
               }}
             >
               <UserTaskDetail
                 url={selectedTask?.owner?.imageUrl}
                 username={selectedTask?.owner?.nickname}
-                date={new Date(+(selectedTask?.createdOn || 0)).toLocaleString()}
+                date={new Date(
+                  +(selectedTask?.createdOn || 0)
+                ).toLocaleString()}
               />
             </Box>
           </Box>

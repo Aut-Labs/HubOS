@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
-import StepWizard, { StepWizardChildProps } from 'react-step-wizard';
-import { styled } from '@mui/system';
-import { ButtonProps, Container } from '@mui/material';
-import { AutButton } from '@components/buttons';
-import { pxToRem } from '@utils/text-size';
-import StepperNav from './StepperNav';
-import { StepperProps } from './model';
+import { useEffect, useState } from "react";
+import StepWizard, { StepWizardChildProps } from "react-step-wizard";
+import { styled } from "@mui/system";
+import { ButtonProps, Container } from "@mui/material";
+import { AutButton } from "@components/buttons";
+import { pxToRem } from "@utils/text-size";
+import StepperNav from "./StepperNav";
+import { StepperProps } from "./model";
 
-const StepperWrapper = styled('div')`
+const StepperWrapper = styled("div")`
   .animated {
     -webkit-animation-duration: 0.8192s;
     animation-duration: 0.8192s;
@@ -144,20 +144,23 @@ const StepperWrapper = styled('div')`
   }
 `;
 
-const ActionsWrapper = styled('div')({
-  textAlign: 'center',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+const ActionsWrapper = styled("div")({
+  textAlign: "center",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center"
 });
 
-export const StepperButton = ({ label, ...props }: ButtonProps & { label: string }) => {
+export const StepperButton = ({
+  label,
+  ...props
+}: ButtonProps & { label: string }) => {
   return (
     <AutButton
       sx={{
         minWidth: pxToRem(400),
         height: pxToRem(70),
-        my: pxToRem(50),
+        my: pxToRem(50)
       }}
       type="submit"
       color="primary"
@@ -181,10 +184,10 @@ export default (props: StepperProps) => {
     <Container
       maxWidth="md"
       sx={{
-        width: '100%',
+        width: "100%",
         flexGrow: 1,
-        boxSizing: 'border-box',
-        position: 'relative',
+        boxSizing: "border-box",
+        position: "relative"
       }}
     >
       <StepperWrapper>
@@ -194,7 +197,7 @@ export default (props: StepperProps) => {
             enterLeft: `animated enterLeft`,
             exitRight: `animated exitRight`,
             exitLeft: `animated exitLeft`,
-            intro: `animated exitLeft`,
+            intro: `animated exitLeft`
           }}
           isHashEnabled
           isLazyMount
@@ -203,7 +206,14 @@ export default (props: StepperProps) => {
         >
           {props.steps.map(({ component }, index) => {
             const Step = component;
-            return <Step key={`top-step-${index}`} setActions={setActions} hashKey={`Step${index + 1}`} stepper={instance} />;
+            return (
+              <Step
+                key={`top-step-${index}`}
+                setActions={setActions}
+                hashKey={`Step${index + 1}`}
+                stepper={instance}
+              />
+            );
           })}
         </StepWizard>
         <ActionsWrapper>{actions}</ActionsWrapper>

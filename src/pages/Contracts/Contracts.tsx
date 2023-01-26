@@ -1,37 +1,51 @@
-import { MutableRefObject, useEffect, useState } from 'react';
-import { GridActionsCellItem, GridColumns, GridEditRowApi, GridRenderEditCellParams, GridRowApi } from '@mui/x-data-grid';
-import SWDatatable from '@components/datatable/Datatable';
-import { CustomEditComponent, useDatatableApiRef } from '@components/datatable/DatatableRef';
-import { Container, Typography } from '@mui/material';
-import SwEditToolbar from '@components/datatable/DatatableToolbar';
-import { GetDatatableItems, GetDatatableChangedItems } from '@components/datatable/DatatableHelpers';
-import { ReactComponent as PinIcon } from '@assets/pin.svg';
-import { ReactComponent as SaveIcon } from '@assets/actions/confirm.svg';
-import { ReactComponent as CancelIcon } from '@assets/actions/cancel.svg';
-import { ReactComponent as EditIcon } from '@assets/actions/edit.svg';
-import { useSelector } from 'react-redux';
-import { RootState, useAppDispatch } from '@store/store.model';
-import { ResultState } from '@store/result-status';
-import LoadingDialog from '@components/Dialog/LoadingPopup';
-import { pxToRem } from '@utils/text-size';
-import './Contracts.scss';
-import ErrorDialog from '@components/Dialog/ErrorPopup';
-import { addPAContracts, getPAContracts } from '@api/community.api';
-import { getLockedContracts } from '@store/AutDashboard/aut-dashboard.reducer';
-import { AutButton } from '@components/buttons';
+import { MutableRefObject, useEffect, useState } from "react";
+import {
+  GridActionsCellItem,
+  GridColumns,
+  GridEditRowApi,
+  GridRenderEditCellParams,
+  GridRowApi
+} from "@mui/x-data-grid";
+import SWDatatable from "@components/datatable/Datatable";
+import {
+  CustomEditComponent,
+  useDatatableApiRef
+} from "@components/datatable/DatatableRef";
+import { Container, Typography } from "@mui/material";
+import SwEditToolbar from "@components/datatable/DatatableToolbar";
+import {
+  GetDatatableItems,
+  GetDatatableChangedItems
+} from "@components/datatable/DatatableHelpers";
+import { ReactComponent as PinIcon } from "@assets/pin.svg";
+import { ReactComponent as SaveIcon } from "@assets/actions/confirm.svg";
+import { ReactComponent as CancelIcon } from "@assets/actions/cancel.svg";
+import { ReactComponent as EditIcon } from "@assets/actions/edit.svg";
+import { useSelector } from "react-redux";
+import { RootState, useAppDispatch } from "@store/store.model";
+import { ResultState } from "@store/result-status";
+import LoadingDialog from "@components/Dialog/LoadingPopup";
+import { pxToRem } from "@utils/text-size";
+import "./Contracts.scss";
+import ErrorDialog from "@components/Dialog/ErrorPopup";
+import { addPAContracts, getPAContracts } from "@api/community.api";
+import { getLockedContracts } from "@store/AutDashboard/aut-dashboard.reducer";
+import { AutButton } from "@components/buttons";
 
-const tableColumns = (getRef: () => MutableRefObject<GridEditRowApi & GridRowApi>): GridColumns => {
+const tableColumns = (
+  getRef: () => MutableRefObject<GridEditRowApi & GridRowApi>
+): GridColumns => {
   const handleEditClick = (id) => (event) => {
     event.stopPropagation();
     const apiRef = getRef();
-    apiRef.current.setRowMode(id, 'edit');
+    apiRef.current.setRowMode(id, "edit");
   };
 
   const handleSaveClick = (id) => (event) => {
     const apiRef = getRef();
     event.stopPropagation();
     apiRef.current.commitRowChange(id);
-    apiRef.current.setRowMode(id, 'view');
+    apiRef.current.setRowMode(id, "view");
 
     const row = apiRef.current.getRow(id);
     apiRef.current.updateRows([{ ...row, isNew: false }]);
@@ -40,42 +54,42 @@ const tableColumns = (getRef: () => MutableRefObject<GridEditRowApi & GridRowApi
   const handleDeleteClick = (id) => (event) => {
     const apiRef = getRef();
     event.stopPropagation();
-    apiRef.current.setRowMode(id, 'view');
-    apiRef.current.updateRows([{ id, _action: 'delete' }]);
+    apiRef.current.setRowMode(id, "view");
+    apiRef.current.updateRows([{ id, _action: "delete" }]);
   };
   return [
     {
-      headerName: '#',
-      field: 'id',
+      headerName: "#",
+      field: "id",
       width: 140,
       sortable: false,
-      valueGetter: ({ id }) => `${+id + 1}.`,
+      valueGetter: ({ id }) => `${+id + 1}.`
     },
     {
-      headerName: 'Use',
-      field: 'use',
+      headerName: "Use",
+      field: "use",
       editable: true,
       flex: 1,
       sortable: false,
       renderEditCell: (props: GridRenderEditCellParams) => {
         const placeholder = `Use ${+props.id + 1}`;
         return CustomEditComponent(props, placeholder);
-      },
+      }
     },
     {
-      headerName: 'Added By',
-      field: 'addedBy',
+      headerName: "Added By",
+      field: "addedBy",
       editable: true,
       flex: 1,
       sortable: false,
       renderEditCell: (props: GridRenderEditCellParams) => {
         const placeholder = `New Contract ${+props.id + 1}`;
         return CustomEditComponent(props, placeholder);
-      },
+      }
     },
     {
-      headerName: 'Address',
-      field: 'address',
+      headerName: "Address",
+      field: "address",
       editable: true,
       flex: 1,
       sortable: false,
@@ -88,17 +102,17 @@ const tableColumns = (getRef: () => MutableRefObject<GridEditRowApi & GridRowApi
           right = right.substr(right.length - 8);
           return `${left}...${right}`;
         }
-      },
+      }
     },
     {
-      headerName: '',
-      field: 'actions',
+      headerName: "",
+      field: "actions",
       sortable: false,
       width: 100,
-      type: 'actions',
+      type: "actions",
       getActions: ({ id }) => {
         const apiRef = getRef();
-        const isInEditMode = apiRef.current.getRowMode(id) === 'edit';
+        const isInEditMode = apiRef.current.getRowMode(id) === "edit";
 
         if (isInEditMode) {
           return [
@@ -109,15 +123,26 @@ const tableColumns = (getRef: () => MutableRefObject<GridEditRowApi & GridRowApi
               onClick={handleDeleteClick(id)}
               color="inherit"
             />,
-            <GridActionsCellItem icon={<SaveIcon />} label="Save" onClick={handleSaveClick(id)} color="primary" />,
+            <GridActionsCellItem
+              icon={<SaveIcon />}
+              label="Save"
+              onClick={handleSaveClick(id)}
+              color="primary"
+            />
           ];
         }
 
         return [
-          <GridActionsCellItem icon={<EditIcon />} label="Edit" className="textPrimary" onClick={handleEditClick(id)} color="inherit" />,
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="Edit"
+            className="textPrimary"
+            onClick={handleEditClick(id)}
+            color="inherit"
+          />
         ];
-      },
-    },
+      }
+    }
   ];
 };
 
@@ -128,7 +153,9 @@ const Contracts = () => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [open, setOpen] = useState(false);
   const lockedContracts = useSelector(getLockedContracts);
-  const { status, errorMessage } = useSelector((state: RootState) => state.dashboard);
+  const { status, errorMessage } = useSelector(
+    (state: RootState) => state.dashboard
+  );
 
   const handleClose = () => {
     setOpen(false);
@@ -156,7 +183,7 @@ const Contracts = () => {
     if (firstItem?.isNew) {
       const timeout = setTimeout(() => {
         if (apiRef.current) {
-          apiRef.current.setRowMode(0, 'edit');
+          apiRef.current.setRowMode(0, "edit");
         }
       });
       return () => clearTimeout(timeout);
@@ -171,12 +198,23 @@ const Contracts = () => {
 
   return (
     <Container maxWidth="md" className="sw-core-team">
-      <LoadingDialog open={status === ResultState.Updating} message="Updating contracts..." />
-      <ErrorDialog open={open} handleClose={handleClose} message=" No new addresses were added!" />
-      <ErrorDialog open={status === ResultState.Failed} handleClose={handleClose} message={errorMessage} />
+      <LoadingDialog
+        open={status === ResultState.Updating}
+        message="Updating contracts..."
+      />
+      <ErrorDialog
+        open={open}
+        handleClose={handleClose}
+        message=" No new addresses were added!"
+      />
+      <ErrorDialog
+        open={status === ResultState.Failed}
+        handleClose={handleClose}
+        message={errorMessage}
+      />
       <Typography
         sx={{
-          mt: pxToRem(20),
+          mt: pxToRem(20)
         }}
         color="primary.main"
         fontSize={pxToRem(50)}
@@ -189,13 +227,14 @@ const Contracts = () => {
       </Typography>
       <Typography
         sx={{
-          mb: pxToRem(50),
+          mb: pxToRem(50)
         }}
         color="primary.main"
         fontSize={pxToRem(25)}
         component="div"
       >
-        and track how Members of your Community interact with (and provide value to) them 🙌
+        and track how Members of your Community interact with (and provide value
+        to) them 🙌
       </Typography>
       <SWDatatable
         apiRef={apiRef}
@@ -208,23 +247,17 @@ const Contracts = () => {
           setIsDisabled(rowsToEdit > 0);
         }}
         components={{
-          Toolbar: SwEditToolbar,
+          Toolbar: SwEditToolbar
         }}
         componentsProps={{
-          toolbar: { apiRef, title: 'Add new Contract', focusOn: 'use' },
+          toolbar: { apiRef, title: "Add new Contract", focusOn: "use" }
         }}
       />
       <div className="sw-table-actions">
         <AutButton
-          mode="light"
           disabled={isDisabled || status === ResultState.Loading}
           onClick={submit}
           endIcon={<PinIcon />}
-          btnStyles={{
-            width: pxToRem(450),
-            height: pxToRem(100),
-            fontSize: pxToRem(28),
-          }}
         >
           Save changes
         </AutButton>

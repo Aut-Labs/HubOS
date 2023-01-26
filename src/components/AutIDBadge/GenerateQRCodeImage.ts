@@ -1,7 +1,7 @@
-import QRCode from 'easyqrcodejs';
-import { QRConfig } from './Badge.model';
-import { DrawScaledImage } from './DrawScaledImage';
-import { LoadImage } from './ImageLoader';
+import QRCode from "easyqrcodejs";
+import { QRConfig } from "./Badge.model";
+import { DrawScaledImage } from "./DrawScaledImage";
+import { LoadImage } from "./ImageLoader";
 
 export const GenerateQRCodeImage = async ({
   text,
@@ -11,13 +11,13 @@ export const GenerateQRCodeImage = async ({
   logoSize,
   logoWidth,
   logoHeight,
-  logoBorderWidth,
+  logoBorderWidth
 }: QRConfig): Promise<string> => {
-  const wrapper = document.createElement('div');
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+  const wrapper = document.createElement("div");
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
   ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
+  ctx.imageSmoothingQuality = "high";
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   const LOGO_SIZE = logoSize;
@@ -29,7 +29,7 @@ export const GenerateQRCodeImage = async ({
 
   DrawScaledImage(ctx, image, 0, 0, LOGO_SIZE, LOGO_SIZE, 0, 0);
 
-  ctx.globalCompositeOperation = 'destination-in';
+  ctx.globalCompositeOperation = "destination-in";
   ctx.beginPath();
   ctx.arc(
     LOGO_SIZE / 2, // x
@@ -40,11 +40,11 @@ export const GenerateQRCodeImage = async ({
   );
   ctx.fill();
 
-  ctx.globalCompositeOperation = 'source-over';
+  ctx.globalCompositeOperation = "source-over";
 
   const STROKE_OFFSET = logoBorderWidth / 2;
   ctx.lineWidth = logoBorderWidth;
-  ctx.strokeStyle = '#fff';
+  ctx.strokeStyle = "#fff";
   ctx.beginPath();
   ctx.arc(
     LOGO_SIZE / 2, // x
@@ -60,18 +60,18 @@ export const GenerateQRCodeImage = async ({
     const qrcode: any = new QRCode(wrapper, {
       width,
       height,
-      crossOrigin: 'anonymous',
+      crossOrigin: "anonymous",
       text,
       correctLevel: QRCode.CorrectLevel.H,
-      format: 'JPG',
+      format: "JPG",
       quality: 1,
       autoColor: true,
       logoWidth,
       logoHeight,
-      logo: canvas.toDataURL('image/png', 1.0),
-      logoBackgroundColor: 'transparent',
+      logo: canvas.toDataURL("image/png", 1.0),
+      logoBackgroundColor: "transparent",
       logoBackgroundTransparent: false,
-      onRenderingEnd: (data: any, base64: string) => resolve(base64),
+      onRenderingEnd: (data: any, base64: string) => resolve(base64)
     });
   });
 };
