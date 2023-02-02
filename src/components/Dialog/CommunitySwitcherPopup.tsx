@@ -1,11 +1,5 @@
 /* eslint-disable max-len */
-import {
-  Avatar,
-  Dialog,
-  DialogContent,
-  styled,
-  Typography
-} from "@mui/material";
+import { Avatar, styled, Typography } from "@mui/material";
 import {
   Communities,
   communityUpdateState
@@ -14,13 +8,12 @@ import { pxToRem } from "@utils/text-size";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "@store/store.model";
 import { Community } from "@api/community.model";
-import { ReactComponent as Logo } from "@assets/daut-logo.svg";
 import CopyAddress from "@components/CopyAddress";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
+import DialogWrapper from "./DialogWrapper";
 
 const CommunityItem = styled("div")({
   width: "100%",
-  height: pxToRem(100),
   borderStyle: "solid",
   borderWidth: "1px",
   borderTopColor: "white",
@@ -38,7 +31,9 @@ const CommunityItem = styled("div")({
 });
 
 const CommunityItemWrapper = styled("div")({
-  width: "100%"
+  width: "100%",
+  flex: 1,
+  marginTop: "20px"
 });
 
 const CommunitySwitcherPopup = ({ open, onClose }: any) => {
@@ -55,51 +50,30 @@ const CommunitySwitcherPopup = ({ open, onClose }: any) => {
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      sx={{
-        borderWidth: "0"
-      }}
-    >
-      <DialogContent
-        sx={{
-          maxWidth: pxToRem(550),
-          minWidth: pxToRem(550),
-          minHeight: pxToRem(550),
+    <DialogWrapper open={open} onClose={onClose}>
+      <div
+        className="sw-join-dialog-content"
+        style={{
           display: "flex",
-          alignItems: "center",
           flexDirection: "column",
-          background: "#000",
-          borderStyle: "solid",
-          borderImage:
-            "linear-gradient(45deg, #009fe3 0%, #0399de 8%, #0e8bd3 19%, #2072bf 30%, #3a50a4 41%, #5a2583 53%, #453f94 71%, #38519f 88%, #3458a4 100%) 1",
-          borderWidth: pxToRem(15)
+          alignItems: "center",
+          justifyContent: "center",
+          flex: 1
         }}
       >
-        <Logo
-          style={{
-            marginBottom: pxToRem(30)
-          }}
-        />
-        <Typography
-          sx={{
-            color: "white",
-            fontSize: pxToRem(25),
-            mb: pxToRem(15),
-            textTransform: "uppercase"
-          }}
-          component="div"
-        >
+        <Typography color="white" variant="subtitle1">
           Community Swicher
         </Typography>
-        <Typography
-          sx={{ color: "white", fontSize: pxToRem(18), mb: pxToRem(30) }}
-          component="div"
-        >
+        <Typography color="white" mb="4" variant="body">
           Pick the Community you wish to work with.
         </Typography>
-        <CommunityItemWrapper>
+        <CommunityItemWrapper
+          sx={{
+            height: {
+              md: "60px"
+            }
+          }}
+        >
           {communities.map((community) => (
             <CommunityItem
               key={`community-select-item-${community.name}`}
@@ -129,8 +103,8 @@ const CommunitySwitcherPopup = ({ open, onClose }: any) => {
             </CommunityItem>
           ))}
         </CommunityItemWrapper>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </DialogWrapper>
   );
 };
 

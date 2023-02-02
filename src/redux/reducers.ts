@@ -9,6 +9,7 @@ import pollReducer from "./Activity/poll.reducer";
 import autDashboardReducer from "./AutDashboard/aut-dashboard.reducer";
 import upcomingReducer from "./Activity/upcoming.reducer";
 import walletProviderReduce from "./WalletProvider/WalletProvider";
+import { postApi } from "@api/posts.api";
 
 export const reducers = combineReducers({
   community: communityReducer,
@@ -20,7 +21,8 @@ export const reducers = combineReducers({
   call: callReducer,
   poll: pollReducer,
   upcoming: upcomingReducer,
-  walletProvider: walletProviderReduce
+  walletProvider: walletProviderReduce,
+  [postApi.reducerPath]: postApi.reducer
 });
 
 const rootReducer = (state, action) => {

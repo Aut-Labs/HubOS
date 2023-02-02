@@ -6,6 +6,8 @@ import { pxToRem } from "@utils/text-size";
 import { Link } from "react-router-dom";
 import { AutButton } from "@components/buttons";
 import { IsAuthenticated } from "@auth/auth.reducer";
+import { useGetPostsByNameQuery } from "@api/posts.api";
+import AutSDK from "@aut-labs-private/sdk";
 
 const Wrapper = styled("div")({
   textAlign: "center",
@@ -18,6 +20,17 @@ const Wrapper = styled("div")({
 
 const GetStarted = () => {
   const isAuthenticated = useSelector(IsAuthenticated);
+  // const { data, error, isLoading, isFetching, refetch } =
+  //   useGetPostsByNameQuery(AutSDK.getInstance(), {
+  //     pollingInterval: 2000,
+  //     refetchOnMountOrArgChange: true,
+  //     skip: false
+  //   });
+
+  // console.log("data: ", data);
+  // console.log("error: ", error);
+  // console.log("isLoading: ", isLoading);
+  // console.log("isFetching: ", isFetching);
   return (
     <Wrapper>
       <Box

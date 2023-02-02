@@ -74,6 +74,16 @@ const communityStats = [
   }
 ];
 
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  const welcomeTypes = ["Good morning", "Good afternoon", "Good evening"];
+  let welcomeText = "";
+  if (hour < 12) welcomeText = welcomeTypes[0];
+  else if (hour < 18) welcomeText = welcomeTypes[1];
+  else welcomeText = welcomeTypes[2];
+  return welcomeText;
+};
+
 const Dashboard = () => {
   const dispatch = useDispatch();
   const userInfo = useSelector(UserInfo);
@@ -81,7 +91,7 @@ const Dashboard = () => {
   const match = useRouteMatch();
 
   useEffect(() => {
-    dispatch(setTitle(`Good Morning, ${userInfo?.name}`));
+    dispatch(setTitle(`${getGreeting()}, ${userInfo?.name}`));
   }, [dispatch, userInfo]);
 
   return (

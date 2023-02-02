@@ -78,23 +78,25 @@ function MembersAndActivities(props) {
       memberTabs = generateMemberTabs(members);
     }
 
-    setTabs([
-      ...(memberTabs || []),
-      {
-        label: "Activity & Logs",
-        props: {
-          total: logs?.length,
-          logs
-        },
-        component: ActivityAndLogs
-      }
-    ]);
+    setTabs(memberTabs || []);
+
+    // setTabs([
+    //   ...(memberTabs || []),
+    //   {
+    //     label: "Activity & Logs",
+    //     props: {
+    //       total: logs?.length,
+    //       logs
+    //     },
+    //     component: ActivityAndLogs
+    //   }
+    // ]);
   }, [members, logs, props]);
 
   useEffect(() => {
     const promises = [
-      dispatch(fetchMembers(props.isCoreTeamMembers)),
-      dispatch(fetchLogs(userInfo?.community))
+      dispatch(fetchMembers(props.isCoreTeamMembers))
+      // dispatch(fetchLogs(userInfo?.community))
     ];
     return () => promises.forEach((p) => p.abort());
   }, [

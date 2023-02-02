@@ -12,22 +12,18 @@ import {
   Collapse,
   Container,
   CssBaseline,
-  MenuItem,
   styled,
   SvgIcon,
   Toolbar
 } from "@mui/material";
 import { ReactComponent as ManageIcon } from "@assets/manage.svg";
-import { ReactComponent as TasksIcon } from "@assets/tasks.svg";
 import { ReactComponent as DashboardIcon } from "@assets/dashboard.svg";
 import { ReactComponent as SwitcherIcon } from "@assets/switcher.svg";
-import { ReactComponent as IntegrationIcon } from "@assets/integration.svg";
 import { NavLink, useLocation } from "react-router-dom";
 import { Fragment, useState } from "react";
 import { pxToRem } from "@utils/text-size";
 import { useSelector } from "react-redux";
-import { Communities, CommunityData } from "@store/Community/community.reducer";
-import { AutSelectField } from "./Fields";
+import { CommunityData } from "@store/Community/community.reducer";
 import { AutButton } from "./buttons";
 import CommunitySwitcherPopup from "./Dialog/CommunitySwitcherPopup";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
@@ -39,11 +35,11 @@ const menuItems: any[] = [
     exact: true,
     icon: DashboardIcon
   },
-  {
-    title: "Integrations & Contracts",
-    route: "/aut-dashboard/integrations-and-contracts",
-    icon: IntegrationIcon
-  },
+  // {
+  //   title: "Integrations & Contracts",
+  //   route: "/aut-dashboard/integrations-and-contracts",
+  //   icon: IntegrationIcon
+  // },
   {
     title: "DAO Management",
     icon: ManageIcon,
@@ -51,32 +47,32 @@ const menuItems: any[] = [
       {
         title: "- Members",
         route: "/aut-dashboard/members"
-      },
-      {
-        title: "- Roles",
-        route: "/aut-dashboard/roles"
-      },
-      {
-        title: "- Share",
-        route: "/aut-dashboard/share"
       }
+      // {
+      //   title: "- Roles",
+      //   route: "/aut-dashboard/roles"
+      // },
+      // {
+      //   title: "- Share",
+      //   route: "/aut-dashboard/share"
+      // }
     ]
-  },
-  {
-    title: "Community Events",
-    route: "/aut-dashboard/event-factory",
-    icon: TasksIcon
-    // children: [
-    //   {
-    //     title: '- Community Calls',
-    //     route: '/aut-dashboard/event-factory/group-call',
-    //   },
-    //   {
-    //     title: '- Polls',
-    //     route: '/aut-dashboard/event-factory/polls',
-    //   },
-    // ],
   }
+  // {
+  //   title: "Community Events",
+  //   route: "/aut-dashboard/event-factory",
+  //   icon: TasksIcon
+  // children: [
+  //   {
+  //     title: '- Community Calls',
+  //     route: '/aut-dashboard/event-factory/group-call',
+  //   },
+  //   {
+  //     title: '- Polls',
+  //     route: '/aut-dashboard/event-factory/polls',
+  //   },
+  // ],
+  // }
   // {
   //   title: "Tasks",
   //   route: "/aut-dashboard/tasks",
@@ -99,25 +95,26 @@ const menuItems: any[] = [
 const drawerWidth = 350;
 const toolbarHeight = 160;
 
-const AutDrawer = styled(Drawer)({
+const AutDrawer = styled(Drawer)(({ theme }) => ({
   width: pxToRem(drawerWidth),
   flexShrink: 0,
   [`& .MuiDrawer-paper`]: {
-    backgroundColor: "#000",
+    backgroundColor: "transparent",
     width: pxToRem(drawerWidth),
     marginTop: 0,
     boxSizing: "border-box",
-    borderImage:
-      "linear-gradient(160deg, #009fe3 0%, #0399de 8%, #0e8bd3 19%, #2072bf 30%, #3a50a4 41%, #5a2583 53%, #453f94 71%, #38519f 88%, #3458a4 100%) 1",
+    borderColor: theme.palette.offWhite.main,
+    // borderImage:
+    //   "linear-gradient(160deg, #009fe3 0%, #0399de 8%, #0e8bd3 19%, #2072bf 30%, #3a50a4 41%, #5a2583 53%, #453f94 71%, #38519f 88%, #3458a4 100%) 1",
     borderRightWidth: "3px",
     borderLeftWidth: "12px",
-    borderColor: "transparent",
+    // borderColor: "transparent",
     borderTop: 0,
     borderBottom: 0
   }
-});
+}));
 
-const AutMenuItem = styled<any>(ListItem)(({ menu }) => ({
+const AutMenuItem = styled<any>(ListItem)(({ menu, theme }) => ({
   border: 0,
   height: pxToRem(60),
   paddingTop: 0,
@@ -128,7 +125,7 @@ const AutMenuItem = styled<any>(ListItem)(({ menu }) => ({
     borderBottom: "1px"
   }),
   borderStyle: "solid",
-  borderColor: "#439EDD",
+  borderColor: theme.palette.offWhite.main,
   letterSpacing: "1.25px",
   background: `linear-gradient(to left, transparent 50%, #6FA1C3 50%) right`,
   backgroundSize: "200%",
@@ -179,10 +176,7 @@ export default function SidebarDrawer({ children }) {
 
   const menuContent = (
     <>
-      <List
-        sx={{ width: "100%", flex: 1, bgcolor: "background.primary" }}
-        component="nav"
-      >
+      <List sx={{ width: "100%", flex: 1 }} component="nav">
         {menuItems.map((menu, index) => {
           const routeParams =
             menu.disabled || !menu.route
@@ -397,8 +391,7 @@ export default function SidebarDrawer({ children }) {
           height: `calc(100% - ${pxToRem(toolbarHeight)})`,
           mt: pxToRem(toolbarHeight),
           flexGrow: 1,
-          p: "0",
-          bgcolor: "background.paper"
+          p: "0"
         }}
       >
         <Box
@@ -406,8 +399,7 @@ export default function SidebarDrawer({ children }) {
             height: "100%",
             width: "100%",
             position: "relative",
-            overflow: "hidden",
-            backgroundColor: "black"
+            overflow: "hidden"
           }}
         >
           <SwScrollbar

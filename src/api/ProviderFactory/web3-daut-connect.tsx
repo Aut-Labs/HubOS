@@ -3,28 +3,30 @@ import { useLocation, useHistory } from "react-router-dom";
 import { useAppDispatch } from "@store/store.model";
 import { resetAuthState, setAuthenticated } from "@auth/auth.reducer";
 import { AutID } from "@api/aut.model";
-import { useSelector } from "react-redux";
-import {
-  NetworkWalletConnectors,
-  NetworksConfig
-} from "@store/WalletProvider/WalletProvider";
 import { Init } from "@aut-labs/d-aut";
 import { communityUpdateState } from "@store/Community/community.reducer";
+import { useEthers } from "@usedapp/core";
 
 function Web3DautConnect({ setLoading }) {
   const dispatch = useAppDispatch();
-  const connectors = useSelector(NetworkWalletConnectors);
-  const networks = useSelector(NetworksConfig);
   const location = useLocation<any>();
   const history = useHistory();
   const abort = useRef<AbortController>();
+  const { activateBrowserWallet } = useEthers();
 
   const onAutInit = async () => {
     setLoading(false);
   };
 
   const onAutLogin = async ({ detail }: any) => {
-    const autID = new AutID(detail);
+    const profile = JSON.parse(JSON.stringify(detail));
+    const autID = new AutID(profile);
+    autID.properties.communities = autID.properties.communities.filter((c) => {
+      return c.properties.userData?.isActive;
+    });
+    autID.properties.address = profile.address;
+    autID.properties.network = profile.network?.toLowerCase();
+
     dispatch(
       setAuthenticated({
         isAuthenticated: true,
@@ -39,64 +41,12 @@ function Web3DautConnect({ setLoading }) {
           autID.properties.communities[0].properties.address
       })
     );
+    activateBrowserWallet({ type: profile.provider });
     const shouldGoToDashboard = location.pathname === "/";
     const goTo = shouldGoToDashboard ? "/aut-dashboard" : location.pathname;
     const returnUrl = location.state?.from;
     history.push(returnUrl || goTo);
   };
-
-  // const onAutLogin = async ({ detail }: any) => {
-  //   if (abort.current) {
-  //     abort.current.abort();
-  //   }
-  //   const profile = JSON.parse(JSON.stringify(detail));
-
-  //   const autID = new AutID(profile);
-  //   autID.properties.communities = autID.properties.communities.filter((c) => {
-  //     return c.properties.userData?.isActive;
-  //   });
-  //   autID.properties.address = profile.address;
-  //   autID.properties.network = profile.network?.toLowerCase();
-  //   const ethDomain = await fetchHolderEthEns(autID.properties.address);
-  //   autID.properties.ethDomain = ethDomain;
-
-  //   const params = new URLSearchParams(window.location.search);
-  //   params.set("network", autID.properties.network?.toLowerCase());
-  //   history.push({
-  //     pathname: `/${autID.name}`,
-  //     search: `?${params.toString()}`
-  //   });
-
-  //   await dispatch(
-  //     setConnectedUserInfo({
-  //       connectedAddress: autID.properties.address,
-  //       connectedNetwork: autID.properties.network?.toLowerCase()
-  //     })
-  //   );
-  //   await dispatch(
-  //     updateHolderState({
-  //       profiles: [autID],
-  //       selectedProfileAddress: autID.properties.address,
-  //       selectedProfileNetwork: autID.properties.network?.toLowerCase(),
-  //       fetchStatus: ResultState.Success,
-  //       status: ResultState.Idle
-  //     })
-  //   );
-
-  //   const [connector] = connectors[profile.provider];
-  //   if (connector) {
-  //     const config = networks.find(
-  //       (n) => n.network?.toLowerCase() === profile?.network?.toLowerCase()
-  //     );
-  //     await connector.activate(config.chainId);
-  //     try {
-  //       await EnableAndChangeNetwork(connector.provider, config);
-  //       await dispatch(setNetwork(config.network));
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  // };
 
   const onDisconnected = () => {
     dispatch(resetAuthState());

@@ -2,8 +2,6 @@ import { Route, Switch } from "react-router-dom";
 import SidebarDrawer from "@components/Sidebar";
 import NotFound from "@components/NotFound";
 import Dashboard from "./Dashboard/Dashboard";
-import Roles from "./Roles/Roles";
-import EventFactory from "./EventFactory/EventFactory";
 import CreateTask from "./EventFactory/CreateTask/CreateTask";
 import GroupCall from "./EventFactory/GroupCall/GroupCall";
 import Polls from "./EventFactory/Polls/Polls";
@@ -13,11 +11,6 @@ import YourTasks from "./EventFactory/Tasks/YourTasks";
 import TaskDetails from "./EventFactory/Tasks/TaskDetails";
 import TaskSubmit from "./EventFactory/Tasks/TaskSubmit";
 import TaskFinalise from "./EventFactory/Tasks/TaskFinalise";
-import Integrations from "./ThirdPartyIntegrations/Integrations";
-import Contracts from "./Contracts/Contracts";
-import DaoIntegration from "./ThirdPartyIntegrations/DaoIntegration/DaoIntegration";
-import DiscordIntegration from "./ThirdPartyIntegrations/DiscordIntegration/DiscordIntegration";
-import AutCommunityShare from "./AutCommunityShare/AutCommunityShare";
 import UserProfile from "./UserProfile/UserProfile";
 import CommunityEdit from "./CommunityEdit/CommunityEdit";
 import MembersAndActivities from "./MemberAndActivities/MembersAndActivities";
@@ -47,51 +40,51 @@ const AutDashboard = (props) => {
             path="/aut-dashboard/members/:memberAddress"
             component={UserProfile}
           />
-          <Route
+          {/* <Route
             exact
             path="/aut-dashboard/roles"
             render={() => <Roles {...props} isCoreTeam />}
-          />
-          <Route
+          /> */}
+          {/* <Route
             exact
             path="/aut-dashboard/share"
             component={AutCommunityShare}
             {...props}
-          />
+          /> */}
 
           {/* Aut Dashboard > Integration and contracts */}
-          <Route
+          {/* <Route
             exact
             path="/aut-dashboard/integrations-and-contracts"
             component={Integrations}
             {...props}
-          />
-          <Route
+          /> */}
+          {/* <Route
             exact
             path="/aut-dashboard/integrations-and-contracts/dao-integration"
             component={DaoIntegration}
             {...props}
-          />
-          <Route
+          /> */}
+          {/* <Route
             exact
             path="/aut-dashboard/integrations-and-contracts/discord-integration"
             component={DiscordIntegration}
             {...props}
-          />
-          <Route
+          /> */}
+          {/* <Route
             exact
             path="/aut-dashboard/integrations-and-contracts/contracts"
             component={Contracts}
             {...props}
-          />
+          /> */}
 
           {/* Aut Dashboard > Event factory */}
-          <Route
+          {/* <Route
             exact
             path="/aut-dashboard/event-factory"
             component={EventFactory}
             {...props}
-          />
+          /> */}
           <Route
             path="/aut-dashboard/event-factory/create-task"
             component={CreateTask}

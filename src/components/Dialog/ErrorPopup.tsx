@@ -1,6 +1,5 @@
 import { Typography } from "@mui/material";
 import { pxToRem } from "@utils/text-size";
-import { SwButton } from "sw-web-shared";
 import { AutButton } from "../buttons";
 import DialogWrapper from "./DialogWrapper";
 
@@ -45,7 +44,7 @@ const ErrorDialog = ({
         <Typography
           sx={{ color: "red", textAlign: "center", mt: 2 }}
           component="div"
-          variant="h2"
+          variant="h4"
         >
           {message}
         </Typography>
@@ -56,12 +55,12 @@ const ErrorDialog = ({
             mt: 2
           }}
           component="div"
-          variant="body2"
+          variant="body1"
         >
           {subtitle}
         </Typography>
         {hasRetry && (
-          <SwButton
+          <AutButton
             type="button"
             btnType="medium"
             mode={mode}

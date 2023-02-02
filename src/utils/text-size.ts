@@ -17,8 +17,8 @@ export const FindTextCenter = (
 export const pxToRem = (px: number | string) => {
   px = `${px}`.replace("px", "");
 
-  // return `${px}px`;
-  const x = 16;
-  const rem = `${(1 / x) * Number(px)}rem`;
-  return rem;
+  return `${px}px`;
+  // const x = 16;
+  // const rem = `${(1 / x) * Number(px)}rem`;
+  // return rem;
 };

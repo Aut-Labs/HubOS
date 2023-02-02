@@ -9,7 +9,14 @@ import {
   useHistory
 } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { AppBar, Box, CssBaseline, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  CssBaseline,
+  Toolbar,
+  Typography,
+  useTheme
+} from "@mui/material";
 import { ReactComponent as AutLogo } from "@assets/aut/logo.svg";
 import Redirect from "@components/Redirect";
 import { resetAuthState, setAuthenticated } from "@auth/auth.reducer";
@@ -87,6 +94,7 @@ function App() {
   const appTitle = useSelector(AppTitle);
   const { isAutheticated } = useSelector((state: RootState) => state.auth);
   const [config, setConfig] = useState<Config>(null);
+  const theme = useTheme();
 
   useEffect(() => {
     getAppConfig()
@@ -110,6 +118,7 @@ function App() {
         sx={{
           border: "0",
           p: 0,
+          backgroundColor: "transparent",
           zIndex: (s) => s.zIndex.drawer + 1,
           ml: isAutheticated ? pxToRem(350) : 0,
           width: isAutheticated ? `calc(100% - ${pxToRem(350)})` : "100%"
@@ -118,7 +127,7 @@ function App() {
         <Toolbar
           sx={{
             p: "0px !important",
-            backgroundColor: "black",
+            backgroundColor: "transparent",
             border: "0",
             minHeight: `${pxToRem(160)} !important`,
             justifyContent: "flex-end",
@@ -150,20 +159,18 @@ function App() {
               width: "100%",
               borderStyle: "solid",
               height: pxToRem(50),
-              borderImage:
-                "linear-gradient(160deg, #009fe3 0%, #0399de 8%, #0e8bd3 19%, #2072bf 30%, #3a50a4 41%, #5a2583 53%, #453f94 71%, #38519f 88%, #3458a4 100%) 1",
+              borderColor: theme.palette.offWhite.main,
+              // borderImage:
+              //   "linear-gradient(160deg, #009fe3 0%, #0399de 8%, #0e8bd3 19%, #2072bf 30%, #3a50a4 41%, #5a2583 53%, #453f94 71%, #38519f 88%, #3458a4 100%) 1",
               borderBottomWidth: "1px",
               borderTopWidth: "1px",
               borderLeft: 0,
-              borderRight: 0
+              borderRight: 0,
+              display: "flex",
+              alignItems: "center"
             }}
           >
-            <Typography
-              paddingLeft="10px"
-              lineHeight={pxToRem(50)}
-              fontSize={pxToRem(20)}
-              color="white"
-            >
+            <Typography pl="10px" color="white" variant="subtitle2">
               {appTitle}
             </Typography>
           </div>
@@ -172,7 +179,7 @@ function App() {
       <Box
         sx={{
           height: `calc(100%)`,
-          backgroundColor: "#000"
+          backgroundColor: "transparent"
         }}
         className={isLoading ? "sw-loading" : ""}
       >
