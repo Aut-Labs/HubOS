@@ -1,10 +1,10 @@
-import { FindTextCenter } from '@utils/text-size';
+import { FindTextCenter } from "@utils/text-size";
 
 /* eslint-disable max-len */
 const SVG_WIDTH = 284.5;
 const TEXT_OFFSET = 17;
 
-const textSize = FindTextCenter(SVG_WIDTH, TEXT_OFFSET, 'width');
+const textSize = FindTextCenter(SVG_WIDTH, TEXT_OFFSET, "width");
 
 function UserTaskDetail({ username, date, url }) {
   return (
@@ -16,64 +16,153 @@ function UserTaskDetail({ username, date, url }) {
       viewBox="0 0 284.5 453.5"
     >
       <defs>
-        <filter id="Rectangle_2202" width="284.5" height="453.5" x="0" y="0" filterUnits="userSpaceOnUse">
+        <filter
+          id="Rectangle_2202"
+          width="284.5"
+          height="453.5"
+          x="0"
+          y="0"
+          filterUnits="userSpaceOnUse"
+        >
           <feOffset dx="6" dy="6" />
           <feGaussianBlur result="blur" stdDeviation="0.5" />
           <feFlood floodColor="#fff" />
           <feComposite in2="blur" operator="in" />
           <feComposite in="SourceGraphic" />
         </filter>
-        <linearGradient id="linear-gradient" x1="0.281" x2="0.538" y1="0.79" y2="0.325" gradientUnits="objectBoundingBox">
+        <linearGradient
+          id="linear-gradient"
+          x1="0.281"
+          x2="0.538"
+          y1="0.79"
+          y2="0.325"
+          gradientUnits="objectBoundingBox"
+        >
           <stop offset="0" stopColor="#fff" stopOpacity="0" />
           <stop offset="0.512" stopColor="#d1d1d1" stopOpacity="0.137" />
           <stop offset="0.917" stopColor="#434342" stopOpacity="0.569" />
           <stop offset="1" stopColor="#171716" stopOpacity="0.698" />
         </linearGradient>
-        <linearGradient id="linear-gradient-2" x1="0.281" x2="0.538" y1="-20.711" y2="-21.177" gradientUnits="objectBoundingBox">
+        <linearGradient
+          id="linear-gradient-2"
+          x1="0.281"
+          x2="0.538"
+          y1="-20.711"
+          y2="-21.177"
+          gradientUnits="objectBoundingBox"
+        >
           <stop offset="0" stopColor="#fff" stopOpacity="0" />
           <stop offset="0.546" stopColor="#cacac9" stopOpacity="0.137" />
           <stop offset="0.977" stopColor="#232322" stopOpacity="0.569" />
           <stop offset="1" stopColor="#171716" stopOpacity="0.6" />
         </linearGradient>
-        <linearGradient id="linear-gradient-3" x1="0.951" x2="0.377" y1="0.714" y2="0.436" gradientUnits="objectBoundingBox">
+        <linearGradient
+          id="linear-gradient-3"
+          x1="0.951"
+          x2="0.377"
+          y1="0.714"
+          y2="0.436"
+          gradientUnits="objectBoundingBox"
+        >
           <stop offset="0" stopColor="#fff" stopOpacity="0" />
           <stop offset="0.721" stopColor="#9f9f9e" stopOpacity="0.125" />
           <stop offset="1" stopColor="#171716" stopOpacity="0.302" />
         </linearGradient>
-        <linearGradient id="linear-gradient-4" x1="0.141" x2="0.557" y1="0.653" y2="0.499" gradientUnits="objectBoundingBox">
+        <linearGradient
+          id="linear-gradient-4"
+          x1="0.141"
+          x2="0.557"
+          y1="0.653"
+          y2="0.499"
+          gradientUnits="objectBoundingBox"
+        >
           <stop offset="0" stopColor="#fff" stopOpacity="0" />
           <stop offset="0.819" stopColor="#525251" stopOpacity="0.298" />
           <stop offset="1" stopColor="#171716" stopOpacity="0.4" />
         </linearGradient>
-        <linearGradient id="linear-gradient-5" x1="0.599" x2="0.332" y1="0.4" y2="0.666" gradientUnits="objectBoundingBox">
+        <linearGradient
+          id="linear-gradient-5"
+          x1="0.599"
+          x2="0.332"
+          y1="0.4"
+          y2="0.666"
+          gradientUnits="objectBoundingBox"
+        >
           <stop offset="0" stopColor="#fff" stopOpacity="0" />
           <stop offset="0.672" stopColor="#c4c4c3" stopOpacity="0.102" />
           <stop offset="1" stopColor="#171716" stopOpacity="0.4" />
         </linearGradient>
-        <linearGradient id="linear-gradient-6" x1="1.117" x2="-0.11" y1="0.807" y2="0.171" xlinkHref="#linear-gradient-5" />
-        <linearGradient id="linear-gradient-7" x1="0.25" x2="1.009" y1="-0.483" y2="0.983" xlinkHref="#linear-gradient-5" />
-        <pattern id="pattern" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" viewBox="0 0 128 128">
+        <linearGradient
+          id="linear-gradient-6"
+          x1="1.117"
+          x2="-0.11"
+          y1="0.807"
+          y2="0.171"
+          xlinkHref="#linear-gradient-5"
+        />
+        <linearGradient
+          id="linear-gradient-7"
+          x1="0.25"
+          x2="1.009"
+          y1="-0.483"
+          y2="0.983"
+          xlinkHref="#linear-gradient-5"
+        />
+        <pattern
+          id="pattern"
+          width="100%"
+          height="100%"
+          preserveAspectRatio="xMidYMid slice"
+          viewBox="0 0 128 128"
+        >
           <image width="128" height="128" xlinkHref={url} />
         </pattern>
       </defs>
 
       <g data-name="Group 10730" transform="translate(-658 -241)">
-        <path d="M0 0H275V444H0z" data-name="Rectangle 2205" transform="translate(660 243)" />
-        <path d="M0 0H276V445H0z" data-name="Rectangle 2206" transform="translate(663 246)" />
-        <path d="M32.7 103h107.175l62.865 445.029H33.1z" data-name="Path 1527" transform="translate(626.595 139.523)" />
-        <text fill="#fff" fontFamily="JosefinSans-Regular, Josefin Sans" fontSize="28" transform="translate(674 438)">
-          <tspan x={textSize(username, '28px')} y="21">
+        <path
+          d="M0 0H275V444H0z"
+          data-name="Rectangle 2205"
+          transform="translate(660 243)"
+        />
+        <path
+          d="M0 0H276V445H0z"
+          data-name="Rectangle 2206"
+          transform="translate(663 246)"
+        />
+        <path
+          d="M32.7 103h107.175l62.865 445.029H33.1z"
+          data-name="Path 1527"
+          transform="translate(626.595 139.523)"
+        />
+        <text
+          fill="#fff"
+          fontFamily="JosefinSans-Regular, Josefin Sans"
+          fontSize="28"
+          transform="translate(674 438)"
+        >
+          <tspan x={textSize(username, "28px")} y="21">
             {username}
           </tspan>
         </text>
 
-        <text fill="#fff" fontFamily="JosefinSans-Regular, Josefin Sans" fontSize="14" transform="translate(674 474)">
-          <tspan x={textSize(date, '14px')} y="11">
+        <text
+          fill="#fff"
+          fontFamily="JosefinSans-Regular, Josefin Sans"
+          fontSize="14"
+          transform="translate(674 474)"
+        >
+          <tspan x={textSize(date, "14px")} y="11">
             {date}
           </tspan>
         </text>
         <g filter="url(#Rectangle_2202)" transform="translate(658 241)">
-          <g fill="none" stroke="#fff" strokeWidth="1" data-name="Rectangle 2202">
+          <g
+            fill="none"
+            stroke="#fff"
+            strokeWidth="1"
+            data-name="Rectangle 2202"
+          >
             <path stroke="none" d="M0 0H277V446H0z" />
             <path d="M0.5 0.5H276.5V445.5H0.5z" />
           </g>
@@ -91,9 +180,21 @@ function UserTaskDetail({ username, date, url }) {
                 data-name="Path 2"
                 transform="translate(-493.07 -601.224)"
               />
-              <path d="M565.6 601.264h.96v7.155h-.96z" data-name="Path 3" transform="translate(-552.71 -601.224)" />
-              <path d="M594.762 601.264h.96v6.236h3.632v.92h-4.592z" data-name="Path 4" transform="translate(-578.959 -601.224)" />
-              <path d="M655.36 601.264h.96v6.236h3.632v.92h-4.592z" data-name="Path 5" transform="translate(-633.51 -601.224)" />
+              <path
+                d="M565.6 601.264h.96v7.155h-.96z"
+                data-name="Path 3"
+                transform="translate(-552.71 -601.224)"
+              />
+              <path
+                d="M594.762 601.264h.96v6.236h3.632v.92h-4.592z"
+                data-name="Path 4"
+                transform="translate(-578.959 -601.224)"
+              />
+              <path
+                d="M655.36 601.264h.96v6.236h3.632v.92h-4.592z"
+                data-name="Path 5"
+                transform="translate(-633.51 -601.224)"
+              />
               <path
                 d="M436.375 706.51h1.125l1.93 5.463-.168-.06 1.415-3.671.445 1.3-1.9 4.433zm3.454 0h.95l2.108 5.393-.208-.039 1.841-5.354h1.029l-2.81 7.442z"
                 data-name="Path 6"
@@ -104,8 +205,16 @@ function UserTaskDetail({ username, date, url }) {
                 data-name="Path 7"
                 transform="translate(-516.552 -693.023)"
               />
-              <path d="M601.014 706.213h.96v6.234h3.632v.92h-4.592z" data-name="Path 8" transform="translate(-584.587 -695.702)" />
-              <path d="M661.611 706.213h.96v6.234h3.629v.92h-4.592z" data-name="Path 9" transform="translate(-639.138 -695.702)" />
+              <path
+                d="M601.014 706.213h.96v6.234h3.632v.92h-4.592z"
+                data-name="Path 8"
+                transform="translate(-584.587 -695.702)"
+              />
+              <path
+                d="M661.611 706.213h.96v6.234h3.629v.92h-4.592z"
+                data-name="Path 9"
+                transform="translate(-639.138 -695.702)"
+              />
               <path
                 d="M722.21 706.213h4.651v.92h-3.691v2.177h3.3v.93h-3.3v2.207H727v.92h-4.79z"
                 data-name="Path 10"
@@ -154,48 +263,264 @@ function UserTaskDetail({ username, date, url }) {
               opacity="0.28"
               transform="translate(-247.185 -598.614)"
             />
-            <path fill="#fff" d="M0 0H6.18V6.18H0z" data-name="Rectangle 2" transform="rotate(-180 3.09 9.3)" />
-            <path fill="#161615" d="M0 0H3.708V3.708H0z" data-name="Rectangle 3" transform="rotate(-180 2.472 8.682)" />
-            <circle cx="0.618" cy="0.618" r="0.618" fill="#fff" data-name="Ellipse 1" transform="translate(2.472 14.893)" />
-            <path fill="#fff" d="M0 0H6.18V6.18H0z" data-name="Rectangle 4" transform="rotate(-180 9.27 9.3)" />
-            <path fill="#161615" d="M0 0H3.708V3.708H0z" data-name="Rectangle 5" transform="rotate(-180 8.652 8.682)" />
-            <circle cx="0.618" cy="0.618" r="0.618" fill="#fff" data-name="Ellipse 2" transform="translate(14.832 14.893)" />
-            <path fill="#fff" d="M0 0H6.18V6.18H0z" data-name="Rectangle 6" transform="rotate(180 3.09 3.09)" />
-            <path fill="#161615" d="M0 0H3.708V3.708H0z" data-name="Rectangle 7" transform="rotate(180 2.472 2.472)" />
-            <circle cx="0.618" cy="0.618" r="0.618" fill="#fff" data-name="Ellipse 3" transform="translate(2.472 2.472)" />
-            <path fill="#fff" d="M0 0H7.416V1.236H0z" data-name="Rectangle 8" transform="translate(2.472 8.682)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 9" transform="translate(6.18 7.446)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 10" transform="translate(3.708 7.446)" />
-            <path fill="#fff" d="M0 0H1.236V2.472H0z" data-name="Rectangle 11" transform="translate(7.416 6.21)" />
-            <path fill="#fff" d="M0 0H8.652V1.236H0z" data-name="Rectangle 12" transform="translate(9.888 2.532)" />
-            <path fill="#fff" d="M0 0H3.708V1.236H0z" data-name="Rectangle 13" transform="translate(14.832 3.768)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 14" transform="translate(17.304 .06)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 15" transform="translate(17.304 5.004)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 16" transform="translate(14.832 .06)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 17" transform="translate(16.125 1.353)" />
-            <path fill="#fff" d="M0 0H3.708V1.236H0z" data-name="Rectangle 18" transform="translate(11.124 6.24)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 19" transform="translate(16.068 6.24)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 20" transform="translate(14.832 7.446)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 21" transform="translate(17.32 9.933)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 22" transform="translate(17.304 7.446)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 23" transform="translate(14.832 5.004)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 24" transform="translate(12.36 5.004)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 25" transform="translate(11.124 3.768)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 26" transform="translate(12.36 .06)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 27" transform="translate(8.652 .06)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 28" transform="translate(12.36 1.296)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 29" transform="translate(11.124 1.296)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 30" transform="translate(13.596 1.296)" />
-            <path fill="#fff" d="M0 0H1.236V2.502H0z" data-name="Rectangle 31" transform="translate(7.416 12.39)" />
-            <path fill="#fff" d="M0 0H1.236V2.502H0z" data-name="Rectangle 32" transform="translate(9.888 12.39)" />
-            <path fill="#fff" d="M0 0H1.236V3.738H0z" data-name="Rectangle 33" transform="translate(8.652 12.39)" />
-            <path fill="#fff" d="M0 0H1.236V1.251H0z" data-name="Rectangle 34" transform="translate(8.652 11.147)" />
-            <path fill="#fff" d="M0 0H1.236V1.251H0z" data-name="Rectangle 35" transform="translate(9.888 16.121)" />
-            <path fill="#fff" d="M0 0H3.708V1.236H0z" data-name="Rectangle 36" transform="translate(4.944 9.918)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 37" transform="translate(2.472 9.918)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 38" transform="translate(6.18 11.154)" />
-            <path fill="#fff" d="M0 0H1.236V1.236H0z" data-name="Rectangle 39" transform="translate(1.236 9.918)" />
-            <path fill="#fff" d="M0 0H2.803V1.236H0z" data-name="Rectangle 40" transform="translate(1.236 7.446)" />
+            <path
+              fill="#fff"
+              d="M0 0H6.18V6.18H0z"
+              data-name="Rectangle 2"
+              transform="rotate(-180 3.09 9.3)"
+            />
+            <path
+              fill="#161615"
+              d="M0 0H3.708V3.708H0z"
+              data-name="Rectangle 3"
+              transform="rotate(-180 2.472 8.682)"
+            />
+            <circle
+              cx="0.618"
+              cy="0.618"
+              r="0.618"
+              fill="#fff"
+              data-name="Ellipse 1"
+              transform="translate(2.472 14.893)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H6.18V6.18H0z"
+              data-name="Rectangle 4"
+              transform="rotate(-180 9.27 9.3)"
+            />
+            <path
+              fill="#161615"
+              d="M0 0H3.708V3.708H0z"
+              data-name="Rectangle 5"
+              transform="rotate(-180 8.652 8.682)"
+            />
+            <circle
+              cx="0.618"
+              cy="0.618"
+              r="0.618"
+              fill="#fff"
+              data-name="Ellipse 2"
+              transform="translate(14.832 14.893)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H6.18V6.18H0z"
+              data-name="Rectangle 6"
+              transform="rotate(180 3.09 3.09)"
+            />
+            <path
+              fill="#161615"
+              d="M0 0H3.708V3.708H0z"
+              data-name="Rectangle 7"
+              transform="rotate(180 2.472 2.472)"
+            />
+            <circle
+              cx="0.618"
+              cy="0.618"
+              r="0.618"
+              fill="#fff"
+              data-name="Ellipse 3"
+              transform="translate(2.472 2.472)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H7.416V1.236H0z"
+              data-name="Rectangle 8"
+              transform="translate(2.472 8.682)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 9"
+              transform="translate(6.18 7.446)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 10"
+              transform="translate(3.708 7.446)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V2.472H0z"
+              data-name="Rectangle 11"
+              transform="translate(7.416 6.21)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H8.652V1.236H0z"
+              data-name="Rectangle 12"
+              transform="translate(9.888 2.532)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H3.708V1.236H0z"
+              data-name="Rectangle 13"
+              transform="translate(14.832 3.768)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 14"
+              transform="translate(17.304 .06)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 15"
+              transform="translate(17.304 5.004)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 16"
+              transform="translate(14.832 .06)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 17"
+              transform="translate(16.125 1.353)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H3.708V1.236H0z"
+              data-name="Rectangle 18"
+              transform="translate(11.124 6.24)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 19"
+              transform="translate(16.068 6.24)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 20"
+              transform="translate(14.832 7.446)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 21"
+              transform="translate(17.32 9.933)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 22"
+              transform="translate(17.304 7.446)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 23"
+              transform="translate(14.832 5.004)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 24"
+              transform="translate(12.36 5.004)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 25"
+              transform="translate(11.124 3.768)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 26"
+              transform="translate(12.36 .06)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 27"
+              transform="translate(8.652 .06)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 28"
+              transform="translate(12.36 1.296)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 29"
+              transform="translate(11.124 1.296)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 30"
+              transform="translate(13.596 1.296)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V2.502H0z"
+              data-name="Rectangle 31"
+              transform="translate(7.416 12.39)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V2.502H0z"
+              data-name="Rectangle 32"
+              transform="translate(9.888 12.39)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V3.738H0z"
+              data-name="Rectangle 33"
+              transform="translate(8.652 12.39)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.251H0z"
+              data-name="Rectangle 34"
+              transform="translate(8.652 11.147)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.251H0z"
+              data-name="Rectangle 35"
+              transform="translate(9.888 16.121)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H3.708V1.236H0z"
+              data-name="Rectangle 36"
+              transform="translate(4.944 9.918)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 37"
+              transform="translate(2.472 9.918)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 38"
+              transform="translate(6.18 11.154)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H1.236V1.236H0z"
+              data-name="Rectangle 39"
+              transform="translate(1.236 9.918)"
+            />
+            <path
+              fill="#fff"
+              d="M0 0H2.803V1.236H0z"
+              data-name="Rectangle 40"
+              transform="translate(1.236 7.446)"
+            />
             <path
               fill="url(#linear-gradient-6)"
               d="M253.366 598.342l2.341 5 2.146-.06-2.015-4.884z"
@@ -212,7 +537,12 @@ function UserTaskDetail({ username, date, url }) {
           </g>
         </g>
         <g data-name="Group 10729" transform="translate(758.266 512.582)">
-          <g fill="#fff" stroke="rgba(0,0,0,0)" strokeWidth="1" data-name="Group 1915">
+          <g
+            fill="#fff"
+            stroke="rgba(0,0,0,0)"
+            strokeWidth="1"
+            data-name="Group 1915"
+          >
             <g data-name="Rectangle 1884">
               <path stroke="none" d="M0 0H3.284V3.284H0z" />
               <path fill="none" d="M0.5 0.5H2.784V2.784H0.5z" />
@@ -1487,7 +1817,14 @@ function UserTaskDetail({ username, date, url }) {
           transform="translate(-3439.322 -2270)"
         />
 
-        <circle cx="65.5" cy="65.5" r="65.5" fill="url(#pattern)" data-name="Ellipse 351" transform="translate(736 287)" />
+        <circle
+          cx="65.5"
+          cy="65.5"
+          r="65.5"
+          fill="url(#pattern)"
+          data-name="Ellipse 351"
+          transform="translate(736 287)"
+        />
       </g>
     </svg>
   );

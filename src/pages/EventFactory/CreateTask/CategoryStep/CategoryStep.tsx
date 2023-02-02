@@ -1,14 +1,19 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
-import { ReactComponent as CoreTeam } from '@assets/core-team.svg';
-import { ReactComponent as Community } from '@assets/community.svg';
-import { ActivityCurrentStep, ActivityCurrentTask, activitySetCurrentStep, activityUpdateTask } from '@store/Activity/task.reducer';
-import { Typography } from '@mui/material';
-import { Controller, useForm } from 'react-hook-form';
-import { pxToRem } from '@utils/text-size';
-import './CategoryStep.scss';
-import { AutButton } from '@components/buttons';
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
+import { ReactComponent as CoreTeam } from "@assets/core-team.svg";
+import { ReactComponent as Community } from "@assets/community.svg";
+import {
+  ActivityCurrentStep,
+  ActivityCurrentTask,
+  activitySetCurrentStep,
+  activityUpdateTask
+} from "@store/Activity/task.reducer";
+import { Typography } from "@mui/material";
+import { Controller, useForm } from "react-hook-form";
+import { pxToRem } from "@utils/text-size";
+import "./CategoryStep.scss";
+import { AutButton } from "@components/buttons";
 
 const CategoryStep = () => {
   const history = useHistory();
@@ -17,22 +22,23 @@ const CategoryStep = () => {
   const { isCoreTeamMembersOnly, role } = useSelector(ActivityCurrentTask);
 
   const { control, handleSubmit, watch } = useForm({
-    mode: 'onChange',
+    mode: "onChange",
     defaultValues: {
-      isCoreTeamMembersOnly,
-    },
+      isCoreTeamMembersOnly
+    }
   });
   const values = watch();
 
   const onSubmit = (data: any) => {
-    const shouldResetRole = data?.isCoreTeamMembersOnly !== isCoreTeamMembersOnly;
+    const shouldResetRole =
+      data?.isCoreTeamMembersOnly !== isCoreTeamMembersOnly;
     dispatch(
       activityUpdateTask({
         ...data,
-        role: shouldResetRole ? null : role,
+        role: shouldResetRole ? null : role
       })
     );
-    history.push('/aut-dashboard/event-factory/create-task/roles');
+    history.push("/aut-dashboard/event-factory/create-task/roles");
   };
 
   useEffect(() => {
@@ -43,7 +49,7 @@ const CategoryStep = () => {
           title: null,
           description: null,
           toPrevBtnPath: null,
-          left: null,
+          left: null
         })
       );
     }
@@ -54,21 +60,22 @@ const CategoryStep = () => {
       <form className="sw-category-wrapper" onSubmit={handleSubmit(onSubmit)}>
         <Typography
           sx={{
-            color: 'primary.main',
-            textAlign: 'center',
+            color: "primary.main",
+            textAlign: "center",
             mb: pxToRem(35),
-            fontSize: pxToRem(22),
+            fontSize: pxToRem(22)
           }}
           component="div"
         >
-          This is an Open Task that lets you assign work, creative competitions and daily tasks to other Members of your DAO.
+          This is an Open Task that lets you assign work, creative competitions
+          and daily tasks to other Members of your DAO.
         </Typography>
         <Typography
           sx={{
-            color: 'primary.main',
-            textAlign: 'center',
+            color: "primary.main",
+            textAlign: "center",
             mb: pxToRem(35),
-            fontSize: pxToRem(22),
+            fontSize: pxToRem(22)
           }}
           component="div"
         >
@@ -82,18 +89,12 @@ const CategoryStep = () => {
               return (
                 <AutButton
                   name={name}
-                  mode="light"
                   onClick={() => onChange(true)}
-                  className={value ? 'active-link' : ''}
+                  className={value ? "active-link" : ""}
                   endIcon={<CoreTeam />}
-                  label="Core Team"
-                  btnStyles={{
-                    width: pxToRem(340),
-                    height: pxToRem(80),
-                    fontSize: pxToRem(19),
-                    padding: `0 ${pxToRem(75)}`,
-                  }}
-                />
+                >
+                  Core Team
+                </AutButton>
               );
             }}
           />
@@ -104,38 +105,24 @@ const CategoryStep = () => {
               return (
                 <AutButton
                   name={name}
-                  mode="light"
                   onClick={() => onChange(false)}
-                  className={!value ? 'active-link' : ''}
+                  className={!value ? "active-link" : ""}
                   endIcon={<Community />}
-                  label="Community"
-                  btnStyles={{
-                    width: pxToRem(340),
-                    height: pxToRem(80),
-                    fontSize: pxToRem(19),
-                    padding: `0 ${pxToRem(75)}`,
-                  }}
-                />
+                >
+                  Community
+                </AutButton>
               );
             }}
           />
         </div>
 
-        <div className="bottom-action" style={{ marginTop: '80px' }}>
+        <div className="bottom-action" style={{ marginTop: "80px" }}>
           <AutButton
             type="submit"
-            btnStyles={{
-              width: pxToRem(630),
-              height: pxToRem(100),
-              fontSize: pxToRem(28),
-              '.sw-btn-label': {
-                textAlign: 'center',
-              },
-            }}
             disabled={values.isCoreTeamMembersOnly === null}
-            mode="light"
-            label="Next: Assign Role"
-          />
+          >
+            Next: Assign Role
+          </AutButton>
         </div>
       </form>
     </>

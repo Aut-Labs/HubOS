@@ -1,19 +1,29 @@
-import { ResultState } from '@store/result-status';
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { ErrorParser } from '@utils/error-parser';
-import { getLogs } from '@api/aut.api';
-import { fetchCommunity, fetchMember, fetchMembers, removeAsCoreTeam, setAsCoreTeam, updateCommunity } from '@api/community.api';
-import { createSelector } from 'reselect';
-import { Community } from '@api/community.model';
-import { AutID } from '@api/aut.model';
+import { ResultState } from "@store/result-status";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { ErrorParser } from "@utils/error-parser";
+import { getLogs } from "@api/aut.api";
+import {
+  fetchCommunity,
+  fetchMember,
+  fetchMembers,
+  removeAsCoreTeam,
+  setAsCoreTeam,
+  updateCommunity
+} from "@api/community.api";
+import { createSelector } from "reselect";
+import { Community } from "@api/community.model";
+import { AutID } from "@api/aut.model";
 
-export const fetchLogs = createAsyncThunk('community/logs', async (address: string, { dispatch }) => {
-  try {
-    return await getLogs();
-  } catch (error) {
-    return ErrorParser(error, dispatch);
+export const fetchLogs = createAsyncThunk(
+  "community/logs",
+  async (address: string, { dispatch }) => {
+    try {
+      return await getLogs();
+    } catch (error) {
+      return ErrorParser(error, dispatch);
+    }
   }
-});
+);
 
 export interface CommunityState {
   selectedCommunityAddress: string;
@@ -30,11 +40,11 @@ const initialState: CommunityState = {
   communities: [],
   logs: [],
   status: ResultState.Idle,
-  memberStatus: ResultState.Idle,
+  memberStatus: ResultState.Idle
 };
 
 export const communitySlice = createSlice({
-  name: 'community',
+  name: "community",
   initialState,
   reducers: {
     resetCommunityState: () => initialState,
@@ -42,7 +52,7 @@ export const communitySlice = createSlice({
       Object.keys(action.payload).forEach((key) => {
         state[key] = action.payload[key];
       });
-    },
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -62,7 +72,7 @@ export const communitySlice = createSlice({
           });
           return {
             ...prev,
-            [curr]: members,
+            [curr]: members
           };
         }, state.members);
         state.status = ResultState.Idle;
@@ -84,13 +94,15 @@ export const communitySlice = createSlice({
           const members = state.members[curr].map((member: AutID) => {
             if (member.properties.address === address) {
               member.properties.isCoreTeam = false;
-              prev.Admins.filter((m: AutID) => m.properties.address !== address);
+              prev.Admins.filter(
+                (m: AutID) => m.properties.address !== address
+              );
             }
             return member;
           });
           return {
             ...prev,
-            [curr]: members,
+            [curr]: members
           };
         }, state.members);
       })
@@ -146,7 +158,7 @@ export const communitySlice = createSlice({
       .addCase(fetchMember.fulfilled, (state, action) => {
         state.members = {
           ...state.members,
-          ...action.payload,
+          ...action.payload
         };
         state.memberStatus = ResultState.Idle;
       })
@@ -190,20 +202,31 @@ export const communitySlice = createSlice({
         // state.status = ResultState.Failed;
         state.logs = [];
       });
-  },
+  }
 });
 
 export const { communityUpdateState } = communitySlice.actions;
 
 export const CommunityStatus = (state) => state.community.status as ResultState;
-export const MemberStatus = (state) => state.community.memberStatus as ResultState;
-export const Communities = (state) => state.community.communities as Community[];
-export const CommunityMembers = (state) => state.community.members as { [key: string]: AutID[] };
+export const MemberStatus = (state) =>
+  state.community.memberStatus as ResultState;
+export const Communities = (state) =>
+  state.community.communities as Community[];
+export const CommunityMembers = (state) =>
+  state.community.members as { [key: string]: AutID[] };
 
-const CommunityAddress = (state) => state.community.selectedCommunityAddress as string;
-export const CommunityData = createSelector(Communities, CommunityAddress, (communities, address) => {
-  return communities.find((c) => c.properties.address === address) || new Community();
-});
+const CommunityAddress = (state) =>
+  state.community.selectedCommunityAddress as string;
+export const CommunityData = createSelector(
+  Communities,
+  CommunityAddress,
+  (communities, address) => {
+    return (
+      communities.find((c) => c.properties.address === address) ||
+      new Community()
+    );
+  }
+);
 
 export const allRoles = createSelector(CommunityData, (c) => {
   return c.properties?.rolesSets[0]?.roles || [];
@@ -211,9 +234,18 @@ export const allRoles = createSelector(CommunityData, (c) => {
 
 export const SelectedMember = (memberAddress: string) =>
   createSelector(CommunityMembers, (c) => {
-    const membersKey = Object.keys(c).find((key) => c[key].some((member: AutID) => member.properties.address === memberAddress));
+    const membersKey = Object.keys(c).find((key) =>
+      c[key].some(
+        (member: AutID) => member.properties.address === memberAddress
+      )
+    );
 
-    return c[membersKey] && c[membersKey].find((member) => member.properties.address === memberAddress);
+    return (
+      c[membersKey] &&
+      c[membersKey].find(
+        (member) => member.properties.address === memberAddress
+      )
+    );
   });
 
 export default communitySlice.reducer;

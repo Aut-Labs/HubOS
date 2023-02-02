@@ -1,7 +1,7 @@
-import { addActivityTask } from '@api/activities.api';
-import { createSlice } from '@reduxjs/toolkit';
-import { CurrentStep } from '@store/model';
-import { ResultState } from '@store/result-status';
+import { addActivityTask } from "@api/activities.api";
+import { createSlice } from "@reduxjs/toolkit";
+import { CurrentStep } from "@store/model";
+import { ResultState } from "@store/result-status";
 
 export interface TaskState {
   currentStep: CurrentStep;
@@ -25,12 +25,12 @@ const initialState: TaskState = {
     allParticipants: false,
     participants: 1,
     role: null,
-    title: '',
-  },
+    title: ""
+  }
 };
 
 export const taskSlice = createSlice({
-  name: 'task',
+  name: "task",
   initialState,
   reducers: {
     activitySetCurrentStep(state, action) {
@@ -39,13 +39,13 @@ export const taskSlice = createSlice({
     activityUpdateTask(state, action) {
       state.taskInfo = {
         ...state.taskInfo,
-        ...action.payload,
+        ...action.payload
       };
     },
     activityUpdateTaskStatus(state, action) {
       state.status = action.payload;
     },
-    resetActivityTaskState: () => initialState,
+    resetActivityTaskState: () => initialState
   },
   extraReducers: (builder) => {
     builder
@@ -58,13 +58,20 @@ export const taskSlice = createSlice({
       .addCase(addActivityTask.rejected, (state) => {
         state.status = ResultState.Failed;
       });
-  },
+  }
 });
 
-export const { activityUpdateTaskStatus, resetActivityTaskState, activityUpdateTask, activitySetCurrentStep } = taskSlice.actions;
+export const {
+  activityUpdateTaskStatus,
+  resetActivityTaskState,
+  activityUpdateTask,
+  activitySetCurrentStep
+} = taskSlice.actions;
 
-export const ActivityCurrentStep = (state: any) => state.task.currentStep as CurrentStep;
+export const ActivityCurrentStep = (state: any) =>
+  state.task.currentStep as CurrentStep;
 export const ActivityStatus = (state: any) => state.task.status as ResultState;
-export const ActivityCurrentTask = (state: any) => state.task.taskInfo as typeof initialState.taskInfo;
+export const ActivityCurrentTask = (state: any) =>
+  state.task.taskInfo as typeof initialState.taskInfo;
 
 export default taskSlice.reducer;

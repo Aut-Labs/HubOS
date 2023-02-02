@@ -1,35 +1,44 @@
-import { GridColumns, GridEditRowApi, GridRenderEditCellParams, GridStateApi, useGridApiContext } from '@mui/x-data-grid';
-import { useRef, useMemo } from 'react';
-import { styled } from '@mui/material/styles';
-import { InputBase } from '@mui/material';
+import {
+  GridColumns,
+  GridEditRowApi,
+  GridRenderEditCellParams,
+  GridStateApi,
+  useGridApiContext
+} from "@mui/x-data-grid";
+import { useRef, useMemo } from "react";
+import { styled } from "@mui/material/styles";
+import { InputBase } from "@mui/material";
 
 // @TODO: Move to sw-web-shared
 const GridEditInputCellRoot = styled(InputBase, {
-  name: 'MuiDataGrid',
-  slot: 'EditInputCell',
-  overridesResolver: (props, styles) => styles.editInputCell,
+  name: "MuiDataGrid",
+  slot: "EditInputCell",
+  overridesResolver: (props, styles) => styles.editInputCell
 })(({ theme }) => ({
   ...theme.typography.body2,
-  padding: '1px 0',
-  '& input': {
-    padding: '0 16px',
-    height: '100%',
-    '&::placeholder': {
+  padding: "1px 0",
+  "& input": {
+    padding: "0 16px",
+    height: "100%",
+    "&::placeholder": {
       opacity: 1,
-      color: '#707070',
+      color: "#707070"
     },
-    '&::-webkit-input-placeholder': {
-      color: '#707070',
-      opacity: 1,
+    "&::-webkit-input-placeholder": {
+      color: "#707070",
+      opacity: 1
     },
-    '&::-moz-placeholder': {
-      color: '#707070',
-      opacity: 1,
-    },
-  },
+    "&::-moz-placeholder": {
+      color: "#707070",
+      opacity: 1
+    }
+  }
 }));
 
-export function CustomEditComponent(props: GridRenderEditCellParams, placeholder: string) {
+export function CustomEditComponent(
+  props: GridRenderEditCellParams,
+  placeholder: string
+) {
   const { id, value, field, ...other } = props;
   const apiRef = useGridApiContext();
 
@@ -38,15 +47,26 @@ export function CustomEditComponent(props: GridRenderEditCellParams, placeholder
     apiRef.current.setEditCellValue({ id, field, value: newValue });
   };
 
-  return <GridEditInputCellRoot fullWidth type="text" value={value ?? ''} onChange={handleChange} placeholder={placeholder} {...other} />;
+  return (
+    <GridEditInputCellRoot
+      fullWidth
+      type="text"
+      value={value ?? ""}
+      onChange={handleChange}
+      placeholder={placeholder}
+      {...other}
+    />
+  );
 }
 
-export const useDatatableApiRef = (tableColumns: (apiRef: any) => GridColumns) => {
+export const useDatatableApiRef = (
+  tableColumns: (apiRef: any) => GridColumns
+) => {
   const apiRef = useRef<GridEditRowApi & GridStateApi>(null);
   const _columns = useMemo(() => {
     const columns = tableColumns(() => apiRef);
     return columns.concat({
-      field: '__HIDDEN__',
+      field: "__HIDDEN__",
       width: 0,
       minWidth: 0,
       flex: 0,
@@ -54,7 +74,7 @@ export const useDatatableApiRef = (tableColumns: (apiRef: any) => GridColumns) =
       renderCell: (params) => {
         apiRef.current = params.api;
         return null;
-      },
+      }
     });
   }, [tableColumns]);
 

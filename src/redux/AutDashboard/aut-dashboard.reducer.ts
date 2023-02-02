@@ -1,7 +1,7 @@
-import { ResultState } from '@store/result-status';
-import { createSlice } from '@reduxjs/toolkit';
-import { LockDatatableItems } from '@components/datatable/DatatableHelpers';
-import { createSelector } from 'reselect';
+import { ResultState } from "@store/result-status";
+import { createSlice } from "@reduxjs/toolkit";
+import { LockDatatableItems } from "@components/datatable/DatatableHelpers";
+import { createSelector } from "reselect";
 import {
   getWhitelistedAddresses,
   addNewWhitelistedAddresses,
@@ -9,8 +9,8 @@ import {
   getPAUrl,
   addPAContracts,
   getPAContracts,
-  addDiscordToCommunity,
-} from '@api/community.api';
+  addDiscordToCommunity
+} from "@api/community.api";
 // export const addDiscordWebhook = createAsyncThunk('aut-dashboard/discord/addurl', async (payload: any, { dispatch }) => {
 //   try {
 //     dispatch(openSnackbar({ message: 'Discord webhook was updated successfully', severity: 'success' }));
@@ -35,14 +35,14 @@ const initialState = {
   whitelistedAddresses: [],
   paUrl: null,
   status: ResultState.Idle,
-  errorMessage: '',
+  errorMessage: ""
 };
 
 export const dashboardSlice = createSlice({
-  name: 'dashboard',
+  name: "dashboard",
   initialState,
   reducers: {
-    resetAutDashboardState: () => initialState,
+    resetAutDashboardState: () => initialState
   },
   extraReducers: (builder) => {
     builder
@@ -153,7 +153,7 @@ export const dashboardSlice = createSlice({
         }
         state.errorMessage = action.payload as string;
       });
-  },
+  }
 });
 
 const addresses = (state) => state.dashboard.whitelistedAddresses;
@@ -161,15 +161,16 @@ const contracts = (state) => state.dashboard.contracts;
 
 export const PaUrl = (state) => state.dashboard.paUrl as string;
 
-export const DiscordWebHookUrl = (state) => state.dashboard?.paCommunity?.discordWebhookUrl;
+export const DiscordWebHookUrl = (state) =>
+  state.dashboard?.paCommunity?.discordWebhookUrl;
 
 export const getLockedContracts = createSelector(contracts, (x1) => {
   let lockedData = LockDatatableItems(
     x1.map((c) => {
       return {
-        use: 'N/A',
+        use: "N/A",
         address: c,
-        addedBy: 'N/A',
+        addedBy: "N/A"
       };
     })
   );
@@ -185,7 +186,7 @@ export const getLockedWhitelistedAddresses = createSelector(addresses, (x1) => {
     x1.map((w) => {
       return {
         name: w.name,
-        address: w.address,
+        address: w.address
       };
     })
   );

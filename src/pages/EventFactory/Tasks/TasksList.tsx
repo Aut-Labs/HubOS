@@ -1,15 +1,18 @@
-/* eslint-disable react/no-unstable-nested-components */
-import { AutButton } from '@components/buttons';
-import AutLoading from '@components/AutLoading';
-import { Box, CircularProgress, ListItem, Typography } from '@mui/material';
-import { FilteredTasks, TasksRefreshStatus, TasksStatus } from '@store/Activity/tasks.reducer';
-import { GroupTask, Task, TaskStatus, TaskTypes } from '@store/model';
-import { ResultState } from '@store/result-status';
-import { pxToRem } from '@utils/text-size';
-import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { SwButton } from 'sw-web-shared';
-import './Tasks.scss';
+import { AutButton } from "@components/buttons";
+import AutLoading from "@components/AutLoading";
+import { Box, CircularProgress, ListItem, Typography } from "@mui/material";
+import {
+  FilteredTasks,
+  TasksRefreshStatus,
+  TasksStatus
+} from "@store/Activity/tasks.reducer";
+import { GroupTask, Task, TaskStatus, TaskTypes } from "@store/model";
+import { ResultState } from "@store/result-status";
+import { pxToRem } from "@utils/text-size";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { SwButton } from "sw-web-shared";
+import "./Tasks.scss";
 
 const TasksList = (props) => {
   const status = useSelector(TasksStatus);
@@ -21,61 +24,40 @@ const TasksList = (props) => {
       case TaskTypes.Open:
         return (
           <AutButton
-            mode="light"
-            btnStyles={{
-              width: pxToRem(260),
-              height: pxToRem(120),
-              p: 0,
-              '.sw-btn-label': {
-                textAlign: 'center',
-              },
-            }}
-            disabled={task.creator.toLowerCase() === window.ethereum.selectedAddress || refreshStatus === ResultState.Loading}
+            disabled={
+              task.creator.toLowerCase() === window.ethereum.selectedAddress ||
+              refreshStatus === ResultState.Loading
+            }
             onClick={() => props.handleTask(props.status, task)}
-            label="I’ll do it!"
-          />
+          >
+            I’ll do it!
+          </AutButton>
         );
       case TaskTypes.Ongoing:
         if (task.status === TaskStatus.Submitted) {
           return (
             <AutButton
-              mode="light"
-              btnStyles={{
-                width: pxToRem(260),
-                height: pxToRem(120),
-                p: 0,
-                '.sw-btn-label': {
-                  textAlign: 'center',
-                },
-              }}
               component={Link}
               to={`/aut-dashboard/tasks/finalise/${task.activityId}`}
-              label="Waiting for Approval"
-            />
+            >
+              Waiting for Approval
+            </AutButton>
           );
         }
         return (
           <AutButton
-            mode="light"
-            btnStyles={{
-              width: pxToRem(260),
-              height: pxToRem(120),
-              p: 0,
-              '.sw-btn-label': {
-                textAlign: 'center',
-              },
-            }}
             component={Link}
             to={`/aut-dashboard/tasks/${task.activityId}`}
-            label="Working"
-          />
+          >
+            Working
+          </AutButton>
         );
       case TaskTypes.Closed:
         return (
           <Typography
             sx={{
-              color: 'primary.main',
-              width: '200px',
+              color: "primary.main",
+              width: "200px"
             }}
             variant="h2"
           >
@@ -86,10 +68,9 @@ const TasksList = (props) => {
         if (task.status === TaskStatus.Submitted) {
           return (
             <SwButton
-              mode="light"
               sx={{
-                width: '220px',
-                height: '85px',
+                width: "220px",
+                height: "85px"
               }}
               component={Link}
               to={`/aut-dashboard/tasks/finalise/${task.activityId}`}
@@ -101,8 +82,8 @@ const TasksList = (props) => {
           return (
             <Typography
               sx={{
-                color: 'primary.main',
-                width: '200px',
+                color: "primary.main",
+                width: "200px"
               }}
               variant="h2"
             >
@@ -112,20 +93,12 @@ const TasksList = (props) => {
         }
         return (
           <AutButton
-            mode="light"
-            btnStyles={{
-              width: pxToRem(260),
-              height: pxToRem(120),
-              p: 0,
-              '.sw-btn-label': {
-                textAlign: 'center',
-              },
-            }}
             component={Link}
             disabled={refreshStatus === ResultState.Loading}
             to={`/aut-dashboard/tasks/${task.activityId}/submit`}
-            label="Submit"
-          />
+          >
+            Submit
+          </AutButton>
         );
       default:
         return null;
@@ -138,8 +111,8 @@ const TasksList = (props) => {
         <div className="no-tasks">
           <Typography
             sx={{
-              color: 'info.dark',
-              fontSize: pxToRem(25),
+              color: "info.dark",
+              fontSize: pxToRem(25)
             }}
           >
             No tasks found!
@@ -152,42 +125,42 @@ const TasksList = (props) => {
         <ListItem
           sx={{
             minHeight: pxToRem(215),
-            display: 'flex',
-            flexDirection: 'row',
-            borderWidth: '2px',
-            borderStyle: 'solid',
-            borderColor: '#000',
-            justifyContent: 'space-between',
-            '&:not(:last-child)': {
-              borderBottom: '0',
-            },
+            display: "flex",
+            flexDirection: "row",
+            borderWidth: "2px",
+            borderStyle: "solid",
+            borderColor: "#000",
+            justifyContent: "space-between",
+            "&:not(:last-child)": {
+              borderBottom: "0"
+            }
           }}
           key={index}
           disablePadding
         >
           <Box
             sx={{
-              px: '20px',
-              py: '28px',
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
+              px: "20px",
+              py: "28px",
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column"
             }}
           >
             <Typography
               sx={{
-                color: 'primary.main',
+                color: "primary.main",
                 mb: pxToRem(25),
-                fontSize: pxToRem(25),
+                fontSize: pxToRem(25)
               }}
             >
-              {task.title || 'N/A'}
+              {task.title || "N/A"}
             </Typography>
             <Typography
               sx={{
-                color: 'primary.main',
-                fontSize: pxToRem(20),
+                color: "primary.main",
+                fontSize: pxToRem(20)
               }}
             >
               {task.description}
@@ -195,10 +168,10 @@ const TasksList = (props) => {
           </Box>
           <Box
             sx={{
-              px: '20px',
-              py: '28px',
-              display: 'flex',
-              flexDirection: 'column',
+              px: "20px",
+              py: "28px",
+              display: "flex",
+              flexDirection: "column"
             }}
           >
             {Action(task)}
@@ -214,8 +187,8 @@ const TasksList = (props) => {
         sx={{
           p: 0,
           m: 0,
-          gridGap: '0',
-          mt: pxToRem(20),
+          gridGap: "0",
+          mt: pxToRem(20)
         }}
         className="sw-box"
       >
@@ -230,9 +203,9 @@ const TasksList = (props) => {
                 {group.label && (
                   <Typography
                     sx={{
-                      color: 'primary.main',
-                      mb: '10px',
-                      fontSize: pxToRem(35),
+                      color: "primary.main",
+                      mb: "10px",
+                      fontSize: pxToRem(35)
                     }}
                   >
                     {group.label}

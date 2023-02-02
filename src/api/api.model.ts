@@ -1,33 +1,31 @@
-import { TokenInput } from 'nft.storage/dist/src/lib/interface';
+import { BaseNFTModel } from "@aut-labs-private/sdk/dist/models/baseNFTModel";
+import { CommunityMembershipDetails } from "@aut-labs-private/sdk/dist/models/holder";
+import { Community } from "./community.model";
+import { httpUrlToIpfsCID } from "./storage.api";
 
 /* eslint-disable no-shadow */
 export enum ActivityTypes {
   Polls = 1,
   Gatherings,
-  Tasks,
+  Tasks
 }
 
 export enum CommunityEventTypes {
   Ongoing,
   Upcoming,
-  Past,
+  Past
 }
 
-export class BaseNFTModel<Properties> implements Omit<TokenInput, 'image'> {
-  name: string;
+export interface HolderData {
+  daos: CommunityMembershipDetails[];
+  address: string;
+  tokenId: string;
+  metadataUri: string;
+}
 
-  description: string;
-
-  image: File | string;
-
-  properties: Properties;
-
-  constructor(data: BaseNFTModel<Properties>) {
-    this.name = data.name;
-    this.description = data.description;
-    this.image = data.image as string;
-    this.properties = data.properties;
-  }
+export interface AutSocial {
+  type: string;
+  link: string;
 }
 
 export interface ActivityTask {

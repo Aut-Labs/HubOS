@@ -1,4 +1,4 @@
-import { StepWizardChildProps, StepWizardProps } from 'react-step-wizard';
+import { StepWizardChildProps, StepWizardProps } from "react-step-wizard";
 
 export interface StepperChildProps extends Partial<StepWizardProps> {
   stepper: StepWizardChildProps;

@@ -1,20 +1,27 @@
-import { Typography } from '@mui/material';
-import { pxToRem } from '@utils/text-size';
-import { SwButton } from 'sw-web-shared';
-import { AutButton } from '../buttons';
-import DialogWrapper from './DialogWrapper';
+import { Typography } from "@mui/material";
+import { pxToRem } from "@utils/text-size";
+import { AutButton } from "../buttons";
+import DialogWrapper from "./DialogWrapper";
 
-const ErrorDialog = ({ mode = 'light', open, hasRetry = false, handleClose, subtitle, message, fullScreen = false }: any) => {
+const ErrorDialog = ({
+  mode = "light",
+  open,
+  hasRetry = false,
+  handleClose,
+  subtitle,
+  message,
+  fullScreen = false
+}: any) => {
   return (
     <DialogWrapper
       open={open}
       fullScreen={fullScreen}
       actions={
         <AutButton
-          onClick={() => handleClose('close')}
+          onClick={() => handleClose("close")}
           sx={{
             width: pxToRem(250),
-            height: pxToRem(50),
+            height: pxToRem(50)
           }}
           type="submit"
           color="primary"
@@ -27,28 +34,40 @@ const ErrorDialog = ({ mode = 'light', open, hasRetry = false, handleClose, subt
       <div
         className="sw-join-dialog-content"
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          flex: 1
         }}
       >
-        <Typography sx={{ color: 'red', textAlign: 'center', mt: 2 }} component="div" variant="h2">
+        <Typography
+          sx={{ color: "red", textAlign: "center", mt: 2 }}
+          component="div"
+          variant="h4"
+        >
           {message}
         </Typography>
         <Typography
           sx={{
-            color: mode === 'light' ? 'primary.main' : 'text.primary',
-            textAlign: 'center',
-            mt: 2,
+            color: mode === "light" ? "primary.main" : "text.primary",
+            textAlign: "center",
+            mt: 2
           }}
           component="div"
-          variant="body2"
+          variant="body1"
         >
           {subtitle}
         </Typography>
-        {hasRetry && <SwButton type="button" btnType="medium" mode={mode} onClick={() => handleClose('retry')} label="Retry" />}
+        {hasRetry && (
+          <AutButton
+            type="button"
+            btnType="medium"
+            mode={mode}
+            onClick={() => handleClose("retry")}
+            label="Retry"
+          />
+        )}
       </div>
     </DialogWrapper>
   );

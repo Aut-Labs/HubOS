@@ -1,6 +1,6 @@
-import { addGroupCall } from '@api/activities.api';
-import { createSlice } from '@reduxjs/toolkit';
-import { ResultState } from '@store/result-status';
+import { addGroupCall } from "@api/activities.api";
+import { createSlice } from "@reduxjs/toolkit";
+import { ResultState } from "@store/result-status";
 
 export interface ActivityTaskState {
   status: ResultState;
@@ -18,7 +18,7 @@ export interface ActivityTaskState {
 
 const initialState: ActivityTaskState = {
   status: ResultState.Idle,
-  errorMessage: '',
+  errorMessage: "",
   callData: {
     forCoreTeamRoles: null,
     allParticipants: null,
@@ -26,24 +26,24 @@ const initialState: ActivityTaskState = {
     startTime: null,
     duration: null,
     participants: null,
-    role: null,
-  },
+    role: null
+  }
 };
 
 export const callSlice = createSlice({
-  name: 'call',
+  name: "call",
   initialState,
   reducers: {
     activityUpdateGroupCallData(state, action) {
       state.callData = {
         ...state.callData,
-        ...action.payload,
+        ...action.payload
       };
     },
     activityUpdateGroupCallStatus(state, action) {
       state.status = action.payload;
     },
-    resetActivityGroupCall: () => initialState,
+    resetActivityGroupCall: () => initialState
   },
   extraReducers: (builder) => {
     builder
@@ -57,13 +57,20 @@ export const callSlice = createSlice({
         state.status = ResultState.Failed;
         state.errorMessage = action.payload as string;
       });
-  },
+  }
 });
 
-export const { activityUpdateGroupCallStatus, resetActivityGroupCall, activityUpdateGroupCallData } = callSlice.actions;
+export const {
+  activityUpdateGroupCallStatus,
+  resetActivityGroupCall,
+  activityUpdateGroupCallData
+} = callSlice.actions;
 
-export const ActivityGroupCallStatus = (state: any) => state.call.status as ResultState;
-export const ActivityGroupCallError = (state: any) => state.call.errorMessage as string;
-export const ActivityGroupCallData = (state: any) => state.call.callData as typeof initialState.callData;
+export const ActivityGroupCallStatus = (state: any) =>
+  state.call.status as ResultState;
+export const ActivityGroupCallError = (state: any) =>
+  state.call.errorMessage as string;
+export const ActivityGroupCallData = (state: any) =>
+  state.call.callData as typeof initialState.callData;
 
 export default callSlice.reducer;

@@ -1,14 +1,17 @@
-import { fetchMember } from '@api/community.api';
-import AutLoading from '@components/AutLoading';
-import SwGrid from '@components/SwGrid';
-import { MemberStatus, SelectedMember } from '@store/Community/community.reducer';
-import { ResultState } from '@store/result-status';
-import { useAppDispatch } from '@store/store.model';
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
-import LeftProfile from './Left';
-import RightProfile from './Right';
+import { fetchMember } from "@api/community.api";
+import AutLoading from "@components/AutLoading";
+import SwGrid from "@components/SwGrid";
+import {
+  MemberStatus,
+  SelectedMember
+} from "@store/Community/community.reducer";
+import { ResultState } from "@store/result-status";
+import { useAppDispatch } from "@store/store.model";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import LeftProfile from "./Left";
+import RightProfile from "./Right";
 
 const UserProfile = () => {
   const dispatch = useAppDispatch();
@@ -37,11 +40,11 @@ const UserProfile = () => {
               <div
                 className="sw-user-info"
                 style={{
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center"
                 }}
               >
                 <LeftProfile member={member} />
@@ -51,11 +54,11 @@ const UserProfile = () => {
           right={
             <div
               style={{
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center"
               }}
             >
               <RightProfile member={member} />

@@ -1,32 +1,38 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const path = require('path');
-const webpack = require('webpack');
-const { alias } = require('react-app-rewire-alias');
+const path = require("path");
+const { alias } = require("react-app-rewire-alias");
+const webpack = require("webpack");
 
 module.exports = {
-  webpack: (configuration) => {
-    configuration.resolve.fallback = {
-      url: require.resolve('url'),
+  webpack: (config) => {
+    config.ignoreWarnings = [/Failed to parse source map/];
+
+    const fallback = config.resolve.fallback || {};
+    Object.assign(fallback, {
+      stream: false,
       assert: false,
-      buffer: require.resolve('buffer'),
-    };
+      https: false,
+      util: path.resolve(__dirname, "node_modules/util"),
+      os: false,
+      url: false,
+      http: false
+    });
+    config.plugins = (config.plugins || []).concat([
+      new webpack.ProvidePlugin({
+        Buffer: ["buffer", "Buffer"]
+      })
+    ]);
+    config.resolve.fallback = fallback;
 
     const modifiedConfig = alias({
-      '@assets': path.resolve(__dirname, './src/assets'),
-      '@auth': path.resolve(__dirname, './src/auth'),
-      '@api': path.resolve(__dirname, './src/api'),
-      '@utils': path.resolve(__dirname, './src/utils'),
-      '@store': path.resolve(__dirname, './src/redux'),
-      '@components': path.resolve(__dirname, './src/components'),
-      react: path.resolve('./node_modules/react'),
-      'react-dom': path.resolve('./node_modules/react-dom'),
-      '@mui/material': path.resolve('./node_modules/@mui/material'),
-      '@mui/icons-material': path.resolve('./node_modules/@mui/icons-material'),
-      '@emotion/react': path.resolve('./node_modules/@emotion/react'),
-      '@emotion/styled': path.resolve('./node_modules/@emotion/styled'),
-      'react-router-dom': path.resolve('./node_modules/react-router-dom'),
-    })(configuration);
+      "@assets": path.resolve(__dirname, "./src/assets"),
+      "@auth": path.resolve(__dirname, "./src/auth"),
+      "@api": path.resolve(__dirname, "./src/api"),
+      "@utils": path.resolve(__dirname, "./src/utils"),
+      "@store": path.resolve(__dirname, "./src/redux"),
+      "@theme": path.resolve(__dirname, "./src/theme"),
+      "@components": path.resolve(__dirname, "./src/components")
+    })(config);
+
     return modifiedConfig;
-  },
+  }
 };

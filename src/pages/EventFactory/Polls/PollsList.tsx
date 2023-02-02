@@ -1,10 +1,10 @@
-import AutLoading from '@components/AutLoading';
-import { Box, CircularProgress, ListItem, Typography } from '@mui/material';
-import { PollStatus, UpcomingPolls } from '@store/Activity/poll.reducer';
-import { ResultState } from '@store/result-status';
-import { pxToRem } from '@utils/text-size';
-import { format } from 'date-fns';
-import { useSelector } from 'react-redux';
+import AutLoading from "@components/AutLoading";
+import { Box, CircularProgress, ListItem, Typography } from "@mui/material";
+import { PollStatus, UpcomingPolls } from "@store/Activity/poll.reducer";
+import { ResultState } from "@store/result-status";
+import { pxToRem } from "@utils/text-size";
+import { format } from "date-fns";
+import { useSelector } from "react-redux";
 
 const PollsList = () => {
   const status = useSelector(PollStatus);
@@ -15,10 +15,10 @@ const PollsList = () => {
       <Box
         sx={{
           pt: !polls.length ? pxToRem(100) : 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column"
         }}
         className="sw-box"
       >
@@ -31,41 +31,41 @@ const PollsList = () => {
             <ListItem
               sx={{
                 minHeight: pxToRem(215),
-                display: 'flex',
-                flexDirection: 'row',
-                borderBottom: '2px solid #439EDD',
-                justifyContent: 'space-between',
-                '&:last-child': {
-                  borderBottom: '0',
-                },
+                display: "flex",
+                flexDirection: "row",
+                borderBottom: "2px solid #439EDD",
+                justifyContent: "space-between",
+                "&:last-child": {
+                  borderBottom: "0"
+                }
               }}
               key={index}
               disablePadding
             >
               <Box
                 sx={{
-                  px: '20px',
-                  py: '28px',
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
+                  px: "20px",
+                  py: "28px",
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column"
                 }}
               >
                 <Typography
                   sx={{
-                    color: 'white',
+                    color: "white",
                     mb: pxToRem(25),
-                    fontSize: pxToRem(25),
+                    fontSize: pxToRem(25)
                   }}
                 >
-                  {poll.pollData.title || 'N/A'}
+                  {poll.pollData.title || "N/A"}
                 </Typography>
                 <Typography
                   sx={{
-                    color: 'white',
-                    maxWidth: '70%',
-                    fontSize: pxToRem(20),
+                    color: "white",
+                    maxWidth: "70%",
+                    fontSize: pxToRem(20)
                   }}
                 >
                   {poll.pollData.description}
@@ -73,32 +73,33 @@ const PollsList = () => {
               </Box>
               <Box
                 sx={{
-                  px: '20px',
-                  py: '28px',
-                  display: 'flex',
-                  minWidth: '30%',
-                  flexDirection: 'column',
+                  px: "20px",
+                  py: "28px",
+                  display: "flex",
+                  minWidth: "30%",
+                  flexDirection: "column"
                 }}
               >
                 <Typography
                   sx={{
-                    color: 'white',
+                    color: "white",
                     mb: pxToRem(20),
-                    fontSize: pxToRem(20),
+                    fontSize: pxToRem(20)
                   }}
                 >
-                  {format(new Date(+poll.timestamp * 1000), 'PPPP')}
-                  {'  '}
-                  {format(new Date(+poll.timestamp * 1000), 'hh:mm a')}
+                  {format(new Date(+poll.timestamp * 1000), "PPPP")}
+                  {"  "}
+                  {format(new Date(+poll.timestamp * 1000), "hh:mm a")}
                 </Typography>
                 <Typography
                   sx={{
-                    color: 'white',
+                    color: "white",
                     mb: pxToRem(20),
-                    fontSize: pxToRem(20),
+                    fontSize: pxToRem(20)
                   }}
                 >
-                  Role assigned to {poll.pollData.allRoles ? 'All' : poll.pollData.roleName}
+                  Role assigned to{" "}
+                  {poll.pollData.allRoles ? "All" : poll.pollData.roleName}
                 </Typography>
               </Box>
             </ListItem>
@@ -106,9 +107,9 @@ const PollsList = () => {
         ) : (
           <Typography
             sx={{
-              color: 'white',
+              color: "white",
               mb: pxToRem(30),
-              fontSize: pxToRem(30),
+              fontSize: pxToRem(30)
             }}
           >
             No polls found!

@@ -1,22 +1,36 @@
-import { Box, Container, styled, Typography } from '@mui/material';
-import { pxToRem } from '@utils/text-size';
-import { ReactComponent as CutLogo } from '@assets/aut/cut.svg';
-import { AutButton } from '@components/buttons';
-import { Link, useParams } from 'react-router-dom';
+import { Box, Container, styled, Typography } from "@mui/material";
+import { pxToRem } from "@utils/text-size";
+import { ReactComponent as CutLogo } from "@assets/aut/cut.svg";
+import { AutButton } from "@components/buttons";
+import { Link, useParams } from "react-router-dom";
 
 const StepWrapper = styled(Container)({
-  textAlign: 'center',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexDirection: 'column',
+  textAlign: "center",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexDirection: "column"
 });
 
 const SuccessStep = () => {
   const params = useParams<{ address: string }>();
   return (
-    <StepWrapper maxWidth="md" sx={{ width: '100%', flexGrow: 1, boxSizing: 'border-box', position: 'relative' }}>
-      <Typography letterSpacing="10.5px" textTransform="uppercase" marginTop={pxToRem(50)} fontSize={pxToRem(70)} color="white">
+    <StepWrapper
+      maxWidth="md"
+      sx={{
+        width: "100%",
+        flexGrow: 1,
+        boxSizing: "border-box",
+        position: "relative"
+      }}
+    >
+      <Typography
+        letterSpacing="10.5px"
+        textTransform="uppercase"
+        marginTop={pxToRem(50)}
+        fontSize={pxToRem(70)}
+        color="white"
+      >
         Congratulations
       </Typography>
       <CutLogo />
@@ -29,13 +43,17 @@ const SuccessStep = () => {
         fontSize={pxToRem(25)}
         color="white"
       >
-        Great, your Poll now exists on the Blockchain. Just share it on Discord to kick it off and get your Members onboard!
+        Great, your Poll now exists on the Blockchain. Just share it on Discord
+        to kick it off and get your Members onboard!
       </Typography>
-      <Box sx={{ gridGap: '30px', display: 'flex', justifyContent: 'center' }} className="right-box">
+      <Box
+        sx={{ gridGap: "30px", display: "flex", justifyContent: "center" }}
+        className="right-box"
+      >
         <AutButton
           sx={{
             width: pxToRem(450),
-            height: pxToRem(90),
+            height: pxToRem(90)
           }}
           type="submit"
           color="primary"
@@ -46,7 +64,7 @@ const SuccessStep = () => {
         <AutButton
           sx={{
             width: pxToRem(450),
-            height: pxToRem(90),
+            height: pxToRem(90)
           }}
           component={Link}
           to="/aut-dashboard/event-factory/polls"

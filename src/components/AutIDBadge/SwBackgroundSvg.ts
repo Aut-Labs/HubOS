@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
 
-import { FindTextWidth } from './FindCenter';
+import { FindTextWidth } from "./FindCenter";
 
-const fontSize = FindTextWidth('Helvetica');
+const fontSize = FindTextWidth("Helvetica");
 
 export const SwBackgroundSvg = ({ timestamp, title, width }): string => {
   const SVGDomElement = new DOMParser().parseFromString(
@@ -72,7 +72,7 @@ export const SwBackgroundSvg = ({ timestamp, title, width }): string => {
         </g>
       </g>
       <text id="${title}" data-name="${title}" transform="translate(${
-      width - fontSize(title, '20px') - 30
+      width - fontSize(title, "20px") - 30
     } 600)" fill="#fff" font-size="20" font-family="Helvetica"><tspan x="0" y="0">${title}</tspan></text>
       <text id="${timestamp}" data-name="#${timestamp}" transform="translate(294 630)" fill="#009fe3" font-size="12" font-family="Helvetica" letter-spacing="0.075em" style="isolation: isolate"><tspan x="-44.122" y="0">${timestamp}</tspan></text>
       <g id="Layer_1" data-name="Layer 1" transform="translate(25.262 27.538)">
@@ -137,7 +137,7 @@ export const SwBackgroundSvg = ({ timestamp, title, width }): string => {
     </g>
   </svg>
   `,
-    'application/xml'
+    "application/xml"
   );
   const serializedSVG = new XMLSerializer().serializeToString(SVGDomElement);
   return `data:image/svg+xml;base64, ${window.btoa(serializedSVG)}`;

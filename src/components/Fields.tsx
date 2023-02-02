@@ -1,8 +1,14 @@
-import { DatePicker, CalendarPicker } from '@mui/lab';
-import { Select, SelectProps, TextField, TextFieldProps, Typography } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { pxToRem } from '@utils/text-size';
-import { Controller, FieldErrors } from 'react-hook-form';
+import { DatePicker, CalendarPicker } from "@mui/lab";
+import {
+  Select,
+  SelectProps,
+  TextField,
+  TextFieldProps,
+  Typography
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { pxToRem } from "@utils/text-size";
+import { Controller, FieldErrors } from "react-hook-form";
 
 interface FormHelperTextProps {
   errors: FieldErrors<any>;
@@ -13,18 +19,24 @@ interface FormHelperTextProps {
 }
 
 const defaultErrorTypes = {
-  required: 'Field is required!',
+  required: "Field is required!"
 };
 
-export function FormHelperText({ errors, name, errorTypes, children = null, value }: FormHelperTextProps) {
+export function FormHelperText({
+  errors,
+  name,
+  errorTypes,
+  children = null,
+  value
+}: FormHelperTextProps) {
   if (errors[name]) {
     const { type } = errors[name];
     const types = {
       ...defaultErrorTypes,
-      ...(errorTypes || {}),
+      ...(errorTypes || {})
     };
 
-    const message = types[type];
+    const message = types[type as any];
 
     return (
       <Typography
@@ -35,9 +47,9 @@ export function FormHelperText({ errors, name, errorTypes, children = null, valu
         variant="body2"
         className="auto-helper-error"
         sx={{
-          width: '100%',
-          position: 'absolute',
-          left: '0',
+          width: "100%",
+          position: "absolute",
+          left: "0"
         }}
       >
         {message}
@@ -48,9 +60,9 @@ export function FormHelperText({ errors, name, errorTypes, children = null, valu
     children && (
       <Typography
         sx={{
-          width: '100%',
-          position: 'absolute',
-          left: '0',
+          width: "100%",
+          position: "absolute",
+          left: "0"
         }}
         className="auto-helper-info"
         color="white"
@@ -65,55 +77,61 @@ export function FormHelperText({ errors, name, errorTypes, children = null, valu
 }
 
 const CustomSwCalendarPicker = styled(CalendarPicker)(({ theme }) => ({
-  '&.MuiCalendarPicker-root': {
+  "&.MuiCalendarPicker-root": {
     width: pxToRem(376),
-    minHeight: pxToRem(450),
+    minHeight: pxToRem(450)
   },
-  '.MuiTypography-caption': {
-    color: theme.palette.primary.main,
+  ".MuiTypography-caption": {
+    color: theme.palette.primary.main
   },
-  '.MuiTypography-root, .MuiButtonBase-root': {
+  ".MuiTypography-root, .MuiButtonBase-root": {
     fontSize: pxToRem(25),
     width: pxToRem(50),
-    height: pxToRem(50),
+    height: pxToRem(50)
   },
   'div[role="presentation"]': {
-    '.PrivatePickersFadeTransitionGroup-root': {
+    ".PrivatePickersFadeTransitionGroup-root": {
       fontSize: pxToRem(29),
-      color: theme.palette.primary.main,
-    },
+      color: theme.palette.primary.main
+    }
   },
-  '.MuiPickersDay-hiddenDaySpacingFiller': {
-    width: '3.125rem',
-    height: '3.125rem',
+  ".MuiPickersDay-hiddenDaySpacingFiller": {
+    width: "3.125rem",
+    height: "3.125rem"
   },
-  '.MuiButtonBase-root .MuiSvgIcon-root': {
+  ".MuiButtonBase-root .MuiSvgIcon-root": {
     width: pxToRem(40),
     height: pxToRem(40),
-    color: 'white',
+    color: "white"
   },
-  '.PrivatePickersSlideTransition-root': {
+  ".PrivatePickersSlideTransition-root": {
     minHeight: pxToRem(320),
-    '.MuiButtonBase-root.Mui-disabled': {
-      color: '#777777',
-      backgroundColor: 'black',
+    ".MuiButtonBase-root.Mui-disabled": {
+      color: "#777777",
+      backgroundColor: "black"
     },
     // '.MuiButtonBase-root': {
     //   margin: `0 ${pxToRem(6)}`,
     // },
-    '.MuiButtonBase-root:not(.Mui-disabled)': {
-      backgroundColor: '#707070',
-      color: 'white',
+    ".MuiButtonBase-root:not(.Mui-disabled)": {
+      backgroundColor: "#707070",
+      color: "white",
       borderRadius: 0,
-      '&:hover, &.Mui-selected': {
+      "&:hover, &.Mui-selected": {
         backgroundColor: theme.palette.primary.main,
-        color: '#fff',
-      },
-    },
-  },
+        color: "#fff"
+      }
+    }
+  }
 }));
 
-export const SwDatePicker = ({ control, name, minDate, maxDate = null, otherProps = {} }) => {
+export const SwDatePicker = ({
+  control,
+  name,
+  minDate,
+  maxDate = null,
+  otherProps = {}
+}) => {
   return (
     <Controller
       name={name}
@@ -126,28 +144,37 @@ export const SwDatePicker = ({ control, name, minDate, maxDate = null, otherProp
             maxDate={maxDate}
             PaperProps={{
               sx: {
-                '&.MuiCalendarPicker-root': {
+                "&.MuiCalendarPicker-root": {
                   width: pxToRem(480),
-                  background: 'red',
-                  'div[role="presentation"], .MuiButtonBase-root, .MuiTypography-root, .PrivatePickersYear-yearButton': {
-                    fontSize: pxToRem(18),
-                    color: 'primary.main',
-                    '&.Mui-selected': {
-                      color: 'text.primary',
-                    },
-                    '&[disabled]': {
-                      color: 'text.disabled',
-                    },
-                  },
-                },
-              },
+                  background: "red",
+                  'div[role="presentation"], .MuiButtonBase-root, .MuiTypography-root, .PrivatePickersYear-yearButton':
+                    {
+                      fontSize: pxToRem(18),
+                      color: "primary.main",
+                      "&.Mui-selected": {
+                        color: "text.primary"
+                      },
+                      "&[disabled]": {
+                        color: "text.disabled"
+                      }
+                    }
+                }
+              }
             }}
             value={field.value}
             onChange={field.onChange}
             renderInput={(params) => {
               const v = params.inputProps.value;
               delete params.inputProps.value;
-              return <TextField {...params} value={field.value ? v : ''} color="primary" name={field.name} required />;
+              return (
+                <TextField
+                  {...params}
+                  value={field.value ? v : ""}
+                  color="primary"
+                  name={field.name}
+                  required
+                />
+              );
             }}
             {...otherProps}
           />
@@ -157,7 +184,13 @@ export const SwDatePicker = ({ control, name, minDate, maxDate = null, otherProp
   );
 };
 
-export const SwCalendarPicker = ({ control, name, minDate, maxDate = null, otherProps = {} }) => {
+export const SwCalendarPicker = ({
+  control,
+  name,
+  minDate,
+  maxDate = null,
+  otherProps = {}
+}) => {
   return (
     <Controller
       name={name}
@@ -177,168 +210,171 @@ export const SwCalendarPicker = ({ control, name, minDate, maxDate = null, other
   );
 };
 
-export const AutTextField = styled((props: TextFieldProps & { width: string }) => <TextField {...props} />)(
-  ({ theme, width, multiline }) => ({
-    width: pxToRem(width),
-    '.MuiInputLabel-root': {
-      top: '-2px',
+export const AutTextField = styled(
+  (props: TextFieldProps & { width: string }) => <TextField {...props} />
+)(({ theme, width, multiline }) => ({
+  width: pxToRem(width),
+  ".MuiInputLabel-root": {
+    top: "-2px"
+  },
+  ".MuiFormHelperText-root": {
+    marginRight: 0,
+    marginLeft: 0,
+    textAlign: "right",
+    position: "relative"
+  },
+  ".MuiInput-underline": {
+    "&:after": {
+      borderWidth: "1px",
+      transform: "scaleX(1)"
+    }
+  },
+  ".MuiOutlinedInput-root, .MuiInput-underline": {
+    color: "#fff",
+    fontSize: pxToRem(18),
+    ...(!multiline && {
+      padding: 0,
+      height: pxToRem(50)
+    }),
+    ".MuiInputBase-input": {
+      paddingTop: 0,
+      paddingBottom: 0
     },
-    '.MuiFormHelperText-root': {
-      marginRight: 0,
-      marginLeft: 0,
-      textAlign: 'right',
-      position: 'relative',
+    "&::placeholder": {
+      opacity: 1,
+      color: "#707070"
     },
-    '.MuiInput-underline': {
-      '&:after': {
-        borderWidth: '1px',
-        transform: 'scaleX(1)',
-      },
+    "&::-webkit-input-placeholder": {
+      color: "#707070",
+      opacity: 1,
+      fontSize: pxToRem(18)
     },
-    '.MuiOutlinedInput-root, .MuiInput-underline': {
-      color: '#fff',
-      fontSize: pxToRem(18),
-      ...(!multiline && {
-        padding: 0,
-        height: pxToRem(50),
-      }),
-      '.MuiInputBase-input': {
-        paddingTop: 0,
-        paddingBottom: 0,
-      },
-      '&::placeholder': {
-        opacity: 1,
-        color: '#707070',
-      },
-      '&::-webkit-input-placeholder': {
-        color: '#707070',
-        opacity: 1,
-        fontSize: pxToRem(18),
-      },
-      '&::-moz-placeholder': {
-        color: '#707070',
-        opacity: 1,
-      },
+    "&::-moz-placeholder": {
+      color: "#707070",
+      opacity: 1
+    }
+  },
+  ".MuiOutlinedInput-root": {
+    "& > fieldset": {
+      border: "1px solid #439EDD",
+      borderWidth: "1px"
     },
-    '.MuiOutlinedInput-root': {
-      '& > fieldset': {
-        border: '1px solid #439EDD',
-        borderWidth: '1px',
-      },
-      '&.Mui-focused fieldset, &:hover fieldset': {
-        border: '1px solid #439EDD',
-        borderWidth: '1px !important',
-      },
-    },
-  })
-);
+    "&.Mui-focused fieldset, &:hover fieldset": {
+      border: "1px solid #439EDD",
+      borderWidth: "1px !important"
+    }
+  }
+}));
 
 const StyledSelectField = styled((props: SelectProps & { width: string }) => {
   return (
     <Select
       MenuProps={{
         sx: {
-          '.MuiPaper-root': {
-            borderWidth: '1px !important',
-            background: 'black',
+          ".MuiPaper-root": {
+            borderWidth: "1px !important",
+            background: "black"
           },
           borderTop: 0,
-          '& ul': {
-            color: '#000',
-            padding: 0,
+          "& ul": {
+            color: "#000",
+            padding: 0
           },
-          '& li': {
+          "& li": {
             fontSize: pxToRem(18),
-            color: 'white',
-            '&:hover:not(.Mui-selected)': {
-              backgroundColor: '#009FE3',
-              color: '#fff',
+            color: "white",
+            "&:hover:not(.Mui-selected)": {
+              backgroundColor: "#009FE3",
+              color: "#fff"
             },
-            '&.Mui-selected:hover, &.Mui-selected': {
-              backgroundColor: '#009FE3',
-              color: '#fff',
-            },
-          },
-        },
+            "&.Mui-selected:hover, &.Mui-selected": {
+              backgroundColor: "#009FE3",
+              color: "#fff"
+            }
+          }
+        }
       }}
       {...props}
     />
   );
 })(({ width }) => ({
-  '.MuiFormHelperText-root': {
+  ".MuiFormHelperText-root": {
     marginRight: 0,
     marginLeft: 0,
-    textAlign: 'right',
-    position: 'relative',
+    textAlign: "right",
+    position: "relative"
   },
-  '&.MuiInput-underline': {
-    '&:after': {
-      borderWidth: '1px',
-      transform: 'scaleX(1)',
-    },
+  "&.MuiInput-underline": {
+    "&:after": {
+      borderWidth: "1px",
+      transform: "scaleX(1)"
+    }
   },
-  '&.MuiOutlinedInput-root, &.MuiInput-underline': {
+  "&.MuiOutlinedInput-root, &.MuiInput-underline": {
     width: pxToRem(width),
-    '.MuiSelect-select, .MuiSelect-nativeInput': {
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center',
+    ".MuiSelect-select, .MuiSelect-nativeInput": {
+      height: "100%",
+      display: "flex",
+      alignItems: "center"
     },
-    color: '#fff',
+    color: "#fff",
     padding: 0,
     fontSize: pxToRem(18),
     height: pxToRem(50),
-    '.MuiInputBase-input': {
+    ".MuiInputBase-input": {
       paddingTop: 0,
       paddingBottom: 0,
-      color: '#fff !important',
+      color: "#fff !important"
     },
-    '.MuiSvgIcon-root': {
-      fontSize: '20px',
-      color: '#fff',
+    ".MuiSvgIcon-root": {
+      fontSize: "20px",
+      color: "#fff"
     },
-    '&::placeholder': {
+    "&::placeholder": {
       opacity: 1,
-      color: '#707070',
+      color: "#707070"
     },
-    '&::-webkit-input-placeholder': {
-      color: '#707070',
+    "&::-webkit-input-placeholder": {
+      color: "#707070",
       opacity: 1,
-      fontSize: pxToRem(18),
+      fontSize: pxToRem(18)
     },
-    '&::-moz-placeholder': {
-      color: '#707070',
-      opacity: 1,
-    },
+    "&::-moz-placeholder": {
+      color: "#707070",
+      opacity: 1
+    }
   },
-  '&.MuiOutlinedInput-root': {
+  "&.MuiOutlinedInput-root": {
     fieldset: {
-      border: '1px solid #439EDD',
+      border: "1px solid #439EDD"
     },
-    '&:hover fieldset': {
-      border: '2px solid #439EDD',
+    "&:hover fieldset": {
+      border: "2px solid #439EDD"
     },
-    '.MuiSelect-select, .MuiSelect-nativeInput': {
-      justifyContent: 'center',
-    },
-  },
+    ".MuiSelect-select, .MuiSelect-nativeInput": {
+      justifyContent: "center"
+    }
+  }
 }));
 
-const SelectWrapper = styled('div')({
-  display: 'flex',
-  flexDirection: 'column',
+const SelectWrapper = styled("div")({
+  display: "flex",
+  flexDirection: "column",
   marginBottom: pxToRem(45),
-  position: 'relative',
-  '.auto-helper-info, .auto-helper-error': {
-    bottom: '-18px',
-  },
+  position: "relative",
+  ".auto-helper-info, .auto-helper-error": {
+    bottom: "-18px"
+  }
 });
 
 interface AutSelectProps extends Partial<SelectProps> {
   width: string;
   helperText?: JSX.Element;
 }
-export const AutSelectField = ({ helperText = null, ...props }: AutSelectProps) => {
+export const AutSelectField = ({
+  helperText = null,
+  ...props
+}: AutSelectProps) => {
   return (
     <SelectWrapper>
       <StyledSelectField {...props} />

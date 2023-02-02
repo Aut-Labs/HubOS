@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { styled, Typography } from '@mui/material';
+import React, { useState } from "react";
+import { styled, Typography } from "@mui/material";
 
-const CopyWrapper = styled('div')(
+const CopyWrapper = styled("div")(
   ({ theme }) => `
   display: flex;
   align-content: center;
@@ -30,10 +30,10 @@ function ClipboardToCopy({ url, mode, sx = {}, trim = (v) => v }) {
 
   // This is the function we wrote earlier
   async function copyTextToClipboard(text) {
-    if ('clipboard' in navigator) {
+    if ("clipboard" in navigator) {
       return navigator.clipboard.writeText(text);
     }
-    return document.execCommand('copy', true, text);
+    return document.execCommand("copy", true, text);
   }
 
   // onClick handler function for the copy button
@@ -54,12 +54,16 @@ function ClipboardToCopy({ url, mode, sx = {}, trim = (v) => v }) {
   };
 
   return (
-    <CopyWrapper style={sx} className={`copy-wrapper ${mode}`} onClick={handleCopyClick}>
+    <CopyWrapper
+      style={sx}
+      className={`copy-wrapper ${mode}`}
+      onClick={handleCopyClick}
+    >
       <Typography
         variant="h4"
         sx={{
-          textAlign: 'center',
-          flex: 1,
+          textAlign: "center",
+          flex: 1
         }}
         color="info.dark"
         component="span"
@@ -69,12 +73,12 @@ function ClipboardToCopy({ url, mode, sx = {}, trim = (v) => v }) {
       <div
         className="copy-text"
         style={{
-          transition: 'all 0.3s ease-in',
-          opacity: isCopied ? '0.7' : '1',
+          transition: "all 0.3s ease-in",
+          opacity: isCopied ? "0.7" : "1"
         }}
       >
         <Typography variant="h4" color="info.dark" component="span">
-          {isCopied ? 'Copied!' : 'COPY'}
+          {isCopied ? "Copied!" : "COPY"}
         </Typography>
       </div>
     </CopyWrapper>
