@@ -140,7 +140,6 @@ const TaskDetails = () => {
               </Typography>
 
               <SwButton
-                
                 sx={{
                   width: "280px",
                   height: "85px",
@@ -152,7 +151,6 @@ const TaskDetails = () => {
               />
 
               <SwButton
-                
                 sx={{
                   width: "280px",
                   height: "85px",

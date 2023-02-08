@@ -98,7 +98,10 @@ const CommunitySwitcherPopup = ({ open, onClose }: any) => {
                 >
                   {community.name}
                 </Typography>
-                <CopyAddress address={community.properties.address} />
+                <CopyAddress
+                  address={community.properties.address}
+                  variant="body1"
+                />
               </div>
             </CommunityItem>
           ))}

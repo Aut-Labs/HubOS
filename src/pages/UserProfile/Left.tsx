@@ -159,7 +159,10 @@ const LeftProfile = ({ member }: { member: AutID }) => {
               </Typography>
             </div>
 
-            <CopyAddress address={member?.properties?.address} />
+            <CopyAddress
+              address={member?.properties?.address}
+              variant="body1"
+            />
             <IconContainer>
               <SvgIcon
                 sx={{

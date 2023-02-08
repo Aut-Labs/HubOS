@@ -43,11 +43,12 @@ import { setNetworks } from "@store/WalletProvider/WalletProvider";
 import { getAppConfig } from "@api/aut.api";
 import AutSDK from "@aut-labs-private/sdk";
 import { DautPlaceholder } from "@components/DautPlaceholder";
+import AutLoading from "@components/AutLoading";
 
 const LoadingMessage = () => (
-  <div className="app-loading">
-    <AutLogo width="80" height="80" />
-  </div>
+  // <div className="app-loading">
+  // </div>
+  <AutLoading></AutLoading>
 );
 
 const generateConfig = (networks: NetworkConfig[]): Config => {
@@ -124,7 +125,7 @@ function App() {
           width: isAutheticated ? `calc(100% - ${pxToRem(350)})` : "100%"
         }}
       >
-        <Toolbar
+        {/* <Toolbar
           sx={{
             p: "0px !important",
             backgroundColor: "transparent",
@@ -174,7 +175,7 @@ function App() {
               {appTitle}
             </Typography>
           </div>
-        </Toolbar>
+        </Toolbar> */}
       </AppBar>
       <Box
         sx={{

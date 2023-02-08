@@ -2,21 +2,38 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { trimAddress } from "@utils/helpers";
 import { Tooltip, Typography, IconButton } from "@mui/material";
-import { pxToRem } from "@utils/text-size";
+import { useState } from "react";
 
-export const CopyAddress = ({ address }) => {
+export const CopyAddress = ({ address, variant }) => {
+  const [copied, setCopied] = useState(false);
+
+  function clickCopy(copied) {
+    if (copied === true) {
+      setCopied(true);
+      setTimeout(() => {
+        setCopied(false);
+      }, 3000);
+    } else {
+      return null;
+    }
+  }
+
   return (
-    <CopyToClipboard text={address}>
-      <div style={{ width: "100%", color: "white" }}>
-        <Tooltip title="Copy Address">
+    <CopyToClipboard text={address} onCopy={() => clickCopy(true)}>
+      <div
+        onClick={(event) => event.stopPropagation()}
+        style={{ color: "white" }}
+      >
+        <Tooltip title={copied ? "Copied!" : "Copy Address"}>
           <Typography
-            sx={{ color: "white", fontSize: pxToRem(12) }}
-            component="div"
+            variant={variant || "body1"}
+            color="white"
+            fontWeight="normal"
           >
             {trimAddress(address)}
             <IconButton sx={{ color: "white", p: 0 }}>
               <ContentCopyIcon
-                sx={{ cursor: "pointer", width: pxToRem(12), ml: "5px" }}
+                sx={{ cursor: "pointer", width: "20px", ml: "5px" }}
               />
             </IconButton>
           </Typography>
