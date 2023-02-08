@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1605.43 1605.43">
+  <defs>
+    <style>
+      .cls-1 {
+        filter: url(#outer-glow-2);
+      }
+
+      .cls-1, .cls-2 {
+        fill: #262626;
+      }
+
+      .cls-3 {
+        fill: url(#Degradado_sin_nombre_96);
+      }
+
+      .cls-4 {
+        fill: url(#Degradado_sin_nombre_92);
+      }
+
+      .cls-5 {
+        opacity: .4;
+      }
+
+      .cls-6 {
+        fill: url(#Degradado_sin_nombre_100);
+      }
+
+      .cls-7 {
+        fill: none;
+        stroke: #ebebf2;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2 {
+        filter: url(#outer-glow-1);
+      }
+    </style>
+    <filter id="outer-glow-1" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur" stdDeviation="100"/>
+      <feFlood flood-color="#192afc" flood-opacity="1"/>
+      <feComposite in2="blur" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="outer-glow-2" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur-2" stdDeviation="100"/>
+      <feFlood flood-color="#14ecec" flood-opacity="1"/>
+      <feComposite in2="blur-2" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <radialGradient id="Degradado_sin_nombre_92" data-name="Degradado sin nombre 92" cx="-192.51" cy="-212.11" fx="-192.51" fy="-212.11" r="1" gradientTransform="translate(143019.3 -6085.86) rotate(45) scale(497.08 -497.08)" gradientUnits="userSpaceOnUse">
+      <stop offset=".79" stop-color="#192afc" stop-opacity="0"/>
+      <stop offset="1" stop-color="#14ecec"/>
+    </radialGradient>
+    <radialGradient id="Degradado_sin_nombre_96" data-name="Degradado sin nombre 96" cx="-191.09" cy="-213.18" fx="-191.09" fy="-213.18" r="1" gradientTransform="translate(104079.07 -4845.27) rotate(45) scale(361.67 -361.67)" gradientUnits="userSpaceOnUse">
+      <stop offset=".71" stop-color="#192afc" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#14ecec"/>
+    </radialGradient>
+    <radialGradient id="Degradado_sin_nombre_100" data-name="Degradado sin nombre 100" cx="-187.93" cy="-215.57" fx="-187.93" fy="-215.57" r="1" gradientTransform="translate(64713.04 -3590.88) rotate(45) scale(224.78 -224.78)" gradientUnits="userSpaceOnUse">
+      <stop offset=".63" stop-color="#192afc" stop-opacity="0"/>
+      <stop offset="1" stop-color="#14ecec"/>
+    </radialGradient>
+  </defs>
+  <g id="Trifold">
+    <g class="cls-5">
+      <circle class="cls-7" cx="802.72" cy="802.72" r="802.22"/>
+      <circle class="cls-7" cx="622.15" cy="802.72" r="580.38"/>
+      <circle class="cls-7" cx="444.17" cy="802.72" r="361.13"/>
+    </g>
+    <circle class="cls-2" cx="802.72" cy="802.55" r="500"/>
+    <circle class="cls-1" cx="802.72" cy="802.55" r="500"/>
+    <circle class="cls-4" cx="802.72" cy="802.55" r="500"/>
+    <circle class="cls-3" cx="690.18" cy="802.55" r="361.74"/>
+    <circle class="cls-6" cx="579.24" cy="802.55" r="225.08"/>
+  </g>
+</svg>

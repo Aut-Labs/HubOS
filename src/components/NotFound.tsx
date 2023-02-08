@@ -47,7 +47,6 @@ function NotFound() {
           height: "50px"
         }}
         type="button"
-        
         component={Link}
         to={previousRoute}
         label="Go back"

@@ -1,6 +1,6 @@
 // @ts-ignore
 import { Player } from "@lottiefiles/react-lottie-player";
-import * as animationData from "@assets/aut-load.json";
+import * as animationData from "@assets/aut-load2.json";
 
 const defaultOptions = {
   loop: true,
