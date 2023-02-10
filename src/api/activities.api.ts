@@ -4,10 +4,9 @@ import {
   PollsContractEventType,
   TasksContractEventType,
   Web3CommunityCallProvider,
-  Web3CommunityExtensionProvider,
   Web3PollsProvider,
   Web3TasksProvider
-} from "@aut-protocol/abi-types";
+} from "@aut-labs-private/abi-types";
 import { Task, TaskStatus } from "@store/model";
 import axios from "axios";
 import { dateToUnix } from "@utils/date-format";
@@ -30,15 +29,15 @@ import { DiscordMessage } from "./discord.api";
 import { environment } from "./environment";
 
 const callThunkProvider = Web3ThunkProviderFactory("Call", {
-  provider: Web3CommunityCallProvider
+  provider: null
 });
 
 const taskThunkProvider = Web3ThunkProviderFactory("Task", {
-  provider: Web3TasksProvider
+  provider: null
 });
 
 const pollsThunkProvider = Web3ThunkProviderFactory("Poll", {
-  provider: Web3PollsProvider
+  provider: null
 });
 
 const contractAddress = async (
@@ -47,9 +46,9 @@ const contractAddress = async (
 ) => {
   const state = thunkAPI.getState();
   const communityAddress = state.community.selectedCommunityAddress;
-  const contract = await Web3CommunityExtensionProvider(communityAddress);
-  const activities = (await contract.getActivitiesWhitelist()) as any[];
-
+  // const contract = await Web3CommunityExtensionProvider(communityAddress);
+  // const activities = (await contract.getActivitiesWhitelist()) as any[];
+  const activities = [];
   let { actAddr } =
     (activities || []).find(
       ({ actType }) => Number(actType.toString()) === type
@@ -77,7 +76,7 @@ const contractAddress = async (
       default:
         throw new Error("Activity type does not exist");
     }
-    await contract.addActivitiesAddress(actAddr, type);
+    // await contract.addActivitiesAddress(actAddr, type);
   }
   console.log(actAddr);
   return Promise.resolve(actAddr);
@@ -167,9 +166,9 @@ export const addActivityTask = taskThunkProvider(
     } = task;
     const communities = state.community.communities as Community[];
     const communityAddress = state.community.selectedCommunityAddress as string;
-    const community = communities.find(
-      (c) => c.properties.address === communityAddress
-    );
+    // const community = communities.find(
+    //   (c) => c.properties.address === communityAddress
+    // );
 
     // const selectedRole = community.properties.skills.roles.find(({ roleName }) => roleName === role);
 
@@ -178,22 +177,22 @@ export const addActivityTask = taskThunkProvider(
       throw new Error("Role is missing!");
     }
 
-    const metadata = {
-      name: title,
-      description,
-      image: community.image,
-      properties: {
-        creator: userInfo.nickname,
-        creatorAutId: window.ethereum.selectedAddress,
-        role: selectedRole,
-        roleId: role,
-        participants,
-        allParticipants,
-        description,
-        title,
-        isCoreTeamMembersOnly
-      }
-    };
+    // const metadata = {
+    //   name: title,
+    //   description,
+    //   image: community.image,
+    //   properties: {
+    //     creator: userInfo.nickname,
+    //     creatorAutId: window.ethereum.selectedAddress,
+    //     role: selectedRole,
+    //     roleId: role,
+    //     participants,
+    //     allParticipants,
+    //     description,
+    //     title,
+    //     isCoreTeamMembersOnly
+    //   }
+    // };
     // const uri = await storeMetadata(metadata);
     // const result = await contract.create(selectedRole.id, uri);
     const discordMessage: DiscordMessage = {
@@ -289,12 +288,12 @@ export const addGroupCall = callThunkProvider(
 
     const communities = state.community.communities as Community[];
     const communityAddress = state.community.selectedCommunityAddress as string;
-    const community = communities.find(
-      (c) => c.properties.address === communityAddress
-    );
-    const selectedRole = community.properties.rolesSets[0].roles.find(
-      ({ roleName }) => roleName === role
-    );
+    // const community = communities.find(
+    //   (c) => c.properties.address === communityAddress
+    // );
+    // const selectedRole = community.properties.rolesSets[0].roles.find(
+    //   ({ roleName }) => roleName === role
+    // );
 
     const startDatetime = new Date(startDate);
     const time = new Date(startTime);
@@ -323,7 +322,7 @@ export const addGroupCall = callThunkProvider(
       startTime: dateToUnix(startDatetime),
       endTime: dateToUnix(endDatetime),
       duration,
-      roleId: selectedRole.id,
+      // roleId: selectedRole.id,
       allParticipants,
       participants
     };
@@ -338,29 +337,29 @@ export const addGroupCall = callThunkProvider(
     //   uri
     // );
 
-    const discordMessage: DiscordMessage = {
-      title: "New Community Call",
-      description: `${allParticipants ? "All" : participants} **${
-        selectedRole.roleName
-      }** participants can join the call`,
-      fields: [
-        {
-          name: "Date",
-          value: format(startDatetime, "PPPP"),
-          inline: true
-        },
-        {
-          name: "Time",
-          value: format(time, "hh:mm a"),
-          inline: true
-        },
-        {
-          name: "Duration",
-          value: duration,
-          inline: true
-        }
-      ]
-    };
+    // const discordMessage: DiscordMessage = {
+    //   title: "New Community Call",
+    //   // description: `${allParticipants ? "All" : participants} **${
+    //   //   selectedRole.roleName
+    //   // }** participants can join the call`,
+    //   fields: [
+    //     {
+    //       name: "Date",
+    //       value: format(startDatetime, "PPPP"),
+    //       inline: true
+    //     },
+    //     {
+    //       name: "Time",
+    //       value: format(time, "hh:mm a"),
+    //       inline: true
+    //     },
+    //     {
+    //       name: "Duration",
+    //       value: duration,
+    //       inline: true
+    //     }
+    //   ]
+    // };
     // await dispatch(sendDiscordNotification(discordMessage));
     // return result;
   }
@@ -384,32 +383,32 @@ export const addPoll = pollsThunkProvider(
       callData;
     const communities = state.community.communities as Community[];
     const communityAddress = state.community.selectedCommunityAddress as string;
-    const community = communities.find(
-      (c) => c.properties.address === communityAddress
-    );
-    const selectedRole = community.properties.rolesSets[0].roles.find(
-      ({ roleName }) => roleName === role
-    );
-    let roleId = 0;
-    let roleName = "All";
-    if (!allRoles) {
-      roleId = selectedRole.id;
-      roleName = selectedRole.roleName;
-    }
+    // const community = communities.find(
+    //   (c) => c.properties.address === communityAddress
+    // );
+    // const selectedRole = community.properties.rolesSets[0].roles.find(
+    //   ({ roleName }) => roleName === role
+    // );
+    // let roleId = 0;
+    // let roleName = "All";
+    // if (!allRoles) {
+    //   roleId = selectedRole.id;
+    //   roleName = selectedRole.roleName;
+    // }
 
-    if (roleId === undefined || roleId === null) {
-      throw new Error("RoleId missing!");
-    }
+    // if (roleId === undefined || roleId === null) {
+    //   throw new Error("RoleId missing!");
+    // }
 
-    const metadata = {
-      role: roleId,
-      roleName,
-      title,
-      description,
-      duration,
-      options,
-      emojis
-    };
+    // const metadata = {
+    //   role: roleId,
+    //   roleName,
+    //   title,
+    //   description,
+    //   duration,
+    //   options,
+    //   emojis
+    // };
     // const uri = await storeAsBlob(metadata);
     // console.log("Poll Metadata ->", ipfsCIDToHttpUrl(uri));
     let daysToAdd = 0;

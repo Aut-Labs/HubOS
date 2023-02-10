@@ -8,9 +8,7 @@ import {
   Typography
 } from "@mui/material";
 import { useAppDispatch } from "@store/store.model";
-import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { SwScrollbar } from "sw-web-shared";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
@@ -25,6 +23,7 @@ import {
 import { format, isEqual } from "date-fns";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
+import { useNavigation } from "react-router-dom";
 
 const StepWrapper = styled("form")({
   textAlign: "center",
@@ -35,7 +34,7 @@ const StepWrapper = styled("form")({
 
 const CalendarStep = () => {
   const dispatch = useAppDispatch();
-  const history = useHistory();
+  const navigate = useNavigation();
   const { startDate, startTime } = useSelector(ActivityGroupCallData);
   const [timeSlots] = useState(
     generateTimeSlots({
@@ -56,7 +55,7 @@ const CalendarStep = () => {
 
   const onSubmit = async () => {
     dispatch(activityUpdateGroupCallData(values));
-    history.push("/aut-dashboard/event-factory/group-call/info");
+    // navigate.push("/aut-dashboard/event-factory/group-call/info");
   };
 
   return (
@@ -135,7 +134,7 @@ const CalendarStep = () => {
                 ? format(new Date(values.startDate), "PPPP")
                 : "Select date"}
             </Typography>
-            <SwScrollbar
+            {/* <SwScrollbar
               sx={{
                 height: pxToRem(400),
                 flex: 1
@@ -182,7 +181,7 @@ const CalendarStep = () => {
                   );
                 })}
               </List>
-            </SwScrollbar>
+            </SwScrollbar> */}
           </Box>
         </Box>
 

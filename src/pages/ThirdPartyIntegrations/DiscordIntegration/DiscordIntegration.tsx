@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef, memo } from "react";
 import { Typography, Container } from "@mui/material";
 import debounce from "lodash.debounce";
-import { RootState, useAppDispatch } from "@store/store.model";
+import { useAppDispatch } from "@store/store.model";
 import { useSelector } from "react-redux";
 import { ResultState } from "@store/result-status";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
@@ -15,7 +15,7 @@ const DiscordIntegration = () => {
   const dispatch = useAppDispatch();
   const [discordUrl, setDiscordUrl] = useState("");
   const input = useRef<any>();
-  const { status } = useSelector((state: RootState) => state.dashboard);
+  const { status } = useSelector((state: any) => state.dashboard);
 
   const submit = async () => {
     dispatch(addDiscordToCommunity(discordUrl));

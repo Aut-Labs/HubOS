@@ -1,6 +1,6 @@
 import { Box, Link, styled, Typography } from "@mui/material";
 import { useAppDispatch } from "@store/store.model";
-import { useHistory } from "react-router-dom";
+import { useNavigation } from "react-router-dom";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { pxToRem } from "@utils/text-size";
 import EmojiInputPicker, {
@@ -62,7 +62,7 @@ function FormArrayHelperText({ errors, name, children = null, value }) {
 
 const CreatePollOptionsStep = () => {
   const dispatch = useAppDispatch();
-  const history = useHistory();
+  const navigate = useNavigation();
   const data = useSelector(CreatePollData);
 
   const {
@@ -86,7 +86,7 @@ const CreatePollOptionsStep = () => {
 
   const onSubmit = async () => {
     await dispatch(pollUpdateData(values));
-    history.push("/aut-dashboard/event-factory/polls/participants");
+    // navigate.push("/aut-dashboard/event-factory/polls/participants");
   };
 
   return (

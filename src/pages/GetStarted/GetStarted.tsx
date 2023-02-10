@@ -6,7 +6,6 @@ import { pxToRem } from "@utils/text-size";
 import { Link } from "react-router-dom";
 import { AutButton } from "@components/buttons";
 import { IsAuthenticated } from "@auth/auth.reducer";
-import { useGetPostsByNameQuery } from "@api/posts.api";
 import AutSDK from "@aut-labs-private/sdk";
 import { ReactComponent as Trifold } from "@assets/trifold.svg";
 import { DautPlaceholder } from "@components/DautPlaceholder";

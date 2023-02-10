@@ -2,7 +2,6 @@ import { Box, CircularProgress, Container, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { resetActivityTaskState } from "@store/Activity/task.reducer";
-import { SwButton } from "sw-web-shared";
 import { Link } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import {
@@ -88,7 +87,7 @@ const YourTasks = () => {
         </Box>
 
         <div className="create-task-btn">
-          <SwButton
+          {/* <SwButton
             startIcon={<AddIcon />}
             sx={{
               width: pxToRem(180),
@@ -97,7 +96,7 @@ const YourTasks = () => {
             to="/aut-dashboard/event-factory/create-task"
             component={Link}
             label="Open task"
-          />
+          /> */}
         </div>
       </Box>
 

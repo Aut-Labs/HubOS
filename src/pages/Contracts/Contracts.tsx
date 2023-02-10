@@ -153,9 +153,7 @@ const Contracts = () => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [open, setOpen] = useState(false);
   const lockedContracts = useSelector(getLockedContracts);
-  const { status, errorMessage } = useSelector(
-    (state: RootState) => state.dashboard
-  );
+  const { status, errorMessage } = useSelector((state: any) => state.dashboard);
 
   const handleClose = () => {
     setOpen(false);

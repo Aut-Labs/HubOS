@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Route, Switch } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Container } from "@mui/material";
 import { resetPollState } from "@store/Activity/poll.reducer";
@@ -9,6 +8,7 @@ import CreatePollInfoStep from "./CreatePollInfoStep/CreatePollInfoStep";
 import CreatePollParticipantsStep from "./CreatePollParticipantsStep/CreatePollParticipantsStep";
 import SuccessStep from "./SuccessStep/SuccessStep";
 import { pxToRem } from "@utils/text-size";
+import { Routes } from "react-router-dom";
 
 const Polls = () => {
   const dispatch = useDispatch();
@@ -33,8 +33,8 @@ const Polls = () => {
         py: pxToRem(30)
       }}
     >
-      <Switch>
-        <Route
+      <Routes>
+        {/* <Route
           exact
           path="/aut-dashboard/event-factory/polls"
           component={CreatePollInfoStep}
@@ -50,8 +50,8 @@ const Polls = () => {
         <Route
           path="/aut-dashboard/event-factory/polls/success"
           component={SuccessStep}
-        />
-      </Switch>
+        /> */}
+      </Routes>
     </Container>
   );
 };

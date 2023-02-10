@@ -1,4 +1,4 @@
-import { envionmentGenerator } from "sw-web-shared";
+import { envionmentGenerator } from "@utils/env";
 
 export enum EnvMode {
   Production = "production",

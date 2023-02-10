@@ -1,6 +1,5 @@
 import { styled, Typography } from "@mui/material";
 import { useAppDispatch } from "@store/store.model";
-import { useHistory } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { pxToRem } from "@utils/text-size";
 import { CreatePollData, pollUpdateData } from "@store/Activity/poll.reducer";
@@ -10,6 +9,7 @@ import { useSelector } from "react-redux";
 import { AutHeader } from "@components/AutHeader";
 import { AutTextField, FormHelperText } from "@components/Fields";
 import { AutButton } from "@components/buttons";
+import { useNavigation } from "react-router-dom";
 
 const StepWrapper = styled("form")({
   textAlign: "center",
@@ -24,7 +24,7 @@ const errorTypes = {
 
 const CreatePollInfoStep = () => {
   const dispatch = useAppDispatch();
-  const history = useHistory();
+  const navigate = useNavigation();
   const { title, description, duration } = useSelector(CreatePollData);
 
   const {
@@ -51,7 +51,7 @@ const CreatePollInfoStep = () => {
 
   const onSubmit = async (data: any) => {
     await dispatch(pollUpdateData(data));
-    history.push("/aut-dashboard/event-factory/polls/options");
+    // navigate.push("/aut-dashboard/event-factory/polls/options");
   };
 
   return (

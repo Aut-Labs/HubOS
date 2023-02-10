@@ -6,7 +6,7 @@ export const DautPlaceholder = ({
   hide = true,
   styles = {}
 }) => {
-  const [[width, height], setElSize] = useState([220, 50]);
+  const [[width, height], setElSize] = useState([270, 55]);
 
   useLayoutEffect(() => {
     function updateDautPosition() {

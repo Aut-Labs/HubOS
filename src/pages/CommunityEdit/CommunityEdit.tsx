@@ -16,10 +16,10 @@ import { ResultState } from "@store/result-status";
 import { useAppDispatch } from "@store/store.model";
 import { countWords } from "@utils/helpers";
 import { pxToRem } from "@utils/text-size";
+import { toBase64 } from "@utils/to-base-64";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { toBase64 } from "sw-web-shared";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,

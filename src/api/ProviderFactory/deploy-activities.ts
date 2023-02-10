@@ -1,13 +1,12 @@
+import { ethers } from "ethers";
 import {
-  CommunityCallABI,
-  CommunityCallByteCode,
   PollsABI,
   PollsByteCode,
+  CommunityCallABI,
+  CommunityCallByteCode,
   TasksABI,
   TasksByteCode
-} from "@aut-protocol/abi-types";
-import { ethers } from "ethers";
-import { EnableAndChangeNetwork } from "./web3.network";
+} from "@aut-labs-private/abi-types";
 
 export const deployPolls = async (
   communityAddress: string,

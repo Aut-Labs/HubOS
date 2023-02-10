@@ -117,14 +117,26 @@ export default (theme: Theme) =>
     ...theme.components.MuiButton,
     styleOverrides: {
       outlinedOffWhite: {
-        borderColor: theme.palette.offWhite.main,
+        borderColor: theme.palette.divider,
         "&:hover": {
           backgroundColor: theme.palette.offWhite.main,
           color: theme.palette.nightBlack.main
         },
         "&.Mui-disabled": {
-          borderColor: theme.palette.offWhite.main,
+          borderColor: theme.palette.divider,
           color: theme.palette.offWhite.main,
+          opacity: "0.5"
+        }
+      },
+      outlinedPrimary: {
+        borderColor: theme.palette.primary.main,
+        "&:hover": {
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.offWhite.main
+        },
+        "&.Mui-disabled": {
+          borderColor: theme.palette.primary.main,
+          color: theme.palette.primary.main,
           opacity: "0.5"
         }
       }
@@ -204,7 +216,6 @@ export default (theme: Theme) =>
           }
         ];
 
-        console.log(prev, "prev");
         return prev;
       }, [] as ComponentsVariants["MuiButton"])
     ]

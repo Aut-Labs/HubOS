@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+import { useNavigation } from "react-router-dom";
 import { TextField, Typography } from "@mui/material";
 import { ReactComponent as TagIcon } from "@assets/tag.svg";
 import { allRoles } from "@store/Community/community.reducer";
@@ -17,7 +17,7 @@ import { AutButton } from "@components/buttons";
 
 const RolesStep = () => {
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigation();
   const { activeStep } = useSelector(ActivityCurrentStep);
   const { role, allParticipants, participants } =
     useSelector(ActivityCurrentTask);
@@ -36,7 +36,7 @@ const RolesStep = () => {
 
   const onSubmit = (data: any) => {
     dispatch(activityUpdateTask(data));
-    history.push("/aut-dashboard/event-factory/create-task/description");
+    // navigate.push("/aut-dashboard/event-factory/create-task/description");
   };
 
   useEffect(() => {

@@ -4,6 +4,7 @@ import { pxToRem } from "@utils/text-size";
 import { Link } from "react-router-dom";
 import { AutID } from "@api/aut.model";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
+import { memo } from "react";
 
 const Members = ({ members }: { members: AutID[] }) => {
   const theme = useTheme();
@@ -76,4 +77,4 @@ const Members = ({ members }: { members: AutID[] }) => {
   );
 };
 
-export default Members;
+export default memo(Members);

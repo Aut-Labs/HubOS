@@ -1,8 +1,6 @@
 import { TextField, Typography } from "@mui/material";
 import { useAppDispatch } from "@store/store.model";
-import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { SwButton } from "sw-web-shared";
 import { useEffect } from "react";
 import { ResultState } from "@store/result-status";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
@@ -21,10 +19,11 @@ import { addActivityTask } from "@api/activities.api";
 import { countWords } from "@utils/helpers";
 import { pxToRem } from "@utils/text-size";
 import { DiscordWebHookUrl } from "@store/AutDashboard/aut-dashboard.reducer";
+import { useNavigation } from "react-router-dom";
 
 const DescriptionStep = () => {
   const dispatch = useAppDispatch();
-  const history = useHistory();
+  const navigate = useNavigation();
   const { activeStep } = useSelector(ActivityCurrentStep);
   const status = useSelector(ActivityStatus);
   const webhookUrl = useSelector(DiscordWebHookUrl);
@@ -60,7 +59,7 @@ const DescriptionStep = () => {
     );
 
     if (result.meta.requestStatus === "fulfilled") {
-      history.push("/aut-dashboard/event-factory/create-task-success");
+      // history.push("/aut-dashboard/event-factory/create-task-success");
     }
   };
 
@@ -197,11 +196,11 @@ const DescriptionStep = () => {
           </div>
         </div>
         <div className="bottom-action" style={{ marginTop: "30px" }}>
-          <SwButton
+          {/* <SwButton
             type="submit"
             disabled={!values?.description || !values.title}
             label="Create Task"
-          />
+          /> */}
         </div>
       </form>
     </div>

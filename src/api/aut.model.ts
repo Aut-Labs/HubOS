@@ -2,6 +2,8 @@ import { AutSocial, HolderData } from "./api.model";
 import { Community } from "./community.model";
 import { BaseNFTModel } from "@aut-labs-private/sdk/dist/models/baseNFTModel";
 import { httpUrlToIpfsCID } from "./storage.api";
+import { Role } from "@aut-labs-private/sdk/dist/models/dao";
+import { CommitmentMessages } from "@utils/misc";
 
 export const socialUrls = {
   discord: {
@@ -69,7 +71,7 @@ export class AutIDProperties {
 
   holderData?: HolderData;
 
-  isCoreTeam?: boolean;
+  isAdmin?: boolean;
 
   constructor(data: AutIDProperties) {
     if (!data) {
@@ -88,7 +90,7 @@ export class AutIDProperties {
       this.socials = this.socials.filter((s) => s.type !== "eth");
       this.network = data.network;
       this.holderData = data.holderData;
-      this.isCoreTeam = data.isCoreTeam;
+      this.isAdmin = data.isAdmin;
     }
   }
 }
@@ -114,5 +116,22 @@ export class AutID extends BaseNFTModel<AutIDProperties> {
   constructor(data: AutID = {} as AutID) {
     super(data);
     this.properties = new AutIDProperties(data.properties);
+  }
+}
+
+export interface DAOMemberProperties extends AutIDProperties {
+  role: Role;
+  commitmentDescription: string;
+  commitment: string;
+}
+
+export class DAOMember extends BaseNFTModel<Partial<DAOMemberProperties>> {
+  constructor(data: DAOMember = {} as DAOMember) {
+    super(data);
+    this.properties.commitmentDescription = CommitmentMessages(
+      Number(data.properties.commitment)
+    );
+    this.properties.role = data.properties.role;
+    this.properties.commitment = data.properties.commitment;
   }
 }

@@ -21,7 +21,6 @@ import { useEffect } from "react";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { SwScrollbar } from "sw-web-shared";
 import { ResultState } from "@store/result-status";
 import UserTaskDetail from "./UserTaskDetail";
 import "./Tasks.scss";
@@ -68,7 +67,7 @@ const TaskFinalise = () => {
         open={status === ResultState.Failed}
         message={errorMessage || "Something went wrong"}
       />
-      {status === ResultState.Loading ? (
+      {/* {status === ResultState.Loading ? (
         <div className="tasks-loading-spinner">
           <AutLoading />
         </div>
@@ -174,7 +173,7 @@ const TaskFinalise = () => {
             </Box>
           </Box>
         </SwScrollbar>
-      )}
+      )} */}
     </Container>
   );
 };

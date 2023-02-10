@@ -9,7 +9,6 @@ import { useRef, useMemo } from "react";
 import { styled } from "@mui/material/styles";
 import { InputBase } from "@mui/material";
 
-// @TODO: Move to sw-web-shared
 const GridEditInputCellRoot = styled(InputBase, {
   name: "MuiDataGrid",
   slot: "EditInputCell",
@@ -62,7 +61,7 @@ export function CustomEditComponent(
 export const useDatatableApiRef = (
   tableColumns: (apiRef: any) => GridColumns
 ) => {
-  const apiRef = useRef<GridEditRowApi & GridStateApi>(null);
+  const apiRef = useRef<GridEditRowApi & GridStateApi<any>>(null);
   const _columns = useMemo(() => {
     const columns = tableColumns(() => apiRef);
     return columns.concat({

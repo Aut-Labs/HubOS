@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
 import { ReactComponent as CoreTeam } from "@assets/core-team.svg";
 import { ReactComponent as Community } from "@assets/community.svg";
 import {
@@ -14,9 +13,10 @@ import { Controller, useForm } from "react-hook-form";
 import { pxToRem } from "@utils/text-size";
 import "./CategoryStep.scss";
 import { AutButton } from "@components/buttons";
+import { useNavigation } from "react-router-dom";
 
 const CategoryStep = () => {
-  const history = useHistory();
+  const navigate = useNavigation();
   const dispatch = useDispatch();
   const { activeStep } = useSelector(ActivityCurrentStep);
   const { isCoreTeamMembersOnly, role } = useSelector(ActivityCurrentTask);
@@ -38,7 +38,7 @@ const CategoryStep = () => {
         role: shouldResetRole ? null : role
       })
     );
-    history.push("/aut-dashboard/event-factory/create-task/roles");
+    // navigate.push("/aut-dashboard/event-factory/create-task/roles");
   };
 
   useEffect(() => {

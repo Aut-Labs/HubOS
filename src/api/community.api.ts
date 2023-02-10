@@ -1,21 +1,17 @@
-import {
-  CommunityExtensionContractEventType,
-  Web3AutIDProvider,
-  Web3CommunityExtensionProvider
-} from "@aut-protocol/abi-types";
 import axios from "axios";
 import { CommitmentMessages } from "@utils/misc";
 import { Community, findRoleName } from "./community.model";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
-import { httpUrlToIpfsCID, ipfsCIDToHttpUrl, isValidUrl } from "./storage.api";
-import { environment } from "./environment";
-import { AutID } from "./aut.model";
-import { base64toFile, isBase64 } from "sw-web-shared";
+import { fetchMetadata, ipfsCIDToHttpUrl, isValidUrl } from "./storage.api";
+import { AutID, DAOMember } from "./aut.model";
+import AutSDK, { DAOExpander } from "@aut-labs-private/sdk";
+import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
+import { base64toFile } from "@utils/to-base-64";
 
 const communityExtensionThunkProvider = Web3ThunkProviderFactory(
   "CommunityExtension",
   {
-    provider: Web3CommunityExtensionProvider
+    provider: null
   }
 );
 
@@ -35,6 +31,23 @@ export const fetchCommunity = communityExtensionThunkProvider(
     return community;
   }
 );
+
+// export const fetchCommunity = createAsyncThunk(
+//   "community/get",
+//   async (_, { rejectWithValue, getState }) => {
+//     const sdk = AutSDK.getInstance();
+//     const state = getState() as any;
+//     const { selectedCommunityAddress } = state.community;
+//     const response = await sdk..getComData(
+//       requestBody.daoAddr,
+//       requestBody.daoType
+//     );
+//     if (response?.isSuccess) {
+//       return response.data;
+//     }
+//     return rejectWithValue(response?.errorMessage);
+//   }
+// );
 
 export const getWhitelistedAddresses = communityExtensionThunkProvider(
   {
@@ -101,8 +114,7 @@ export const whitelistAddress = communityExtensionThunkProvider(
 
 export const setAsCoreTeam = communityExtensionThunkProvider(
   {
-    type: "aut-dashboard/core-team/add",
-    event: CommunityExtensionContractEventType.CoreTeamMemberAdded
+    type: "aut-dashboard/core-team/add"
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
@@ -117,8 +129,7 @@ export const setAsCoreTeam = communityExtensionThunkProvider(
 
 export const removeAsCoreTeam = communityExtensionThunkProvider(
   {
-    type: "aut-dashboard/core-team/remove",
-    event: CommunityExtensionContractEventType.CoreTeamMemberRemoved
+    type: "aut-dashboard/core-team/remove"
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
@@ -154,77 +165,6 @@ export const updateCommunity = communityExtensionThunkProvider(
   }
 );
 
-export const fetchMembers = communityExtensionThunkProvider(
-  {
-    type: "community/members/get"
-  },
-  async (thunkAPI) => {
-    const state = thunkAPI.getState();
-    const { selectedCommunityAddress } = state.community;
-    return Promise.resolve(selectedCommunityAddress);
-  },
-  async (contract, _, thunkAPI) => {
-    const state = thunkAPI.getState();
-    const AutIDsResponse: { [role: string]: AutID[] } = {};
-
-    const communities = state.community.communities as Community[];
-    const communityAddress = state.community.selectedCommunityAddress as string;
-    const community = communities.find(
-      (c) => c.properties.address === communityAddress
-    );
-
-    const filteredRoles = community.properties.rolesSets[0].roles;
-
-    for (let i = 0; i < filteredRoles.length; i += 1) {
-      AutIDsResponse[filteredRoles[i].roleName] = [];
-    }
-
-    AutIDsResponse.Admins = [];
-
-    const memberIds = await contract.getAllMembers();
-    const autContract = await Web3AutIDProvider(environment.autIDAddress);
-
-    for (let i = 0; i < memberIds.length; i += 1) {
-      const memberAddress = memberIds[i];
-      const tokenId = await autContract.getAutIDByOwner(memberAddress);
-      const metadataCID = await autContract.tokenURI(
-        Number(tokenId.toString())
-      );
-      const [, role, commitment] = await autContract.getCommunityData(
-        memberAddress,
-        community.properties.address
-      );
-      const jsonUri = ipfsCIDToHttpUrl(metadataCID);
-      const jsonMetadata: AutID = (await axios.get(jsonUri)).data;
-      const roleName = findRoleName(
-        role.toString(),
-        community.properties.rolesSets
-      );
-
-      const isCoreTeam = await contract.isCoreTeam(memberAddress);
-      const member = new AutID({
-        ...jsonMetadata,
-        properties: {
-          ...jsonMetadata.properties,
-          address: memberAddress,
-          role: role.toString(),
-          roleName,
-          tokenId: tokenId.toString(),
-          commitmentDescription: CommitmentMessages(commitment),
-          commitment: commitment.toString(),
-          isCoreTeam
-        } as any
-      });
-      if (isCoreTeam) {
-        AutIDsResponse.Admins.push(member);
-      }
-      AutIDsResponse[roleName].push(member);
-    }
-
-    return AutIDsResponse;
-  }
-);
-
 export const fetchMember = communityExtensionThunkProvider(
   {
     type: "community/member/get"
@@ -251,38 +191,38 @@ export const fetchMember = communityExtensionThunkProvider(
 
     AutIDsResponse.Admins = [];
 
-    const autContract = await Web3AutIDProvider(environment.autIDAddress);
-    const tokenId = await autContract.getAutIDByOwner(memberAddress);
-    const metadataCID = await autContract.tokenURI(Number(tokenId.toString()));
-    const [, role, commitment] = await autContract.getCommunityData(
-      memberAddress,
-      community.properties.address
-    );
-    const jsonUri = ipfsCIDToHttpUrl(metadataCID);
-    const jsonMetadata: AutID = (await axios.get(jsonUri)).data;
-    const roleName = findRoleName(
-      role.toString(),
-      community.properties.rolesSets
-    );
+    // const autContract = await Web3AutIDProvider(environment.autIDAddress);
+    // const tokenId = await autContract.getAutIDByOwner(memberAddress);
+    // const metadataCID = await autContract.tokenURI(Number(tokenId.toString()));
+    // const [, role, commitment] = await autContract.getCommunityData(
+    //   memberAddress,
+    //   community.properties.address
+    // );
+    // const jsonUri = ipfsCIDToHttpUrl(metadataCID);
+    // const jsonMetadata: AutID = (await axios.get(jsonUri)).data;
+    // const roleName = findRoleName(
+    //   role.toString(),
+    //   community.properties.rolesSets
+    // );
 
     const isCoreTeam = await contract.isCoreTeam(memberAddress);
-    const member = new AutID({
-      ...jsonMetadata,
-      properties: {
-        ...jsonMetadata.properties,
-        address: memberAddress,
-        role: role.toString(),
-        roleName,
-        tokenId: tokenId.toString(),
-        commitmentDescription: CommitmentMessages(commitment),
-        commitment: commitment.toString(),
-        isCoreTeam
-      } as any
-    });
-    if (isCoreTeam) {
-      AutIDsResponse.Admins.push(member);
-    }
-    AutIDsResponse[roleName].push(member);
+    // const member = new AutID({
+    //   ...jsonMetadata,
+    //   properties: {
+    //     ...jsonMetadata.properties,
+    //     address: memberAddress,
+    //     role: role.toString(),
+    //     roleName,
+    //     tokenId: tokenId.toString(),
+    //     commitmentDescription: CommitmentMessages(commitment),
+    //     commitment: commitment.toString(),
+    //     isCoreTeam
+    //   } as any
+    // });
+    // if (isCoreTeam) {
+    //   AutIDsResponse.Admins.push(member);
+    // }
+    // AutIDsResponse[roleName].push(member);
     return AutIDsResponse;
   }
 );
@@ -338,8 +278,7 @@ export const addPAContracts = communityExtensionThunkProvider(
 
 export const addDiscordToCommunity = communityExtensionThunkProvider(
   {
-    type: "community/integrate/discord",
-    event: CommunityExtensionContractEventType.DiscordServerSet
+    type: "community/integrate/discord"
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
@@ -354,8 +293,7 @@ export const addDiscordToCommunity = communityExtensionThunkProvider(
 
 export const addPAUrl = communityExtensionThunkProvider(
   {
-    type: "community/url/add",
-    event: CommunityExtensionContractEventType.UrlAdded
+    type: "community/url/add"
   },
   (thunkAPI) => {
     const state = thunkAPI.getState();
@@ -367,3 +305,104 @@ export const addPAUrl = communityExtensionThunkProvider(
     return dispatch(getPAUrl(null));
   }
 );
+
+const getMembers = async (body, api: BaseQueryApi) => {
+  const state: any = api.getState();
+  const { selectedCommunityAddress, communities } = state.community;
+  const community: Community = communities.find(
+    (c) => c.properties.address === selectedCommunityAddress
+  );
+
+  const sdk = AutSDK.getInstance();
+
+  if (!sdk.daoExpander) {
+    sdk.daoExpander = sdk.initService<DAOExpander>(
+      DAOExpander,
+      selectedCommunityAddress
+    );
+  }
+
+  const members: DAOMember[] = [];
+  const membersResponse =
+    await sdk.daoExpander.contract.members.getAllMembers();
+
+  for (let i = 0; i < membersResponse.data.length; i += 1) {
+    try {
+      const memberAddress = membersResponse.data[i];
+      const autIdResponse = await sdk.autID.findAutID(memberAddress);
+      const { tokenId, metadataUri } = autIdResponse.data;
+      const metadata = await fetchMetadata(metadataUri);
+      const comDataResponse = await sdk.autID.contract.getCommunityMemberData(
+        memberAddress,
+        selectedCommunityAddress
+      );
+      const { role, commitment } = comDataResponse.data;
+      const roleName = findRoleName(role, community.properties.rolesSets);
+      const isAdminResponse = await sdk.daoExpander.contract.admins.isAdmin(
+        memberAddress
+      );
+      const member = new DAOMember({
+        ...metadata,
+        properties: {
+          ...metadata.properties,
+          address: memberAddress,
+          role: {
+            id: Number(role),
+            roleName
+          },
+          tokenId: tokenId,
+          commitmentDescription: CommitmentMessages(Number(commitment)),
+          commitment: commitment,
+          isAdmin: isAdminResponse.data
+        }
+      });
+      members.push(member);
+    } catch (error) {
+      console.log(error);
+      // handle error
+    }
+  }
+  return {
+    data: members
+  };
+};
+
+export const communityApi = createApi({
+  reducerPath: "communityApi",
+  baseQuery: async (args, api, extraOptions) => {
+    const { url, body } = args;
+    if (url === "getAllMembers") {
+      return getMembers(body, api);
+    }
+
+    // if (url === "createQuest") {
+    //   return createQuest(body, api);
+    // }
+    return {
+      data: "Test"
+    };
+  },
+  endpoints: (builder) => ({
+    getAllMembers: builder.query<DAOMember[], void>({
+      query: (body) => {
+        return {
+          body,
+          url: "getAllMembers"
+        };
+      }
+    })
+    // createQuest: builder.mutation<
+    //   Quest,
+    //   Partial<Quest & { pluginAddress: string }>
+    // >({
+    //   query: (body) => {
+    //     return {
+    //       body,
+    //       url: "createQuest"
+    //     };
+    //   }
+    // })
+  })
+});
+
+export const { useGetAllMembersQuery } = communityApi;

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Container } from "@mui/material";
 import { resetActivityGroupCall } from "@store/Activity/call.reducer";
@@ -32,8 +32,8 @@ const GroupCall = () => {
         py: pxToRem(30)
       }}
     >
-      <Switch>
-        <Route
+      <Routes>
+        {/* <Route
           exact
           path="/aut-dashboard/event-factory/group-call"
           component={CalendarStep}
@@ -45,8 +45,8 @@ const GroupCall = () => {
         <Route
           path="/aut-dashboard/event-factory/group-call/success"
           component={SuccessStep}
-        />
-      </Switch>
+        /> */}
+      </Routes>
     </Container>
   );
 };

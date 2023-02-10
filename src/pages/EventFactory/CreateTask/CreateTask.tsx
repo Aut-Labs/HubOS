@@ -1,13 +1,9 @@
 import { Box, Container } from "@mui/material";
 import { useState } from "react";
-import { SwStepper } from "sw-web-shared";
-import { Route, Switch } from "react-router-dom";
+import { Routes } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { ActivityCurrentStep } from "@store/Activity/task.reducer";
 import { pxToRem } from "@utils/text-size";
-import CategoryStep from "./CategoryStep/CategoryStep";
-import DescriptionStep from "./DescriptionStep/DescriptionStep";
-import RolesStep from "./RolesStep/RolesStep";
 import "./CreateTask.scss";
 
 const CreateTask = () => {
@@ -43,7 +39,7 @@ const CreateTask = () => {
         }}
         className="sw-box-right-inner"
       >
-        <SwStepper
+        {/* <SwStepper
           mode="dark"
           title={title}
           stepperText={stepperText}
@@ -56,10 +52,10 @@ const CreateTask = () => {
             height: pxToRem(63)
           }}
           maxWidth="100%"
-        />
+        /> */}
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <Switch>
-            <Route
+          <Routes>
+            {/* <Route
               exact
               path="/aut-dashboard/event-factory/create-task"
               component={CategoryStep}
@@ -71,8 +67,8 @@ const CreateTask = () => {
             <Route
               path="/aut-dashboard/event-factory/create-task/description"
               component={DescriptionStep}
-            />
-          </Switch>
+            /> */}
+          </Routes>
         </Box>
       </Box>
     </Container>

@@ -17,7 +17,6 @@ import { useAppDispatch } from "@store/store.model";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { SwButton, SwScrollbar } from "sw-web-shared";
 import { ResultState } from "@store/result-status";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
@@ -106,7 +105,7 @@ const TaskSubmit = () => {
                 Submit Task
               </Typography>
 
-              <SwScrollbar
+              {/* <SwScrollbar
                 sx={{
                   height: "100%",
                   flex: 1
@@ -228,7 +227,7 @@ const TaskSubmit = () => {
                     </div>
                   </Box>
                 </form>
-              </SwScrollbar>
+              </SwScrollbar> */}
             </Box>
           </>
         )}

@@ -1,5 +1,3 @@
-// @TODO: Move to sw-web-shared
-
 export const GetDatatableItems = (state) => {
   return Object.keys(state.rows.idRowsLookup).reduce(
     (prev, key) => {

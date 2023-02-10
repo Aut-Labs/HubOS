@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import StepWizard, { StepWizardChildProps } from "react-step-wizard";
 import { styled } from "@mui/system";
-import { ButtonProps, Container } from "@mui/material";
-import { AutButton } from "@components/buttons";
+import { Button, ButtonProps, Container } from "@mui/material";
 import { pxToRem } from "@utils/text-size";
 import StepperNav from "./StepperNav";
 import { StepperProps } from "./model";
@@ -156,19 +155,18 @@ export const StepperButton = ({
   ...props
 }: ButtonProps & { label: string }) => {
   return (
-    <AutButton
+    <Button
       sx={{
-        minWidth: pxToRem(400),
-        height: pxToRem(70),
         my: pxToRem(50)
       }}
       type="submit"
-      color="primary"
       variant="outlined"
+      size="normal"
+      color="primary"
       {...props}
     >
       {label}
-    </AutButton>
+    </Button>
   );
 };
 
@@ -199,7 +197,6 @@ export default (props: StepperProps) => {
             exitLeft: `animated exitLeft`,
             intro: `animated exitLeft`
           }}
-          isHashEnabled
           isLazyMount
           nav={<StepperNav steps={props.steps} />}
           instance={setInstance}

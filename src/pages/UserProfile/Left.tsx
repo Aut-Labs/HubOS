@@ -94,7 +94,7 @@ const LeftProfile = ({ member }: { member: AutID }) => {
   const status = useSelector(CommunityStatus);
 
   const addOrRemoveAsCoreTeam = () => {
-    if (member.properties.isCoreTeam) {
+    if (member.properties.isAdmin) {
       dispatch(removeAsCoreTeam(member.properties.address));
     } else {
       dispatch(setAsCoreTeam(member.properties.address));
@@ -270,9 +270,7 @@ const LeftProfile = ({ member }: { member: AutID }) => {
             color="primary"
             variant="outlined"
           >
-            {member?.properties?.isCoreTeam
-              ? "Remove as Admin"
-              : "Set as Admin"}
+            {member?.properties?.isAdmin ? "Remove as Admin" : "Set as Admin"}
           </AutButton>
         )}
       </Box>

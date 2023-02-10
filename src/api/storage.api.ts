@@ -1,3 +1,4 @@
+import axios from "axios";
 import { environment } from "./environment";
 
 export const isValidUrl = (uri: string) => {
@@ -51,3 +52,19 @@ export function httpUrlToIpfsCID(url: string) {
   }
   return url;
 }
+
+const metadataCache = {};
+
+export const fetchMetadata = async (metadataURI: string) => {
+  if (!metadataURI) return;
+  let metadata = metadataCache[metadataURI];
+  if (!metadata) {
+    try {
+      metadata = (await axios.get(ipfsCIDToHttpUrl(metadataURI))).data;
+      metadataCache[metadataURI] = metadata;
+    } catch (error) {
+      console.warn(error);
+    }
+  }
+  return metadata;
+};

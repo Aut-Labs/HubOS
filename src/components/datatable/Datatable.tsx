@@ -2,7 +2,6 @@ import React, { useCallback } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { useTheme } from "@mui/material";
 
-// @TODO: Move to sw-web-shared
 const Datatable = ({
   apiRef,
   data,

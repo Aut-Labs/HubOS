@@ -1,11 +1,9 @@
-import { Box, Typography } from "@mui/material";
-import { RootState } from "@store/store.model";
+import { Box, Button, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { SwButton } from "sw-web-shared";
 
 function NotFound() {
-  const { previousRoute } = useSelector((state: RootState) => state.ui);
+  const { previousRoute } = useSelector((state: any) => state.ui);
   return (
     <Box
       sx={{
@@ -41,7 +39,7 @@ function NotFound() {
       >
         This page could not be found
       </Typography>
-      <SwButton
+      {/* <Button
         sx={{
           width: "140px",
           height: "50px"
@@ -50,7 +48,7 @@ function NotFound() {
         component={Link}
         to={previousRoute}
         label="Go back"
-      />
+      /> */}
     </Box>
   );
 }

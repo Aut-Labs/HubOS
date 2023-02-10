@@ -1,8 +1,6 @@
 import { GridToolbarContainer } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
-import { SwButton } from "sw-web-shared";
-
-// @TODO: Move to sw-web-shared
+import { Button } from "@mui/material";
 
 const SwEditToolbar = (props) => {
   const { apiRef, maxSize, title, focusOn } = props;
@@ -23,9 +21,7 @@ const SwEditToolbar = (props) => {
 
   return (
     <GridToolbarContainer>
-      <SwButton
-        btnType="medium"
-        
+      <Button
         sx={{
           width: "220px"
         }}
@@ -34,7 +30,7 @@ const SwEditToolbar = (props) => {
         onClick={handleClick}
       >
         Add new
-      </SwButton>
+      </Button>
     </GridToolbarContainer>
   );
 };

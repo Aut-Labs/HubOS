@@ -1,5 +1,4 @@
 import "emoji-mart/css/emoji-mart.css";
-import { Picker } from "emoji-mart";
 import {
   IconButton,
   InputAdornment,
@@ -181,7 +180,7 @@ const EmojiInputPicker = ({
           }
         }}
       >
-        <Picker onSelect={onSelectEmoji} />
+        {/* <Picker onSelect={onSelectEmoji} /> */}
       </Menu>
     </>
   );

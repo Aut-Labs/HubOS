@@ -1,12 +1,11 @@
 import { useState, useMemo, useEffect, useRef, memo } from "react";
 import { Typography, Container } from "@mui/material";
 import debounce from "lodash.debounce";
-import { SwButton } from "sw-web-shared";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import { RootState, useAppDispatch } from "@store/store.model";
+import { useAppDispatch } from "@store/store.model";
 import { useSelector } from "react-redux";
 import { ResultState } from "@store/result-status";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
@@ -39,9 +38,9 @@ function AlertDialog({ handleClose, open }) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <SwButton onClick={handleClose} autoFocus>
+        {/* <SwButton onClick={handleClose} autoFocus>
           Dismiss
-        </SwButton>
+        </SwButton> */}
       </DialogActions>
     </Dialog>
   );
@@ -53,7 +52,7 @@ const DaoIntegration = () => {
   const [daoUrl, setDaoUrl] = useState("");
   const [open, setOpen] = useState(false);
   const input = useRef<any>();
-  const { status, paUrl } = useSelector((state: RootState) => state.dashboard);
+  const { status, paUrl } = useSelector((state: any) => state.dashboard);
 
   const handleClose = () => {
     setOpen(false);

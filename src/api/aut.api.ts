@@ -1,12 +1,8 @@
-import {
-  AutIDContractEventType,
-  Web3AutIDProvider
-} from "@aut-protocol/abi-types";
 import axios from "axios";
 import { environment } from "./environment";
-import { EnableAndChangeNetwork } from "./ProviderFactory/web3.network";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
 import { NetworkConfig } from "./ProviderFactory/network.config";
+import { Web3AutIDProvider } from "@aut-labs-private/abi-types";
 
 export const getUsersData = () => {
   const params = {
@@ -122,7 +118,7 @@ export const AutExists = async () => {
 };
 
 const autIDThunkProvider = Web3ThunkProviderFactory("AutID", {
-  provider: Web3AutIDProvider
+  provider: null
 });
 
 export const getAppConfig = (): Promise<NetworkConfig[]> => {

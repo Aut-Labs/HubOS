@@ -1,42 +1,32 @@
-import { useState, useEffect } from "react";
+import { useEffect, memo, useMemo } from "react";
 import Box from "@mui/material/Box";
-import { RootState, useAppDispatch } from "@store/store.model";
-import { Container } from "@mui/material";
-import { useSelector } from "react-redux";
-import { CommunityData, fetchLogs } from "@store/Community/community.reducer";
-import { ResultState } from "@store/result-status";
+import { useAppDispatch } from "@store/store.model";
+import { Button, CircularProgress, Container, Typography } from "@mui/material";
 import { setTitle } from "@store/ui-reducer";
-import { fetchMembers } from "@api/community.api";
-import { AutHeader } from "@components/AutHeader";
+import { useGetAllMembersQuery } from "@api/community.api";
 import { pxToRem } from "@utils/text-size";
 import SwTabs from "../../components/tabs/SwTabs";
-import ActivityAndLogs from "./ActivityAndLogs";
 import Members from "./Members";
-import { AutID } from "@api/aut.model";
-import "./member-and-activities.scss";
-import AutLoading from "@components/AutLoading";
+import { DAOMember } from "@api/aut.model";
+import IosShareIcon from "@mui/icons-material/IosShare";
 
-const getAllMembers = (members: { [role: string]: AutID[] }) => {
-  return Object.keys(members).reduce((prev, curr) => {
-    const item = members[curr];
-    if (Array.isArray(item)) {
-      prev = [...prev, ...item];
-    }
-    return prev;
-  }, []);
-};
+const generateMemberTabs = (members: DAOMember[]) => {
+  const membersByRole = members.reduce((group, member) => {
+    const roleName = member.properties.role?.roleName;
+    group[roleName] = group[roleName] ?? [];
+    group[roleName].push(member);
+    return group;
+  }, {});
 
-const generateMemberTabs = (members: { [role: string]: AutID[] }) => {
-  return Object.keys(members).reduce((prev, curr) => {
-    const item = members[curr];
-    if (Array.isArray(item)) {
+  return Object.keys(membersByRole).reduce((prev, roleName) => {
+    if (Array.isArray(membersByRole[roleName])) {
       prev = [
         ...prev,
         {
-          label: curr,
+          label: roleName,
           props: {
-            total: item?.length,
-            members: item
+            total: membersByRole[roleName]?.length,
+            members: membersByRole[roleName]
           },
           component: Members
         }
@@ -46,105 +36,84 @@ const generateMemberTabs = (members: { [role: string]: AutID[] }) => {
   }, []);
 };
 
-function MembersAndActivities(props) {
+function MembersAndActivities() {
   const dispatch = useAppDispatch();
-  const { userInfo } = useSelector((state: RootState) => state.auth);
-  const { members, logs, status } = useSelector(
-    (state: RootState) => state.community
-  );
-  const community = useSelector(CommunityData);
-  const [tabs, setTabs] = useState([]);
+
+  const { data, isLoading } = useGetAllMembersQuery(null, {
+    refetchOnMountOrArgChange: true,
+    skip: false
+  });
+
+  const tabs = useMemo(() => {
+    if (!data?.length) return [];
+    return generateMemberTabs(data);
+  }, [data]);
 
   useEffect(() => {
-    const { isCoreTeamMembers } = props;
-    let memberTabs = [];
-    if (!members || !logs) {
-      return;
-    }
-
-    if (isCoreTeamMembers) {
-      const allMembers = getAllMembers(members);
-      memberTabs = [
-        {
-          label: "All",
-          props: {
-            total: allMembers?.length,
-            members: allMembers
-          },
-          component: Members
-        }
-      ];
-    } else {
-      memberTabs = generateMemberTabs(members);
-    }
-
-    setTabs(memberTabs || []);
-
-    // setTabs([
-    //   ...(memberTabs || []),
-    //   {
-    //     label: "Activity & Logs",
-    //     props: {
-    //       total: logs?.length,
-    //       logs
-    //     },
-    //     component: ActivityAndLogs
-    //   }
-    // ]);
-  }, [members, logs, props]);
-
-  useEffect(() => {
-    const promises = [
-      dispatch(fetchMembers(props.isCoreTeamMembers))
-      // dispatch(fetchLogs(userInfo?.community))
-    ];
-    return () => promises.forEach((p) => p.abort());
-  }, [
-    dispatch,
-    userInfo,
-    props.isCoreTeamMembers,
-    community?.properties?.address
-  ]);
-
-  useEffect(() => {
-    dispatch(setTitle(`DAO Management - Members & Roles in your Community.`));
+    dispatch(setTitle(`DAO - Members & Roles in your Community.`));
   }, [dispatch]);
 
   return (
-    <Container
-      maxWidth="lg"
-      sx={{
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        flexGrow: 1,
-        boxSizing: "border-box",
-        py: pxToRem(30)
-      }}
-    >
-      {status === ResultState.Loading ? (
-        <div className="sw-loading-spinner">
-          <AutLoading />
-        </div>
-      ) : (
+    <Container maxWidth="lg" sx={{ mt: pxToRem(20) }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          position: "relative"
+        }}
+      >
+        <Typography textAlign="center" color="white" variant="h3">
+          DAO Members
+        </Typography>
         <Box
           sx={{
-            flex: 1,
             display: "flex",
-            flexDirection: "column"
+            mt: 4,
+            alignItems: "center",
+            justifyContent: "flex-end"
           }}
         >
-          <AutHeader title="Your DAO Members" />
-          <SwTabs
-            tabPanelStyles={{
-              border: "2px solid #439EDD"
-            }}
-            tabs={tabs}
-          />
+          <Button
+            startIcon={<IosShareIcon />}
+            variant="outlined"
+            size="medium"
+            color="offWhite"
+          >
+            Invite members
+          </Button>
         </Box>
+      </Box>
+
+      {!isLoading && !data?.length && (
+        <Box
+          sx={{
+            display: "flex",
+            gap: "20px",
+            mt: 12,
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <Typography color="rgb(107, 114, 128)" variant="subtitle2">
+            There are no members on this community yet...
+          </Typography>
+        </Box>
+      )}
+
+      {isLoading ? (
+        <CircularProgress className="spinner-center" size="60px" />
+      ) : (
+        <SwTabs
+          tabPanelStyles={{
+            border: "2px solid #439EDD"
+          }}
+          tabs={tabs}
+        />
       )}
     </Container>
   );
 }
 
-export default MembersAndActivities;
+export default memo(MembersAndActivities);

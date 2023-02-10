@@ -1,5 +1,4 @@
 import { FormHelperText } from "@components/Fields";
-import { useTheme } from "@emotion/react";
 import {
   Typography,
   Slider,

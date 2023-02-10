@@ -1,15 +1,21 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "name": "Āut",
+  "short_name": "Āut",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "/favicon-light.ico",
+      "sizes": "48x48",
+      "type": "icon",
+      "color_scheme": "light"
+    },
+    {
+      "src": "/favicon-dark.ico",
+      "sizes": "48x48",
+      "type": "icon",
+      "color_scheme": "dark"
     }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  ]
 }

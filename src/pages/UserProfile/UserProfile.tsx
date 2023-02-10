@@ -1,10 +1,6 @@
 import { fetchMember } from "@api/community.api";
 import AutLoading from "@components/AutLoading";
 import SwGrid from "@components/SwGrid";
-import {
-  MemberStatus,
-  SelectedMember
-} from "@store/Community/community.reducer";
 import { ResultState } from "@store/result-status";
 import { useAppDispatch } from "@store/store.model";
 import { useEffect } from "react";
@@ -16,20 +12,19 @@ import RightProfile from "./Right";
 const UserProfile = () => {
   const dispatch = useAppDispatch();
   const params = useParams<{ memberAddress: string }>();
-  const status = useSelector(MemberStatus);
-  const member = useSelector(SelectedMember(params.memberAddress));
+  const member = {};
 
-  useEffect(() => {
-    const promises = [];
-    if (!member && params.memberAddress) {
-      promises.push(dispatch(fetchMember(params.memberAddress)));
-    }
-    return () => promises.forEach((p) => p.abort());
-  }, [dispatch, member, params]);
+  // useEffect(() => {
+  //   const promises = [];
+  //   if (!member && params.memberAddress) {
+  //     promises.push(dispatch(fetchMember(params.memberAddress)));
+  //   }
+  //   return () => promises.forEach((p) => p.abort());
+  // }, [dispatch, member, params]);
 
   return (
     <>
-      {status === ResultState.Loading ? (
+      {/* {status === ResultState.Loading ? (
         <div className="sw-loading-spinner">
           <AutLoading />
         </div>
@@ -65,7 +60,7 @@ const UserProfile = () => {
             </div>
           }
         />
-      )}
+      )} */}
     </>
   );
 };

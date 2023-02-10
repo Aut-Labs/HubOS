@@ -7,22 +7,22 @@ import {
   CardHeader,
   IconButton,
   SvgIcon,
-  Typography
+  Typography,
+  styled
 } from "@mui/material";
 import { CommunityData } from "@store/Community/community.reducer";
 import { pxToRem } from "@utils/text-size";
 import { useDispatch, useSelector } from "react-redux";
 import { setTitle } from "@store/ui-reducer";
-import { useEffect } from "react";
+import { memo, useEffect } from "react";
 import { UserInfo } from "@auth/auth.reducer";
 import SwGrid from "@components/SwGrid";
-import { styled } from "@mui/system";
 import CopyAddress from "@components/CopyAddress";
 import { ReactComponent as EditPencil } from "@assets/pencil-edit.svg";
 import CardMock from "@assets/card-mock.png";
 
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
-import { Link, useRouteMatch } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { DautPlaceholder } from "@components/DautPlaceholder";
 
 const AutTable = styled("table")(({ theme }) => ({
@@ -31,7 +31,7 @@ const AutTable = styled("table")(({ theme }) => ({
   tr: {
     "&:first-of-type": {
       td: {
-        borderTop: "1px solid white"
+        borderTop: `1px solid ${theme.palette.divider}`
       }
     }
   },
@@ -51,7 +51,7 @@ const AutTable = styled("table")(({ theme }) => ({
         paddingLeft: "15px"
       }
     },
-    borderBottom: "1px solid white"
+    borderBottom: `1px solid ${theme.palette.divider}`
   },
 
   th: {
@@ -67,7 +67,7 @@ const AutTable = styled("table")(({ theme }) => ({
         paddingLeft: "15px"
       }
     },
-    borderBottom: "1px solid white"
+    borderBottom: `1px solid ${theme.palette.divider}`
   }
 }));
 
@@ -194,7 +194,7 @@ const Dashboard = () => {
   const dispatch = useDispatch();
   const userInfo = useSelector(UserInfo);
   const community = useSelector(CommunityData);
-  const match = useRouteMatch();
+  // const match = useRouteMatch();
 
   useEffect(() => {
     dispatch(
@@ -205,8 +205,6 @@ const Dashboard = () => {
       )
     );
   }, [dispatch, userInfo]);
-
-  console.log(community, "COMMU");
 
   const communityStats = [
     {
@@ -251,16 +249,12 @@ const Dashboard = () => {
           <Card
             sx={{
               maxWidth: {
-                xs: "300px",
+                xs: "80%",
                 md: "600px",
                 xxl: "800px"
               },
               width: "100%",
               margin: "0 auto",
-              p: {
-                xs: "10x",
-                md: "50px"
-              },
               display: "flex",
               flexDirection: "column",
               background: "transparent",
@@ -273,13 +267,13 @@ const Dashboard = () => {
                 <Avatar
                   sx={{
                     height: {
-                      xs: "200px",
+                      xs: "120px",
                       xxl: "300px"
                     },
                     width: "100%"
                   }}
                   variant="square"
-                  src={ipfsCIDToHttpUrl(community?.image as string)}
+                  srcSet={ipfsCIDToHttpUrl(community?.image as string)}
                 />
               }
               sx={{
@@ -363,4 +357,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default memo(Dashboard);

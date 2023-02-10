@@ -11,7 +11,6 @@ import { ResultState } from "@store/result-status";
 import { pxToRem } from "@utils/text-size";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { SwButton } from "sw-web-shared";
 import "./Tasks.scss";
 
 const TasksList = (props) => {
@@ -67,15 +66,16 @@ const TasksList = (props) => {
       case TaskTypes.MyTasks:
         if (task.status === TaskStatus.Submitted) {
           return (
-            <SwButton
-              sx={{
-                width: "220px",
-                height: "85px"
-              }}
-              component={Link}
-              to={`/aut-dashboard/tasks/finalise/${task.activityId}`}
-              label="Waiting for Approval"
-            />
+            <></>
+            // <SwButton
+            //   sx={{
+            //     width: "220px",
+            //     height: "85px"
+            //   }}
+            //   component={Link}
+            //   to={`/aut-dashboard/tasks/finalise/${task.activityId}`}
+            //   label="Waiting for Approval"
+            // />
           );
         }
         if (task.status === TaskStatus.Finished) {

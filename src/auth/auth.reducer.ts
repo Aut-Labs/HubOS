@@ -1,15 +1,14 @@
 import { AutID } from "@api/aut.model";
-import { ipfsCIDToHttpUrl } from "@api/storage.api";
-import { createSlice } from "@reduxjs/toolkit";
+import { createSelector, createSlice } from "@reduxjs/toolkit";
 
 export interface AuthState {
-  isAutheticated: boolean;
+  isAuthenticated: boolean;
   userInfo: any;
   userAddress: string;
 }
 
 const initialState: AuthState = {
-  isAutheticated: false,
+  isAuthenticated: false,
   userAddress: null,
   userInfo: null
 };
@@ -20,7 +19,7 @@ export const authSlice = createSlice({
   reducers: {
     setAuthenticated(state, action) {
       const { isAuthenticated, userInfo } = action.payload;
-      state.isAutheticated = isAuthenticated;
+      state.isAuthenticated = isAuthenticated;
       state.userInfo = userInfo;
     },
     setUserAddress(state, action) {
@@ -33,7 +32,9 @@ export const authSlice = createSlice({
 export const { setAuthenticated, setUserAddress, resetAuthState } =
   authSlice.actions;
 
-export const UserInfo = (state) => state.auth.userInfo as AutID;
-export const IsAuthenticated = (state) => state.auth.isAuthenticated as boolean;
+export const userInfo = (state) => state.auth.userInfo as AutID;
+export const UserInfo = createSelector([userInfo], (a) => a);
+export const isAuthenticated = (state) => state.auth.isAuthenticated as boolean;
+export const IsAuthenticated = createSelector([isAuthenticated], (a) => a);
 
 export default authSlice.reducer;

@@ -1,21 +1,100 @@
-import { useEffect, useRef } from "react";
-import { useLocation, useHistory } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAppDispatch } from "@store/store.model";
 import { resetAuthState, setAuthenticated } from "@auth/auth.reducer";
 import { AutID } from "@api/aut.model";
 import { Init } from "@aut-labs/d-aut";
 import { communityUpdateState } from "@store/Community/community.reducer";
-import { useEthers } from "@usedapp/core";
+import {
+  NetworksConfig,
+  updateWalletProviderState
+} from "@store/WalletProvider/WalletProvider";
+import { useSelector } from "react-redux";
+import AutSDK from "@aut-labs-private/sdk";
+import { ethers } from "ethers";
+import { NetworkConfig } from "./network.config";
+import { Config, Connector, useConnector, useEthers } from "@usedapp/core";
+import AutLoading from "@components/AutLoading";
+import DialogWrapper from "@components/Dialog/DialogWrapper";
+import { Typography, styled } from "@mui/material";
+import AppTitle from "@components/AppTitle";
+import { NetworkSelectors } from "./components/NetworkSelectors";
 
-function Web3DautConnect({ setLoading }) {
+const DialogInnerContent = styled("div")({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  flex: 1,
+  gridGap: "30px"
+});
+
+function Web3DautConnect({
+  setLoading,
+  config
+}: {
+  setLoading: (loading: boolean) => void;
+  config: Config;
+}) {
   const dispatch = useAppDispatch();
-  const location = useLocation<any>();
-  const history = useHistory();
   const abort = useRef<AbortController>();
-  const { activateBrowserWallet } = useEthers();
+  const networks = useSelector(NetworksConfig);
+  const [currentChainId, setCurrentChainId] = useState(null);
+  const [dAutConnected, setDAutConnected] = useState(false);
+  const [loadingNetwork, setIsLoadingNetwork] = useState(false);
+  const { connector, activate } = useConnector();
+  const { activateBrowserWallet, switchNetwork, chainId } = useEthers();
+
+  const openForSelectNetwork = useMemo(() => {
+    return dAutConnected && currentChainId && currentChainId != chainId;
+  }, [chainId, dAutConnected, currentChainId]);
 
   const onAutInit = async () => {
-    setLoading(false);
+    const connetectedAlready = sessionStorage.getItem("aut-data");
+    if (!connetectedAlready) {
+      setLoading(false);
+    }
+  };
+
+  const initialiseSDK = async (
+    network: NetworkConfig,
+    signer: ethers.providers.JsonRpcSigner
+  ) => {
+    const sdk = AutSDK.getInstance();
+    return sdk.init(signer, {
+      daoTypesAddress: network.contracts.daoTypesAddress,
+      autDaoRegistryAddress: network.contracts.autDaoRegistryAddress,
+      autIDAddress: network.contracts.autIDAddress,
+      daoExpanderRegistryAddress: network.contracts.daoExpanderRegistryAddress,
+      pluginRegistryAddress: network.contracts.pluginRegistryAddress
+    });
+  };
+
+  const activateNetwork = async (
+    network: NetworkConfig,
+    conn: Connector,
+    wallet?: string
+  ) => {
+    setIsLoadingNetwork(true);
+    try {
+      await activate(conn);
+      await switchNetwork(+network.chainId);
+    } catch (error) {
+      console.log(error, "error");
+    }
+    const signer = conn?.provider?.getSigner();
+    const itemsToUpdate = {
+      sdkInitialized: true,
+      selectedWalletType: wallet,
+      selectedNetwork: network.network,
+      signer
+    };
+    if (!wallet) {
+      delete itemsToUpdate.selectedWalletType;
+    }
+    await dispatch(updateWalletProviderState(itemsToUpdate));
+    await initialiseSDK(network, signer as ethers.providers.JsonRpcSigner);
+    setCurrentChainId(+network.chainId);
+    setIsLoadingNetwork(false);
   };
 
   const onAutLogin = async ({ detail }: any) => {
@@ -27,30 +106,38 @@ function Web3DautConnect({ setLoading }) {
     autID.properties.address = profile.address;
     autID.properties.network = profile.network?.toLowerCase();
 
-    dispatch(
-      setAuthenticated({
-        isAuthenticated: true,
-        userInfo: autID
-      })
+    const network = networks.find(
+      (n) =>
+        n.network?.toLowerCase() === autID?.properties?.network?.toLowerCase()
     );
 
-    dispatch(
+    if (network && !network?.disabled) {
+      const connector = config.connectors[profile.provider];
+      activateBrowserWallet({ type: profile.provider });
+      await activateNetwork(network, connector, profile.provider);
+    }
+    await dispatch(
       communityUpdateState({
         communities: autID.properties.communities,
         selectedCommunityAddress:
           autID.properties.communities[0].properties.address
       })
     );
-    activateBrowserWallet({ type: profile.provider });
-    const shouldGoToDashboard = location.pathname === "/";
-    const goTo = shouldGoToDashboard ? "/aut-dashboard" : location.pathname;
-    const returnUrl = location.state?.from;
-    history.push(returnUrl || goTo);
+
+    await dispatch(
+      setAuthenticated({
+        isAuthenticated: true,
+        userInfo: autID
+      })
+    );
+
+    setDAutConnected(true);
+    setLoading(false);
   };
 
   const onDisconnected = () => {
     dispatch(resetAuthState());
-    history.push("/");
+    // history.push("/");
   };
 
   useEffect(() => {
@@ -71,18 +158,62 @@ function Web3DautConnect({ setLoading }) {
   }, []);
 
   return (
-    <d-aut
-      style={{
-        width: "220px",
-        height: "50px",
-        display: "none",
-        position: "absolute",
-        zIndex: 99999
-      }}
-      id="d-aut"
-      dao-expander="0x1d9258482896F8671d01Fa5b44d953693d801174"
-      button-type="simple"
-    />
+    <>
+      <d-aut
+        style={{
+          display: "none",
+          position: "absolute",
+          zIndex: 99999
+        }}
+        id="d-aut"
+        dao-expander="0x07Fe1FD4631c35d3B78eFbceF2F09c6f8d6292B8"
+        button-type="simple"
+      />
+      <DialogWrapper open={openForSelectNetwork}>
+        <>
+          <AppTitle
+            mb={{
+              xs: "16px",
+              lg: "24px",
+              xxl: "32px"
+            }}
+            variant="h2"
+          />
+          {loadingNetwork && (
+            <div style={{ position: "relative", flex: 1 }}>
+              <AutLoading />
+            </div>
+          )}
+          {!loadingNetwork && (
+            <>
+              <>
+                <Typography
+                  mb={{
+                    xs: "8px"
+                  }}
+                  color="white"
+                  variant="subtitle1"
+                >
+                  Change Network
+                </Typography>
+
+                <Typography color="white" variant="body">
+                  You will need to switch your wallet’s network.
+                </Typography>
+              </>
+              <DialogInnerContent>
+                <NetworkSelectors
+                  networks={networks}
+                  onSelect={async (network: NetworkConfig) => {
+                    activateNetwork(network, connector.connector);
+                  }}
+                />
+              </DialogInnerContent>
+            </>
+          )}
+        </>
+      </DialogWrapper>
+    </>
   );
 }
 

@@ -16,7 +16,7 @@ export default function SWSnackbar() {
   const dispatch = useDispatch();
 
   const { message, duration, severity, open } = useSelector(
-    (state: RootState) => state.ui.snackbar
+    (state: any) => state.ui.snackbar
   );
 
   const handleClose = () => {

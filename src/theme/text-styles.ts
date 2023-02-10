@@ -136,6 +136,11 @@ export default (theme: Theme) =>
     {
       ...theme.typography,
       fontSize: 16,
-      fontFamily: ["FractulRegular", " sans-serif"].join(",")
+      fontFamily: [
+        "FractulRegular",
+        "FractulAltLight",
+        "FractulAltBold",
+        " sans-serif"
+      ].join(",")
     } as TypographyOptions
   ) as unknown as Typography;

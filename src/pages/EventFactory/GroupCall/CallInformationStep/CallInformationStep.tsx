@@ -13,9 +13,7 @@ import {
   Typography
 } from "@mui/material";
 import { useAppDispatch } from "@store/store.model";
-import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { SwScrollbar } from "sw-web-shared";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { pxToRem } from "@utils/text-size";
@@ -36,6 +34,7 @@ import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
 import { AutSelectField, AutTextField } from "@components/Fields";
+import { useNavigation } from "react-router-dom";
 
 const StepWrapper = styled("form")({
   textAlign: "center",
@@ -46,7 +45,7 @@ const StepWrapper = styled("form")({
 
 const CallInformationStep = () => {
   const dispatch = useAppDispatch();
-  const history = useHistory();
+  const navigate = useNavigation();
   const roles = useSelector(allRoles);
   const status = useSelector(ActivityGroupCallStatus);
   const errorMessage = useSelector(ActivityGroupCallError);
@@ -83,7 +82,7 @@ const CallInformationStep = () => {
     await dispatch(activityUpdateGroupCallData(values));
     const result = await dispatch(addGroupCall(metadata));
     if (result.meta.requestStatus === "fulfilled") {
-      history.push("/aut-dashboard/event-factory/group-call/success");
+      // navigate.push("/aut-dashboard/event-factory/group-call/success");
     }
   };
 
@@ -144,7 +143,7 @@ const CallInformationStep = () => {
             >
               How long would you like the call to be?
             </Typography>
-            <SwScrollbar
+            {/* <SwScrollbar
               sx={{
                 height: pxToRem(400),
                 flex: 1
@@ -190,7 +189,7 @@ const CallInformationStep = () => {
                   );
                 })}
               </List>
-            </SwScrollbar>
+            </SwScrollbar> */}
           </Box>
           <Divider sx={{ borderColor: "#707070" }} orientation="vertical" />
           <Box

@@ -43,6 +43,27 @@ declare module "@mui/material/Button" {
   }
 }
 
+declare module "@mui/material/Link" {
+  interface LinkPropsColorOverrides {
+    offWhite?: true;
+    nightBlack?: true;
+  }
+}
+
+declare module "@mui/material/IconButton" {
+  interface IconButtonPropsColorOverrides {
+    offWhite?: true;
+    nightBlack?: true;
+  }
+}
+
+declare module "@mui/material/CircularProgress" {
+  interface CircularProgressPropsColorOverrides {
+    offWhite?: true;
+    nightBlack?: true;
+  }
+}
+
 declare module "@mui/material/Slider" {
   interface SliderPropsColorOverrides {
     offWhite?: true;
