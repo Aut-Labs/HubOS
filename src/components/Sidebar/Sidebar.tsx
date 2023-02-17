@@ -3,7 +3,10 @@ import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import {
   CssBaseline,
+  Divider,
   IconButton,
+  LinearProgress,
+  Stack,
   SvgIcon,
   Toolbar,
   Typography,
@@ -15,12 +18,16 @@ import MenuItems from "./MenuItems";
 import { memo, useMemo, useState } from "react";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
 import DashboardTitle from "@components/AppTitle";
-import { DautPlaceholder } from "@components/DautPlaceholder";
 import { ReactComponent as AutWhiteIcon } from "@assets/aut/aut-white.svg";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { useSelector } from "react-redux";
 import { AppTitle } from "@store/ui-reducer";
+import { SelectedNetworkConfig } from "@store/WalletProvider/WalletProvider";
+import { CommunityData } from "@store/Community/community.reducer";
+import { UserInfo } from "@auth/auth.reducer";
+import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
 
 const Main = styled("main", {
   shouldForwardProp: (prop) =>
@@ -33,7 +40,7 @@ const Main = styled("main", {
   flexGrow: 1,
   position: "relative",
   marginTop: `${toolbarHeight}px`,
-  padding: theme.spacing(3),
+  // padding: theme.spacing(3),
   [theme.breakpoints.up("md")]: {
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.sharp,
@@ -53,8 +60,8 @@ const Main = styled("main", {
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  justifyContent: "center",
-  padding: theme.spacing(0, 1),
+  justifyContent: "flex-start",
+  padding: theme.spacing(0, 2),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar
 }));
@@ -92,26 +99,41 @@ const AppBar = styled(MuiAppBar, {
 
 const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
   const theme = useTheme();
+  const community = useSelector(CommunityData);
+  const userInfo = useSelector(UserInfo);
+  const network = useSelector(SelectedNetworkConfig);
   const appTitle = useSelector(AppTitle);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isExtraLarge = useMediaQuery(theme.breakpoints.up("xxl"));
   const [open, setOpen] = useState(!isMobile);
+  const [warningAppBarOpen, setWarningAppBarOpen] = useState(
+    !sessionStorage.getItem("warning-toolbar-flag")
+  );
 
   const drawerWidth = useMemo(() => {
-    return isExtraLarge ? 350 : 280;
+    return isExtraLarge ? 350 : 300;
   }, [isExtraLarge]);
 
   const toolbarHeight = useMemo(() => {
     return isExtraLarge ? 92 : 72;
   }, [isExtraLarge]);
 
+  const warningToolbarHeight = useMemo(() => {
+    if (!warningAppBarOpen) return 0;
+    return toolbarHeight / 1.5;
+  }, [toolbarHeight, warningAppBarOpen]);
+
   const handleDrawerToggle = () => {
     setOpen(!open);
   };
 
+  const closeWarningBar = () => {
+    sessionStorage.setItem("warning-toolbar-flag", "false");
+    setWarningAppBarOpen(false);
+  };
+
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
-      <CssBaseline />
       <AppBar
         sx={{
           boxShadow: 2
@@ -144,9 +166,47 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             }}
           ></span>
 
-          <DautPlaceholder styles={{ top: "8px" }} hide={false} />
+          <DautPlaceholder />
         </Toolbar>
       </AppBar>
+
+      {warningAppBarOpen && (
+        <AppBar
+          sx={{
+            top: `${toolbarHeight}px`,
+            boxShadow: 2
+          }}
+          toolbarHeight={warningToolbarHeight}
+          drawerWidth={drawerWidth}
+          position="fixed"
+          open={open}
+        >
+          <Toolbar
+            sx={{
+              minHeight: `${warningToolbarHeight}px`,
+              backgroundColor: "warning.light",
+              border: 0
+            }}
+          >
+            <Typography variant="body" noWrap color="white">
+              Some warning message
+            </Typography>
+            <span
+              style={{
+                flex: 1
+              }}
+            ></span>
+
+            <IconButton
+              onClick={() => closeWarningBar()}
+              color="offWhite"
+              edge="start"
+            >
+              <CloseIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+      )}
 
       <Drawer
         variant={isMobile ? "temporary" : "persistent"}
@@ -162,8 +222,8 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             borderTop: 0,
             borderBottom: 0,
             borderLeft: 0,
-            borderRight: 0,
-            // borderColor: theme.palette.offWhite.main,
+            borderRight: "1px solid",
+            borderColor: theme.palette.divider,
             width: drawerWidth,
             boxSizing: "border-box"
           }
@@ -171,12 +231,79 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
       >
         <DrawerHeader
           sx={{
-            mb: 4,
             minHeight: `${toolbarHeight}px !important`
           }}
         >
           <DashboardTitle variant="subtitle1" />
         </DrawerHeader>
+        <Divider />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            px: 2,
+            gridGap: "8px",
+            my: 2
+          }}
+        >
+          <Stack direction="column">
+            <Typography
+              fontFamily="FractulAltBold"
+              color="primary"
+              variant="subtitle2"
+            >
+              {network?.name}
+            </Typography>
+            <Typography variant="caption" className="text-secondary">
+              Network
+            </Typography>
+          </Stack>
+          <Stack direction="column">
+            <Typography
+              fontFamily="FractulAltBold"
+              color="primary"
+              variant="subtitle2"
+            >
+              {community?.name}
+            </Typography>
+            <Typography variant="caption" className="text-secondary">
+              DAO
+            </Typography>
+          </Stack>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr"
+            }}
+          >
+            <Stack direction="column">
+              <Typography
+                fontFamily="FractulAltBold"
+                color="primary"
+                variant="subtitle2"
+                maxWidth="120px"
+              >
+                {userInfo?.name}
+              </Typography>
+              <Typography variant="caption" className="text-secondary">
+                Āut name
+              </Typography>
+            </Stack>
+            <Stack direction="column">
+              <Typography
+                fontFamily="FractulAltBold"
+                color="primary"
+                variant="subtitle2"
+              >
+                {community?.properties?.userData?.roleName}
+              </Typography>
+              <Typography variant="caption" className="text-secondary">
+                DAO Role
+              </Typography>
+            </Stack>
+          </Box>
+        </Box>
+        <Divider />
         <MenuItems addonMenuItems={addonMenuItems} />
         <Box
           sx={{
@@ -195,8 +322,17 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
           />
         </Box>
       </Drawer>
-      <Main toolbarHeight={toolbarHeight} drawerWidth={drawerWidth} open={open}>
+      <Main
+        toolbarHeight={toolbarHeight + warningToolbarHeight}
+        drawerWidth={drawerWidth}
+        open={open}
+      >
         <PerfectScrollbar
+          style={{
+            minHeight: "100%",
+            display: "flex",
+            flexDirection: "column"
+          }}
           options={{
             suppressScrollX: true,
             useBothWheelAxes: false,

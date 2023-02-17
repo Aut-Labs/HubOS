@@ -11,7 +11,7 @@ const defaultOptions = {
   }
 };
 
-const AutLoading = ({ width = 300, height = 300 }) => {
+const AutLoading = ({ width = "300px", height = "300px" }) => {
   return (
     <div
       style={{
@@ -29,7 +29,7 @@ const AutLoading = ({ width = 300, height = 300 }) => {
         autoplay
         rendererSettings={{ preserveAspectRatio: "xMidYMid slice" }}
         src={animationData}
-        style={{ height: "300px", width: "300px" }}
+        style={{ height, width }}
       />
     </div>
   );

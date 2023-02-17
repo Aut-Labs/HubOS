@@ -1,21 +1,4 @@
-// @import "react-perfect-scrollbar/dist/css/styles.css";
-// @font-face {
-//   font-family: "FractulAltBold";
-//   src: url("./assets/fonts/Fractul/FractulAltBold/font.woff2") format("woff2"),
-//     url("./assets/fonts/Fractul/FractulAltBold/font.woff") format("woff");
-// }
-
-// @font-face {
-//   font-family: "FractulAltLight";
-//   src: url("./assets/fonts/Fractul/FractulAltLight/font.woff2") format("woff2"),
-//     url("./assets/fonts/Fractul/FractulAltLight/font.woff") format("woff");
-// }
-
-// @font-face {
-//   font-family: "FractulRegular";
-//   src: url("./assets/fonts/Fractul/FractulRegular/font.woff2") format("woff2"),
-//     url("./assets/fonts/Fractul/FractulRegular/font.woff") format("woff");
-// }
+@import "react-perfect-scrollbar/dist/css/styles.css";
 
 .sw-background.loading {
   filter: blur(5px);

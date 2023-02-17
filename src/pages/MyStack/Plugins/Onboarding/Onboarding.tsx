@@ -3,11 +3,13 @@ import {
   Box,
   CircularProgress,
   Container,
+  FormControlLabel,
+  Switch,
   Typography,
   styled
 } from "@mui/material";
-import { memo, useMemo } from "react";
-import { PluginDefinitionCard } from "./Shared/PluginCard";
+import { memo, useMemo, useState } from "react";
+import PluginCard, { EmptyPluginCard } from "../../Shared/PluginCard";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 
 const GridBox = styled(Box)(({ theme }) => {
@@ -25,31 +27,25 @@ const GridBox = styled(Box)(({ theme }) => {
   };
 });
 
-const MyStack = () => {
+const Onboarding = () => {
+  const [hideInstalled, setToggleInstalled] = useState(false);
+
   const { plugins, isLoading, isFetching } =
     pluginRegistryApi.useGetAllPluginDefinitionsByDAOQuery(null, {
       selectFromResult: ({ data, isLoading, isFetching }) => ({
         isLoading,
         isFetching,
-        plugins: data || []
+        plugins: (data || []).filter(
+          (p) =>
+            p.metadata?.properties?.stack?.type?.toLowerCase() === "onboarding"
+        )
       })
     });
 
-  const myStacks = useMemo(() => {
-    return plugins.reduce(
-      (prev, curr) => {
-        const stackType = curr?.metadata?.properties?.stack?.type;
-        if (stackType && !prev[stackType]) {
-          prev[stackType] = true;
-          prev.types.push(curr);
-        }
-        return prev;
-      },
-      {
-        types: []
-      }
-    ).types;
-  }, [plugins]);
+  const filteredPlugins = useMemo(() => {
+    if (!hideInstalled) return plugins;
+    return plugins.filter((p) => !p.pluginAddress);
+  }, [hideInstalled, plugins]);
 
   return (
     <>
@@ -64,8 +60,27 @@ const MyStack = () => {
           }}
         >
           <Typography textAlign="center" color="white" variant="h3">
-            My Stack
+            Onboarding
           </Typography>
+          {!!plugins?.length && (
+            <Box
+              sx={{
+                display: "flex",
+                mt: 4,
+                alignItems: "center",
+                justifyContent: "flex-end"
+              }}
+            >
+              <FormControlLabel
+                sx={{
+                  color: "white"
+                }}
+                onChange={(_, checked) => setToggleInstalled(checked)}
+                control={<Switch checked={hideInstalled} color="primary" />}
+                label="Hide installed"
+              />
+            </Box>
+          )}
         </Box>
 
         {isLoading ? (
@@ -73,12 +88,14 @@ const MyStack = () => {
         ) : (
           <>
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>
-              {myStacks.map((plugin, index) => (
-                <PluginDefinitionCard
+              {filteredPlugins.map((plugin, index) => (
+                <PluginCard
+                  isFetching={isFetching}
                   key={`my-stack-plugin-${index}`}
                   plugin={plugin}
                 />
               ))}
+              <EmptyPluginCard />
             </GridBox>
           </>
         )}
@@ -87,4 +104,4 @@ const MyStack = () => {
   );
 };
 
-export default memo(MyStack);
+export default memo(Onboarding);

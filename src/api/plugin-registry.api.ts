@@ -1,10 +1,6 @@
 import AutSDK, { PluginDefinition } from "@aut-labs-private/sdk";
 import { fetchMetadata } from "./storage.api";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
-import {
-  QuestOnboardingPluginABI,
-  QuestOnboardingPluginByteCode
-} from "@aut-labs-private/abi-types";
 import { REHYDRATE } from "redux-persist";
 
 const fetch = async (body: any, api: BaseQueryApi) => {
@@ -32,17 +28,16 @@ const fetch = async (body: any, api: BaseQueryApi) => {
   };
 };
 
-const add = async (
-  body: PluginDefinition & { daoAddress: string },
-  api: BaseQueryApi
-) => {
+const add = async (body: PluginDefinition, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
+  const state = api.getState() as any;
+  const { selectedCommunityAddress } = state.community;
 
-  const { pluginDefinitionId, daoAddress } = body;
+  const { pluginDefinitionId } = body;
 
   const response = await sdk.pluginRegistry.addPluginToDAO(
     pluginDefinitionId,
-    daoAddress
+    selectedCommunityAddress
   );
 
   if (!response.isSuccess) {
@@ -50,17 +45,25 @@ const add = async (
       error: response.errorMessage
     };
   }
-  return response;
+  return {
+    data: {
+      ...body,
+      ...response.data
+    }
+  };
 };
+
+const KEEP_DATA_UNUSED = 5 * 60;
 
 export const pluginRegistryApi = createApi({
   reducerPath: "pluginRegistryApi",
   extractRehydrationInfo(action, { reducerPath }) {
-    if (action.type === REHYDRATE) {
+    if (action.payload && action.type === REHYDRATE) {
       return action.payload[reducerPath];
     }
   },
-  baseQuery: async (args, api, extraOptions) => {
+  keepUnusedDataFor: KEEP_DATA_UNUSED,
+  baseQuery: async (args, api) => {
     const { url, body } = args;
     if (url === "getAllPluginDefinitionsByDAO") {
       return fetch(body, api);
@@ -73,6 +76,7 @@ export const pluginRegistryApi = createApi({
       data: "Test"
     };
   },
+  tagTypes: ["Plugins"],
   endpoints: (builder) => ({
     getAllPluginDefinitionsByDAO: builder.query<PluginDefinition[], void>({
       query: (body) => {
@@ -80,18 +84,44 @@ export const pluginRegistryApi = createApi({
           body,
           url: "getAllPluginDefinitionsByDAO"
         };
-      }
+      },
+      providesTags: ["Plugins"]
     }),
     addPluginToDAO: builder.mutation<
       PluginDefinition,
-      Partial<PluginDefinition & { daoAddress: string }>
+      Partial<PluginDefinition>
     >({
       query: (body) => {
         return {
           body,
           url: "addPluginToDAO"
         };
+      },
+      async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(
+            pluginRegistryApi.util.updateQueryData(
+              "getAllPluginDefinitionsByDAO",
+              null,
+              (draft) => {
+                return draft.map((d) => {
+                  if (d.pluginDefinitionId === data.pluginDefinitionId) {
+                    return {
+                      ...d,
+                      ...data
+                    };
+                  }
+                  return d;
+                });
+              }
+            )
+          );
+        } catch (err) {
+          console.log(err);
+        }
       }
+      // invalidatesTags: ["Plugins"]
     })
   })
 });

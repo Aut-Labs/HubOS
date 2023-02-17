@@ -47,6 +47,9 @@ const generateColors = (color: PaletteColor, white: PaletteColor) => ({
     letterSpacing: "-0.008em",
     fontFamily: "FractulRegular"
   },
+  ".MuiInputBase-multiline": {
+    borderRadius: "8.5px"
+  },
   ".MuiInputBase-root:before, .MuiInputBase-root:not(.Mui-Focused) fieldset": {
     borderColor: color.dark
   },

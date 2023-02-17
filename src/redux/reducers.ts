@@ -10,9 +10,8 @@ import autDashboardReducer from "./AutDashboard/aut-dashboard.reducer";
 import upcomingReducer from "./Activity/upcoming.reducer";
 import walletProviderReduce from "./WalletProvider/WalletProvider";
 import { pluginRegistryApi } from "@api/plugin-registry.api";
-import { onboardingQuestApi } from "@api/onboarding-quest.api";
+import { onboardingApi } from "@api/onboarding.api";
 import { communityApi } from "@api/community.api";
-import { onboardingTasksApi } from "@api/onboarding-tasks.api";
 
 export const reducers = combineReducers({
   community: communityReducer,
@@ -25,10 +24,9 @@ export const reducers = combineReducers({
   poll: pollReducer,
   upcoming: upcomingReducer,
   walletProvider: walletProviderReduce,
-  [onboardingTasksApi.reducerPath]: onboardingTasksApi.reducer,
+  [onboardingApi.reducerPath]: onboardingApi.reducer,
   [communityApi.reducerPath]: communityApi.reducer,
-  [pluginRegistryApi.reducerPath]: pluginRegistryApi.reducer,
-  [onboardingQuestApi.reducerPath]: onboardingQuestApi.reducer
+  [pluginRegistryApi.reducerPath]: pluginRegistryApi.reducer
 });
 
 const rootReducer = (state, action) => {

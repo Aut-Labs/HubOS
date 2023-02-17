@@ -64,8 +64,7 @@ export function FormHelperText({
           position: "absolute",
           left: "0"
         }}
-        className="auto-helper-info"
-        color="white"
+        className="auto-helper-info text-secondary"
         align="right"
         component="span"
         variant="body2"

@@ -113,7 +113,10 @@ function App() {
                   {!isAutheticated && (
                     <>
                       <Route path="/" element={<GetStarted />} />
-                      <Route path="*" element={<Navigate to="/" replace />} />
+                      <Route
+                        path="*"
+                        element={<Navigate to="/" state={{ from: location }} />}
+                      />
                     </>
                   )}
                   {isAutheticated && (

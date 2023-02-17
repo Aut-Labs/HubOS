@@ -5,25 +5,18 @@ import {
   Card,
   CardContent,
   CardHeader,
-  IconButton,
-  SvgIcon,
+  Container,
   Typography,
   styled
 } from "@mui/material";
 import { CommunityData } from "@store/Community/community.reducer";
-import { pxToRem } from "@utils/text-size";
 import { useDispatch, useSelector } from "react-redux";
 import { setTitle } from "@store/ui-reducer";
 import { memo, useEffect } from "react";
 import { UserInfo } from "@auth/auth.reducer";
-import SwGrid from "@components/SwGrid";
 import CopyAddress from "@components/CopyAddress";
-import { ReactComponent as EditPencil } from "@assets/pencil-edit.svg";
-import CardMock from "@assets/card-mock.png";
 
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
-import { Link } from "react-router-dom";
-import { DautPlaceholder } from "@components/DautPlaceholder";
 
 const AutTable = styled("table")(({ theme }) => ({
   width: "100%",
@@ -235,125 +228,116 @@ const Dashboard = () => {
   ];
 
   return (
-    <>
-      <Box>
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center"
-          }}
-        >
-          <Card
-            sx={{
-              maxWidth: {
-                xs: "80%",
-                md: "600px",
-                xxl: "800px"
-              },
-              width: "100%",
-              margin: "0 auto",
-              display: "flex",
-              flexDirection: "column",
-              background: "transparent",
-              border: "none",
-              boxShadow: "none"
-            }}
-          >
-            <CardHeader
-              avatar={
-                <Avatar
-                  sx={{
-                    height: {
-                      xs: "120px",
-                      xxl: "300px"
-                    },
-                    width: "100%"
-                  }}
-                  variant="square"
-                  srcSet={ipfsCIDToHttpUrl(community?.image as string)}
-                />
-              }
+    <Container
+      maxWidth="sm"
+      sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}
+    >
+      <Card
+        sx={{
+          maxWidth: {
+            xs: "80%",
+            md: "600px",
+            xxl: "800px"
+          },
+          width: "100%",
+          margin: "0 auto",
+          display: "flex",
+          flexDirection: "column",
+          background: "transparent",
+          border: "none",
+          boxShadow: "none"
+        }}
+      >
+        <CardHeader
+          avatar={
+            <Avatar
               sx={{
-                alignItems: "flex-start",
-                ".MuiAvatar-root": {
-                  backgroundColor: "transparent"
-                }
+                height: {
+                  xs: "120px",
+                  xxl: "300px"
+                },
+                width: "100%"
               }}
-              title={
-                <>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gridGap: "4px"
-                    }}
-                  >
-                    <Typography variant="h3" color="white">
-                      {community.name}
-                    </Typography>
-                    {/* <IconButton
+              variant="square"
+              srcSet={ipfsCIDToHttpUrl(community?.image as string)}
+            />
+          }
+          sx={{
+            alignItems: "flex-start",
+            flexDirection: {
+              xs: "column",
+              md: "row"
+            },
+            ".MuiAvatar-root": {
+              backgroundColor: "transparent"
+            }
+          }}
+          title={
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gridGap: "4px"
+                }}
+              >
+                <Typography variant="h3" color="white">
+                  {community.name}
+                </Typography>
+                {/* <IconButton
                       component={Link}
                       to={`${match.url}/edit-community`}
                     >
                       <SvgIcon component={EditPencil} />
                     </IconButton> */}
-                  </Box>
-                  <CopyAddress
-                    address={community.properties.address}
-                    variant="subtitle2"
-                  />
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+              </Box>
+              <CopyAddress
+                address={community.properties.address}
+                variant="subtitle2"
+              />
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <Typography color="white" variant="body" sx={{ mb: "20px" }}>
+                  {community.properties.market}
+                </Typography>
+                <Typography color="white" variant="body">
+                  {community.description}
+                </Typography>
+              </Box>
+            </>
+          }
+        />
+        <CardContent
+          sx={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}
+        >
+          <AutTable aria-label="table" cellSpacing="0">
+            <tbody>
+              {communityStats.map(({ title, value, type }, index) => (
+                <tr key={`row-key-${index}`}>
+                  <td>
                     <Typography
+                      variant="subtitle2"
+                      fontWeight="normal"
+                      textAlign="start"
                       color="white"
-                      variant="body"
-                      sx={{ mb: "20px" }}
+                      sx={{ pb: "5px", pl: "30px" }}
                     >
-                      {community.properties.market}
+                      {title}
                     </Typography>
-                    <Typography color="white" variant="body">
-                      {community.description}
-                    </Typography>
-                  </Box>
-                </>
-              }
-            />
-            <CardContent
-              sx={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between"
-              }}
-            >
-              <AutTable aria-label="table" cellSpacing="0">
-                <tbody>
-                  {communityStats.map(({ title, value, type }, index) => (
-                    <tr key={`row-key-${index}`}>
-                      <td>
-                        <Typography
-                          variant="subtitle2"
-                          fontWeight="normal"
-                          textAlign="start"
-                          color="white"
-                          sx={{ pb: "5px", pl: "30px" }}
-                        >
-                          {title}
-                        </Typography>
-                      </td>
+                  </td>
 
-                      <td>{CommunityStatsValues(value, type)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </AutTable>
-            </CardContent>
-          </Card>
-        </div>
-      </Box>
-    </>
+                  <td>{CommunityStatsValues(value, type)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </AutTable>
+        </CardContent>
+      </Card>
+    </Container>
   );
 };
 

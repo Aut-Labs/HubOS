@@ -18,10 +18,10 @@ const LoadingDialog = ({ open, message = null, fullScreen = false }: any) => {
         {message && (
           <Typography
             sx={{
-              color: "white",
               textAlign: "center",
               mt: 2
             }}
+            className="text-secondary"
             component="div"
             variant="subtitle1"
           >
@@ -34,7 +34,7 @@ const LoadingDialog = ({ open, message = null, fullScreen = false }: any) => {
             position: "relative"
           }}
         >
-          <AutLoading />
+          <AutLoading width="200px" height="200px" />
         </div>
       </div>
     </DialogWrapper>

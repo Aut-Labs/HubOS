@@ -51,7 +51,8 @@ const AutTheme = createTheme({
         root: {
           borderStyle: "solid",
           borderWidth: "2px",
-          borderColor: AutPalette.primary.main
+          // borderRadius: "16px",
+          borderColor: AutPalette.divider
         }
       }
     }

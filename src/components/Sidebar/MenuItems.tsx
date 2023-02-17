@@ -37,9 +37,26 @@ const AutMenuItem = styled(ListItem)(({ theme }) => ({
   height: pxToRem(45),
   borderRadius: "4px",
   cursor: "pointer",
-  transition: theme.transitions.create(["background-color"]),
+  transition: theme.transitions.create(["background-color", "color"]),
+  color: "rgba(255, 255, 255, 0.7)",
+  fontFamily: "FractulAltBold",
+  ".MuiListItemIcon-root": {
+    transition: theme.transitions.create(["color"]),
+    color: "rgba(255, 255, 255, 0.7)",
+    svg: {
+      transition: theme.transitions.create(["fill"]),
+      fill: "rgba(255, 255, 255, 0.7)"
+    }
+  },
   "&.active-link, &:hover": {
-    backgroundColor: alpha(theme.palette.primary.main, 0.16)
+    backgroundColor: alpha(theme.palette.primary.main, 0.16),
+    color: "white",
+    ".MuiListItemIcon-root": {
+      color: "white",
+      svg: {
+        fill: "white"
+      }
+    }
   }
 }));
 
@@ -74,7 +91,7 @@ const autMenuItem = (menu: SidebarMenuItem, level = 0) => {
     >
       <ListItemIcon
         sx={{
-          color: "white",
+          color: "inherit",
           pr: 1,
           minWidth: "auto"
         }}
@@ -88,9 +105,7 @@ const autMenuItem = (menu: SidebarMenuItem, level = 0) => {
           inheritViewBox
         />
       </ListItemIcon>
-      <Typography sx={{ color: "white" }} variant="body1">
-        {menu.title}
-      </Typography>
+      <Typography variant="body">{menu.title}</Typography>
     </AutMenuItem>
   );
 };
@@ -114,7 +129,7 @@ const MenuItems = ({ addonMenuItems = [] }) => {
       sx={{
         width: "100%",
         flex: 1,
-        p: 1,
+        p: 2,
         display: "flex",
         gridGap: "6px",
         flexDirection: "column"

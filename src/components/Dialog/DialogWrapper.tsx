@@ -29,6 +29,8 @@ export const DialogWrapper = ({
       })}
       sx={{
         ".MuiPaper-root": {
+          borderColor: "divider",
+          borderRadius: "16px",
           ...(contentSx?.maxWidth && {
             maxWidth: contentSx.maxWidth
           })

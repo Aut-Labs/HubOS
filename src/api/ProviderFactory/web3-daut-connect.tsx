@@ -1,6 +1,17 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  memo,
+  useEffect,
+  useMemo,
+  useLayoutEffect,
+  useRef,
+  useState
+} from "react";
 import { useAppDispatch } from "@store/store.model";
-import { resetAuthState, setAuthenticated } from "@auth/auth.reducer";
+import {
+  IsAuthenticated,
+  resetAuthState,
+  setAuthenticated
+} from "@auth/auth.reducer";
 import { AutID } from "@api/aut.model";
 import { Init } from "@aut-labs/d-aut";
 import { communityUpdateState } from "@store/Community/community.reducer";
@@ -15,7 +26,7 @@ import { NetworkConfig } from "./network.config";
 import { Config, Connector, useConnector, useEthers } from "@usedapp/core";
 import AutLoading from "@components/AutLoading";
 import DialogWrapper from "@components/Dialog/DialogWrapper";
-import { Typography, styled } from "@mui/material";
+import { Typography, debounce, styled } from "@mui/material";
 import AppTitle from "@components/AppTitle";
 import { NetworkSelectors } from "./components/NetworkSelectors";
 
@@ -120,7 +131,7 @@ function Web3DautConnect({
       communityUpdateState({
         communities: autID.properties.communities,
         selectedCommunityAddress:
-          autID.properties.communities[0].properties.address
+          autID.properties.communities[6].properties.address
       })
     );
 
@@ -166,7 +177,7 @@ function Web3DautConnect({
           zIndex: 99999
         }}
         id="d-aut"
-        dao-expander="0x07Fe1FD4631c35d3B78eFbceF2F09c6f8d6292B8"
+        dao-expander="0x64F7Ec2901E2B707303A1F723e66F708EFbC99E8"
         button-type="simple"
       />
       <DialogWrapper open={openForSelectNetwork}>
@@ -217,4 +228,42 @@ function Web3DautConnect({
   );
 }
 
-export default Web3DautConnect;
+export const DautPlaceholder = memo(() => {
+  const ref = useRef<HTMLDivElement>();
+  useLayoutEffect(() => {
+    let dautEl: HTMLElement = document.querySelector("#d-aut");
+    dautEl.style.display = "none";
+    const updateDautPosition = () => {
+      if (!dautEl) {
+        dautEl = document.querySelector("#d-aut");
+      }
+      if (!dautEl || !ref.current) return;
+      const rect = ref.current.getBoundingClientRect();
+      dautEl.style.left = `${rect.left}px`;
+      dautEl.style.top = `${rect.top}px`;
+      dautEl.style.display = "inherit";
+    };
+    const debounceFn = debounce(updateDautPosition, 10);
+    window.addEventListener("resize", debounceFn);
+    debounceFn();
+    return () => {
+      window.removeEventListener("resize", debounceFn);
+      dautEl.style.display = "none";
+    };
+  }, [ref.current]);
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        width: "270px",
+        height: "55px",
+        position: "relative",
+        zIndex: -1
+      }}
+      className="web-component-placeholder"
+    />
+  );
+});
+
+export default memo(Web3DautConnect);
