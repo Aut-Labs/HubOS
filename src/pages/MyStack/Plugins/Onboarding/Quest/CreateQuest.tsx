@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { useCreateQuestMutation } from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
@@ -11,6 +12,7 @@ import {
   InputAdornment,
   MenuItem,
   Stack,
+  Tooltip,
   Typography,
   styled
 } from "@mui/material";
@@ -22,6 +24,7 @@ import { memo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
@@ -116,7 +119,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
     defaultValues: {
       title: "",
       description: "",
-      durationInDays: null,
+      durationInDays: 3,
       role: null
     }
   });
@@ -274,6 +277,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
                 return (
                   <AutTextField
                     name={name}
+                    disabled
                     value={value || ""}
                     type="number"
                     onChange={onChange}
@@ -295,6 +299,26 @@ const CreateQuest = ({ plugin }: PluginParams) => {
                       )
                     }}
                     placeholder="Duration"
+                    helperText={
+                      <FormHelperText
+                        errorTypes={errorTypes}
+                        value={value}
+                        name={name}
+                        errors={formState.errors}
+                      >
+                        <Tooltip title="During the closed beta, the duration of each onboarding quest will be Xdays and begin on the Xth, until then you can invite your community to allowlist for quests you have activated. During the onboarding period, every community will be listed on the Nova Leaderboard where the number of successful onboardings will correspond to their ranking. Happy Onboarding!">
+                          <HelpOutlineIcon
+                            // color="white"
+                            sx={{
+                              color: "white",
+                              width: {
+                                sm: "16px"
+                              }
+                            }}
+                          />
+                        </Tooltip>
+                      </FormHelperText>
+                    }
                   />
                 );
               }}

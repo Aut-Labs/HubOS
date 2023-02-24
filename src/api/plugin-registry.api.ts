@@ -2,6 +2,7 @@ import AutSDK, { PluginDefinition } from "@aut-labs-private/sdk";
 import { fetchMetadata } from "./storage.api";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
+import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 
 const fetch = async (body: any, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();

@@ -80,9 +80,9 @@ html {
   body,
   #root {
     margin: 0;
-    background: transparent;
     height: 100%;
     background: transparent;
+    overflow: hidden;
   }
 
   // body {
@@ -115,11 +115,6 @@ html {
   //     background-image: url("./assets/bubble.svg");
   //   }
   // }
-}
-
-body {
-  font-size: 0.875rem;
-  font-feature-settings: "salt";
 }
 
 .bg-card {

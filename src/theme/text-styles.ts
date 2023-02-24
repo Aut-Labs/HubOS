@@ -140,7 +140,7 @@ export default (theme: Theme) =>
         "FractulRegular",
         "FractulAltLight",
         "FractulAltBold",
-        " sans-serif"
+        "sans-serif"
       ].join(",")
     } as TypographyOptions
   ) as unknown as Typography;

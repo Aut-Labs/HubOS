@@ -22,6 +22,7 @@ import { useSelector } from "react-redux";
 import { AutSelectField } from "@theme/field-select-styles";
 import { AutTextField } from "@theme/field-text-styles";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { addDays } from "date-fns";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
@@ -46,6 +47,12 @@ export const QuestListItem = memo(({ row }: { row: Quest }) => {
   const roleName = useMemo(() => {
     return roles.find((r) => r.id === row.role)?.roleName;
   }, [roles]);
+
+  const endsIn = useMemo(() => {
+    const startDate = new Date(+row.start * 1000);
+    const endDate = addDays(startDate, row?.durationInDays);
+    return endDate?.toDateString();
+  }, [row?.durationInDays, row?.start]);
 
   return (
     <StyledTableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
@@ -95,7 +102,10 @@ export const QuestListItem = memo(({ row }: { row: Quest }) => {
         {row.tasksCount}
       </QuestStyledTableCell>
       <QuestStyledTableCell align="right">
-        {row.durationInDays || 0} days
+        <Stack direction="column">
+          {new Date(+row.start * 1000).toDateString()} - {endsIn}
+          <Typography>{row.durationInDays || 0} days</Typography>
+        </Stack>
       </QuestStyledTableCell>
       <QuestStyledTableCell align="right">
         <Chip

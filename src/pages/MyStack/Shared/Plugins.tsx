@@ -1,10 +1,15 @@
-import { pluginRegistryApi } from "@api/plugin-registry.api";
+import {
+  pluginRegistryApi,
+  useGetAllPluginDefinitionsByDAOQuery
+} from "@api/plugin-registry.api";
 import {
   Box,
   CircularProgress,
   Container,
   FormControlLabel,
+  IconButton,
   Switch,
+  Tooltip,
   Typography,
   styled
 } from "@mui/material";
@@ -13,6 +18,7 @@ import PluginCard, { EmptyPluginCard } from "./PluginCard";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import { BaseNFTModel } from "@aut-labs-private/sdk/dist/models/baseNFTModel";
 import { PluginDefinitionProperties } from "@aut-labs-private/sdk/dist/models/plugin";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -36,10 +42,12 @@ interface StackParams {
 const Plugins = ({ definition }: StackParams) => {
   const [hideInstalled, setToggleInstalled] = useState(false);
 
-  const { plugins, isLoading, isFetching } =
-    pluginRegistryApi.useGetAllPluginDefinitionsByDAOQuery(null, {
-      selectFromResult: ({ data, isLoading, isFetching }) => ({
+  const { plugins, isLoading, isFetching, refetch } =
+    useGetAllPluginDefinitionsByDAOQuery(null, {
+      // @ts-ignore
+      selectFromResult: ({ data, isLoading, isFetching, refetch }) => ({
         isLoading,
+        refetch,
         isFetching,
         plugins: (data || []).filter(
           (p) =>
@@ -68,6 +76,19 @@ const Plugins = ({ definition }: StackParams) => {
         >
           <Typography textAlign="center" color="white" variant="h3">
             {definition.properties.stack.title}
+            <Tooltip title="Refresh plugins">
+              <IconButton
+                size="medium"
+                color="offWhite"
+                sx={{
+                  ml: 1
+                }}
+                disabled={isLoading || isFetching}
+                onClick={refetch}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
           </Typography>
           {!!plugins?.length && (
             <Box

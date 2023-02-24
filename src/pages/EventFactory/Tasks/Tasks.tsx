@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { resetActivityTaskState } from "@store/Activity/task.reducer";
 import { Link } from "react-router-dom";
-import SwTabs from "@components/tabs/SwTabs";
+import SwTabs from "@components/AutTabs/AutTabs";
 import AddIcon from "@mui/icons-material/Add";
 import {
   TasksRefreshStatus,
@@ -159,13 +159,13 @@ const Tasks = () => {
             selectedTab={(selectedIndex: number) => {
               dispatch(tasksUpdateSelectedTab(selectedIndex));
             }}
-            tabPanelStyles={{
-              p: 0
-            }}
-            scrollbarStyles={{
-              border: "0px",
-              p: 0
-            }}
+            // tabPanelStyles={{
+            //   p: 0
+            // }}
+            // scrollbarStyles={{
+            //   border: "0px",
+            //   p: 0
+            // }}
           />
         </Box>
       </div>

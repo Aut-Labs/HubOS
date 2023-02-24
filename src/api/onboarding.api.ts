@@ -8,6 +8,8 @@ import { fetchMetadata } from "./storage.api";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import { dateToUnix } from "@utils/date-format";
+import { addDays, getUnixTime } from "date-fns";
 
 const fetchQuests = async (pluginAddress: any, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
@@ -52,7 +54,10 @@ const fetchTasks = async ({ pluginAddress, questId }, api: BaseQueryApi) => {
     sdk.questOnboarding = questOnboarding;
   }
 
-  const response = await questOnboarding.getAllTasksByQuest(questId);
+  const response = await questOnboarding.getAllTasksByQuest(
+    questId,
+    pluginAddress
+  );
   if (response?.isSuccess) {
     const tasksWithMetadata: Task[] = [];
     for (let i = 0; i < response.data.length; i++) {
@@ -93,8 +98,6 @@ const fetchTasksPerPluginType = async (
     sdk.questOnboarding = questOnboarding;
   }
 
-  debugger;
-
   const response = await questOnboarding.getTasksByType(
     pluginAddress,
     pluginDefinitionType
@@ -132,6 +135,10 @@ const createQuest = async (
     sdk.questOnboarding = questOnboarding;
   }
 
+  const startDate = addDays(new Date(), 5);
+  const date = getUnixTime(startDate) * 1000;
+
+  body.startDate = date;
   const response = await questOnboarding.createQuest(body);
 
   if (!response.isSuccess) {
@@ -165,10 +172,44 @@ const createTaskPerQuest = async (
     sdk.questOnboarding = questOnboarding;
   }
 
+  await questOnboarding.getOrInitialiseQuestPluginContract();
+  await questOnboarding.getOrInitialisePluginRegistryContract();
+
+  // try {
+  //   const taskContract = questOnboarding.getOrInitialiseTaskPluginContract(
+  //     body.pluginAddress,
+  //     body.pluginDefinitionId
+  //   );
+
+  //   const res = await taskContract.functions.createBy(
+  //     "0x81c843A6FEd08672FD392846e13ad9e5F85aC35a",
+  //     0,
+  //     "https://something",
+  //     getUnixTime(new Date()),
+  //     getUnixTime(new Date()) + 1000
+  //   );
+
+  //   const tx = await res.wait();
+
+  //   const eventsEmitted = tx.events
+  //     .filter((e) => !!e.event)
+  //     .map((e) => e.event);
+  //   // const successEventEmitted = tx.events.find(
+  //   //   (e) => e.event === QuestPluginContractEventType.TasksAddedToQuest
+  //   // );
+
+  //   debugger;
+  // } catch (error) {
+  //   console.error(error);
+  //   debugger;
+  // }
+
   const response = await questOnboarding.createTask(
     body.task,
+    body.questId,
+    body.pluginDefinitionId,
     body.pluginAddress,
-    body.pluginDefinitionId
+    body.questPluginAddress
   );
 
   if (!response.isSuccess) {

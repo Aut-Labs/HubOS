@@ -18,8 +18,6 @@ const AutDashboardMain = () => {
     }
   );
 
-  console.log("plugins: ", plugins);
-
   const myStack = useMemo(() => {
     const { allRoutes, menuItems } = pluginRoutes(plugins || []);
     return {

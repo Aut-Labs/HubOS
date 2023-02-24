@@ -1,14 +1,17 @@
-import { pluginRegistryApi } from "@api/plugin-registry.api";
+import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import {
   Box,
   CircularProgress,
   Container,
+  IconButton,
+  Tooltip,
   Typography,
   styled
 } from "@mui/material";
 import { memo, useMemo } from "react";
 import { PluginDefinitionCard } from "./Shared/PluginCard";
 import LoadingProgressBar from "@components/LoadingProgressBar";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -26,9 +29,11 @@ const GridBox = styled(Box)(({ theme }) => {
 });
 
 const MyStack = () => {
-  const { plugins, isLoading, isFetching } =
-    pluginRegistryApi.useGetAllPluginDefinitionsByDAOQuery(null, {
-      selectFromResult: ({ data, isLoading, isFetching }) => ({
+  const { plugins, isLoading, isFetching, refetch } =
+    useGetAllPluginDefinitionsByDAOQuery(null, {
+      // @ts-ignore
+      selectFromResult: ({ data, isLoading, isFetching, refetch }) => ({
+        refetch,
         isLoading,
         isFetching,
         plugins: data || []
@@ -64,9 +69,39 @@ const MyStack = () => {
           }}
         >
           <Typography textAlign="center" color="white" variant="h3">
-            My Stack
+            Modules
+            <Tooltip title="Refresh modules">
+              <IconButton
+                size="medium"
+                color="offWhite"
+                sx={{
+                  ml: 1
+                }}
+                disabled={isLoading || isFetching}
+                onClick={refetch}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
           </Typography>
         </Box>
+
+        {!isLoading && !myStacks?.length && (
+          <Box
+            sx={{
+              display: "flex",
+              gap: "20px",
+              mt: 12,
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <Typography color="rgb(107, 114, 128)" variant="subtitle2">
+              No modules were found...
+            </Typography>
+          </Box>
+        )}
 
         {isLoading ? (
           <CircularProgress className="spinner-center" size="60px" />

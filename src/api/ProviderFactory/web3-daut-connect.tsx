@@ -131,7 +131,7 @@ function Web3DautConnect({
       communityUpdateState({
         communities: autID.properties.communities,
         selectedCommunityAddress:
-          autID.properties.communities[6].properties.address
+          autID.properties.communities[0].properties.address
       })
     );
 
@@ -177,7 +177,7 @@ function Web3DautConnect({
           zIndex: 99999
         }}
         id="d-aut"
-        dao-expander="0x64F7Ec2901E2B707303A1F723e66F708EFbC99E8"
+        dao-expander="0xc0DaD1DA55370945AadFD909E641340E8F5a342d"
         button-type="simple"
       />
       <DialogWrapper open={openForSelectNetwork}>

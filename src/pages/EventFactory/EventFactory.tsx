@@ -2,7 +2,7 @@ import { getPolls } from "@api/activities.api";
 import { CommunityEventTypes } from "@api/api.model";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
-import SwTabs from "@components/tabs/SwTabs";
+import SwTabs from "@components/AutTabs/AutTabs";
 import { Box, Container } from "@mui/material";
 import {
   UpcomingSelectedTab,
@@ -138,7 +138,6 @@ const EventFactory = () => {
         className="sw-box"
       >
         <SwTabs
-          width={315}
           tabs={tabs}
           selectedTabIndex={selectedTabIndex}
           selectedTab={(selectedIndex: number) => {
@@ -148,14 +147,14 @@ const EventFactory = () => {
               })
             );
           }}
-          tabPanelStyles={{
-            p: 0,
-            border: "2px solid #439EDD"
-          }}
-          scrollbarStyles={{
-            border: "0px",
-            p: 0
-          }}
+          // tabPanelStyles={{
+          //   p: 0,
+          //   border: "2px solid #439EDD"
+          // }}
+          // scrollbarStyles={{
+          //   border: "0px",
+          //   p: 0
+          // }}
         />
       </Box>
     </Container>

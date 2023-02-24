@@ -50,6 +50,10 @@ const generateColors = (color: PaletteColor, white: PaletteColor) => ({
   ".MuiInputBase-multiline": {
     borderRadius: "8.5px"
   },
+
+  ".MuiInputBase-input.Mui-disabled": {
+    "-webkit-text-fill-color": white.dark
+  },
   ".MuiInputBase-root:before, .MuiInputBase-root:not(.Mui-Focused) fieldset": {
     borderColor: color.dark
   },

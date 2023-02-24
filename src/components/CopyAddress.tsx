@@ -4,7 +4,7 @@ import { trimAddress } from "@utils/helpers";
 import { Tooltip, Typography, IconButton } from "@mui/material";
 import { useState } from "react";
 
-export const CopyAddress = ({ address, variant }) => {
+export const CopyAddress = ({ address, variant = null }) => {
   const [copied, setCopied] = useState(false);
 
   function clickCopy(copied) {
