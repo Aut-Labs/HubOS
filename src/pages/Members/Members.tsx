@@ -226,7 +226,7 @@ function Members() {
         <CircularProgress className="spinner-center" size="60px" />
       ) : (
         <GridBox sx={{ flexGrow: 1, mt: 6 }}>
-          {[...data, ...data, ...data, ...data].map((member, index) => (
+          {data.map((member, index) => (
             <MemberCard
               key={`member-plugin-${index}`}
               member={member}

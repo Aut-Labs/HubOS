@@ -177,6 +177,7 @@ function Web3DautConnect({
           zIndex: 99999
         }}
         id="d-aut"
+        ipfs-gateway="http://gateway.ipfs.io/ipfs"
         dao-expander="0xc0DaD1DA55370945AadFD909E641340E8F5a342d"
         button-type="simple"
       />
