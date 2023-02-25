@@ -1,5 +1,8 @@
 /* eslint-disable max-len */
-import { useCreateQuestMutation } from "@api/onboarding.api";
+import {
+  useCreateQuestMutation,
+  useGetAllOnboardingQuestsQuery
+} from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
@@ -124,6 +127,12 @@ const CreateQuest = ({ plugin }: PluginParams) => {
     }
   });
 
+  const { quests } = useGetAllOnboardingQuestsQuery(plugin.pluginAddress, {
+    selectFromResult: ({ data }) => ({
+      quests: data || []
+    })
+  });
+
   const [
     createQuest,
     { error, isError, isSuccess, data: quest, isLoading, reset }
@@ -136,7 +145,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       role: values.role,
       durationInDays: values.durationInDays,
       metadata: {
-        name: values.title,
+        name: values.title || roles.find((r) => r.id === values.role)?.roleName,
         description: values.description,
         properties: {}
       }
@@ -187,7 +196,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
               }
             }}
           >
-            <Controller
+            {/* <Controller
               name="title"
               control={control}
               rules={{
@@ -222,7 +231,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
                   />
                 );
               }}
-            />
+            /> */}
             <Controller
               name="role"
               control={control}
@@ -258,11 +267,21 @@ const CreateQuest = ({ plugin }: PluginParams) => {
                       </FormHelperText>
                     }
                   >
-                    {roles.map((type) => (
-                      <MenuItem key={`role-${type.id}`} value={type.id}>
-                        {type.roleName}
-                      </MenuItem>
-                    ))}
+                    {roles.map((type) => {
+                      const questByRole = quests.some(
+                        (q) => q.role === type.id
+                      );
+                      return (
+                        <MenuItem
+                          disabled={!!questByRole}
+                          key={`role-${type.id}`}
+                          value={type.id}
+                        >
+                          {type.roleName}
+                          {!!questByRole && <> (Quest already created) </>}
+                        </MenuItem>
+                      );
+                    })}
                   </AutSelectField>
                 );
               }}

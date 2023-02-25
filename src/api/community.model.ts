@@ -39,6 +39,7 @@ export class CommunityProperties extends DAOProperties {
     role: string;
     roleName?: string;
     commitment: string;
+    isAdmin: boolean;
     commitmentDescription?: string;
     isActive?: boolean;
   };
@@ -71,6 +72,8 @@ export class CommunityProperties extends DAOProperties {
           +this.userData.commitment
         );
       }
+      // @TODO - Tao to fix
+      this.userData.isAdmin = (data as any).isAdmin?.data;
     }
   }
 }

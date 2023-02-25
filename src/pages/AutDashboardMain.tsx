@@ -2,14 +2,17 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import SidebarDrawer from "@components/Sidebar/Sidebar";
 import Dashboard from "./Dashboard/Dashboard";
 import Members from "./Members/Members";
-import YourStack from "./MyStack/MyStack";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import { Suspense, memo, useMemo } from "react";
 import { ReactComponent as StackIcon } from "@assets/aut/stack.svg";
 import AutLoading from "@components/AutLoading";
-import { pluginRoutes } from "./MyStack/Shared/routes";
+import { pluginRoutes } from "./Modules/Shared/routes";
+import Modules from "./Modules/Modules";
+import { useSelector } from "react-redux";
+import { IsAdmin } from "@store/Community/community.reducer";
 
 const AutDashboardMain = () => {
+  const isAdmin = useSelector(IsAdmin);
   const { data: plugins, isLoading } = useGetAllPluginDefinitionsByDAOQuery(
     null,
     {
@@ -18,32 +21,32 @@ const AutDashboardMain = () => {
     }
   );
 
-  const myStack = useMemo(() => {
-    const { allRoutes, menuItems } = pluginRoutes(plugins || []);
+  const modules = useMemo(() => {
+    const { allRoutes, menuItems } = pluginRoutes(plugins || [], isAdmin);
     return {
       menuItem: {
-        title: "My Stack",
-        route: "my-stack",
+        title: "Modules",
+        route: "modules",
         exact: true,
         icon: StackIcon,
         children: menuItems
       },
       routes: allRoutes
     };
-  }, [plugins]);
+  }, [plugins, isAdmin]);
 
   return (
     <>
       {isLoading ? (
         <AutLoading />
       ) : (
-        <SidebarDrawer addonMenuItems={[myStack.menuItem]}>
+        <SidebarDrawer addonMenuItems={[modules.menuItem]}>
           <Suspense fallback={<AutLoading />}>
             <Routes>
               <Route index element={<Dashboard />} />
               <Route path="members" element={<Members />} />
-              <Route path="my-stack" element={<YourStack />} />
-              {myStack.routes.map((r) => r)}
+              <Route path="modules" element={<Modules />} />
+              {modules.routes.map((r) => r)}
               <Route path="*" element={<Navigate to="/aut-dashboard" />} />
             </Routes>
           </Suspense>

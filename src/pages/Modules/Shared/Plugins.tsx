@@ -1,7 +1,4 @@
-import {
-  pluginRegistryApi,
-  useGetAllPluginDefinitionsByDAOQuery
-} from "@api/plugin-registry.api";
+import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import {
   Box,
   CircularProgress,
@@ -19,6 +16,8 @@ import LoadingProgressBar from "@components/LoadingProgressBar";
 import { BaseNFTModel } from "@aut-labs-private/sdk/dist/models/baseNFTModel";
 import { PluginDefinitionProperties } from "@aut-labs-private/sdk/dist/models/plugin";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { useSelector } from "react-redux";
+import { IsAdmin } from "@store/Community/community.reducer";
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -40,6 +39,7 @@ interface StackParams {
 }
 
 const Plugins = ({ definition }: StackParams) => {
+  const isAdmin = useSelector(IsAdmin);
   const [hideInstalled, setToggleInstalled] = useState(false);
 
   const { plugins, isLoading, isFetching, refetch } =
@@ -80,6 +80,7 @@ const Plugins = ({ definition }: StackParams) => {
               <IconButton
                 size="medium"
                 color="offWhite"
+                component="span"
                 sx={{
                   ml: 1
                 }}
@@ -119,7 +120,8 @@ const Plugins = ({ definition }: StackParams) => {
               {filteredPlugins.map((plugin, index) => (
                 <PluginCard
                   isFetching={isFetching}
-                  key={`my-stack-plugin-${index}`}
+                  isAdmin={isAdmin}
+                  key={`modules-plugin-${index}`}
                   plugin={plugin}
                 />
               ))}

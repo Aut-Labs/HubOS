@@ -18,7 +18,7 @@ const fetch = async (body: any, api: BaseQueryApi) => {
       const def = response.data[i];
       definitionsWithMetadata.push({
         ...def,
-        metadata: await fetchMetadata(def.metadataURI)
+        metadata: await fetchMetadata<typeof def.metadata>(def.metadataURI)
       });
     }
     response.data = definitionsWithMetadata;

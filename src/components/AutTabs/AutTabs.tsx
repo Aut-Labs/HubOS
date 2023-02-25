@@ -106,7 +106,7 @@ function AutTabs(props: AutTabsParams) {
                 bgcolor: "offWhite.main",
                 color: "nightBlack.main"
               },
-              "&:first-child": {
+              "&:first-of-type": {
                 borderTopLeftRadius: "16px"
               },
               "&:last-child": {

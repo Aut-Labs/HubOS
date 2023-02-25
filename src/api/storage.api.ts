@@ -1,5 +1,6 @@
 import axios from "axios";
 import { environment } from "./environment";
+import { addHours } from "date-fns";
 
 export const isValidUrl = (uri: string) => {
   let url = null as any;
@@ -53,15 +54,43 @@ export function httpUrlToIpfsCID(url: string) {
   return url;
 }
 
-const metadataCache = {};
+const addToCache = <T>(key: string, value: T) => {
+  const now = addHours(new Date(), 2);
+  const item = {
+    value: value,
+    expiry: now.getTime()
+  };
+  localStorage.setItem(key, JSON.stringify(item));
+};
 
-export const fetchMetadata = async (metadataURI: string) => {
+const getFromCache = <T>(key: string): T => {
+  const itemStr = localStorage.getItem(key);
+
+  if (!itemStr) {
+    return null;
+  }
+
+  const item = JSON.parse(itemStr);
+  const now = new Date();
+
+  if (now.getTime() > item.expiry) {
+    localStorage.removeItem(key);
+    return null;
+  }
+  return item.value;
+};
+
+export const fetchMetadata = async <T>(metadataURI: string) => {
   if (!metadataURI) return;
-  let metadata = metadataCache[metadataURI];
+  let metadata = getFromCache<T>(metadataURI);
   if (!metadata) {
     try {
-      metadata = (await axios.get(ipfsCIDToHttpUrl(metadataURI))).data;
-      metadataCache[metadataURI] = metadata;
+      metadata = (
+        await axios.get(ipfsCIDToHttpUrl(metadataURI), {
+          timeout: 10000
+        })
+      ).data;
+      addToCache<T>(metadataURI, metadata);
     } catch (error) {
       console.warn(error);
     }

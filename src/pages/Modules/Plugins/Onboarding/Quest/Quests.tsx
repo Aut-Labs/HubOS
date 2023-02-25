@@ -15,12 +15,13 @@ import {
   Stack,
   CircularProgress,
   IconButton,
-  Tooltip
+  Tooltip,
+  Badge
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { memo, useMemo, useState } from "react";
-
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import {
@@ -28,12 +29,16 @@ import {
   QuestListItem,
   QuestStyledTableCell
 } from "./QuestShared";
+import { useSelector } from "react-redux";
+import { IsAdmin } from "@store/Community/community.reducer";
 
 interface PluginParams {
   plugin: PluginDefinition;
 }
 
 const Quests = ({ plugin }: PluginParams) => {
+  const isAdmin = useSelector(IsAdmin);
+  console.log("isAdmin: ", isAdmin);
   const [search, setSearchState] = useState(null);
   const {
     data: quests,
@@ -72,6 +77,7 @@ const Quests = ({ plugin }: PluginParams) => {
           <Tooltip title="Refresh quests">
             <IconButton
               size="medium"
+              component="span"
               color="offWhite"
               sx={{
                 ml: 1
@@ -94,26 +100,43 @@ const Quests = ({ plugin }: PluginParams) => {
           >
             <QuestFilters searchCallback={setSearchState} />
             <Stack direction="row" gap={2}>
-              <Button
-                startIcon={<AddIcon />}
-                variant="outlined"
-                size="medium"
-                color="primary"
-                to={`create`}
-                component={Link}
-              >
-                Create quest
-              </Button>
-              <Button
-                startIcon={<AddIcon />}
-                variant="outlined"
-                size="medium"
-                color="primary"
-                to={`create`}
-                component={Link}
-              >
-                Activate onboarding
-              </Button>
+              {isAdmin && (
+                <>
+                  <Box>
+                    <Badge
+                      invisible={quests?.length < 3}
+                      badgeContent={
+                        <Tooltip title="During beta there is a maximum of 3 quests, one for each role.">
+                          <ErrorOutlineIcon color="error" />
+                        </Tooltip>
+                      }
+                    >
+                      <Button
+                        startIcon={<AddIcon />}
+                        disabled={quests?.length >= 3}
+                        variant="outlined"
+                        size="medium"
+                        color="primary"
+                        to={`create`}
+                        component={Link}
+                      >
+                        Create quest
+                      </Button>
+                    </Badge>
+                  </Box>
+
+                  <Button
+                    startIcon={<AddIcon />}
+                    variant="outlined"
+                    size="medium"
+                    color="primary"
+                    to={`create`}
+                    component={Link}
+                  >
+                    Activate onboarding
+                  </Button>
+                </>
+              )}
             </Stack>
           </Box>
         )}
@@ -190,23 +213,32 @@ const Quests = ({ plugin }: PluginParams) => {
                     <QuestStyledTableCell align="right">
                       Role
                     </QuestStyledTableCell>
-                    <QuestStyledTableCell align="right">
-                      Submissions
-                    </QuestStyledTableCell>
+                    {isAdmin && (
+                      <QuestStyledTableCell align="right">
+                        Submissions
+                      </QuestStyledTableCell>
+                    )}
                     <QuestStyledTableCell align="right">
                       Duration
                     </QuestStyledTableCell>
                     <QuestStyledTableCell align="right">
                       Status
                     </QuestStyledTableCell>
-                    <QuestStyledTableCell align="right">
-                      Action
-                    </QuestStyledTableCell>
+                    {isAdmin && (
+                      <QuestStyledTableCell align="right">
+                        Action
+                      </QuestStyledTableCell>
+                    )}
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {filteredQuests?.map((row, index) => (
-                    <QuestListItem key={`table-row-${index}`} row={row} />
+                    <QuestListItem
+                      isAdmin={isAdmin}
+                      pluginAddress={plugin?.pluginAddress}
+                      key={`table-row-${index}`}
+                      row={row}
+                    />
                   ))}
                 </TableBody>
               </Table>

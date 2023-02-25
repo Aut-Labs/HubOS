@@ -331,7 +331,7 @@ const getMembers = async (body, api: BaseQueryApi) => {
       const memberAddress = membersResponse.data[i];
       const autIdResponse = await sdk.autID.findAutID(memberAddress);
       const { tokenId, metadataUri } = autIdResponse.data;
-      const metadata = await fetchMetadata(metadataUri);
+      const metadata = await fetchMetadata<DAOMember>(metadataUri);
       const comDataResponse = await sdk.autID.contract.getCommunityMemberData(
         memberAddress,
         selectedCommunityAddress

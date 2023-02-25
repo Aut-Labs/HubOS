@@ -285,7 +285,6 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                     variant="standard"
                     color="offWhite"
                     required
-                    autoFocus
                     name={name}
                     value={value || ""}
                     onChange={onChange}

@@ -30,7 +30,7 @@ const fetchQuests = async (pluginAddress: any, api: BaseQueryApi) => {
       const def = response.data[i];
       questsWithMetadata.push({
         ...def,
-        metadata: await fetchMetadata(def.metadataUri)
+        metadata: await fetchMetadata<typeof def.metadata>(def.metadataUri)
       });
     }
     return {

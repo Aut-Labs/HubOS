@@ -28,7 +28,7 @@ const GridBox = styled(Box)(({ theme }) => {
   };
 });
 
-const MyStack = () => {
+const Modules = () => {
   const { plugins, isLoading, isFetching, refetch } =
     useGetAllPluginDefinitionsByDAOQuery(null, {
       // @ts-ignore
@@ -40,11 +40,11 @@ const MyStack = () => {
       })
     });
 
-  const myStacks = useMemo(() => {
+  const myModules = useMemo(() => {
     return plugins.reduce(
       (prev, curr) => {
         const stackType = curr?.metadata?.properties?.stack?.type;
-        if (stackType && !prev[stackType]) {
+        if (stackType && !prev[stackType] && stackType === "Onboarding") {
           prev[stackType] = true;
           prev.types.push(curr);
         }
@@ -73,6 +73,7 @@ const MyStack = () => {
             <Tooltip title="Refresh modules">
               <IconButton
                 size="medium"
+                component="span"
                 color="offWhite"
                 sx={{
                   ml: 1
@@ -86,7 +87,7 @@ const MyStack = () => {
           </Typography>
         </Box>
 
-        {!isLoading && !myStacks?.length && (
+        {!isLoading && !myModules?.length && (
           <Box
             sx={{
               display: "flex",
@@ -108,9 +109,9 @@ const MyStack = () => {
         ) : (
           <>
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>
-              {myStacks.map((plugin, index) => (
+              {myModules.map((plugin, index) => (
                 <PluginDefinitionCard
-                  key={`my-stack-plugin-${index}`}
+                  key={`modules-plugin-${index}`}
                   plugin={plugin}
                 />
               ))}
@@ -122,4 +123,4 @@ const MyStack = () => {
   );
 };
 
-export default memo(MyStack);
+export default memo(Modules);

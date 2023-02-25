@@ -1,6 +1,8 @@
 import { useAddPluginToDAOMutation } from "@api/plugin-registry.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import {
+  Badge,
+  Box,
   Button,
   Card,
   CardActionArea,
@@ -24,6 +26,7 @@ import { SelectedNetworkConfig } from "@store/WalletProvider/WalletProvider";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import LinkWithQuery from "@components/LinkWithQuery";
+import InfoIcon from "@mui/icons-material/Info";
 
 const GridCard = styled(Card)(({ theme }) => {
   return {
@@ -38,12 +41,13 @@ const GridCard = styled(Card)(({ theme }) => {
 
 const PluginCard = ({
   plugin,
-  isFetching
+  isFetching,
+  isAdmin
 }: {
+  isAdmin: boolean;
   plugin: PluginDefinition;
   isFetching: boolean;
 }) => {
-  const location = useLocation();
   const selectedNetworkConfig = useSelector(SelectedNetworkConfig);
   const [addPlugin, { error, isLoading, isError, reset }] =
     useAddPluginToDAOMutation();
@@ -135,37 +139,55 @@ const PluginCard = ({
             )}
           </Stack>
 
-          <LoadingButton
-            loading={isLoading}
-            disabled={isFetching || !path}
-            variant="outlined"
-            loadingIndicator={
-              <Stack direction="row" gap={1} alignItems="center">
-                <Typography className="text-secondary">
-                  Activating...
-                </Typography>
-                <CircularProgress
-                  size="20px"
-                  color={plugin.pluginAddress ? "offWhite" : "primary"}
-                />
-              </Stack>
-            }
+          <Badge
             sx={{
               width: "100%",
               my: 6
             }}
-            {...(!!plugin.pluginAddress && {
-              to: path,
-              preserveParams: true,
-              component: LinkWithQuery
-            })}
-            {...(!plugin.pluginAddress && {
-              onClick: () => addPlugin(plugin)
-            })}
-            color={plugin.pluginAddress ? "offWhite" : "primary"}
+            invisible={plugin.pluginAddress && !isAdmin}
+            badgeContent={
+              <Tooltip title="Only admins can install plugins">
+                <InfoIcon
+                  sx={{
+                    color: "white"
+                  }}
+                />
+              </Tooltip>
+            }
           >
-            {plugin.pluginAddress ? "Go to plugin" : "Install"}
-          </LoadingButton>
+            <LoadingButton
+              loading={isLoading}
+              sx={{
+                width: "100%"
+              }}
+              disabled={
+                isFetching || !path || (!plugin.pluginAddress && !isAdmin)
+              }
+              variant="outlined"
+              loadingIndicator={
+                <Stack direction="row" gap={1} alignItems="center">
+                  <Typography className="text-secondary">
+                    Activating...
+                  </Typography>
+                  <CircularProgress
+                    size="20px"
+                    color={plugin.pluginAddress ? "offWhite" : "primary"}
+                  />
+                </Stack>
+              }
+              {...(!!plugin.pluginAddress && {
+                to: path,
+                preserveParams: true,
+                component: LinkWithQuery
+              })}
+              {...(!plugin.pluginAddress && {
+                onClick: () => addPlugin(plugin)
+              })}
+              color={plugin.pluginAddress ? "offWhite" : "primary"}
+            >
+              {plugin.pluginAddress ? "Go to plugin" : "Install"}
+            </LoadingButton>
+          </Badge>
 
           <Stack direction="row" justifyContent="flex-end">
             <Typography
@@ -293,7 +315,7 @@ export const PluginDefinitionCard = ({
           to={plugin?.metadata?.properties?.stack?.type}
           component={Link}
         >
-          View stack
+          View module
         </Button>
 
         <Stack direction="row" justifyContent="flex-end">
