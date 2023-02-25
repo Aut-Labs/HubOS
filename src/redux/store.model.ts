@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
 import { ThunkDispatch, AnyAction } from "@reduxjs/toolkit";
-import store from "./store";
+import { reducers } from "./reducers";
 
-export type RootState = ReturnType<typeof store.getState>;
+export type RootState = ReturnType<typeof reducers>;
 export type AppDispatch = ThunkDispatch<RootState, any, AnyAction>;
 export const useAppDispatch = () => useDispatch<AppDispatch>();

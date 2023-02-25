@@ -14,10 +14,8 @@ import { ReactComponent as SwAuthIcon } from "@assets/sw-auth.svg";
 import { ReactComponent as DiscordBotIcon } from "@assets/discord-bot.svg";
 import { ReactComponent as ContractIcon } from "@assets/contract.svg";
 import { pxToRem } from "@utils/text-size";
-import { RootState } from "@store/reducers";
 import { useAppDispatch } from "@store/store.model";
 import { setTitle } from "@store/ui-reducer";
-import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const IntegrationCards = [

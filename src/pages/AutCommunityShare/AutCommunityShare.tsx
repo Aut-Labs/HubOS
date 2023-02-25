@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { memo, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { RootState, useAppDispatch } from "@store/store.model";
+import { useAppDispatch } from "@store/store.model";
 import { CommunityData } from "@store/Community/community.reducer";
 import AutShare from "@components/Share";
 import { getPAUrl } from "@api/community.api";

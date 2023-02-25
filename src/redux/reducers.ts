@@ -28,14 +28,3 @@ export const reducers = combineReducers({
   [communityApi.reducerPath]: communityApi.reducer,
   [pluginRegistryApi.reducerPath]: pluginRegistryApi.reducer
 });
-
-const rootReducer = (state, action) => {
-  if (action.type === "RESET_APP") {
-    state = undefined;
-  }
-  return reducers(state, action);
-};
-
-export type RootState = ReturnType<typeof rootReducer>;
-
-export default rootReducer;

@@ -48,9 +48,7 @@ function ClipboardToCopy({ url, mode, sx = {}, trim = (v) => v }) {
           setIsCopied(false);
         }, 2500);
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch(console.error);
   };
 
   return (

@@ -22,7 +22,7 @@ import { ReactComponent as SaveIcon } from "@assets/actions/confirm.svg";
 import { ReactComponent as CancelIcon } from "@assets/actions/cancel.svg";
 import { ReactComponent as EditIcon } from "@assets/actions/edit.svg";
 import { useSelector } from "react-redux";
-import { RootState, useAppDispatch } from "@store/store.model";
+import { useAppDispatch } from "@store/store.model";
 import { ResultState } from "@store/result-status";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { pxToRem } from "@utils/text-size";

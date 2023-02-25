@@ -153,9 +153,9 @@ export const allRoles = createSelector(CommunityData, (c) => {
   return c.properties?.rolesSets[0]?.roles || [];
 });
 
-export const IsAdmin = createSelector([CommunityData], (a) => {
-  console.log(a, "a");
-  return a?.properties?.userData?.isAdmin;
-});
+export const IsAdmin = createSelector(
+  [CommunityData],
+  (a) => a?.properties?.userData?.isAdmin
+);
 
 export default communitySlice.reducer;

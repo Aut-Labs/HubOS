@@ -3,17 +3,18 @@ import logger from "redux-logger";
 import { reducers } from "./reducers";
 import { pluginRegistryApi } from "@api/plugin-registry.api";
 import { onboardingApi } from "@api/onboarding.api";
-import storage from "redux-persist/lib/storage";
-import {
-  FLUSH,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-  REHYDRATE,
-  persistReducer
-} from "redux-persist";
 import { communityApi } from "@api/community.api";
+// import storage from "redux-persist/lib/storage";
+// import {
+//   FLUSH,
+//   PAUSE,
+//   PERSIST,
+//   PURGE,
+//   REGISTER,
+//   REHYDRATE,
+//   persistReducer
+// } from "redux-persist";
+
 // import autoMergeLevel1 from "redux-persist/es/stateReconciler/autoMergeLevel1";
 // const persistConfig = {
 //   key: "aut-dashboard",

@@ -90,7 +90,7 @@ function Web3DautConnect({
       await activate(conn);
       await switchNetwork(+network.chainId);
     } catch (error) {
-      console.log(error, "error");
+      console.error(error, "error");
     }
     const signer = conn?.provider?.getSigner();
     const itemsToUpdate = {

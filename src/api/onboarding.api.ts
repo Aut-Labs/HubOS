@@ -300,7 +300,7 @@ export const onboardingApi = createApi({
             )
           );
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
       }
     }),

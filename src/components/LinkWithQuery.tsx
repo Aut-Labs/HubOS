@@ -23,8 +23,6 @@ const CustomLink = ({
   ...props
 }: LinkWithQueryParams) => {
   const [searchParams] = useSearchParams(queryParams);
-
-  console.log("searchParams: ", searchParams.toString());
   return (
     <Link
       ref={innerRef}

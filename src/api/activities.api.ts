@@ -78,7 +78,6 @@ const contractAddress = async (
     }
     // await contract.addActivitiesAddress(actAddr, type);
   }
-  console.log(actAddr);
   return Promise.resolve(actAddr);
 };
 
@@ -329,7 +328,6 @@ export const addGroupCall = callThunkProvider(
 
     // const uri = await storeAsBlob(metadata);
 
-    // console.log("Metadata uri -> ", ipfsCIDToHttpUrl(uri));
     // const result = await contract.create(
     //   selectedRole.id,
     //   metadata.startTime,
@@ -410,7 +408,6 @@ export const addPoll = pollsThunkProvider(
     //   emojis
     // };
     // const uri = await storeAsBlob(metadata);
-    // console.log("Poll Metadata ->", ipfsCIDToHttpUrl(uri));
     let daysToAdd = 0;
     switch (duration) {
       case "1d":
@@ -429,8 +426,6 @@ export const addPoll = pollsThunkProvider(
     const date = new Date();
     const endTime = date.setDate(date.getDate() + daysToAdd);
     const endTimeBlock = Math.floor(endTime / 1000);
-    // console.log(roleId, endTimeBlock, uri);
-    console.log("ce", await contract.communityExtension());
     // const result = await contract.create(roleId, endTimeBlock, uri);
 
     // publishPoll({

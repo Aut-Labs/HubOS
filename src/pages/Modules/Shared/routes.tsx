@@ -6,15 +6,16 @@ import ExtensionIcon from "@mui/icons-material/Extension";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { ReactComponent as SubStackIcon } from "@assets/aut/sub-stack.svg";
 
+const Plugins = lazy(() => import("./Plugins"));
+
+/* Quest */
 const Quests = lazy(() => import("../Plugins/Onboarding/Quest/Quests"));
 const CreateQuest = lazy(
   () => import("../Plugins/Onboarding/Quest/CreateQuest")
 );
 const Quest = lazy(() => import("../Plugins/Onboarding/Quest/Quest"));
-const Plugins = lazy(() => import("./Plugins"));
 
 /* Task Types */
-
 const OpenTasks = lazy(() => import(`../Plugins/Task/Open/OpenTasks`));
 const OpenTask = lazy(() => import("../Plugins/Task/Open/OpenTask"));
 const CreateOpenTask = lazy(
@@ -56,7 +57,7 @@ export const pluginRoutes = (
 } => {
   return plugins.reduce(
     (prev, plugin) => {
-      if (!plugin.pluginAddress && !plugin?.metadata?.properties) return prev;
+      if (!plugin.pluginAddress || !plugin?.metadata?.properties) return prev;
       const stackType = plugin.metadata.properties.stack.type;
       const stack = `modules/${stackType}`;
 

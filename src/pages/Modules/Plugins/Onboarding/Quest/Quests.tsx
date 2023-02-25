@@ -38,7 +38,6 @@ interface PluginParams {
 
 const Quests = ({ plugin }: PluginParams) => {
   const isAdmin = useSelector(IsAdmin);
-  console.log("isAdmin: ", isAdmin);
   const [search, setSearchState] = useState(null);
   const {
     data: quests,

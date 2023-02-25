@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
-import { RootState } from "@store/store.model";
 import { closeSnackbar } from "@store/ui-reducer";
 import React from "react";
 

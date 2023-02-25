@@ -68,7 +68,7 @@ export const Web3ThunkProviderFactory = <
           // @ts-ignore
           return await thunk(contractProvider, arg, thunkAPI);
         } catch (error) {
-          console.log(error);
+          console.error(error);
           const message = ParseSWErrorMessage(error);
           if (stateActions.updateErrorStateAction) {
             stateActions.updateErrorStateAction(message, thunkAPI.dispatch);

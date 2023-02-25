@@ -198,7 +198,6 @@ interface TasksParams {
 }
 
 const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
-  console.log("isAdmin: ", isAdmin);
   return (
     <Box>
       {isLoading ? (

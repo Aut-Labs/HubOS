@@ -9,7 +9,7 @@ import {
   CommunityStatus,
   communityUpdateState
 } from "@store/Community/community.reducer";
-import { RootState, useAppDispatch } from "@store/store.model";
+import { useAppDispatch } from "@store/store.model";
 import { updateCommunity } from "@api/community.api";
 import { ResultState } from "@store/result-status";
 import { useForm, useFieldArray, Controller } from "react-hook-form";

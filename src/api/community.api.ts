@@ -156,11 +156,9 @@ export const updateCommunity = communityExtensionThunkProvider(
     if (community.image && !isValidUrl(community.image as string)) {
       const file = base64toFile(community.image as string, "image");
       // community.image = await storeImageAsBlob(file as File);
-      console.log("New image: ->", ipfsCIDToHttpUrl(community.image));
     }
 
     // const uri = await storeAsBlob(Community.updateCommunity(community));
-    // console.log("New metadata: ->", ipfsCIDToHttpUrl(uri));
     // await contract.setMetadataUri(uri);
     return community;
   }
@@ -362,7 +360,6 @@ const getMembers = async (body, api: BaseQueryApi) => {
       });
       members.push(member);
     } catch (error) {
-      console.log(error);
       // handle error
     }
   }
