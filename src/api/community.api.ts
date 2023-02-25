@@ -2,11 +2,12 @@ import axios from "axios";
 import { CommitmentMessages } from "@utils/misc";
 import { Community, findRoleName } from "./community.model";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
-import { fetchMetadata, ipfsCIDToHttpUrl, isValidUrl } from "./storage.api";
+import { ipfsCIDToHttpUrl, isValidUrl } from "./storage.api";
 import { AutID, DAOMember } from "./aut.model";
-import AutSDK, { DAOExpander } from "@aut-labs-private/sdk";
+import AutSDK, { DAOExpander, fetchMetadata } from "@aut-labs-private/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { base64toFile } from "@utils/to-base-64";
+import { environment } from "./environment";
 
 const communityExtensionThunkProvider = Web3ThunkProviderFactory(
   "CommunityExtension",
@@ -331,7 +332,10 @@ const getMembers = async (body, api: BaseQueryApi) => {
       const memberAddress = membersResponse.data[i];
       const autIdResponse = await sdk.autID.findAutID(memberAddress);
       const { tokenId, metadataUri } = autIdResponse.data;
-      const metadata = await fetchMetadata<DAOMember>(metadataUri);
+      const metadata = await fetchMetadata<DAOMember>(
+        metadataUri,
+        environment.nftStorageUrl
+      );
       const comDataResponse = await sdk.autID.contract.getCommunityMemberData(
         memberAddress,
         selectedCommunityAddress

@@ -1,8 +1,7 @@
-import AutSDK, { PluginDefinition } from "@aut-labs-private/sdk";
-import { fetchMetadata } from "./storage.api";
+import AutSDK, { PluginDefinition, fetchMetadata } from "@aut-labs-private/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import { environment } from "./environment";
 
 const fetch = async (body: any, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
@@ -18,7 +17,10 @@ const fetch = async (body: any, api: BaseQueryApi) => {
       const def = response.data[i];
       definitionsWithMetadata.push({
         ...def,
-        metadata: await fetchMetadata<typeof def.metadata>(def.metadataURI)
+        metadata: await fetchMetadata<typeof def.metadata>(
+          def.metadataURI,
+          environment.nftStorageUrl
+        )
       });
     }
     response.data = definitionsWithMetadata;

@@ -1,15 +1,14 @@
 import AutSDK, {
   Quest,
   QuestOnboarding,
-  SDKContractGenericResponse,
-  Task
+  Task,
+  fetchMetadata
 } from "@aut-labs-private/sdk";
-import { fetchMetadata } from "./storage.api";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
-import { dateToUnix } from "@utils/date-format";
 import { addDays, getUnixTime } from "date-fns";
+import { environment } from "./environment";
 
 const fetchQuests = async (pluginAddress: any, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
@@ -30,7 +29,10 @@ const fetchQuests = async (pluginAddress: any, api: BaseQueryApi) => {
       const def = response.data[i];
       questsWithMetadata.push({
         ...def,
-        metadata: await fetchMetadata<typeof def.metadata>(def.metadataUri)
+        metadata: await fetchMetadata<typeof def.metadata>(
+          def.metadataUri,
+          environment.nftStorageUrl
+        )
       });
     }
     return {
@@ -64,7 +66,10 @@ const fetchTasks = async ({ pluginAddress, questId }, api: BaseQueryApi) => {
       const def = response.data[i];
       tasksWithMetadata.push({
         ...def,
-        metadata: await fetchMetadata(def.submitionUrl)
+        metadata: await fetchMetadata(
+          def.submitionUrl,
+          environment.nftStorageUrl
+        )
       });
     }
     return {
@@ -108,7 +113,10 @@ const fetchTasksPerPluginType = async (
       const def = response.data[i];
       tasksWithMetadata.push({
         ...def,
-        metadata: await fetchMetadata(def.metadataUri)
+        metadata: await fetchMetadata(
+          def.metadataUri,
+          environment.nftStorageUrl
+        )
       });
     }
     return {
