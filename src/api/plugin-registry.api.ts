@@ -2,6 +2,7 @@ import AutSDK, { PluginDefinition, fetchMetadata } from "@aut-labs-private/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
+import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 
 const fetch = async (body: any, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
@@ -36,11 +37,20 @@ const add = async (body: PluginDefinition, api: BaseQueryApi) => {
   const state = api.getState() as any;
   const { selectedCommunityAddress } = state.community;
 
+  // temporary
+  const { data } =
+    state.pluginRegistryApi.queries["getAllPluginDefinitionsByDAO(null)"];
+  const questPlugin: PluginDefinition = data.find(
+    (d: PluginDefinition) =>
+      d.pluginDefinitionId === PluginDefinitionType.QuestOnboardingPlugin
+  );
+
   const { pluginDefinitionId } = body;
 
   const response = await sdk.pluginRegistry.addPluginToDAO(
     pluginDefinitionId,
-    selectedCommunityAddress
+    selectedCommunityAddress,
+    questPlugin.pluginAddress
   );
 
   if (!response.isSuccess) {

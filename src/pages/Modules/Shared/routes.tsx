@@ -57,7 +57,7 @@ export const pluginRoutes = (
 } => {
   return plugins.reduce(
     (prev, plugin) => {
-      if (!plugin.pluginAddress || !plugin?.metadata?.properties) return prev;
+      if (!plugin?.metadata?.properties) return prev;
       const stackType = plugin.metadata.properties.stack.type;
       const stack = `modules/${stackType}`;
 
@@ -69,6 +69,7 @@ export const pluginRoutes = (
             element={<Plugins definition={plugin.metadata} />}
           />
         );
+
         if (stackType === "Onboarding") {
           // for now we will ignore Task module menu
           const mainMenu = {
@@ -82,6 +83,7 @@ export const pluginRoutes = (
           prev.taskTypesMainMenu[stackType] = mainMenu;
         }
       }
+      if (!plugin.pluginAddress) return prev;
 
       if (plugin.pluginAddress) {
         const mainMenu = prev.taskTypesMainMenu[stackType];

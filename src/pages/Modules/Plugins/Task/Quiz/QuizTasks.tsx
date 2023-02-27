@@ -114,7 +114,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
     const values = getValues();
     createTask({
       questPluginAddress: searchParams.get("questPluginAddress"),
-      pluginDefinitionId: plugin.pluginDefinitionId,
+      pluginTokenId: plugin.tokenId,
       questId: +searchParams.get("questId"),
       pluginAddress: plugin.pluginAddress,
       task: {
@@ -123,7 +123,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
           name: values.title,
           description: values.description,
           properties: {
-            test: "Any"
+            questions: values.questions
           }
         },
         startDate: dateToUnix(new Date()),

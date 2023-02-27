@@ -122,7 +122,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
     const values = getValues();
     createTask({
       questPluginAddress: searchParams.get("questPluginAddress"),
-      pluginDefinitionId: plugin.pluginDefinitionId,
+      pluginTokenId: plugin.tokenId,
       questId: +searchParams.get("questId"),
       pluginAddress: plugin.pluginAddress,
       task: {
@@ -131,7 +131,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
           name: values.title,
           description: values.description,
           properties: {
-            test: "Any"
+            inviteUrl: values.inviteUrl
           }
         },
         startDate: dateToUnix(new Date()),

@@ -119,7 +119,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
     const values = getValues();
     createTask({
       questPluginAddress: searchParams.get("questPluginAddress"),
-      pluginDefinitionId: plugin.pluginDefinitionId,
+      pluginTokenId: plugin.tokenId,
       questId: +searchParams.get("questId"),
       pluginAddress: plugin.pluginAddress,
       task: {
@@ -127,9 +127,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
         metadata: {
           name: values.title,
           description: values.description,
-          properties: {
-            test: "Any"
-          }
+          properties: {}
         },
         startDate: dateToUnix(new Date()),
         endDate: dateToUnix(endDatetime)

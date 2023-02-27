@@ -132,7 +132,7 @@ function Web3DautConnect({
       communityUpdateState({
         communities: autID.properties.communities,
         selectedCommunityAddress:
-          autID.properties.communities[0].properties.address
+          autID.properties.communities[5].properties.address
       })
     );
 
@@ -178,8 +178,8 @@ function Web3DautConnect({
           zIndex: 99999
         }}
         id="d-aut"
-        ipfs-gateway="https://cloudflare-ipfs.com/ipfs"
-        dao-expander="0xc0DaD1DA55370945AadFD909E641340E8F5a342d"
+        ipfs-gateway="https://ipfs.io/ipfs"
+        dao-expander="0xbAac78A371432Ce5e0FAaFd01E45Df4364a7E6a4"
         button-type="simple"
       />
       <DialogWrapper open={openForSelectNetwork}>

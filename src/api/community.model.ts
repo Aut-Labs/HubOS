@@ -23,7 +23,7 @@ export const MarketTemplates = [
 ];
 
 export const findRoleName = (roleId: string, rolesSets: RoleSet[]) => {
-  const roleSet = rolesSets.find((s) =>
+  const roleSet = (rolesSets || []).find((s) =>
     s.roles.some((r) => r.id.toString() === roleId)
   );
   if (roleSet) {

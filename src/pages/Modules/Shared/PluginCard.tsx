@@ -1,8 +1,6 @@
 import { useAddPluginToDAOMutation } from "@api/plugin-registry.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import {
-  Badge,
-  Box,
   Button,
   Card,
   CardActionArea,
@@ -17,7 +15,7 @@ import {
 } from "@mui/material";
 import { memo, useMemo } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import LoadingButton from "@mui/lab/LoadingButton";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
@@ -26,7 +24,6 @@ import { SelectedNetworkConfig } from "@store/WalletProvider/WalletProvider";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import LinkWithQuery from "@components/LinkWithQuery";
-import InfoIcon from "@mui/icons-material/Info";
 
 const GridCard = styled(Card)(({ theme }) => {
   return {
@@ -139,55 +136,39 @@ const PluginCard = ({
             )}
           </Stack>
 
-          <Badge
+          <LoadingButton
+            loading={isLoading}
             sx={{
               width: "100%",
               my: 6
             }}
-            invisible={plugin.pluginAddress && !isAdmin}
-            badgeContent={
-              <Tooltip title="Only admins can install plugins">
-                <InfoIcon
-                  sx={{
-                    color: "white"
-                  }}
-                />
-              </Tooltip>
+            disabled={
+              isFetching || !path || (!plugin.pluginAddress && !isAdmin)
             }
+            variant="outlined"
+            loadingIndicator={
+              <Stack direction="row" gap={1} alignItems="center">
+                <Typography className="text-secondary">
+                  Activating...
+                </Typography>
+                <CircularProgress
+                  size="20px"
+                  color={plugin.pluginAddress ? "offWhite" : "primary"}
+                />
+              </Stack>
+            }
+            {...(!!plugin.pluginAddress && {
+              to: path,
+              preserveParams: true,
+              component: LinkWithQuery
+            })}
+            {...(!plugin.pluginAddress && {
+              onClick: () => addPlugin(plugin)
+            })}
+            color={plugin.pluginAddress ? "offWhite" : "primary"}
           >
-            <LoadingButton
-              loading={isLoading}
-              sx={{
-                width: "100%"
-              }}
-              disabled={
-                isFetching || !path || (!plugin.pluginAddress && !isAdmin)
-              }
-              variant="outlined"
-              loadingIndicator={
-                <Stack direction="row" gap={1} alignItems="center">
-                  <Typography className="text-secondary">
-                    Activating...
-                  </Typography>
-                  <CircularProgress
-                    size="20px"
-                    color={plugin.pluginAddress ? "offWhite" : "primary"}
-                  />
-                </Stack>
-              }
-              {...(!!plugin.pluginAddress && {
-                to: path,
-                preserveParams: true,
-                component: LinkWithQuery
-              })}
-              {...(!plugin.pluginAddress && {
-                onClick: () => addPlugin(plugin)
-              })}
-              color={plugin.pluginAddress ? "offWhite" : "primary"}
-            >
-              {plugin.pluginAddress ? "Go to plugin" : "Install"}
-            </LoadingButton>
-          </Badge>
+            {plugin.pluginAddress ? "Go to plugin" : "Install"}
+          </LoadingButton>
 
           <Stack direction="row" justifyContent="flex-end">
             <Typography

@@ -9,7 +9,8 @@ import {
   Tooltip,
   Typography,
   Box,
-  styled
+  styled,
+  Checkbox
 } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { memo, useState } from "react";
@@ -23,8 +24,6 @@ interface AnswersParams {
 }
 
 const Answers = memo(({ control, questionIndex }: AnswersParams) => {
-  const [selectedValue, setSelectedValue] = useState();
-
   const { fields, update } = useFieldArray({
     control,
     name: `questions[${questionIndex}].answers`
@@ -34,6 +33,8 @@ const Answers = memo(({ control, questionIndex }: AnswersParams) => {
     name: `questions[${questionIndex}].answers`,
     control
   });
+
+  console.log("values: ", values);
 
   return (
     <GridBox>
@@ -74,36 +75,42 @@ const Answers = memo(({ control, questionIndex }: AnswersParams) => {
               name={`questions[${questionIndex}].answers[${index}].correct`}
               control={control}
               rules={{
-                validate: {
-                  required: () => !!selectedValue
-                }
+                required: !values?.some((v) => v.correct)
               }}
-              render={({ field: { name, value } }) => {
+              render={({ field: { name, value, onChange } }) => {
                 return (
-                  <Tooltip
-                    title={
-                      selectedValue === answers[index]
-                        ? "Correct Answer"
-                        : "Set as correct answer"
-                    }
-                  >
-                    <Radio
-                      color="primary"
-                      tabIndex={-1}
-                      checked={selectedValue === answers[index]}
-                      onChange={(e) => {
-                        setSelectedValue(answers[index]);
-                        fields.forEach((field, fIndex) => {
-                          update(fIndex, {
-                            ...values[fIndex],
-                            correct: fIndex === index
-                          });
-                        });
-                      }}
-                      value={value}
-                      name={name}
-                    />
-                  </Tooltip>
+                  <Checkbox
+                    name={name}
+                    color="primary"
+                    required={!values?.some((v) => v.correct)}
+                    value={value}
+                    tabIndex={-1}
+                    onChange={onChange}
+                  />
+                  // <Tooltip
+                  //   title={
+                  //     selectedValue === answers[index]
+                  //       ? "Correct Answer"
+                  //       : "Set as correct answer"
+                  //   }
+                  // >
+                  //   <Radio
+                  //     color="primary"
+                  //     tabIndex={-1}
+                  //     checked={selectedValue === answers[index]}
+                  //     onChange={(e) => {
+                  //       setSelectedValue(answers[index]);
+                  //       fields.forEach((field, fIndex) => {
+                  //         update(fIndex, {
+                  //           ...values[fIndex],
+                  //           correct: fIndex === index
+                  //         });
+                  //       });
+                  //     }}
+                  //     value={value}
+                  //     name={name}
+                  //   />
+                  // </Tooltip>
                 );
               }}
             />

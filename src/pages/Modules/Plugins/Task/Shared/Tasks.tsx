@@ -17,10 +17,11 @@ import {
   Typography,
   styled,
   tableCellClasses,
-  Chip
+  Chip,
+  IconButton
 } from "@mui/material";
 import { memo, useMemo } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 import CopyAddress from "@components/CopyAddress";
@@ -29,6 +30,9 @@ import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { TaskType } from "@aut-labs-private/sdk/dist/models/task";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useConfirmDialog } from "react-mui-confirm";
+import OverflowTooltip from "@components/OverflowTooltip";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
@@ -48,7 +52,7 @@ const TaskStyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const taskStatses = {
   [TaskStatus.Created]: {
-    label: "Created",
+    label: "Open",
     color: "info"
   }
 };
@@ -66,19 +70,49 @@ const taskTypes = {
     pluginType: PluginDefinitionType.OnboardingQuizTaskPlugin,
     label: "Multiple-Choice Quiz"
   },
-  [TaskType.TwitterFollow]: {
+  [TaskType.JoinDiscord]: {
     pluginType: PluginDefinitionType.OnboardingJoinDiscordTaskPlugin,
     label: "Join Discord"
   }
+};
+
+const dateTypes = (start: number, end: number) => {
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+
+  return (
+    <Stack alignItems="flex-end">
+      <Stack direction="row" flexWrap="wrap">
+        <Stack direction="row">
+          <Typography color="success.main">
+            {startDate.toDateString()}
+          </Typography>
+          <Typography mx={0.5} color="white">
+            -
+          </Typography>
+        </Stack>
+        <Typography color="error">{endDate.toDateString()}</Typography>
+      </Stack>
+    </Stack>
+  );
 };
 
 const TaskListItem = memo(
   ({ row, isAdmin }: { row: Task; isAdmin: boolean }) => {
     const location = useLocation();
     const params = useParams<{ questId: string }>();
+    const confirm = useConfirmDialog();
+
+    const confimDelete = () =>
+      confirm({
+        title: "Are you sure you want to delete this task?",
+        onConfirm: () => {
+          console.log("Confimed");
+          // delete
+        }
+      });
 
     const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
-      // @ts-ignore
       selectFromResult: ({ data }) => ({
         plugin: (data || []).find(
           (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
@@ -140,17 +174,19 @@ const TaskListItem = memo(
                 </Tooltip>
               </Badge>
             </Box>
-            <Typography variant="body" className="text-secondary">
-              {row.metadata?.description}
-            </Typography>
+            <OverflowTooltip
+              typography={{
+                maxWidth: "300px"
+              }}
+              text={row.metadata?.description}
+            />
           </span>
         </TaskStyledTableCell>
         <TaskStyledTableCell align="right">
           <CopyAddress address={row.creator} />
         </TaskStyledTableCell>
         <TaskStyledTableCell align="right">
-          {new Date(+row.startDate * 1000).toDateString()} -{" "}
-          {new Date(+row.endDate * 1000).toDateString()}
+          {dateTypes(row.startDate, row.endDate)}
         </TaskStyledTableCell>
         <TaskStyledTableCell align="right">
           <Chip {...taskStatses[row.status]} size="small" />
@@ -160,16 +196,11 @@ const TaskListItem = memo(
         </TaskStyledTableCell>
         {isAdmin && (
           <TaskStyledTableCell align="right">
-            <Button
-              sx={{
-                minWidth: "120px"
-              }}
-              color="error"
-              size="small"
-              variant="outlined"
-            >
-              Remove
-            </Button>
+            <Tooltip title="Remove task">
+              <IconButton onClick={confimDelete} color="error">
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
           </TaskStyledTableCell>
         )}
         {!isAdmin && (
@@ -215,7 +246,7 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
                 borderRadius: "16px",
                 backgroundColor: "nightBlack.main",
                 borderColor: "divider",
-                mt: 4
+                my: 4
               }}
               component={Paper}
             >
@@ -257,6 +288,23 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
                 </TableBody>
               </Table>
             </TableContainer>
+          )}
+
+          {!isLoading && !tasks?.length && (
+            <Box
+              sx={{
+                display: "flex",
+                gap: "20px",
+                mt: 12,
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <Typography className="text-secondary" variant="subtitle2">
+                No tasks yet...
+              </Typography>
+            </Box>
           )}
         </>
       )}

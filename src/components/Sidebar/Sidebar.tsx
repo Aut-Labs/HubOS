@@ -333,11 +333,11 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             display: "flex",
             flexDirection: "column"
           }}
-          options={{
-            suppressScrollX: true,
-            useBothWheelAxes: false,
-            swipeEasing: true
-          }}
+          // options={{
+          //   suppressScrollX: true,
+          //   useBothWheelAxes: false
+          //   // swipeEasing: true
+          // }}
         >
           {children}
         </PerfectScrollbar>

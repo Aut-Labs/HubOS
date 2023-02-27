@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@aut-labs-private/abi-types": "^0.0.16",
-    "@aut-labs-private/sdk": "^0.0.18",
+    "@aut-labs-private/sdk": "^0.0.19",
     "@aut-labs-private/sdk-biconomy": "latest",
     "@aut-labs/d-aut": "^1.0.10",
     "@emotion/react": "^11.10.5",
@@ -67,6 +67,7 @@
     "react-dropzone": "^14.2.1",
     "react-hook-form": "^7.23.0",
     "react-lines-ellipsis": "^0.15.3",
+    "react-mui-confirm": "^1.0.1",
     "react-perfect-scrollbar": "^1.5.8",
     "react-redux": "^8.0.4",
     "react-router-dom": "^6.8.1",

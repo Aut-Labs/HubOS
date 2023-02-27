@@ -56,18 +56,17 @@ const fetchTasks = async ({ pluginAddress, questId }, api: BaseQueryApi) => {
     sdk.questOnboarding = questOnboarding;
   }
 
-  const response = await questOnboarding.getAllTasksByQuest(
-    questId,
-    pluginAddress
-  );
+  const response = await questOnboarding.getAllTasksByQuest(questId);
+
   if (response?.isSuccess) {
     const tasksWithMetadata: Task[] = [];
+
     for (let i = 0; i < response.data.length; i++) {
       const def = response.data[i];
       tasksWithMetadata.push({
         ...def,
         metadata: await fetchMetadata(
-          def.submitionUrl,
+          def.metadataUri,
           environment.nftStorageUrl
         )
       });
@@ -165,7 +164,7 @@ const createTaskPerQuest = async (
     questId: number;
     pluginAddress: string;
     questPluginAddress: string;
-    pluginDefinitionId: PluginDefinitionType;
+    pluginTokenId: number;
   },
   api: BaseQueryApi
 ) => {
@@ -180,44 +179,10 @@ const createTaskPerQuest = async (
     sdk.questOnboarding = questOnboarding;
   }
 
-  await questOnboarding.getOrInitialiseQuestPluginContract();
-  await questOnboarding.getOrInitialisePluginRegistryContract();
-
-  // try {
-  //   const taskContract = questOnboarding.getOrInitialiseTaskPluginContract(
-  //     body.pluginAddress,
-  //     body.pluginDefinitionId
-  //   );
-
-  //   const res = await taskContract.functions.createBy(
-  //     "0x81c843A6FEd08672FD392846e13ad9e5F85aC35a",
-  //     0,
-  //     "https://something",
-  //     getUnixTime(new Date()),
-  //     getUnixTime(new Date()) + 1000
-  //   );
-
-  //   const tx = await res.wait();
-
-  //   const eventsEmitted = tx.events
-  //     .filter((e) => !!e.event)
-  //     .map((e) => e.event);
-  //   // const successEventEmitted = tx.events.find(
-  //   //   (e) => e.event === QuestPluginContractEventType.TasksAddedToQuest
-  //   // );
-
-  //   debugger;
-  // } catch (error) {
-  //   console.error(error);
-  //   debugger;
-  // }
-
   const response = await questOnboarding.createTask(
     body.task,
     body.questId,
-    body.pluginDefinitionId,
-    body.pluginAddress,
-    body.questPluginAddress
+    body.pluginTokenId
   );
 
   if (!response.isSuccess) {
@@ -326,7 +291,7 @@ export const onboardingApi = createApi({
         questId: number;
         pluginAddress: string;
         questPluginAddress: string;
-        pluginDefinitionId: PluginDefinitionType;
+        pluginTokenId: number;
       }
     >({
       query: (body) => {

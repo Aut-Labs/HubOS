@@ -94,10 +94,10 @@ const Quests = ({ plugin }: PluginParams) => {
               display: "flex",
               mt: 4,
               alignItems: "center",
-              justifyContent: "space-between"
+              justifyContent: "flex-end"
             }}
           >
-            <QuestFilters searchCallback={setSearchState} />
+            {/* <QuestFilters searchCallback={setSearchState} /> */}
             <Stack direction="row" gap={2}>
               {isAdmin && (
                 <>
@@ -126,13 +126,14 @@ const Quests = ({ plugin }: PluginParams) => {
 
                   <Button
                     startIcon={<AddIcon />}
+                    disabled={quests?.length < 3}
                     variant="outlined"
                     size="medium"
                     color="primary"
                     to={`create`}
                     component={Link}
                   >
-                    Activate onboarding
+                    Activate Quest onboarding
                   </Button>
                 </>
               )}
@@ -209,12 +210,12 @@ const Quests = ({ plugin }: PluginParams) => {
                 <TableHead>
                   <TableRow>
                     <QuestStyledTableCell>Name</QuestStyledTableCell>
-                    <QuestStyledTableCell align="right">
+                    {/* <QuestStyledTableCell align="right">
                       Role
-                    </QuestStyledTableCell>
+                    </QuestStyledTableCell> */}
                     {isAdmin && (
                       <QuestStyledTableCell align="right">
-                        Submissions
+                        Tasks
                       </QuestStyledTableCell>
                     )}
                     <QuestStyledTableCell align="right">

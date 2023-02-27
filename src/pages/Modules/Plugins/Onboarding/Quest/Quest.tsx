@@ -9,12 +9,14 @@ import {
   Typography,
   Button,
   Stack,
-  CircularProgress
+  CircularProgress,
+  IconButton,
+  Tooltip
 } from "@mui/material";
 import { useLocation, useParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
-import { memo, useMemo, useState } from "react";
-import { IsAdmin, allRoles } from "@store/Community/community.reducer";
+import { memo, useMemo } from "react";
+import { IsAdmin } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
 import LinkWithQuery from "@components/LinkWithQuery";
 import AutTabs from "@components/AutTabs/AutTabs";
@@ -25,70 +27,33 @@ import { TaskType } from "@aut-labs-private/sdk/dist/models/task";
 import { QuestTasks } from "./QuestShared";
 import OverflowTooltip from "@components/OverflowTooltip";
 import Tasks from "../../Task/Shared/Tasks";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import LoadingProgressBar from "@components/LoadingProgressBar";
 
 interface PluginParams {
   plugin: PluginDefinition;
 }
 
-// taskId?: number;
-const demoTasks: Task[] = [
-  {
-    taskId: 1,
-    createdOn: dateToUnix(new Date()),
-    startDate: dateToUnix(new Date()),
-    endDate: dateToUnix(new Date()),
-    taskType: TaskType.TwitterFollow,
-    status: TaskStatus.Created,
-    creator: "0x55954C2C092f6e973B55C5D2Af28950b3b6D1338",
-    taker: ethers.constants.AddressZero,
-    role: 1,
-    submitionUrl: "",
-    metadataUri:
-      "ipfs://bafkreib3lwy7kj2jyfuzx6wg4bqgqn4ums6eh6j32trsbvq7k2p6pusqoi",
-    metadata: {
-      name: "Task title 1",
-      description: "Some task description",
-      properties: {}
-    }
-  },
-  {
-    taskId: 1,
-    createdOn: dateToUnix(new Date()),
-    startDate: dateToUnix(new Date()),
-    endDate: dateToUnix(new Date()),
-    taskType: TaskType.TwitterFollow,
-    status: TaskStatus.Submitted,
-    creator: ethers.constants.AddressZero,
-    taker: "0x55954C2C092f6e973B55C5D2Af28950b3b6D1338",
-    role: 1,
-    submitionUrl: "",
-    metadataUri:
-      "ipfs://bafkreib3lwy7kj2jyfuzx6wg4bqgqn4ums6eh6j32trsbvq7k2p6pusqoi",
-    metadata: {
-      name: "Task title 2",
-      description: "Some task description",
-      properties: {}
-    }
-  }
-];
-
 const Quest = ({ plugin }: PluginParams) => {
   const location = useLocation();
   const isAdmin = useSelector(IsAdmin);
   const params = useParams<{ questId: string }>();
-  const [roles] = useState(useSelector(allRoles));
 
-  const { data: allTasks, isLoading: isLoadingTasks } =
-    useGetAllTasksPerQuestQuery(
-      {
-        questId: +params.questId,
-        pluginAddress: plugin.pluginAddress
-      },
-      {
-        refetchOnMountOrArgChange: false,
-        skip: false
-      }
-    );
+  const {
+    data: allTasks,
+    isLoading: isLoadingTasks,
+    isFetching,
+    refetch
+  } = useGetAllTasksPerQuestQuery(
+    {
+      questId: +params.questId,
+      pluginAddress: plugin.pluginAddress
+    },
+    {
+      refetchOnMountOrArgChange: false,
+      skip: false
+    }
+  );
 
   const { quest, isLoading: isLoadingPlugins } = useGetAllOnboardingQuestsQuery(
     plugin.pluginAddress,
@@ -104,12 +69,8 @@ const Quest = ({ plugin }: PluginParams) => {
     return isLoadingPlugins || isLoadingTasks;
   }, [isLoadingTasks, isLoadingPlugins]);
 
-  const role = useMemo(() => {
-    return roles.find((r) => r.id === quest?.role);
-  }, [roles, quest]);
-
   const { tasks, submissions } = useMemo(() => {
-    return demoTasks.reduce(
+    return (allTasks || []).reduce(
       (prev, curr) => {
         if (curr.status === TaskStatus.Submitted) {
           prev.submissions = [...prev.submissions, curr];
@@ -136,6 +97,7 @@ const Quest = ({ plugin }: PluginParams) => {
         position: "relative"
       }}
     >
+      <LoadingProgressBar isLoading={isFetching} />
       {isLoading ? (
         <CircularProgress className="spinner-center" size="60px" />
       ) : (
@@ -150,6 +112,20 @@ const Quest = ({ plugin }: PluginParams) => {
         >
           <Typography textAlign="center" color="white" variant="h3">
             {quest?.metadata?.name}
+            <Tooltip title="Refresh quests">
+              <IconButton
+                size="medium"
+                component="span"
+                color="offWhite"
+                sx={{
+                  ml: 1
+                }}
+                disabled={isLoading || isFetching}
+                onClick={refetch}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
           </Typography>
 
           <OverflowTooltip
@@ -254,7 +230,7 @@ const Quest = ({ plugin }: PluginParams) => {
                   label: "Task",
                   props: {
                     isLoading,
-                    tasks,
+                    tasks: [...tasks, ...tasks, ...tasks, ...tasks],
                     isAdmin,
                     questPluginAddress: plugin.pluginAddress,
                     questId: params.questId

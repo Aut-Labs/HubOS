@@ -55,16 +55,14 @@ const dateTypes = (date: number, durationInDays: number) => {
       </Typography>
       <Stack direction="row" flexWrap="wrap">
         <Stack direction="row">
-          <Typography color="success.main" variant="caption">
+          <Typography color="success.main">
             {startDate.toDateString()}
           </Typography>
-          <Typography mx={0.5} color="white" variant="caption">
+          <Typography mx={0.5} color="white">
             -
           </Typography>
         </Stack>
-        <Typography color="error" variant="caption">
-          {endDate.toDateString()}
-        </Typography>
+        <Typography color="error">{endDate.toDateString()}</Typography>
       </Stack>
     </Stack>
   );
@@ -136,7 +134,7 @@ export const QuestListItem = memo(
             />
           </span>
         </QuestStyledTableCell>
-        <QuestStyledTableCell align="right">{roleName}</QuestStyledTableCell>
+        {/* <QuestStyledTableCell align="right">{roleName}</QuestStyledTableCell> */}
         {isAdmin && (
           <QuestStyledTableCell align="right">
             {row.tasksCount}
@@ -163,16 +161,6 @@ export const QuestListItem = memo(
                 color="offWhite"
                 size="small"
                 variant="outlined"
-              >
-                Activate
-              </Button>
-              <Button
-                sx={{
-                  minWidth: "120px"
-                }}
-                color="offWhite"
-                size="small"
-                variant="outlined"
                 to="/aut-dashboard/modules/Task"
                 preserveParams
                 queryParams={{
@@ -183,7 +171,7 @@ export const QuestListItem = memo(
                 }}
                 component={LinkWithQuery}
               >
-                Add tasks
+                Add task
               </Button>
             </Stack>
           </QuestStyledTableCell>
@@ -319,10 +307,10 @@ export const QuestTasks = memo(
               display: "flex",
               mt: 2,
               alignItems: "center",
-              justifyContent: "space-between"
+              justifyContent: "flex-end"
             }}
           >
-            <Stack direction="row" alignItems="center" spacing={2}>
+            {/* <Stack direction="row" alignItems="center" spacing={2}>
               <AutTextField
                 variant="standard"
                 color="offWhite"
@@ -334,7 +322,7 @@ export const QuestTasks = memo(
                   }
                 }}
               />
-            </Stack>
+            </Stack> */}
             <Button
               startIcon={<AddIcon />}
               variant="outlined"
