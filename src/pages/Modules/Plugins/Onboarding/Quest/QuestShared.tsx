@@ -153,7 +153,14 @@ export const QuestListItem = memo(
 
         {isAdmin && (
           <QuestStyledTableCell align="right">
-            <Stack direction="column" spacing={1}>
+            <Badge
+              invisible={row.tasksCount < 5}
+              badgeContent={
+                <Tooltip title="During beta there is a maximum of 5 tasks per quest">
+                  <ErrorOutlineIcon color="error" />
+                </Tooltip>
+              }
+            >
               <Button
                 sx={{
                   minWidth: "120px"
@@ -161,11 +168,12 @@ export const QuestListItem = memo(
                 color="offWhite"
                 size="small"
                 variant="outlined"
+                disabled={row.tasksCount >= 5}
                 to="/aut-dashboard/modules/Task"
                 preserveParams
                 queryParams={{
                   questPluginAddress: pluginAddress,
-                  returnUrlLinkName: "See Quest",
+                  returnUrlLinkName: "Back to quest",
                   returnUrl: location.pathname,
                   questId: row.questId.toString()
                 }}
@@ -173,7 +181,7 @@ export const QuestListItem = memo(
               >
                 Add task
               </Button>
-            </Stack>
+            </Badge>
           </QuestStyledTableCell>
         )}
       </StyledTableRow>
@@ -323,23 +331,33 @@ export const QuestTasks = memo(
                 }}
               />
             </Stack> */}
-            <Button
-              startIcon={<AddIcon />}
-              variant="outlined"
-              size="medium"
-              color="primary"
-              to="/aut-dashboard/modules/Task"
-              preserveParams
-              queryParams={{
-                questPluginAddress,
-                returnUrlLinkName: "See Quest",
-                returnUrl: location.pathname,
-                questId: questId.toString()
-              }}
-              component={LinkWithQuery}
+            <Badge
+              invisible={tasks?.length < 5}
+              badgeContent={
+                <Tooltip title="During beta there is a maximum of 5 tasks per quest">
+                  <ErrorOutlineIcon color="error" />
+                </Tooltip>
+              }
             >
-              Add task
-            </Button>
+              <Button
+                startIcon={<AddIcon />}
+                variant="outlined"
+                disabled={tasks?.length >= 5}
+                size="medium"
+                color="primary"
+                to="/aut-dashboard/modules/Task"
+                preserveParams
+                queryParams={{
+                  questPluginAddress,
+                  returnUrlLinkName: "Back to quest",
+                  returnUrl: location.pathname,
+                  questId: questId.toString()
+                }}
+                component={LinkWithQuery}
+              >
+                Add task
+              </Button>
+            </Badge>
           </Box>
         )}
 

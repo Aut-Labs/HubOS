@@ -10,12 +10,13 @@ import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
 import { memo } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { dateToUnix } from "@utils/date-format";
 import { addMinutes } from "date-fns";
 import { countWords } from "@utils/helpers";
 import AddIcon from "@mui/icons-material/Add";
 import QuestionsAndAnswers, { emptyQuestion } from "./QuestionsAndAnswers";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
@@ -158,19 +159,38 @@ const QuizTasks = ({ plugin }: PluginParams) => {
               flex: 1,
               mb: 4,
               mx: "auto",
-              width: {
-                xs: "100%",
-                sm: "600px",
-                xxl: "800px"
-              }
+              position: "relative",
+              width: "100%"
             }}
           >
-            <Typography textAlign="center" color="white" variant="h3">
-              Creating Quiz task
-            </Typography>
+            <Stack alignItems="center" justifyContent="center">
+              <Button
+                startIcon={<ArrowBackIcon />}
+                color="offWhite"
+                sx={{
+                  position: "absolute",
+                  left: 0
+                }}
+                to={searchParams.get("returnUrl")}
+                component={Link}
+              >
+                {searchParams.get("returnUrlLinkName") || "Back"}
+              </Button>
+              <Typography textAlign="center" color="white" variant="h3">
+                Creating Quiz task
+              </Typography>
+            </Stack>
             <Typography
+              sx={{
+                width: {
+                  xs: "100%",
+                  sm: "600px",
+                  xxl: "800px"
+                }
+              }}
               className="text-secondary"
               mt={2}
+              mx="auto"
               textAlign="center"
               color="white"
               variant="body1"

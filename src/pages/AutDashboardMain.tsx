@@ -10,8 +10,10 @@ import { pluginRoutes } from "./Modules/Shared/routes";
 import Modules from "./Modules/Modules";
 import { useSelector } from "react-redux";
 import { IsAdmin } from "@store/Community/community.reducer";
+import useBreadcrumbs from "use-react-router-breadcrumbs";
 
 const AutDashboardMain = () => {
+  const breadcrumbs = useBreadcrumbs();
   const isAdmin = useSelector(IsAdmin);
   const { data: plugins, isLoading } = useGetAllPluginDefinitionsByDAOQuery(
     null,

@@ -2,7 +2,7 @@ import {
   useGetAllOnboardingQuestsQuery,
   useGetAllTasksPerQuestQuery
 } from "@api/onboarding.api";
-import { PluginDefinition, Task } from "@aut-labs-private/sdk";
+import { PluginDefinition } from "@aut-labs-private/sdk";
 import {
   Container,
   Box,
@@ -13,28 +13,29 @@ import {
   IconButton,
   Tooltip
 } from "@mui/material";
-import { useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo } from "react";
 import { IsAdmin } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
 import LinkWithQuery from "@components/LinkWithQuery";
 import AutTabs from "@components/AutTabs/AutTabs";
-import { dateToUnix } from "@utils/date-format";
 import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
-import { ethers } from "ethers";
-import { TaskType } from "@aut-labs-private/sdk/dist/models/task";
 import { QuestTasks } from "./QuestShared";
 import OverflowTooltip from "@components/OverflowTooltip";
 import Tasks from "../../Task/Shared/Tasks";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import LoadingProgressBar from "@components/LoadingProgressBar";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { setTitle } from "@store/ui-reducer";
+import { useAppDispatch } from "@store/store.model";
 
 interface PluginParams {
   plugin: PluginDefinition;
 }
 
 const Quest = ({ plugin }: PluginParams) => {
+  const dispatch = useAppDispatch();
   const location = useLocation();
   const isAdmin = useSelector(IsAdmin);
   const params = useParams<{ questId: string }>();
@@ -64,6 +65,10 @@ const Quest = ({ plugin }: PluginParams) => {
       })
     }
   );
+
+  useEffect(() => {
+    dispatch(setTitle(`Quest - ${quest.metadata?.name}`));
+  }, [dispatch, quest]);
 
   const isLoading = useMemo(() => {
     return isLoadingPlugins || isLoadingTasks;
@@ -110,23 +115,37 @@ const Quest = ({ plugin }: PluginParams) => {
             position: "relative"
           }}
         >
-          <Typography textAlign="center" color="white" variant="h3">
-            {quest?.metadata?.name}
-            <Tooltip title="Refresh quests">
-              <IconButton
-                size="medium"
-                component="span"
-                color="offWhite"
-                sx={{
-                  ml: 1
-                }}
-                disabled={isLoading || isFetching}
-                onClick={refetch}
-              >
-                <RefreshIcon />
-              </IconButton>
-            </Tooltip>
-          </Typography>
+          <Stack alignItems="center" justifyContent="center">
+            <Button
+              startIcon={<ArrowBackIcon />}
+              color="offWhite"
+              sx={{
+                position: "absolute",
+                left: 0
+              }}
+              to="/aut-dashboard/modules/Onboarding/QuestOnboardingPlugin"
+              component={Link}
+            >
+              Back
+            </Button>
+            <Typography textAlign="center" color="white" variant="h3">
+              {quest?.metadata?.name}
+              <Tooltip title="Refresh quests">
+                <IconButton
+                  size="medium"
+                  component="span"
+                  color="offWhite"
+                  sx={{
+                    ml: 1
+                  }}
+                  disabled={isLoading || isFetching}
+                  onClick={refetch}
+                >
+                  <RefreshIcon />
+                </IconButton>
+              </Tooltip>
+            </Typography>
+          </Stack>
 
           <OverflowTooltip
             typography={{
@@ -206,7 +225,7 @@ const Quest = ({ plugin }: PluginParams) => {
             preserveParams
             queryParams={{
               questPluginAddress: plugin.pluginAddress,
-              returnUrlLinkName: "See Quest",
+              returnUrlLinkName: "Back to quest",
               returnUrl: location.pathname,
               questId: params.questId
             }}
@@ -230,7 +249,7 @@ const Quest = ({ plugin }: PluginParams) => {
                   label: "Task",
                   props: {
                     isLoading,
-                    tasks: [...tasks, ...tasks, ...tasks, ...tasks],
+                    tasks: tasks,
                     isAdmin,
                     questPluginAddress: plugin.pluginAddress,
                     questId: params.questId

@@ -5,6 +5,7 @@ import {
   Avatar,
   Button,
   Card,
+  CardActions,
   CardContent,
   CardHeader,
   Chip,
@@ -153,6 +154,21 @@ const MemberCard = memo(
                 </Typography>
               </Stack>
             </CardContent>
+            <CardActions
+              sx={{
+                justifyContent: "center",
+                borderTop: "1px solid",
+                borderColor: "divider"
+              }}
+            >
+              <Button
+                target="_blank"
+                href={`https://my.aut.id/${member.properties.address}`}
+                color="offWhite"
+              >
+                View profile
+              </Button>
+            </CardActions>
           </GridCard>
         </GridCardWrapper>
       </>

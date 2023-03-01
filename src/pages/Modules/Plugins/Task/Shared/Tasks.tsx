@@ -163,7 +163,7 @@ const TaskListItem = memo(
                     preserveParams
                     queryParams={{
                       questPluginAddress: plugin?.pluginAddress,
-                      returnUrlLinkName: "See Quest",
+                      returnUrlLinkName: "Back to quest",
                       returnUrl: location?.pathname,
                       questId: params.questId
                     }}
@@ -184,10 +184,18 @@ const TaskListItem = memo(
         </TaskStyledTableCell>
         <TaskStyledTableCell align="right">
           <CopyAddress address={row.creator} />
+          <BtnLink
+            color="primary"
+            variant="caption"
+            target="_blank"
+            href={`https://my.aut.id/${row.creator}`}
+          >
+            View profile
+          </BtnLink>
         </TaskStyledTableCell>
-        <TaskStyledTableCell align="right">
+        {/* <TaskStyledTableCell align="right">
           {dateTypes(row.startDate, row.endDate)}
-        </TaskStyledTableCell>
+        </TaskStyledTableCell> */}
         <TaskStyledTableCell align="right">
           <Chip {...taskStatses[row.status]} size="small" />
         </TaskStyledTableCell>
@@ -201,20 +209,6 @@ const TaskListItem = memo(
                 <DeleteIcon />
               </IconButton>
             </Tooltip>
-          </TaskStyledTableCell>
-        )}
-        {!isAdmin && (
-          <TaskStyledTableCell align="right">
-            <Button
-              sx={{
-                minWidth: "120px"
-              }}
-              color="offWhite"
-              size="small"
-              variant="outlined"
-            >
-              Take
-            </Button>
           </TaskStyledTableCell>
         )}
       </StyledTableRow>
@@ -263,18 +257,20 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
                     <TaskStyledTableCell align="right">
                       Creator
                     </TaskStyledTableCell>
-                    <TaskStyledTableCell align="right">
+                    {/* <TaskStyledTableCell align="right">
                       Time
-                    </TaskStyledTableCell>
+                    </TaskStyledTableCell> */}
                     <TaskStyledTableCell align="right">
                       Status
                     </TaskStyledTableCell>
                     <TaskStyledTableCell align="right">
                       Task type
                     </TaskStyledTableCell>
-                    <TaskStyledTableCell align="right">
-                      Action
-                    </TaskStyledTableCell>
+                    {isAdmin && (
+                      <TaskStyledTableCell align="right">
+                        Action
+                      </TaskStyledTableCell>
+                    )}
                   </TableRow>
                 </TableHead>
                 <TableBody>

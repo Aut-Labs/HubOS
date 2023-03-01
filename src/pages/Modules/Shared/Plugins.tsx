@@ -1,10 +1,12 @@
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import {
   Box,
+  Button,
   CircularProgress,
   Container,
   FormControlLabel,
   IconButton,
+  Stack,
   Switch,
   Tooltip,
   Typography,
@@ -18,6 +20,8 @@ import { PluginDefinitionProperties } from "@aut-labs-private/sdk/dist/models/pl
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { useSelector } from "react-redux";
 import { IsAdmin } from "@store/Community/community.reducer";
+import { Link, useSearchParams } from "react-router-dom";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -40,6 +44,7 @@ interface StackParams {
 
 const Plugins = ({ definition }: StackParams) => {
   const isAdmin = useSelector(IsAdmin);
+  const [searchParams] = useSearchParams();
   const [hideInstalled, setToggleInstalled] = useState(false);
 
   const { plugins, isLoading, isFetching, refetch } =
@@ -74,23 +79,40 @@ const Plugins = ({ definition }: StackParams) => {
             position: "relative"
           }}
         >
-          <Typography textAlign="center" color="white" variant="h3">
-            {definition.properties.stack.title}
-            <Tooltip title="Refresh plugins">
-              <IconButton
-                size="medium"
+          <Stack alignItems="center" justifyContent="center">
+            {searchParams.get("returnUrl") && (
+              <Button
+                startIcon={<ArrowBackIcon />}
                 color="offWhite"
-                component="span"
                 sx={{
-                  ml: 1
+                  position: "absolute",
+                  left: 0
                 }}
-                disabled={isLoading || isFetching}
-                onClick={refetch}
+                to={searchParams.get("returnUrl")}
+                component={Link}
               >
-                <RefreshIcon />
-              </IconButton>
-            </Tooltip>
-          </Typography>
+                {searchParams.get("returnUrlLinkName") || "Back"}
+              </Button>
+            )}
+            <Typography textAlign="center" color="white" variant="h3">
+              {definition.properties.stack.title}
+              <Tooltip title="Refresh plugins">
+                <IconButton
+                  size="medium"
+                  color="offWhite"
+                  component="span"
+                  sx={{
+                    ml: 1
+                  }}
+                  disabled={isLoading || isFetching}
+                  onClick={refetch}
+                >
+                  <RefreshIcon />
+                </IconButton>
+              </Tooltip>
+            </Typography>
+          </Stack>
+
           {!!plugins?.length && (
             <Box
               sx={{

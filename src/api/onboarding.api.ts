@@ -6,8 +6,6 @@ import AutSDK, {
 } from "@aut-labs-private/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
-import { addDays, getUnixTime } from "date-fns";
 import { environment } from "./environment";
 
 const fetchQuests = async (pluginAddress: any, api: BaseQueryApi) => {
@@ -41,6 +39,30 @@ const fetchQuests = async (pluginAddress: any, api: BaseQueryApi) => {
   }
   return {
     error: response.errorMessage
+  };
+};
+
+const activateOnboarding = async (pluginAddress: any, api: BaseQueryApi) => {
+  const sdk = AutSDK.getInstance();
+  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+
+  if (!questOnboarding) {
+    questOnboarding = sdk.initService<QuestOnboarding>(
+      QuestOnboarding,
+      pluginAddress
+    );
+    sdk.questOnboarding = questOnboarding;
+  }
+
+  const response = await questOnboarding.activateOnboarding();
+
+  if (!response.isSuccess) {
+    return {
+      error: response.errorMessage
+    };
+  }
+  return {
+    data: response.data
   };
 };
 
@@ -80,53 +102,6 @@ const fetchTasks = async ({ pluginAddress, questId }, api: BaseQueryApi) => {
   };
 };
 
-const fetchTasksPerPluginType = async (
-  { pluginDefinitionType, pluginAddress },
-  api: BaseQueryApi
-) => {
-  const sdk = AutSDK.getInstance();
-  const state = api.getState();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
-
-  if (!questOnboarding) {
-    // const { post } = api.endpoint(undefined, {
-    //   selectFromResult: ({ data }) => ({
-    //     post: data?.find((post) => post.id === id)
-    //   })
-    // });
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      ""
-      // state.
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
-
-  const response = await questOnboarding.getTasksByType(
-    pluginAddress,
-    pluginDefinitionType
-  );
-  if (response?.isSuccess) {
-    const tasksWithMetadata: Task[] = [];
-    for (let i = 0; i < response.data.length; i++) {
-      const def = response.data[i];
-      tasksWithMetadata.push({
-        ...def,
-        metadata: await fetchMetadata(
-          def.metadataUri,
-          environment.nftStorageUrl
-        )
-      });
-    }
-    return {
-      data: tasksWithMetadata
-    };
-  }
-  return {
-    error: response.errorMessage
-  };
-};
-
 const createQuest = async (
   body: Quest & { pluginAddress: string },
   api: BaseQueryApi
@@ -142,10 +117,6 @@ const createQuest = async (
     sdk.questOnboarding = questOnboarding;
   }
 
-  const startDate = addDays(new Date(), 5);
-  const date = getUnixTime(startDate) * 1000;
-
-  body.startDate = date;
   const response = await questOnboarding.createQuest(body);
 
   if (!response.isSuccess) {
@@ -219,8 +190,8 @@ export const onboardingApi = createApi({
       return fetchTasks(body, api);
     }
 
-    if (url === "getTasksPerPluginType") {
-      return fetchTasksPerPluginType(body, api);
+    if (url === "activateOnboarding") {
+      return activateOnboarding(body, api);
     }
 
     if (url === "createTaskPerQuest") {
@@ -240,6 +211,15 @@ export const onboardingApi = createApi({
         };
       },
       providesTags: ["Quests"]
+    }),
+    activateOnboarding: builder.mutation<boolean, string>({
+      query: (body) => {
+        return {
+          body,
+          url: "activateOnboarding"
+        };
+      },
+      invalidatesTags: ["Quests", "Tasks"]
     }),
     createQuest: builder.mutation<
       Quest,
@@ -301,21 +281,6 @@ export const onboardingApi = createApi({
         };
       },
       invalidatesTags: ["Tasks"]
-    }),
-    getTasksPerPluginType: builder.query<
-      Task[],
-      {
-        pluginAddress: string;
-        pluginDefinitionId: PluginDefinitionType;
-      }
-    >({
-      query: (body) => {
-        return {
-          body,
-          url: "getTasksPerPluginType"
-        };
-      },
-      providesTags: ["Tasks"]
     })
   })
 });
@@ -325,5 +290,5 @@ export const {
   useCreateTaskPerQuestMutation,
   useGetAllTasksPerQuestQuery,
   useGetAllOnboardingQuestsQuery,
-  useGetTasksPerPluginTypeQuery
+  useActivateOnboardingMutation
 } = onboardingApi;

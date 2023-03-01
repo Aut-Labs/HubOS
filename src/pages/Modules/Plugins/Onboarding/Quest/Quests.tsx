@@ -1,5 +1,8 @@
 /* eslint-disable max-len */
-import { useGetAllOnboardingQuestsQuery } from "@api/onboarding.api";
+import {
+  useActivateOnboardingMutation,
+  useGetAllOnboardingQuestsQuery
+} from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import {
   Container,
@@ -20,7 +23,7 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
-import { memo, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -31,12 +34,17 @@ import {
 } from "./QuestShared";
 import { useSelector } from "react-redux";
 import { IsAdmin } from "@store/Community/community.reducer";
+import { setTitle } from "@store/ui-reducer";
+import { useAppDispatch } from "@store/store.model";
+import ErrorDialog from "@components/Dialog/ErrorPopup";
+import LoadingDialog from "@components/Dialog/LoadingPopup";
 
 interface PluginParams {
   plugin: PluginDefinition;
 }
 
 const Quests = ({ plugin }: PluginParams) => {
+  const dispatch = useAppDispatch();
   const isAdmin = useSelector(IsAdmin);
   const [search, setSearchState] = useState(null);
   const {
@@ -48,6 +56,15 @@ const Quests = ({ plugin }: PluginParams) => {
     refetchOnMountOrArgChange: false,
     skip: false
   });
+
+  const [
+    activateOnboarding,
+    { error, isError, data: quest, isLoading: isActivating, reset }
+  ] = useActivateOnboardingMutation();
+
+  useEffect(() => {
+    dispatch(setTitle(`Quests`));
+  }, [dispatch]);
 
   const filteredQuests = useMemo(() => {
     if (!search) return quests;
@@ -63,6 +80,8 @@ const Quests = ({ plugin }: PluginParams) => {
   return (
     <Container maxWidth="lg" sx={{ py: "20px" }}>
       <LoadingProgressBar isLoading={isFetching} />
+      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <LoadingDialog open={isActivating} message="Activating onboarding..." />
       <Box
         sx={{
           display: "flex",
@@ -130,8 +149,7 @@ const Quests = ({ plugin }: PluginParams) => {
                     variant="outlined"
                     size="medium"
                     color="primary"
-                    to={`create`}
-                    component={Link}
+                    onClick={() => activateOnboarding(plugin.pluginAddress)}
                   >
                     Activate Quest onboarding
                   </Button>

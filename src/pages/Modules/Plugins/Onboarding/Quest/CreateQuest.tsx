@@ -28,6 +28,7 @@ import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import { addDays, getUnixTime } from "date-fns";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
@@ -35,14 +36,7 @@ const errorTypes = {
   maxLength: `Characters cannot be more than 280`
 };
 
-const StepWrapper = styled("form")({
-  textAlign: "center",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  flexDirection: "column",
-  height: "100%"
-});
+const startDate = addDays(new Date(), 1);
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -123,6 +117,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       title: "",
       description: "",
       durationInDays: 3,
+      startDate: getUnixTime(startDate) * 1000,
       role: null
     }
   });
@@ -144,6 +139,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       pluginAddress: plugin.pluginAddress,
       role: values.role,
       durationInDays: values.durationInDays,
+      startDate: values.startDate,
       metadata: {
         name: values.title || roles.find((r) => r.id === values.role)?.roleName,
         description: values.description,

@@ -131,8 +131,7 @@ function Web3DautConnect({
     await dispatch(
       communityUpdateState({
         communities: autID.properties.communities,
-        selectedCommunityAddress:
-          autID.properties.communities[5].properties.address
+        selectedCommunityAddress: "0xbAac78A371432Ce5e0FAaFd01E45Df4364a7E6a4"
       })
     );
 
@@ -178,7 +177,7 @@ function Web3DautConnect({
           zIndex: 99999
         }}
         id="d-aut"
-        ipfs-gateway="https://ipfs.io/ipfs"
+        ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
         dao-expander="0xbAac78A371432Ce5e0FAaFd01E45Df4364a7E6a4"
         button-type="simple"
       />

@@ -1,6 +1,7 @@
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import {
   Box,
+  Button,
   CircularProgress,
   Container,
   IconButton,
@@ -8,10 +9,12 @@ import {
   Typography,
   styled
 } from "@mui/material";
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo } from "react";
 import { PluginDefinitionCard } from "./Shared/PluginCard";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { setTitle } from "@store/ui-reducer";
+import { useAppDispatch } from "@store/store.model";
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -29,6 +32,7 @@ const GridBox = styled(Box)(({ theme }) => {
 });
 
 const Modules = () => {
+  const dispatch = useAppDispatch();
   const { plugins, isLoading, isFetching, refetch } =
     useGetAllPluginDefinitionsByDAOQuery(null, {
       // @ts-ignore
@@ -39,6 +43,10 @@ const Modules = () => {
         plugins: data || []
       })
     });
+
+  useEffect(() => {
+    dispatch(setTitle(`Modules`));
+  }, [dispatch]);
 
   const myModules = useMemo(() => {
     return plugins.reduce(
@@ -101,6 +109,19 @@ const Modules = () => {
             <Typography color="rgb(107, 114, 128)" variant="subtitle2">
               No modules were found...
             </Typography>
+            <Button
+              size="medium"
+              component="span"
+              color="offWhite"
+              startIcon={<RefreshIcon />}
+              sx={{
+                ml: 1
+              }}
+              disabled={isLoading || isFetching}
+              onClick={refetch}
+            >
+              Refresh
+            </Button>
           </Box>
         )}
 
