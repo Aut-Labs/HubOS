@@ -1,7 +1,8 @@
-import { Box, Container, styled, Typography } from "@mui/material";
+import { Box, Button, Container, styled, Typography } from "@mui/material";
 import { ReactComponent as Trifold } from "@assets/trifold.svg";
 import AppTitle from "@components/AppTitle";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
+import { useOAuth } from "@components/Oauth2/oauth2";
 
 const Grid = styled("div")(({ theme }) => {
   return {
@@ -53,6 +54,31 @@ const ImageWrapper = styled("div")(({ theme }) => {
 });
 
 const GetStarted = () => {
+  const { getAuth, authenticating } = useOAuth();
+
+  const authenticateTwitter = () => {
+    getAuth(
+      (data) => {
+        console.log(data);
+        // if (data.screen_name === getValues("daoTwitter")) {
+        //   dispatch(
+        //     integrateUpdateCommunity({
+        //       handleVerified: true
+        //     })
+        //   );
+        // } else {
+        //   setError("daoTwitter", {
+        //     type: "validationFailed",
+        //     message: `Twitter handle doesn't match the one used to validate.`
+        //   });
+        // }
+      },
+      (e) => {
+        console.log(e);
+      }
+    );
+  };
+
   return (
     <Container maxWidth="lg" sx={{ flexGrow: 1, height: "100%" }}>
       <Grid>
@@ -116,6 +142,26 @@ const GetStarted = () => {
             There is no community like yours - Set your own Standard. Opt Āut.
           </Typography>
           <DautPlaceholder />
+          <Button
+            onClick={() => authenticateTwitter()}
+            sx={{
+              width: "140px",
+              height: "48px"
+            }}
+            type="button"
+            size="square"
+            color="offWhite"
+            variant="outlined"
+          >
+            Verify
+            {/* {handleVerified ? (
+              "VERIFIED"
+            ) : authenticating ? (
+              <CircularProgress />
+            ) : (
+              "Verify"
+            )} */}
+          </Button>
         </Content>
         <ImageWrapper>
           <StyledTrifold></StyledTrifold>

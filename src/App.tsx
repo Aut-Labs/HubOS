@@ -20,6 +20,7 @@ import AutDashboardMain from "./pages/AutDashboardMain";
 import GetStarted from "./pages/GetStarted/GetStarted";
 import AutLoading from "@components/AutLoading";
 import ErrorPage from "@components/ErrorPage";
+import Callback from "./pages/Oauth2Callback/Callback";
 
 const generateConfig = (networks: NetworkConfig[]): Config => {
   const readOnlyUrls = networks.reduce((prev, curr) => {
@@ -110,6 +111,7 @@ function App() {
                 <AutLoading />
               ) : (
                 <Routes>
+                  <Route path="callback" element={<Callback />} />
                   {!isAutheticated && (
                     <>
                       <Route path="/" element={<GetStarted />} />
