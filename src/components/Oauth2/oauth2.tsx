@@ -37,7 +37,7 @@ export const useOAuth = () => {
       popupRef.current.close();
     }
     popupRef.current = openPopup(
-      `https://discord.com/oauth2/authorize?response_type=code&client_id=1080508975780474900&scope=identify&state=15773059ghq9183habn&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&prompt=consent`
+      `https://discord.com/oauth2/authorize?response_type=code&client_id=1080508975780474900&scope=guilds&state=15773059ghq9183habn&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&prompt=consent`
     ) as any;
 
     async function handleMessageListener(message) {
