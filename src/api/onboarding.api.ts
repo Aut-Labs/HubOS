@@ -42,6 +42,79 @@ const fetchQuests = async (pluginAddress: any, api: BaseQueryApi) => {
   };
 };
 
+const fetchQuestById = async (
+  body: {
+    questId: number;
+    onboardingQuestAddress: string;
+    daoAddress: string;
+  },
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  const { questId, onboardingQuestAddress } = body;
+
+  if (!questOnboarding) {
+    questOnboarding = sdk.initService<QuestOnboarding>(
+      QuestOnboarding,
+      onboardingQuestAddress
+    );
+    sdk.questOnboarding = questOnboarding;
+  }
+
+  const response = await questOnboarding.getQuestById(+questId);
+
+  if (response?.isSuccess) {
+    response.data.metadata = await fetchMetadata<typeof response.data.metadata>(
+      response.data.metadataUri,
+      environment.nftStorageUrl
+    );
+    return {
+      data: response.data
+    };
+  }
+  return {
+    error: response.errorMessage
+  };
+};
+
+const hasUserCompletedQuest = async (
+  body: {
+    userAddress: string;
+    questId: number;
+    onboardingQuestAddress: string;
+    daoAddress: string;
+  },
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  const { questId, onboardingQuestAddress, userAddress } = body;
+
+  if (!questOnboarding) {
+    questOnboarding = sdk.initService<QuestOnboarding>(
+      QuestOnboarding,
+      onboardingQuestAddress
+    );
+    sdk.questOnboarding = questOnboarding;
+  }
+
+  try {
+    const hasCompletedAQuest =
+      await questOnboarding.questPlugin.functions.hasCompletedAQuest(
+        userAddress,
+        +questId
+      );
+    return {
+      data: hasCompletedAQuest
+    };
+  } catch (error) {
+    return {
+      data: false
+    };
+  }
+};
+
 const activateOnboarding = async (pluginAddress: any, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
   let questOnboarding: QuestOnboarding = sdk.questOnboarding;
@@ -55,6 +128,36 @@ const activateOnboarding = async (pluginAddress: any, api: BaseQueryApi) => {
   }
 
   const response = await questOnboarding.activateOnboarding();
+
+  if (!response.isSuccess) {
+    return {
+      error: response.errorMessage
+    };
+  }
+  return {
+    data: response.data
+  };
+};
+
+const applyForQuest = async (
+  body: {
+    questId: number;
+    onboardingQuestAddress: string;
+  },
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+
+  if (!questOnboarding) {
+    questOnboarding = sdk.initService<QuestOnboarding>(
+      QuestOnboarding,
+      body.onboardingQuestAddress
+    );
+    sdk.questOnboarding = questOnboarding;
+  }
+
+  const response = await questOnboarding.applyForAQuest(body.questId);
 
   if (!response.isSuccess) {
     return {
@@ -182,6 +285,18 @@ export const onboardingApi = createApi({
       return fetchQuests(body, api);
     }
 
+    if (url === "applyForQuest") {
+      return applyForQuest(body, api);
+    }
+
+    if (url === "getOnboardingQuestById") {
+      return fetchQuestById(body, api);
+    }
+
+    if (url === "hasUserCompletedQuest") {
+      return hasUserCompletedQuest(body, api);
+    }
+
     if (url === "createQuest") {
       return createQuest(body, api);
     }
@@ -201,7 +316,7 @@ export const onboardingApi = createApi({
       data: "Test"
     };
   },
-  tagTypes: ["Quests", "Tasks"],
+  tagTypes: ["Quests", "Tasks", "Quest"],
   endpoints: (builder) => ({
     getAllOnboardingQuests: builder.query<Quest[], string>({
       query: (body) => {
@@ -212,6 +327,39 @@ export const onboardingApi = createApi({
       },
       providesTags: ["Quests"]
     }),
+    getOnboardingQuestById: builder.query<
+      Quest,
+      {
+        questId: number;
+        onboardingQuestAddress: string;
+        daoAddress: string;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "getOnboardingQuestById"
+        };
+      },
+      providesTags: ["Quest"]
+    }),
+    hasUserCompletedQuest: builder.query<
+      Quest,
+      {
+        userAddress: string;
+        questId: number;
+        onboardingQuestAddress: string;
+        daoAddress: string;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "hasUserCompletedQuest"
+        };
+      },
+      providesTags: ["Quest"]
+    }),
     activateOnboarding: builder.mutation<boolean, string>({
       query: (body) => {
         return {
@@ -220,6 +368,21 @@ export const onboardingApi = createApi({
         };
       },
       invalidatesTags: ["Quests", "Tasks"]
+    }),
+    applyForQuest: builder.mutation<
+      boolean,
+      {
+        questId: number;
+        onboardingQuestAddress: string;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "applyForQuest"
+        };
+      },
+      invalidatesTags: ["Quest"]
     }),
     createQuest: builder.mutation<
       Quest,
@@ -287,8 +450,12 @@ export const onboardingApi = createApi({
 
 export const {
   useCreateQuestMutation,
+  useApplyForQuestMutation,
+  useLazyHasUserCompletedQuestQuery,
+  useGetOnboardingQuestByIdQuery,
   useCreateTaskPerQuestMutation,
   useGetAllTasksPerQuestQuery,
+  useLazyGetAllTasksPerQuestQuery,
   useGetAllOnboardingQuestsQuery,
   useActivateOnboardingMutation
 } = onboardingApi;

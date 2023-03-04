@@ -1,8 +1,7 @@
-import { PluginDefinition, Task } from "@aut-labs-private/sdk";
+import { Task } from "@aut-labs-private/sdk";
 import {
   Badge,
   Box,
-  Button,
   CircularProgress,
   Paper,
   Stack,
@@ -52,8 +51,12 @@ const TaskStyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const taskStatses = {
   [TaskStatus.Created]: {
-    label: "Open",
+    label: "Todo",
     color: "info"
+  },
+  [TaskStatus.Finished]: {
+    label: "Complete",
+    color: "success"
   }
 };
 
@@ -157,8 +160,10 @@ const TaskListItem = memo(
               >
                 <Tooltip title="View task details">
                   <BtnLink
-                    color="primary"
                     variant="subtitle2"
+                    sx={{
+                      color: "primary.light"
+                    }}
                     to={`/aut-dashboard/${path}/${row.taskId}`}
                     preserveParams
                     queryParams={{
@@ -185,7 +190,7 @@ const TaskListItem = memo(
         <TaskStyledTableCell align="right">
           <CopyAddress address={row.creator} />
           <BtnLink
-            color="primary"
+            color="primary.light"
             variant="caption"
             target="_blank"
             href={`https://my.aut.id/${row.creator}`}
@@ -193,9 +198,6 @@ const TaskListItem = memo(
             View profile
           </BtnLink>
         </TaskStyledTableCell>
-        {/* <TaskStyledTableCell align="right">
-          {dateTypes(row.startDate, row.endDate)}
-        </TaskStyledTableCell> */}
         <TaskStyledTableCell align="right">
           <Chip {...taskStatses[row.status]} size="small" />
         </TaskStyledTableCell>
@@ -257,9 +259,6 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
                     <TaskStyledTableCell align="right">
                       Creator
                     </TaskStyledTableCell>
-                    {/* <TaskStyledTableCell align="right">
-                      Time
-                    </TaskStyledTableCell> */}
                     <TaskStyledTableCell align="right">
                       Status
                     </TaskStyledTableCell>

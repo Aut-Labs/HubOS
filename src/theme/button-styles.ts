@@ -140,6 +140,18 @@ export default (theme: Theme) =>
           opacity: "0.5"
         }
       }
+      // containedPrimary: {
+      //   // borderColor: theme.palette.primary.main,
+      //   // "&:hover": {
+      //   //   backgroundColor: theme.palette.primary.main,
+      //   //   color: theme.palette.offWhite.main
+      //   // },
+      //   // "&.Mui-disabled": {
+      //   //   borderColor: theme.palette.primary.main,
+      //   //   color: theme.palette.primary.main,
+      //   //   opacity: "0.5"
+      //   // }
+      // }
     },
     variants: [
       {
@@ -151,6 +163,16 @@ export default (theme: Theme) =>
             borderWidth: "3px",
             borderStyle: "solid",
             borderRadius: "50px"
+          }
+        }
+      },
+      {
+        props: {
+          variant: "contained"
+        },
+        style: {
+          "&.MuiButton-root": {
+            borderRadius: "8.5px"
           }
         }
       },

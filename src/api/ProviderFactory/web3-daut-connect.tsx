@@ -16,6 +16,7 @@ import { AutID } from "@api/aut.model";
 import { Init } from "@aut-labs/d-aut";
 import { communityUpdateState } from "@store/Community/community.reducer";
 import {
+  NetworkSelectorIsOpen,
   NetworksConfig,
   updateWalletProviderState
 } from "@store/WalletProvider/WalletProvider";
@@ -49,6 +50,7 @@ function Web3DautConnect({
   const dispatch = useAppDispatch();
   const abort = useRef<AbortController>();
   const networks = useSelector(NetworksConfig);
+  const isOpen = useSelector(NetworkSelectorIsOpen);
   const [currentChainId, setCurrentChainId] = useState(null);
   const [dAutConnected, setDAutConnected] = useState(false);
   const [loadingNetwork, setIsLoadingNetwork] = useState(false);

@@ -2,6 +2,7 @@
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import {
+  Button,
   CssBaseline,
   Divider,
   IconButton,
@@ -189,8 +190,17 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             }}
           >
             <Typography variant="body" noWrap color="white">
-              Some warning message
+              Please verify your discord account for your community.
             </Typography>
+            <Button
+              sx={{
+                ml: 2
+              }}
+              variant="contained"
+              color="primary"
+            >
+              Verify
+            </Button>
             <span
               style={{
                 flex: 1

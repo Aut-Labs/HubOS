@@ -141,5 +141,6 @@ export const pluginRegistryApi = createApi({
 
 export const {
   useAddPluginToDAOMutation,
+  useLazyGetAllPluginDefinitionsByDAOQuery,
   useGetAllPluginDefinitionsByDAOQuery
 } = pluginRegistryApi;
