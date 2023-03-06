@@ -7,16 +7,11 @@ import {
   useState
 } from "react";
 import { useAppDispatch } from "@store/store.model";
-import {
-  IsAuthenticated,
-  resetAuthState,
-  setAuthenticated
-} from "@auth/auth.reducer";
+import { resetAuthState, setAuthenticated } from "@auth/auth.reducer";
 import { AutID } from "@api/aut.model";
 import { Init } from "@aut-labs/d-aut";
 import { communityUpdateState } from "@store/Community/community.reducer";
 import {
-  NetworkSelectorIsOpen,
   NetworksConfig,
   updateWalletProviderState
 } from "@store/WalletProvider/WalletProvider";
@@ -30,6 +25,7 @@ import DialogWrapper from "@components/Dialog/DialogWrapper";
 import { Typography, debounce, styled } from "@mui/material";
 import AppTitle from "@components/AppTitle";
 import { NetworkSelectors } from "./components/NetworkSelectors";
+import { useSearchParams } from "react-router-dom";
 
 const DialogInnerContent = styled("div")({
   display: "flex",
@@ -48,9 +44,10 @@ function Web3DautConnect({
   config: Config;
 }) {
   const dispatch = useAppDispatch();
+  const [searchParams] = useSearchParams();
+  const [daoAddress] = useState(localStorage.getItem("temp_dao_address"));
   const abort = useRef<AbortController>();
   const networks = useSelector(NetworksConfig);
-  const isOpen = useSelector(NetworkSelectorIsOpen);
   const [currentChainId, setCurrentChainId] = useState(null);
   const [dAutConnected, setDAutConnected] = useState(false);
   const [loadingNetwork, setIsLoadingNetwork] = useState(false);
@@ -130,10 +127,17 @@ function Web3DautConnect({
       await activateNetwork(network, connector, profile.provider);
     }
 
+    if (searchParams.get("daoAddress")) {
+      localStorage.setItem("temp_dao_address", searchParams.get("daoAddress"));
+    }
+
     await dispatch(
       communityUpdateState({
         communities: autID.properties.communities,
-        selectedCommunityAddress: "0xbAac78A371432Ce5e0FAaFd01E45Df4364a7E6a4"
+        selectedCommunityAddress:
+          searchParams.get("daoAddress") ||
+          daoAddress ||
+          "0xbAac78A371432Ce5e0FAaFd01E45Df4364a7E6a4"
       })
     );
 
@@ -180,7 +184,11 @@ function Web3DautConnect({
         }}
         id="d-aut"
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
-        dao-expander="0xbAac78A371432Ce5e0FAaFd01E45Df4364a7E6a4"
+        dao-expander={
+          searchParams.get("daoAddress") ||
+          daoAddress ||
+          "0xbAac78A371432Ce5e0FAaFd01E45Df4364a7E6a4"
+        }
         button-type="simple"
       />
       <DialogWrapper open={openForSelectNetwork}>
