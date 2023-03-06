@@ -38,6 +38,7 @@ import { setTitle } from "@store/ui-reducer";
 import { useAppDispatch } from "@store/store.model";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
+import AutLoading from "@components/AutLoading";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -205,7 +206,7 @@ const Quests = ({ plugin }: PluginParams) => {
       )}
 
       {isLoading ? (
-        <CircularProgress className="spinner-center" size="60px" />
+        <AutLoading width="130px" height="130px" />
       ) : (
         <>
           {!!filteredQuests?.length && (

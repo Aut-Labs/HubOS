@@ -29,6 +29,7 @@ import LoadingProgressBar from "@components/LoadingProgressBar";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { setTitle } from "@store/ui-reducer";
 import { useAppDispatch } from "@store/store.model";
+import AutLoading from "@components/AutLoading";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -67,7 +68,7 @@ const Quest = ({ plugin }: PluginParams) => {
   );
 
   useEffect(() => {
-    dispatch(setTitle(`Quest - ${quest.metadata?.name}`));
+    dispatch(setTitle(`Quest - ${quest?.metadata?.name}`));
   }, [dispatch, quest]);
 
   const isLoading = useMemo(() => {
@@ -104,7 +105,7 @@ const Quest = ({ plugin }: PluginParams) => {
     >
       <LoadingProgressBar isLoading={isFetching} />
       {isLoading ? (
-        <CircularProgress className="spinner-center" size="60px" />
+        <AutLoading width="130px" height="130px" />
       ) : (
         <Box
           sx={{
@@ -121,7 +122,7 @@ const Quest = ({ plugin }: PluginParams) => {
               color="offWhite"
               sx={{
                 position: "absolute",
-                left: 0
+                left: "30px"
               }}
               to="/aut-dashboard/modules/Onboarding/QuestOnboardingPlugin"
               component={Link}

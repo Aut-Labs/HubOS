@@ -32,6 +32,7 @@ import { TaskType } from "@aut-labs-private/sdk/dist/models/task";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useConfirmDialog } from "react-mui-confirm";
 import OverflowTooltip from "@components/OverflowTooltip";
+import AutLoading from "@components/AutLoading";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
@@ -228,11 +229,7 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
   return (
     <Box>
       {isLoading ? (
-        <CircularProgress
-          sx={{ mt: 12 }}
-          className="spinner-center"
-          size="60px"
-        />
+        <AutLoading width="130px" height="130px" />
       ) : (
         <>
           {!!tasks?.length && (

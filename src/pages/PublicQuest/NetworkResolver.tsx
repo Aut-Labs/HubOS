@@ -1,4 +1,4 @@
-import { Suspense, lazy, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import {
   ConnectorTypes,
   NetworksConfig,
@@ -6,7 +6,10 @@ import {
   setWallet
 } from "@store/WalletProvider/WalletProvider";
 import { useSelector } from "react-redux";
-import AutSDK from "@aut-labs-private/sdk";
+import AutSDK, {
+  addMetadataToCache,
+  getMetadataFromCache
+} from "@aut-labs-private/sdk";
 import { ethers } from "ethers";
 import { Connector, useConnector, useEthers } from "@usedapp/core";
 import AutLoading from "@components/AutLoading";
@@ -32,8 +35,7 @@ import { useAppDispatch } from "@store/store.model";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { useLazyGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import LeaderboardIcon from "@mui/icons-material/Leaderboard";
+import { EnableAndChangeNetwork } from "@api/ProviderFactory/web3.network";
 
 const OpenTask = lazy(() => import("../Modules/Plugins/Task/Open/OpenTask"));
 
@@ -62,9 +64,19 @@ const NetworkResolver = () => {
   const networks = useSelector(NetworksConfig);
   const [isOpen, setIsOpen] = useState(false);
   const { connector, activate } = useConnector();
+  const [eagerLoading, setEagerLoading] = useState(
+    !!getMetadataFromCache("selected-connector")
+  );
   const { activateBrowserWallet, switchNetwork, isLoading, chainId } =
     useEthers();
   const [connected, setIsConnected] = useState(false);
+
+  const shouldEagerLoad = useMemo(() => {
+    const config = networks.find(
+      (n) => n.chainId?.toString() === chainId?.toString()
+    );
+    return !!connector && !isLoading && !connected && !!config && !!chainId;
+  }, [connector, isLoading, chainId, connected]);
 
   const initialiseSDK = async (
     network: NetworkConfig,
@@ -96,16 +108,27 @@ const NetworkResolver = () => {
     const config = networks.find(
       (n) => n.chainId?.toString() === chainId?.toString()
     );
-
     if (config && connector.connector) {
       await activateNetwork(config, connector.connector);
     }
+    addMetadataToCache("selected-connector", connectorType);
+    setEagerLoading(false);
   };
+
+  useEffect(() => {
+    if (!eagerLoading) return;
+    const connectorType: string = getMetadataFromCache("selected-connector");
+    if (shouldEagerLoad && connectorType) {
+      changeConnector(connectorType);
+    }
+  }, [shouldEagerLoad, eagerLoading]);
 
   const activateNetwork = async (network: NetworkConfig, conn: Connector) => {
     try {
       await activate(conn);
       await switchNetwork(+network.chainId);
+      // @ts-ignore
+      await EnableAndChangeNetwork(conn.provider.provider, network);
     } catch (error) {
       console.error(error, "error");
     }
@@ -128,275 +151,281 @@ const NetworkResolver = () => {
         width: "100vw"
       }}
     >
-      {!!connected && (
-        <Toolbar
-          sx={{
-            width: "100%",
-            zIndex: 99,
-            position: "fixed",
-            top: 0,
-            backgroundColor: "nightBlack.main",
-            boxShadow: 2,
-            "&.MuiToolbar-root": {
-              paddingLeft: 6,
-              paddingRight: 6,
-              minHeight: "84px",
-              justifyContent: "space-between",
-              alignItems: "center"
-            }
-          }}
-        >
-          <AppTitle variant="h3" />
-          <Stack
-            flex={1}
-            alignItems="center"
-            justifyContent="center"
-            direction="row"
-            gap={2}
-          >
-            <Link
-              color="offWhite.main"
-              variant="body"
-              target="_blank"
-              href={`https://my.aut.id/`}
+      {eagerLoading || isLoading ? (
+        <AutLoading />
+      ) : (
+        <>
+          {!!connected && (
+            <Toolbar
+              sx={{
+                width: "100%",
+                zIndex: 99,
+                position: "fixed",
+                top: 0,
+                backgroundColor: "nightBlack.main",
+                boxShadow: 2,
+                "&.MuiToolbar-root": {
+                  paddingLeft: 6,
+                  paddingRight: 6,
+                  minHeight: "84px",
+                  justifyContent: "space-between",
+                  alignItems: "center"
+                }
+              }}
             >
-              Leaderboard
-            </Link>
-            <Link
-              color="offWhite.main"
-              variant="body"
-              target="_blank"
-              href={`https://my.aut.id/`}
-            >
-              Nova showcase
-            </Link>
-          </Stack>
-          <Button
-            onClick={() => {
-              setIsOpen(false);
-              setIsConnected(false);
-              dispatch(setWallet(null));
-            }}
-            sx={{
-              width: "220px",
-              height: "55px"
-            }}
-            color="offWhite"
-            variant="outlined"
-          >
-            Disconnect
-          </Button>
-        </Toolbar>
-      )}
-      <PerfectScrollbar
-        style={{
-          marginTop: "84px",
-          height: "calc(100% - 84px)",
-          display: "flex",
-          flexDirection: "column"
-        }}
-      >
-        {!connected && (
-          <Container
-            maxWidth="lg"
-            sx={{
-              py: "20px",
-              height: "100%",
-              flex: 1,
+              <AppTitle variant="h3" />
+              <Stack
+                flex={1}
+                alignItems="center"
+                justifyContent="center"
+                direction="row"
+                gap={2}
+              >
+                <Link
+                  color="offWhite.main"
+                  variant="body"
+                  target="_blank"
+                  href={`https://my.aut.id/`}
+                >
+                  Leaderboard
+                </Link>
+                <Link
+                  color="offWhite.main"
+                  variant="body"
+                  target="_blank"
+                  href={`https://my.aut.id/`}
+                >
+                  Nova showcase
+                </Link>
+              </Stack>
+              <Button
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsConnected(false);
+                  dispatch(setWallet(null));
+                }}
+                sx={{
+                  width: "220px",
+                  height: "55px"
+                }}
+                color="offWhite"
+                variant="outlined"
+              >
+                Disconnect
+              </Button>
+            </Toolbar>
+          )}
+          <PerfectScrollbar
+            style={{
+              marginTop: "84px",
+              height: "calc(100% - 84px)",
               display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              position: "relative"
+              flexDirection: "column"
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row"
-              }}
-              mb={{
-                xs: "25px",
-                md: "50px"
-              }}
-            >
-              <AppTitle />
-            </Box>
-            <Typography
-              mb={{
-                xs: "10px",
-                md: "30px"
-              }}
-              color="white"
-              variant="subtitle2"
-              fontWeight="bold"
-            >
-              To see the quest please connect your wallet.
-            </Typography>
-            <Button
-              onClick={() => setIsOpen(true)}
-              sx={{
-                width: "220px",
-                height: "55px"
-              }}
-              color="offWhite"
-              variant="outlined"
-            >
-              Connect wallet
-            </Button>
-
-            <Stack mt={8} direction="row" gap={2}>
-              <Link
-                color="offWhite.main"
-                variant="body"
-                target="_blank"
-                href={`https://my.aut.id/`}
+            {!connected && (
+              <Container
+                maxWidth="lg"
+                sx={{
+                  py: "20px",
+                  height: "100%",
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  position: "relative"
+                }}
               >
-                Leaderboard
-              </Link>
-              <Link
-                color="offWhite.main"
-                variant="body"
-                target="_blank"
-                href={`https://my.aut.id/`}
-              >
-                Nova showcase
-              </Link>
-            </Stack>
-          </Container>
-        )}
-        {connected && (
-          <Suspense fallback={<AutLoading />}>
-            <Routes>
-              <Route index element={<PublicQuest />} />
-              <Route
-                path={`task/${PluginDefinitionType.OnboardingOpenTaskPlugin}/:taskId`}
-                element={
-                  <OpenTask
-                    plugin={
-                      taskPluginTypes[
-                        PluginDefinitionType.OnboardingOpenTaskPlugin
-                      ]
-                    }
-                  />
-                }
-              />
-              <Route
-                path={`task/${PluginDefinitionType.OnboardingQuizTaskPlugin}/:taskId`}
-                element={
-                  <QuizTask
-                    plugin={
-                      taskPluginTypes[
-                        PluginDefinitionType.OnboardingQuizTaskPlugin
-                      ]
-                    }
-                  />
-                }
-              />
-              <Route
-                path={`task/${PluginDefinitionType.OnboardingJoinDiscordTaskPlugin}/:taskId`}
-                element={
-                  <JoinDiscordTask
-                    plugin={
-                      taskPluginTypes[
-                        PluginDefinitionType.OnboardingJoinDiscordTaskPlugin
-                      ]
-                    }
-                  />
-                }
-              />
-              <Route
-                path={`task/${PluginDefinitionType.OnboardingTransactionTaskPlugin}/:taskId`}
-                element={
-                  <TransactionTask
-                    plugin={
-                      taskPluginTypes[
-                        PluginDefinitionType.OnboardingTransactionTaskPlugin
-                      ]
-                    }
-                  />
-                }
-              />
-            </Routes>
-          </Suspense>
-        )}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row"
+                  }}
+                  mb={{
+                    xs: "25px",
+                    md: "50px"
+                  }}
+                >
+                  <AppTitle />
+                </Box>
+                <Typography
+                  mb={{
+                    xs: "10px",
+                    md: "30px"
+                  }}
+                  color="white"
+                  variant="subtitle2"
+                  fontWeight="bold"
+                >
+                  To see the quest please connect your wallet.
+                </Typography>
+                <Button
+                  onClick={() => setIsOpen(true)}
+                  sx={{
+                    width: "220px",
+                    height: "55px"
+                  }}
+                  color="offWhite"
+                  variant="outlined"
+                >
+                  Connect wallet
+                </Button>
 
-        <DialogWrapper open={isOpen}>
-          <>
-            <AppTitle
-              mb={{
-                xs: "16px",
-                lg: "24px",
-                xxl: "32px"
-              }}
-              variant="h2"
-            />
-            {isLoading && (
-              <div style={{ position: "relative", flex: 1 }}>
-                <AutLoading />
-              </div>
+                <Stack mt={8} direction="row" gap={2}>
+                  <Link
+                    color="offWhite.main"
+                    variant="body"
+                    target="_blank"
+                    href={`https://my.aut.id/`}
+                  >
+                    Leaderboard
+                  </Link>
+                  <Link
+                    color="offWhite.main"
+                    variant="body"
+                    target="_blank"
+                    href={`https://my.aut.id/`}
+                  >
+                    Nova showcase
+                  </Link>
+                </Stack>
+              </Container>
+            )}
+            {connected && (
+              <Suspense fallback={<AutLoading />}>
+                <Routes>
+                  <Route index element={<PublicQuest />} />
+                  <Route
+                    path={`task/${PluginDefinitionType.OnboardingOpenTaskPlugin}/:taskId`}
+                    element={
+                      <OpenTask
+                        plugin={
+                          taskPluginTypes[
+                            PluginDefinitionType.OnboardingOpenTaskPlugin
+                          ]
+                        }
+                      />
+                    }
+                  />
+                  <Route
+                    path={`task/${PluginDefinitionType.OnboardingQuizTaskPlugin}/:taskId`}
+                    element={
+                      <QuizTask
+                        plugin={
+                          taskPluginTypes[
+                            PluginDefinitionType.OnboardingQuizTaskPlugin
+                          ]
+                        }
+                      />
+                    }
+                  />
+                  <Route
+                    path={`task/${PluginDefinitionType.OnboardingJoinDiscordTaskPlugin}/:taskId`}
+                    element={
+                      <JoinDiscordTask
+                        plugin={
+                          taskPluginTypes[
+                            PluginDefinitionType.OnboardingJoinDiscordTaskPlugin
+                          ]
+                        }
+                      />
+                    }
+                  />
+                  <Route
+                    path={`task/${PluginDefinitionType.OnboardingTransactionTaskPlugin}/:taskId`}
+                    element={
+                      <TransactionTask
+                        plugin={
+                          taskPluginTypes[
+                            PluginDefinitionType.OnboardingTransactionTaskPlugin
+                          ]
+                        }
+                      />
+                    }
+                  />
+                </Routes>
+              </Suspense>
             )}
 
-            {!isLoading && (
+            <DialogWrapper open={isOpen}>
               <>
-                {!wallet && (
-                  <Typography color="white" variant="subtitle1">
-                    Connect your wallet
-                  </Typography>
+                <AppTitle
+                  mb={{
+                    xs: "16px",
+                    lg: "24px",
+                    xxl: "32px"
+                  }}
+                  variant="h2"
+                />
+                {isLoading && (
+                  <div style={{ position: "relative", flex: 1 }}>
+                    <AutLoading />
+                  </div>
                 )}
-                {wallet && (
-                  <>
-                    <Typography
-                      mb={{
-                        xs: "8px"
-                      }}
-                      color="white"
-                      variant="subtitle1"
-                    >
-                      Change Network
-                    </Typography>
 
-                    <Typography color="white" variant="body">
-                      You will need to switch your wallet’s network.
-                    </Typography>
+                {!isLoading && (
+                  <>
+                    {!wallet && (
+                      <Typography color="white" variant="subtitle1">
+                        Connect your wallet
+                      </Typography>
+                    )}
+                    {wallet && (
+                      <>
+                        <Typography
+                          mb={{
+                            xs: "8px"
+                          }}
+                          color="white"
+                          variant="subtitle1"
+                        >
+                          Change Network
+                        </Typography>
+
+                        <Typography color="white" variant="body">
+                          You will need to switch your wallet’s network.
+                        </Typography>
+                      </>
+                    )}
+                    <DialogInnerContent>
+                      {!wallet && (
+                        <>
+                          <ConnectorBtn
+                            setConnector={changeConnector}
+                            connectorType={ConnectorTypes.Metamask}
+                          />
+                          <ConnectorBtn
+                            setConnector={changeConnector}
+                            connectorType={ConnectorTypes.WalletConnect}
+                          />
+                        </>
+                      )}
+                      {wallet && !isLoading && (
+                        <NetworkSelectors
+                          networks={networks}
+                          onSelect={async (selectedNetwork: NetworkConfig) => {
+                            if (selectedNetwork) {
+                              try {
+                                await activateNetwork(
+                                  selectedNetwork,
+                                  connector.connector
+                                );
+                              } catch (error) {
+                                console.log(error, "error");
+                              }
+                            }
+                          }}
+                        />
+                      )}
+                    </DialogInnerContent>
                   </>
                 )}
-                <DialogInnerContent>
-                  {!wallet && (
-                    <>
-                      <ConnectorBtn
-                        setConnector={changeConnector}
-                        connectorType={ConnectorTypes.Metamask}
-                      />
-                      <ConnectorBtn
-                        setConnector={changeConnector}
-                        connectorType={ConnectorTypes.WalletConnect}
-                      />
-                    </>
-                  )}
-                  {wallet && !isLoading && (
-                    <NetworkSelectors
-                      networks={networks}
-                      onSelect={async (selectedNetwork: NetworkConfig) => {
-                        if (selectedNetwork) {
-                          try {
-                            await activateNetwork(
-                              selectedNetwork,
-                              connector.connector
-                            );
-                          } catch (error) {
-                            console.log(error, "error");
-                          }
-                        }
-                      }}
-                    />
-                  )}
-                </DialogInnerContent>
               </>
-            )}
-          </>
-        </DialogWrapper>
-      </PerfectScrollbar>
+            </DialogWrapper>
+          </PerfectScrollbar>
+        </>
+      )}
     </Box>
   );
 };

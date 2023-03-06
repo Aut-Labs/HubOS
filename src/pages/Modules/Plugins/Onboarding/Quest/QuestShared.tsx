@@ -117,7 +117,7 @@ export const QuestListItem = memo(
                 <Tooltip title="View quest and submissions">
                   <BtnLink
                     component="button"
-                    color="primary"
+                    color="primary.light"
                     variant="subtitle2"
                     onClick={() => navigate(`${row.questId}`)}
                   >

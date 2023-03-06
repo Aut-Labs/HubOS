@@ -20,6 +20,7 @@ import { isAfter } from "date-fns";
 import Tasks from "./Tasks";
 import CommunityInfo from "./CommunityInfo";
 import QuestInfo from "./QuestInfo";
+import AutLoading from "@components/AutLoading";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 30,
@@ -110,7 +111,7 @@ const PublicQuest = () => {
         isLoading={isFetchingQuest || isFetchingTasks}
       />
       {isLoadingQuest || isLoadingTasks || isLoadingPlugins ? (
-        <CircularProgress className="spinner-center" size="60px" />
+        <AutLoading width="130px" height="130px" />
       ) : (
         <Box
           sx={{

@@ -3,10 +3,8 @@ import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import {
   Button,
-  CssBaseline,
   Divider,
   IconButton,
-  LinearProgress,
   Stack,
   SvgIcon,
   Toolbar,
@@ -29,6 +27,7 @@ import { SelectedNetworkConfig } from "@store/WalletProvider/WalletProvider";
 import { CommunityData } from "@store/Community/community.reducer";
 import { UserInfo } from "@auth/auth.reducer";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
+import "react-perfect-scrollbar/dist/css/styles.css";
 
 const Main = styled("main", {
   shouldForwardProp: (prop) =>
@@ -110,6 +109,8 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
   const [warningAppBarOpen, setWarningAppBarOpen] = useState(
     !sessionStorage.getItem("warning-toolbar-flag")
   );
+
+  console.log("hereeeeeeeeee");
 
   const drawerWidth = useMemo(() => {
     return isExtraLarge ? 350 : 300;
@@ -343,11 +344,11 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             display: "flex",
             flexDirection: "column"
           }}
-          // options={{
-          //   suppressScrollX: true,
-          //   useBothWheelAxes: false
-          //   // swipeEasing: true
-          // }}
+          options={{
+            suppressScrollX: true,
+            useBothWheelAxes: false,
+            swipeEasing: false
+          }}
         >
           {children}
         </PerfectScrollbar>

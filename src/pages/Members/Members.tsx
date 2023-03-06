@@ -9,7 +9,6 @@ import {
   CardContent,
   CardHeader,
   Chip,
-  CircularProgress,
   Container,
   Stack,
   Typography,
@@ -17,11 +16,11 @@ import {
 } from "@mui/material";
 import { setTitle } from "@store/ui-reducer";
 import { useGetAllMembersQuery } from "@api/community.api";
-import { pxToRem } from "@utils/text-size";
 import { DAOMember } from "@api/aut.model";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import LoadingProgressBar from "@components/LoadingProgressBar";
+import AutLoading from "@components/AutLoading";
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -239,7 +238,7 @@ function Members() {
       )}
 
       {isLoading ? (
-        <CircularProgress className="spinner-center" size="60px" />
+        <AutLoading width="130px" height="130px" />
       ) : (
         <GridBox sx={{ flexGrow: 1, mt: 6 }}>
           {data.map((member, index) => (
