@@ -2,6 +2,7 @@ import { Box, Container, styled, Typography } from "@mui/material";
 import { ReactComponent as Trifold } from "@assets/trifold.svg";
 import AppTitle from "@components/AppTitle";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
+import bubble from "@assets/bubble.png";
 
 const Grid = styled("div")(({ theme }) => {
   return {
@@ -16,6 +17,22 @@ const Grid = styled("div")(({ theme }) => {
       flexDirection: "row"
     }
   };
+});
+
+const BottomLeftBubble = styled("img")({
+  position: "absolute",
+  width: "700px",
+  height: "700px",
+  left: "-350px",
+  bottom: "-350px"
+});
+
+const TopRightBubble = styled("img")({
+  position: "absolute",
+  width: "700px",
+  height: "700px",
+  top: "-350px",
+  right: "-350px"
 });
 
 const Content = styled("div")(({ theme }) => {
@@ -55,6 +72,8 @@ const ImageWrapper = styled("div")(({ theme }) => {
 const GetStarted = () => {
   return (
     <Container maxWidth="lg" sx={{ flexGrow: 1, height: "100%" }}>
+      <BottomLeftBubble loading="lazy" src={bubble} />
+      <TopRightBubble loading="lazy" src={bubble} />
       <Grid>
         <Content>
           <Box

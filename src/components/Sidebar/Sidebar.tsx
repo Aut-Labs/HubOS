@@ -110,8 +110,6 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
     !sessionStorage.getItem("warning-toolbar-flag")
   );
 
-  console.log("hereeeeeeeeee");
-
   const drawerWidth = useMemo(() => {
     return isExtraLarge ? 350 : 300;
   }, [isExtraLarge]);

@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import { addDays } from "date-fns";
 import { memo, useEffect, useState } from "react";
-import BetaCountdown from "./BetaCountdown";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { Quest } from "@aut-labs-private/sdk";
 import {
@@ -24,6 +23,7 @@ import { useSearchParams } from "react-router-dom";
 import InfoIcon from "@mui/icons-material/Info";
 import { useConfirmDialog } from "react-mui-confirm";
 import { deleteCache, getCache, updateCache } from "@api/cache.api";
+import BetaCountdown from "@components/BetaCountdown";
 
 const QuestInfo = ({
   quest,
@@ -135,7 +135,7 @@ const QuestInfo = ({
           borderRadius: "16px",
           height: "100%",
           p: 3,
-          backgroundColor: "#ffffff0a"
+          backgroundColor: "nightBlack.main"
         }}
       >
         <Box

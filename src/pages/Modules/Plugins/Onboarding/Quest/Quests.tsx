@@ -16,7 +16,6 @@ import {
   TableHead,
   TableRow,
   Stack,
-  CircularProgress,
   IconButton,
   Tooltip,
   Badge
@@ -27,11 +26,7 @@ import { memo, useEffect, useMemo, useState } from "react";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import {
-  QuestFilters,
-  QuestListItem,
-  QuestStyledTableCell
-} from "./QuestShared";
+import { QuestListItem, QuestStyledTableCell } from "./QuestShared";
 import { useSelector } from "react-redux";
 import { IsAdmin } from "@store/Community/community.reducer";
 import { setTitle } from "@store/ui-reducer";
@@ -39,6 +34,7 @@ import { useAppDispatch } from "@store/store.model";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import AutLoading from "@components/AutLoading";
+import { useEthers } from "@usedapp/core";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -48,6 +44,7 @@ const Quests = ({ plugin }: PluginParams) => {
   const dispatch = useAppDispatch();
   const isAdmin = useSelector(IsAdmin);
   const [search, setSearchState] = useState(null);
+  const { account } = useEthers();
   const {
     data: quests,
     isLoading,
@@ -60,11 +57,11 @@ const Quests = ({ plugin }: PluginParams) => {
 
   const [
     activateOnboarding,
-    { error, isError, data: quest, isLoading: isActivating, reset }
+    { error, isError, isLoading: isActivating, reset }
   ] = useActivateOnboardingMutation();
 
   useEffect(() => {
-    dispatch(setTitle(`Quests`));
+    dispatch(setTitle(`Onboarding quest`));
   }, [dispatch]);
 
   const filteredQuests = useMemo(() => {
@@ -85,10 +82,12 @@ const Quests = ({ plugin }: PluginParams) => {
       <LoadingDialog open={isActivating} message="Activating onboarding..." />
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          flex: 1,
-          position: "relative"
+          boxShadow: 1,
+          border: "2px solid",
+          borderColor: "divider",
+          borderRadius: "16px",
+          p: 3,
+          backgroundColor: "nightBlack.main"
         }}
       >
         <Typography textAlign="center" color="white" variant="h3">
@@ -150,7 +149,12 @@ const Quests = ({ plugin }: PluginParams) => {
                     variant="outlined"
                     size="medium"
                     color="primary"
-                    onClick={() => activateOnboarding(plugin.pluginAddress)}
+                    onClick={() =>
+                      activateOnboarding({
+                        userAddress: account,
+                        pluginAddress: plugin.pluginAddress
+                      })
+                    }
                   >
                     Activate Quest onboarding
                   </Button>

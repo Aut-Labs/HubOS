@@ -30,6 +30,8 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { setTitle } from "@store/ui-reducer";
 import { useAppDispatch } from "@store/store.model";
 import AutLoading from "@components/AutLoading";
+import { addDays, isAfter } from "date-fns";
+import BetaCountdown from "@components/BetaCountdown";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -66,6 +68,11 @@ const Quest = ({ plugin }: PluginParams) => {
       })
     }
   );
+
+  const hasQuestStarted = useMemo(() => {
+    if (!quest?.startDate) return false;
+    return isAfter(new Date(), new Date(quest.startDate));
+  }, [quest]);
 
   useEffect(() => {
     dispatch(setTitle(`Quest - ${quest?.metadata?.name}`));
@@ -112,8 +119,12 @@ const Quest = ({ plugin }: PluginParams) => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 1,
-            position: "relative"
+            boxShadow: 1,
+            border: "2px solid",
+            borderColor: "divider",
+            borderRadius: "16px",
+            p: 3,
+            backgroundColor: "nightBlack.main"
           }}
         >
           <Stack alignItems="center" justifyContent="center">
@@ -122,7 +133,7 @@ const Quest = ({ plugin }: PluginParams) => {
               color="offWhite"
               sx={{
                 position: "absolute",
-                left: "30px"
+                left: "42px"
               }}
               to="/aut-dashboard/modules/Onboarding/QuestOnboardingPlugin"
               component={Link}
@@ -148,22 +159,40 @@ const Quest = ({ plugin }: PluginParams) => {
             </Typography>
           </Stack>
 
-          <OverflowTooltip
-            typography={{
-              maxWidth: "400px"
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center"
             }}
-            text={quest?.metadata?.description}
-          />
+          >
+            <OverflowTooltip
+              typography={{
+                maxWidth: "400px"
+              }}
+              text={quest?.metadata?.description}
+            />
+          </Box>
 
           <Box
             sx={{
-              display: "grid",
-              alignItems: "center",
-              mx: "auto",
-              gridTemplateColumns: "1fr 1fr 1fr"
+              mt: 2,
+              display: "flex",
+              gridGap: "20px",
+              alignItems: "flex-end"
+              // justifyContent: "center",
+              // mx: "auto",
+              // gridTemplateColumns: "1fr 1fr 1fr"
             }}
           >
-            <Stack direction="column" alignItems="center">
+            <BetaCountdown
+              hasStarted={hasQuestStarted}
+              startDate={quest?.startDate}
+              endDate={addDays(
+                new Date(quest?.startDate),
+                quest?.durationInDays
+              ).getTime()}
+            />
+            <Stack direction="column">
               <Typography
                 fontFamily="FractulAltBold"
                 variant="subtitle2"
@@ -175,19 +204,7 @@ const Quest = ({ plugin }: PluginParams) => {
                 Status
               </Typography>
             </Stack>
-            <Stack direction="column" alignItems="center">
-              <Typography
-                fontFamily="FractulAltBold"
-                color="white"
-                variant="subtitle2"
-              >
-                {new Date(quest?.startDate * 1000).toDateString()}
-              </Typography>
-              <Typography variant="caption" className="text-secondary">
-                Start date
-              </Typography>
-            </Stack>
-            <Stack direction="column" alignItems="center">
+            <Stack direction="column">
               <Typography
                 fontFamily="FractulAltBold"
                 color="white"

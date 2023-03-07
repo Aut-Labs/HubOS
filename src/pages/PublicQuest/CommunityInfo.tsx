@@ -68,7 +68,7 @@ const CommunityInfo = () => {
         height: "100%",
         borderRadius: "16px",
         p: 3,
-        backgroundColor: "#ffffff0a"
+        backgroundColor: "nightBlack.main"
       }}
     >
       <Box

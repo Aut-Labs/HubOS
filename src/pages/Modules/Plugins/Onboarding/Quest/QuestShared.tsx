@@ -119,7 +119,12 @@ export const QuestListItem = memo(
                     component="button"
                     color="primary.light"
                     variant="subtitle2"
-                    onClick={() => navigate(`${row.questId}`)}
+                    onClick={() =>
+                      navigate({
+                        pathname: `${row.questId}`,
+                        search: `questPluginAddress=${pluginAddress}`
+                      })
+                    }
                   >
                     {row.metadata?.name || "n/a"}
                   </BtnLink>

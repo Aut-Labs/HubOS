@@ -29,13 +29,31 @@ import { NetworkSelectors } from "@api/ProviderFactory/components/NetworkSelecto
 import { NetworkConfig } from "@api/ProviderFactory/network.config";
 import ConnectorBtn from "@api/ProviderFactory/components/ConnectorBtn";
 import PublicQuest from "./PublicQuest";
-import { Route, Routes, useSearchParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
 import { communityUpdateState } from "@store/Community/community.reducer";
 import { useAppDispatch } from "@store/store.model";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { useLazyGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { EnableAndChangeNetwork } from "@api/ProviderFactory/web3.network";
+
+import bubble from "@assets/bubble.png";
+
+const BottomLeftBubble = styled("img")({
+  position: "absolute",
+  width: "700px",
+  height: "700px",
+  left: "-350px",
+  bottom: "-350px"
+});
+
+const TopRightBubble = styled("img")({
+  position: "absolute",
+  width: "700px",
+  height: "700px",
+  top: "calc(-350px + 84px)",
+  right: "-350px"
+});
 
 const OpenTask = lazy(() => import("../Modules/Plugins/Task/Open/OpenTask"));
 
@@ -59,6 +77,7 @@ const DialogInnerContent = styled("div")({
 
 const NetworkResolver = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const wallet = useSelector(SelectedWalletType);
   const networks = useSelector(NetworksConfig);
@@ -151,6 +170,8 @@ const NetworkResolver = () => {
         width: "100vw"
       }}
     >
+      <BottomLeftBubble loading="lazy" src={bubble} />
+      <TopRightBubble loading="lazy" src={bubble} />
       {eagerLoading || isLoading ? (
         <AutLoading />
       ) : (
@@ -173,7 +194,13 @@ const NetworkResolver = () => {
                 }
               }}
             >
-              <AppTitle variant="h3" />
+              <AppTitle
+                sx={{
+                  cursor: "pointer"
+                }}
+                onClick={() => navigate("/")}
+                variant="h3"
+              />
               <Stack
                 flex={1}
                 alignItems="center"

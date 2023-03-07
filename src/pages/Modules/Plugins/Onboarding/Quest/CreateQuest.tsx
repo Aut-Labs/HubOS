@@ -16,8 +16,7 @@ import {
   MenuItem,
   Stack,
   Tooltip,
-  Typography,
-  styled
+  Typography
 } from "@mui/material";
 import { allRoles } from "@store/Community/community.reducer";
 import { AutSelectField } from "@theme/field-select-styles";
@@ -28,15 +27,19 @@ import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import { addDays, getUnixTime } from "date-fns";
+import { addDays, addMinutes, getUnixTime } from "date-fns";
+
+import * as React from "react";
+import TextField from "@mui/material/TextField";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
   maxNameChars: `Characters cannot be more than 24`,
   maxLength: `Characters cannot be more than 280`
 };
-
-const startDate = addDays(new Date(), 1);
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -117,7 +120,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       title: "",
       description: "",
       durationInDays: 3,
-      startDate: getUnixTime(startDate) * 1000,
+      startDate: addMinutes(new Date(), 60),
       role: null
     }
   });
@@ -139,7 +142,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       pluginAddress: plugin.pluginAddress,
       role: values.role,
       durationInDays: values.durationInDays,
-      startDate: values.startDate,
+      startDate: getUnixTime(new Date(values.startDate)) * 1000,
       metadata: {
         name: values.title || roles.find((r) => r.id === values.role)?.roleName,
         description: values.description,
@@ -282,6 +285,39 @@ const CreateQuest = ({ plugin }: PluginParams) => {
                 );
               }}
             />
+
+            <Controller
+              name="startDate"
+              control={control}
+              rules={{
+                required: true
+              }}
+              render={({ field: { name, value, onChange } }) => {
+                return (
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <TimePicker
+                      // @ts-ignore
+                      name={name}
+                      value={value}
+                      label="Time"
+                      variant="standard"
+                      onChange={onChange}
+                      // @ts-ignore
+                      color="offWhite"
+                      // @ts-ignore
+                      renderInput={(params) => (
+                        <TextField
+                          variant="standard"
+                          color="offWhite"
+                          {...params}
+                        />
+                      )}
+                    />
+                  </LocalizationProvider>
+                );
+              }}
+            />
+
             <Controller
               name="durationInDays"
               control={control}
