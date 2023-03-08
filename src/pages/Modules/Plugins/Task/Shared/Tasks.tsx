@@ -314,7 +314,7 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
               sx={{
                 display: "flex",
                 gap: "20px",
-                mt: 12,
+                pt: 12,
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center"

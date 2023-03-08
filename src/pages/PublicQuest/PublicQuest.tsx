@@ -188,7 +188,7 @@ const PublicQuest = () => {
               color="white"
               variant="subtitle1"
             >
-              Tasks to complete
+              Quest tasks
             </Typography>
           )}
 

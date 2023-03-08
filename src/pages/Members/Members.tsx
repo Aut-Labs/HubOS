@@ -232,7 +232,7 @@ function Members() {
           }}
         >
           <Typography color="rgb(107, 114, 128)" variant="subtitle2">
-            There are no members on this community yet...
+            There are no members in this community yet...
           </Typography>
         </Box>
       )}

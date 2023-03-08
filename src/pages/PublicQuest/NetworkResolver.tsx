@@ -38,6 +38,7 @@ import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { EnableAndChangeNetwork } from "@api/ProviderFactory/web3.network";
 
 import bubble from "@assets/bubble.png";
+import { authoriseWithWeb3 } from "@api/auth.api";
 
 const BottomLeftBubble = styled("img")({
   position: "absolute",
@@ -82,20 +83,11 @@ const NetworkResolver = () => {
   const wallet = useSelector(SelectedWalletType);
   const networks = useSelector(NetworksConfig);
   const [isOpen, setIsOpen] = useState(false);
+  const [isSigning, setIsSigning] = useState(false);
   const { connector, activate } = useConnector();
-  const [eagerLoading, setEagerLoading] = useState(
-    !!getMetadataFromCache("selected-connector")
-  );
   const { activateBrowserWallet, switchNetwork, isLoading, chainId } =
     useEthers();
   const [connected, setIsConnected] = useState(false);
-
-  const shouldEagerLoad = useMemo(() => {
-    const config = networks.find(
-      (n) => n.chainId?.toString() === chainId?.toString()
-    );
-    return !!connector && !isLoading && !connected && !!config && !!chainId;
-  }, [connector, isLoading, chainId, connected]);
 
   const initialiseSDK = async (
     network: NetworkConfig,
@@ -130,37 +122,39 @@ const NetworkResolver = () => {
     if (config && connector.connector) {
       await activateNetwork(config, connector.connector);
     }
-    addMetadataToCache("selected-connector", connectorType);
-    setEagerLoading(false);
   };
-
-  useEffect(() => {
-    if (!eagerLoading) return;
-    const connectorType: string = getMetadataFromCache("selected-connector");
-    if (shouldEagerLoad && connectorType) {
-      changeConnector(connectorType);
-    }
-  }, [shouldEagerLoad, eagerLoading]);
 
   const activateNetwork = async (network: NetworkConfig, conn: Connector) => {
     try {
+      setIsSigning(true);
       await activate(conn);
       await switchNetwork(+network.chainId);
       // @ts-ignore
-      await EnableAndChangeNetwork(conn.provider.provider, network);
+      const provider = conn.provider.provider;
+      await EnableAndChangeNetwork(provider, network);
+      const isAuthorised = await authoriseWithWeb3(provider);
+
+      if (isAuthorised) {
+        const signer = conn?.provider?.getSigner();
+        await initialiseSDK(network, signer as ethers.providers.JsonRpcSigner);
+        await dispatch(
+          communityUpdateState({
+            selectedCommunityAddress: searchParams.get("daoAddress")
+          })
+        );
+        setIsConnected(true);
+        loadPlugins(null);
+      } else {
+        setIsConnected(false);
+        dispatch(setWallet(null));
+      }
     } catch (error) {
       console.error(error, "error");
+    } finally {
+      setIsOpen(false);
+      setIsSigning(false);
+      dispatch(setWallet(null));
     }
-    const signer = conn?.provider?.getSigner();
-    await initialiseSDK(network, signer as ethers.providers.JsonRpcSigner);
-    await dispatch(
-      communityUpdateState({
-        selectedCommunityAddress: searchParams.get("daoAddress")
-      })
-    );
-    setIsOpen(false);
-    setIsConnected(true);
-    loadPlugins(null);
   };
 
   return (
@@ -172,7 +166,7 @@ const NetworkResolver = () => {
     >
       <BottomLeftBubble loading="lazy" src={bubble} />
       <TopRightBubble loading="lazy" src={bubble} />
-      {eagerLoading || isLoading ? (
+      {isLoading ? (
         <AutLoading />
       ) : (
         <>
@@ -385,13 +379,13 @@ const NetworkResolver = () => {
                   }}
                   variant="h2"
                 />
-                {isLoading && (
+                {(isLoading || isSigning) && (
                   <div style={{ position: "relative", flex: 1 }}>
                     <AutLoading />
                   </div>
                 )}
 
-                {!isLoading && (
+                {!isLoading && !isSigning && (
                   <>
                     {!wallet && (
                       <Typography color="white" variant="subtitle1">

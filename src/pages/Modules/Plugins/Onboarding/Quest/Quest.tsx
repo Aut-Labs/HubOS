@@ -11,7 +11,9 @@ import {
   Stack,
   CircularProgress,
   IconButton,
-  Tooltip
+  Tooltip,
+  Chip,
+  Badge
 } from "@mui/material";
 import { Link, useLocation, useParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -32,6 +34,7 @@ import { useAppDispatch } from "@store/store.model";
 import AutLoading from "@components/AutLoading";
 import { addDays, isAfter } from "date-fns";
 import BetaCountdown from "@components/BetaCountdown";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -156,6 +159,14 @@ const Quest = ({ plugin }: PluginParams) => {
                   <RefreshIcon />
                 </IconButton>
               </Tooltip>
+              <Chip
+                sx={{
+                  ml: 1
+                }}
+                label={hasQuestStarted ? "Ongoing" : "Active"}
+                color={hasQuestStarted ? "info" : "success"}
+                size="small"
+              />
             </Typography>
           </Stack>
 
@@ -175,47 +186,40 @@ const Quest = ({ plugin }: PluginParams) => {
 
           <Box
             sx={{
-              mt: 2,
+              width: "100%",
               display: "flex",
-              gridGap: "20px",
-              alignItems: "flex-end"
-              // justifyContent: "center",
-              // mx: "auto",
-              // gridTemplateColumns: "1fr 1fr 1fr"
+              mt: 2,
+              alignItems: "center",
+              justifyContent: "flex-end"
             }}
           >
-            <BetaCountdown
-              hasStarted={hasQuestStarted}
-              startDate={quest?.startDate}
-              endDate={addDays(
-                new Date(quest?.startDate),
-                quest?.durationInDays
-              ).getTime()}
-            />
-            <Stack direction="column">
-              <Typography
-                fontFamily="FractulAltBold"
-                variant="subtitle2"
-                color={quest?.active ? "success" : "error"}
+            <Badge
+              invisible={tasks?.length < 5}
+              badgeContent={
+                <Tooltip title="During beta there is a maximum of 5 tasks per quest">
+                  <ErrorOutlineIcon color="error" />
+                </Tooltip>
+              }
+            >
+              <Button
+                startIcon={<AddIcon />}
+                variant="outlined"
+                disabled={tasks?.length >= 5}
+                size="medium"
+                color="primary"
+                to="/aut-dashboard/modules/Task"
+                preserveParams
+                queryParams={{
+                  questPluginAddress: plugin?.pluginAddress,
+                  returnUrlLinkName: "Back to quest",
+                  returnUrl: location.pathname,
+                  questId: params?.questId.toString()
+                }}
+                component={LinkWithQuery}
               >
-                {quest?.active ? "Active" : "Inactive"}
-              </Typography>
-              <Typography variant="caption" className="text-secondary">
-                Status
-              </Typography>
-            </Stack>
-            <Stack direction="column">
-              <Typography
-                fontFamily="FractulAltBold"
-                color="white"
-                variant="subtitle2"
-              >
-                {quest?.tasksCount}
-              </Typography>
-              <Typography variant="caption" className="text-secondary">
-                Total tasks
-              </Typography>
-            </Stack>
+                Add task
+              </Button>
+            </Badge>
           </Box>
         </Box>
       )}
@@ -260,11 +264,19 @@ const Quest = ({ plugin }: PluginParams) => {
             <AutTabs
               tabStyles={{
                 mt: 4,
-                flex: 1
+                flex: 1,
+                ".tab-content": {
+                  padding: 0,
+                  border: 0,
+                  ".MuiTableContainer-root": {
+                    marginTop: 0,
+                    borderTopLeftRadius: 0
+                  }
+                }
               }}
               tabs={[
                 {
-                  label: "Task",
+                  label: "Tasks",
                   props: {
                     isLoading,
                     tasks: tasks,

@@ -22,7 +22,7 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { useSearchParams } from "react-router-dom";
 import InfoIcon from "@mui/icons-material/Info";
 import { useConfirmDialog } from "react-mui-confirm";
-import { deleteCache, getCache, updateCache } from "@api/cache.api";
+import { CacheTypes, deleteCache, getCache, updateCache } from "@api/cache.api";
 import BetaCountdown from "@components/BetaCountdown";
 
 const QuestInfo = ({
@@ -48,11 +48,7 @@ const QuestInfo = ({
       title: "Are you sure you want to delete withdraw from quest?",
       onConfirm: async () => {
         try {
-          // implement withdraw
-          await deleteCache({
-            ...(cache || {}),
-            address: account
-          });
+          await deleteCache(CacheTypes.UserPhases);
           setAppliedQuest(null);
           setAppliedQuestFn(null);
           setCache(null);
@@ -102,7 +98,7 @@ const QuestInfo = ({
   useEffect(() => {
     const start = async () => {
       try {
-        const cacheResult = await getCache(account);
+        const cacheResult = await getCache(CacheTypes.UserPhases);
         setAppliedQuest(cacheResult?.questId);
         setAppliedQuestFn(cacheResult?.questId);
         setCache(cacheResult);
@@ -236,12 +232,12 @@ const QuestInfo = ({
           }}
         >
           <BetaCountdown
-            hasStarted={hasQuestStarted}
-            startDate={quest?.startDate}
-            endDate={addDays(
-              new Date(quest?.startDate),
-              quest?.durationInDays
-            ).getTime()}
+            textAlign="left"
+            to={
+              hasQuestStarted
+                ? addDays(new Date(quest?.startDate), 15)
+                : new Date(quest?.startDate)
+            }
           />
         </Box>
       </Box>

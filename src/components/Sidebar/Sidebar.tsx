@@ -28,6 +28,7 @@ import { CommunityData } from "@store/Community/community.reducer";
 import { UserInfo } from "@auth/auth.reducer";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
 import "react-perfect-scrollbar/dist/css/styles.css";
+import BetaCountdown from "@components/BetaCountdown";
 
 const Main = styled("main", {
   shouldForwardProp: (prop) =>
@@ -257,7 +258,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
         >
           <Stack direction="column">
             <Typography
-              fontFamily="FractulAltBold"
+              fontFamily="FractulRegular"
               color="primary"
               variant="subtitle2"
             >
@@ -269,7 +270,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
           </Stack>
           <Stack direction="column">
             <Typography
-              fontFamily="FractulAltBold"
+              fontFamily="FractulRegular"
               color="primary"
               variant="subtitle2"
             >
@@ -287,7 +288,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
           >
             <Stack direction="column">
               <Typography
-                fontFamily="FractulAltBold"
+                fontFamily="FractulRegular"
                 color="primary"
                 variant="subtitle2"
                 maxWidth="120px"
@@ -300,7 +301,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             </Stack>
             <Stack direction="column">
               <Typography
-                fontFamily="FractulAltBold"
+                fontFamily="FractulRegular"
                 color="primary"
                 variant="subtitle2"
               >
@@ -317,12 +318,15 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
         <Box
           sx={{
             display: "flex",
+            flexDirection: "column",
             justifyContent: "center",
             py: 2
           }}
         >
+          <BetaCountdown to={new Date("2023-03-16 01:00:00")} />
           <SvgIcon
             sx={{
+              mt: 5,
               height: "30px",
               width: "100%"
             }}
@@ -336,20 +340,21 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
         drawerWidth={drawerWidth}
         open={open}
       >
-        <PerfectScrollbar
+        <div
           style={{
-            minHeight: "100%",
+            height: "100vh",
             display: "flex",
-            flexDirection: "column"
+            flexDirection: "column",
+            overflowY: "auto"
           }}
-          options={{
-            suppressScrollX: true,
-            useBothWheelAxes: false,
-            swipeEasing: false
-          }}
+          // options={{
+          //   suppressScrollX: true,
+          //   useBothWheelAxes: false,
+          //   swipeEasing: false
+          // }}
         >
           {children}
-        </PerfectScrollbar>
+        </div>
       </Main>
     </Box>
   );

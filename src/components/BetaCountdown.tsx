@@ -1,114 +1,58 @@
-import { Stack, Typography } from "@mui/material";
-import { useState, useEffect, memo } from "react";
+import { Typography, styled } from "@mui/material";
+import { memo } from "react";
+import FlipClockCountdown from "@leenguyen/react-flip-clock-countdown";
+import "@leenguyen/react-flip-clock-countdown/dist/index.css";
+import { isAfter } from "date-fns";
+
+const Countdown = styled("div")({
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  "& > DIV > DIV:nth-of-type(even)": {
+    marginLeft: "4px",
+    marginRight: "4px"
+  },
+  "& > DIV > DIV:nth-of-type(odd) > DIV:nth-of-type(2)": {
+    marginRight: "2px"
+  }
+});
 
 const BetaCountdown = ({
-  hasStarted,
-  startDate,
-  endDate
+  to,
+  textAlign = "center"
 }: {
-  hasStarted: boolean;
-  startDate: number;
-  endDate: number;
+  to: Date;
+  textAlign?: string;
 }) => {
-  const [days, setDays] = useState(0);
-  const [hours, setHours] = useState(0);
-  const [minutes, setMinutes] = useState(0);
-  const [seconds, setSeconds] = useState(0);
-
-  const getTime = () => {
-    const date = hasStarted ? endDate : startDate;
-    const time = new Date(date).getTime() - Date.now();
-
-    setDays(Math.floor(time / (1000 * 60 * 60 * 24)));
-    setHours(Math.floor((time / (1000 * 60 * 60)) % 24));
-    setMinutes(Math.floor((time / 1000 / 60) % 60));
-    setSeconds(Math.floor((time / 1000) % 60));
-  };
-
-  useEffect(() => {
-    const interval = setInterval(() => getTime(), 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <div className="timer" role="timer">
-      <Stack direction="column">
-        <Stack direction="row" gap={1}>
-          <Stack direction="column">
-            <Typography
-              color="primary.light"
-              fontFamily="FractulAltBold"
-              variant="subtitle2"
-            >
-              {days < 10 ? days : days}
-            </Typography>
-            <Typography
-              color="white"
-              fontFamily="FractulRegular"
-              variant="body"
-              className="text"
-            >
-              {days == 1 ? "Day" : "Days"}
-            </Typography>
-          </Stack>
-          <Stack direction="column">
-            <Typography
-              color="primary.light"
-              fontFamily="FractulAltBold"
-              variant="subtitle2"
-            >
-              {hours < 10 ? hours : hours}
-            </Typography>
-            <Typography
-              color="white"
-              fontFamily="FractulRegular"
-              variant="body"
-              className="text"
-            >
-              {hours == 1 ? "Hour" : "Hours"}
-            </Typography>
-          </Stack>
-          <Stack direction="column">
-            <Typography
-              color="primary.light"
-              fontFamily="FractulAltBold"
-              variant="subtitle2"
-            >
-              {minutes < 10 ? minutes : minutes}
-            </Typography>
-            <Typography
-              color="white"
-              fontFamily="FractulRegular"
-              variant="body"
-              className="text"
-            >
-              {minutes == 1 ? "Minute" : "Minutes"}
-            </Typography>
-          </Stack>
-          <Stack direction="column">
-            <Typography
-              color="primary.light"
-              fontFamily="FractulAltBold"
-              variant="subtitle2"
-            >
-              {seconds < 10 ? seconds : seconds}
-            </Typography>
-            <Typography
-              color="white"
-              fontFamily="FractulRegular"
-              variant="body"
-              className="text"
-            >
-              {seconds == 1 ? "Second" : "Seconds"}
-            </Typography>
-          </Stack>
-        </Stack>
-        <Typography variant="caption" className="text-secondary">
-          {!!hasStarted ? "Ends in" : "Starts in"}
-        </Typography>
-      </Stack>
-    </div>
+    <Countdown>
+      <Typography
+        width="100%"
+        textAlign={textAlign as any}
+        variant="subtitle2"
+        mb={1}
+        className="text-secondary"
+      >
+        {isAfter(to, new Date()) ? "Beta ends in" : "Beta starts in"}
+      </Typography>
+      <FlipClockCountdown
+        digitBlockStyle={{
+          fontFamily: "FractulRegular",
+          width: "26px",
+          height: "40px",
+          fontSize: "38px"
+        }}
+        labelStyle={{
+          fontSize: "12px",
+          fontFamily: "FractulRegular"
+        }}
+        separatorStyle={{
+          size: "4px"
+        }}
+        to={to?.toUTCString()}
+      />
+    </Countdown>
   );
 };
 

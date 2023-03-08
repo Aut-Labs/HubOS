@@ -7,7 +7,7 @@ import AutSDK, {
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
-import { getCache, updateCache } from "./cache.api";
+import { CacheTypes, getCache, updateCache } from "./cache.api";
 
 const fetchQuests = async (pluginAddress: any, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
@@ -140,7 +140,7 @@ const activateOnboarding = async (
   }
 
   try {
-    const cache = await getCache(userAddress);
+    const cache = await getCache(CacheTypes.UserPhases);
     cache.list[1].status = 1; // complete phase 2
     await updateCache(cache);
   } catch (error) {

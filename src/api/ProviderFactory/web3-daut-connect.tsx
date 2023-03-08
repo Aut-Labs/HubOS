@@ -26,6 +26,7 @@ import { Typography, debounce, styled } from "@mui/material";
 import AppTitle from "@components/AppTitle";
 import { NetworkSelectors } from "./components/NetworkSelectors";
 import { useSearchParams } from "react-router-dom";
+import { AUTH_TOKEN_KEY, authoriseWithWeb3 } from "@api/auth.api";
 
 const DialogInnerContent = styled("div")({
   display: "flex",
@@ -124,6 +125,9 @@ function Web3DautConnect({
     if (network && !network?.disabled) {
       const connector = config.connectors[profile.provider];
       activateBrowserWallet({ type: profile.provider });
+      // @ts-ignore
+      const provider = connector.provider.provider;
+      const isAuthorised = await authoriseWithWeb3(provider);
       await activateNetwork(network, connector, profile.provider);
     }
 
@@ -154,6 +158,7 @@ function Web3DautConnect({
 
   const onDisconnected = () => {
     dispatch(resetAuthState());
+    localStorage.removeItem(AUTH_TOKEN_KEY);
     // history.push("/");
   };
 
