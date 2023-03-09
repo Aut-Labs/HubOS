@@ -37,9 +37,9 @@ function TabPanel(props: any) {
           sx={{
             p: "10px 30px 0 30px",
             borderTopRightRadius: "16px",
-            boxShadow: 3,
+            // boxShadow: 3,
             border: "2px solid",
-            bgcolor: "nightBlack.main",
+            // bgcolor: "nightBlack.main",
             borderColor: "divider",
             borderBottomRightRadius: "16px",
             borderBottomLeftRadius: "16px",

@@ -117,7 +117,7 @@ const hasUserCompletedQuest = async (
 };
 
 const activateOnboarding = async (
-  { pluginAddress, userAddress },
+  { quests, pluginAddress, userAddress },
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
@@ -131,7 +131,7 @@ const activateOnboarding = async (
     sdk.questOnboarding = questOnboarding;
   }
 
-  const response = await questOnboarding.activateOnboarding();
+  const response = await questOnboarding.activateOnboarding(quests);
 
   if (!response.isSuccess) {
     return {
@@ -302,8 +302,11 @@ const removeTaskFromQuest = async (
     sdk.questOnboarding = questOnboarding;
   }
 
-  debugger;
-  const response = await questOnboarding.removeTasks([body.task], body.questId);
+  const response = await questOnboarding.removeTasks(
+    [body.task],
+    body.questId,
+    body.pluginTokenId
+  );
 
   if (!response.isSuccess) {
     return {
@@ -413,6 +416,7 @@ export const onboardingApi = createApi({
     activateOnboarding: builder.mutation<
       boolean,
       {
+        quests: Quest[];
         pluginAddress: string;
         userAddress: string;
       }

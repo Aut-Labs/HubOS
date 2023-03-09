@@ -151,6 +151,7 @@ const Quests = ({ plugin }: PluginParams) => {
                     color="primary"
                     onClick={() =>
                       activateOnboarding({
+                        quests,
                         userAddress: account,
                         pluginAddress: plugin.pluginAddress
                       })

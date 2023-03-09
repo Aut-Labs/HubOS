@@ -146,7 +146,8 @@ export const QuestListItem = memo(
           </QuestStyledTableCell>
         )}
         <QuestStyledTableCell align="right">
-          {dateTypes(row.startDate, row.durationInDays)}
+          {row.durationInDays}
+          {/* {dateTypes(row.startDate, row.durationInDays)} */}
         </QuestStyledTableCell>
         <QuestStyledTableCell align="right">
           <Chip
