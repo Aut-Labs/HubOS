@@ -26,7 +26,8 @@ import { Typography, debounce, styled } from "@mui/material";
 import AppTitle from "@components/AppTitle";
 import { NetworkSelectors } from "./components/NetworkSelectors";
 import { useSearchParams } from "react-router-dom";
-import { AUTH_TOKEN_KEY, authoriseWithWeb3 } from "@api/auth.api";
+import { AUTH_TOKEN_KEY } from "@api/auth.api";
+import { EnableAndChangeNetwork } from "./web3.network";
 
 const DialogInnerContent = styled("div")({
   display: "flex",
@@ -89,6 +90,11 @@ function Web3DautConnect({
     try {
       await activate(conn);
       await switchNetwork(+network.chainId);
+      if (conn.name === "metamask") {
+        // @ts-ignore
+        const provider = conn.provider.provider;
+        await EnableAndChangeNetwork(provider, network);
+      }
     } catch (error) {
       console.error(error, "error");
     }
@@ -125,9 +131,6 @@ function Web3DautConnect({
     if (network && !network?.disabled) {
       const connector = config.connectors[profile.provider];
       activateBrowserWallet({ type: profile.provider });
-      // @ts-ignore
-      const provider = connector.provider.provider;
-      const isAuthorised = await authoriseWithWeb3(provider);
       await activateNetwork(network, connector, profile.provider);
     }
 

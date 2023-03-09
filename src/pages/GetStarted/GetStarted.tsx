@@ -1,8 +1,9 @@
 import { Box, Container, styled, Typography } from "@mui/material";
-import { ReactComponent as Trifold } from "@assets/trifold.svg";
 import AppTitle from "@components/AppTitle";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
-import bubble from "@assets/bubble.png";
+import BubbleTopRight from "@assets/bubble_top_right.png";
+import BubbleBottomLeft from "@assets/bubble_bottom_left.png";
+import TryFoldImage from "@assets/tryfold.png";
 
 const Grid = styled("div")(({ theme }) => {
   return {
@@ -46,7 +47,7 @@ const Content = styled("div")(({ theme }) => {
   };
 });
 
-const StyledTrifold = styled(Trifold)(({ theme }) => {
+const StyledTrifold = styled("img")(({ theme }) => {
   return {
     maxWidth: "500px",
     [theme.breakpoints.up("xxl")]: {
@@ -72,8 +73,8 @@ const ImageWrapper = styled("div")(({ theme }) => {
 const GetStarted = () => {
   return (
     <Container maxWidth="lg" sx={{ flexGrow: 1, height: "100%" }}>
-      <BottomLeftBubble loading="lazy" src={bubble} />
-      <TopRightBubble loading="lazy" src={bubble} />
+      <BottomLeftBubble loading="lazy" src={BubbleBottomLeft} />
+      <TopRightBubble loading="lazy" src={BubbleTopRight} />
       <Grid>
         <Content>
           <Box
@@ -137,7 +138,7 @@ const GetStarted = () => {
           <DautPlaceholder />
         </Content>
         <ImageWrapper>
-          <StyledTrifold></StyledTrifold>
+          <StyledTrifold loading="lazy" src={TryFoldImage}></StyledTrifold>
         </ImageWrapper>
       </Grid>
     </Container>
