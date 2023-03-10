@@ -18,7 +18,8 @@ import {
   Stack,
   IconButton,
   Tooltip,
-  Badge
+  Badge,
+  Chip
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -45,6 +46,7 @@ const Quests = ({ plugin }: PluginParams) => {
   const isAdmin = useSelector(IsAdmin);
   const [search, setSearchState] = useState(null);
   const { account } = useEthers();
+
   const {
     data: quests,
     isLoading,
@@ -59,6 +61,10 @@ const Quests = ({ plugin }: PluginParams) => {
     activateOnboarding,
     { error, isError, isLoading: isActivating, reset }
   ] = useActivateOnboardingMutation();
+
+  const isOnboardingActivate = useMemo(() => {
+    return quests?.every((q) => q.active);
+  }, [quests]);
 
   useEffect(() => {
     dispatch(setTitle(`Onboarding quest`));
@@ -107,6 +113,17 @@ const Quests = ({ plugin }: PluginParams) => {
             </IconButton>
           </Tooltip>
         </Typography>
+        {isOnboardingActivate && (
+          <Box
+            sx={{
+              mt: 1,
+              display: "flex",
+              justifyContent: "center"
+            }}
+          >
+            <Chip color="success" label="ACTIVATED"></Chip>
+          </Box>
+        )}
         {!!quests?.length && (
           <Box
             sx={{
@@ -145,7 +162,7 @@ const Quests = ({ plugin }: PluginParams) => {
 
                   <Button
                     startIcon={<AddIcon />}
-                    disabled={quests?.length < 3}
+                    disabled={quests?.length < 3 || isOnboardingActivate}
                     variant="outlined"
                     size="medium"
                     color="primary"
@@ -248,7 +265,7 @@ const Quests = ({ plugin }: PluginParams) => {
                     <QuestStyledTableCell align="right">
                       Status
                     </QuestStyledTableCell>
-                    {isAdmin && (
+                    {isAdmin && !isOnboardingActivate && (
                       <QuestStyledTableCell align="right">
                         Action
                       </QuestStyledTableCell>

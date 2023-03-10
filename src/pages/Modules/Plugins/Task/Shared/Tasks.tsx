@@ -39,6 +39,7 @@ import {
 } from "@api/onboarding.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
+import { useEthers } from "@usedapp/core";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
@@ -215,17 +216,19 @@ const TaskListItem = memo(
             />
           </span>
         </TaskStyledTableCell>
-        <TaskStyledTableCell align="right">
-          <CopyAddress address={row.creator} />
-          <BtnLink
-            color="primary.light"
-            variant="caption"
-            target="_blank"
-            href={`https://my.aut.id/${row.creator}`}
-          >
-            View profile
-          </BtnLink>
-        </TaskStyledTableCell>
+        {!isAdmin && (
+          <TaskStyledTableCell align="right">
+            <CopyAddress address={row.creator} />
+            <BtnLink
+              color="primary.light"
+              variant="caption"
+              target="_blank"
+              href={`https://my.aut.id/${row.creator}`}
+            >
+              View profile
+            </BtnLink>
+          </TaskStyledTableCell>
+        )}
         <TaskStyledTableCell align="right">
           <Chip {...taskStatses[row.status]} size="small" />
         </TaskStyledTableCell>
@@ -253,6 +256,7 @@ interface TasksParams {
 }
 
 const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
+  const { account } = useEthers();
   return (
     <Box>
       {isLoading ? (
@@ -280,9 +284,13 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
                 <TableHead>
                   <TableRow>
                     <TaskStyledTableCell>Name</TaskStyledTableCell>
-                    <TaskStyledTableCell align="right">
-                      Creator
-                    </TaskStyledTableCell>
+
+                    {!isAdmin && (
+                      <TaskStyledTableCell align="right">
+                        Creator
+                      </TaskStyledTableCell>
+                    )}
+
                     <TaskStyledTableCell align="right">
                       Status
                     </TaskStyledTableCell>

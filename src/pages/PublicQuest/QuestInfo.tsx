@@ -15,7 +15,8 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import { Quest } from "@aut-labs-private/sdk";
 import {
   useApplyForQuestMutation,
-  useLazyHasUserCompletedQuestQuery
+  useLazyHasUserCompletedQuestQuery,
+  useWithdrawFromAQuestMutation
 } from "@api/onboarding.api";
 import { useEthers } from "@usedapp/core";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
@@ -24,6 +25,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import { useConfirmDialog } from "react-mui-confirm";
 import { CacheTypes, deleteCache, getCache, updateCache } from "@api/cache.api";
 import BetaCountdown from "@components/BetaCountdown";
+import { RequiredQueryParams } from "./RequiredQueryParams";
 
 const QuestInfo = ({
   quest,
@@ -43,20 +45,46 @@ const QuestInfo = ({
   const [apply, { isLoading: isApplying, isError, error, reset, isSuccess }] =
     useApplyForQuestMutation();
 
+  const [
+    withdraw,
+    {
+      isLoading: isWithdrawing,
+      isError: isWithdrawError,
+      error: withdrawError,
+      reset: withdrawReset,
+      isSuccess: withdrawIsSuccess
+    }
+  ] = useWithdrawFromAQuestMutation();
+
   const confimWithdrawal = () =>
     confirm({
-      title: "Are you sure you want to delete withdraw from quest?",
+      title: "Are you sure you want to withdraw from quest?",
       onConfirm: async () => {
+        withdraw({
+          onboardingQuestAddress: searchParams.get(
+            RequiredQueryParams.OnboardingQuestAddress
+          ),
+          questId: +searchParams.get(RequiredQueryParams.QuestId)
+        });
+      }
+    });
+
+  useEffect(() => {
+    if (withdrawIsSuccess) {
+      const start = async () => {
         try {
           await deleteCache(CacheTypes.UserPhases);
           setAppliedQuest(null);
           setAppliedQuestFn(null);
           setCache(null);
+          withdrawReset();
         } catch (error) {
           console.log(error);
         }
-      }
-    });
+      };
+      start();
+    }
+  }, [withdrawIsSuccess]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -64,9 +92,12 @@ const QuestInfo = ({
         try {
           const updatedCache = await updateCache({
             ...(cache || {}),
+            cacheKey: CacheTypes.UserPhases,
             address: account,
-            questId: +searchParams.get("questId"),
-            onboardingQuestAddress: searchParams.get("onboardingQuestAddress"),
+            questId: +searchParams.get(RequiredQueryParams.QuestId),
+            onboardingQuestAddress: searchParams.get(
+              RequiredQueryParams.OnboardingQuestAddress
+            ),
             daoAddress: searchParams.get("daoAddress"),
             list: [
               {
@@ -104,12 +135,15 @@ const QuestInfo = ({
         setCache(cacheResult);
         if (
           !!cacheResult?.questId &&
-          cacheResult?.questId === +searchParams.get("questId")
+          cacheResult?.questId ===
+            +searchParams.get(RequiredQueryParams.QuestId)
         ) {
           hasUserCompletedQuest({
-            questId: +searchParams.get("questId"),
+            questId: +searchParams.get(RequiredQueryParams.QuestId),
             userAddress: account,
-            onboardingQuestAddress: searchParams.get("onboardingQuestAddress"),
+            onboardingQuestAddress: searchParams.get(
+              RequiredQueryParams.OnboardingQuestAddress
+            ),
             daoAddress: searchParams.get("daoAddress")
           });
         }
@@ -121,7 +155,14 @@ const QuestInfo = ({
   }, []);
   return (
     <>
-      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <ErrorDialog
+        handleClose={() => {
+          reset();
+          withdrawReset();
+        }}
+        open={isError || isWithdrawError}
+        message={error || withdrawError}
+      />
       <Box
         sx={{
           flex: 1,
@@ -168,60 +209,66 @@ const QuestInfo = ({
             </Typography>
           </Stack>
 
-          {!hasQuestStarted && (
-            <>
-              {!appliedQuest && (
-                <Badge
-                  badgeContent={
-                    <Tooltip title="You can only apply to one quest, but you can withdraw before it starts.">
-                      <InfoIcon
-                        sx={{
-                          fontSize: "16px",
-                          color: "white"
-                        }}
-                      />
-                    </Tooltip>
+          {/* {!hasQuestStarted && (
+            
+          )} */}
+          <>
+            {!appliedQuest && (
+              <Badge
+                badgeContent={
+                  <Tooltip title="You can only apply to one quest, but you can withdraw before it starts.">
+                    <InfoIcon
+                      sx={{
+                        fontSize: "16px",
+                        color: "white"
+                      }}
+                    />
+                  </Tooltip>
+                }
+              >
+                <LoadingButton
+                  onClick={async () => {
+                    apply({
+                      onboardingQuestAddress: searchParams.get(
+                        RequiredQueryParams.OnboardingQuestAddress
+                      ),
+                      questId: +searchParams.get(RequiredQueryParams.QuestId)
+                    });
+                  }}
+                  disabled={isApplying}
+                  loadingIndicator={
+                    <Stack direction="row" gap={1} alignItems="center">
+                      <CircularProgress size="20px" color="offWhite" />
+                    </Stack>
                   }
-                >
-                  <LoadingButton
-                    onClick={async () => {
-                      apply({
-                        onboardingQuestAddress: searchParams.get(
-                          "onboardingQuestAddress"
-                        ),
-                        questId: +searchParams.get("questId")
-                      });
-                    }}
-                    disabled={isApplying}
-                    loadingIndicator={
-                      <Stack direction="row" gap={1} alignItems="center">
-                        <Typography className="text-secondary">
-                          Applying...
-                        </Typography>
-                        <CircularProgress size="20px" color="offWhite" />
-                      </Stack>
-                    }
-                    loading={isApplying}
-                    size="small"
-                    color="primary"
-                    variant="contained"
-                  >
-                    Apply for quest
-                  </LoadingButton>
-                </Badge>
-              )}
-              {appliedQuest === +searchParams.get("questId") && (
-                <Button
-                  onClick={confimWithdrawal}
+                  loading={isApplying}
                   size="small"
-                  color="error"
+                  color="primary"
                   variant="contained"
                 >
-                  Withdraw
-                </Button>
-              )}
-            </>
-          )}
+                  Apply for quest
+                </LoadingButton>
+              </Badge>
+            )}
+            {appliedQuest ===
+              +searchParams.get(RequiredQueryParams.QuestId) && (
+              <LoadingButton
+                onClick={confimWithdrawal}
+                disabled={isWithdrawing}
+                loadingIndicator={
+                  <Stack direction="row" gap={1} alignItems="center">
+                    <CircularProgress size="20px" color="offWhite" />
+                  </Stack>
+                }
+                loading={isWithdrawing}
+                size="small"
+                color="error"
+                variant="contained"
+              >
+                Withdraw
+              </LoadingButton>
+            )}
+          </>
         </Box>
 
         <Box

@@ -157,7 +157,7 @@ export const QuestListItem = memo(
           />
         </QuestStyledTableCell>
 
-        {isAdmin && (
+        {isAdmin && !row.active && (
           <QuestStyledTableCell align="right">
             <Badge
               invisible={row.tasksCount < 5}

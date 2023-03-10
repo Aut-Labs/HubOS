@@ -20,14 +20,12 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import DashboardTitle from "@components/AppTitle";
 import { ReactComponent as AutWhiteIcon } from "@assets/aut/aut-white.svg";
-import PerfectScrollbar from "react-perfect-scrollbar";
 import { useSelector } from "react-redux";
 import { AppTitle } from "@store/ui-reducer";
 import { SelectedNetworkConfig } from "@store/WalletProvider/WalletProvider";
 import { CommunityData } from "@store/Community/community.reducer";
 import { UserInfo } from "@auth/auth.reducer";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
-import "react-perfect-scrollbar/dist/css/styles.css";
 import BetaCountdown from "@components/BetaCountdown";
 
 const Main = styled("main", {
@@ -190,7 +188,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             }}
           >
             <Typography variant="body" noWrap color="white">
-              Please verify your discord account for your community.
+              Please verify the discord account for your community.
             </Typography>
             <Button
               sx={{

@@ -39,6 +39,7 @@ import { EnableAndChangeNetwork } from "@api/ProviderFactory/web3.network";
 import BubbleTopRight from "@assets/bubble_top_right.png";
 import BubbleBottomLeft from "@assets/bubble_bottom_left.png";
 import { authoriseWithWeb3 } from "@api/auth.api";
+import { RequiredQueryParams } from "./RequiredQueryParams";
 
 const BottomLeftBubble = styled("img")({
   position: "absolute",
@@ -96,13 +97,45 @@ const NetworkResolver = () => {
   } = useEthers();
   const [connected, setIsConnected] = useState(false);
 
+  const areAnyQueryParamsMissing = useMemo(() => {
+    try {
+      const daoAddress = searchParams.get(RequiredQueryParams.DaoAddress);
+      const isDaoAddressValid = ethers.utils.isAddress(daoAddress);
+
+      if (!isDaoAddressValid) {
+        return "Dao address not provided or not valid. Please check url!";
+      }
+
+      const onboardingQuestAddress = searchParams.get(
+        RequiredQueryParams.OnboardingQuestAddress
+      );
+
+      const isOnboardingQuestAddress = ethers.utils.isAddress(
+        onboardingQuestAddress
+      );
+
+      if (!isOnboardingQuestAddress) {
+        return "Onboarding Quest address not provided or not valid. Please check url!";
+      }
+
+      const questId = searchParams.get(RequiredQueryParams.QuestId);
+
+      if (!questId) {
+        return "Quest Id not provided or not valid. Please check url!";
+      }
+    } catch (error) {
+      console.log(error);
+      return "Missing query params";
+    }
+  }, []);
+
   const initialiseSDK = async (
     network: NetworkConfig,
     signer: ethers.providers.JsonRpcSigner
   ) => {
     const sdk = AutSDK.getInstance();
     return sdk.init(signer, {
-      daoExpanderAddress: searchParams.get("daoAddress"),
+      daoExpanderAddress: searchParams.get(RequiredQueryParams.DaoAddress),
       daoTypesAddress: network.contracts.daoTypesAddress,
       autDaoRegistryAddress: network.contracts.autDaoRegistryAddress,
       autIDAddress: network.contracts.autIDAddress,
@@ -130,9 +163,11 @@ const NetworkResolver = () => {
   }, []);
 
   const tryConnect = async () => {
-    const config = networks.find(
-      (n) => n.chainId?.toString() === chainId?.toString()
-    );
+    const [config] = networks.filter((n) => !n.disabled);
+    // .find(
+    //   // (n) => n.chainId?.toString() === chainId?.toString()
+    //   (n) => n.chainId?.toString() === chainId?.toString()
+    // );
     if (config && connector?.connector) {
       await activateNetwork(config, connector.connector);
     } else {
@@ -172,7 +207,9 @@ const NetworkResolver = () => {
         await initialiseSDK(network, signer as ethers.providers.JsonRpcSigner);
         await dispatch(
           communityUpdateState({
-            selectedCommunityAddress: searchParams.get("daoAddress")
+            selectedCommunityAddress: searchParams.get(
+              RequiredQueryParams.DaoAddress
+            )
           })
         );
         setIsConnected(true);
@@ -317,6 +354,7 @@ const NetworkResolver = () => {
                 To see the quest please connect your wallet.
               </Typography>
               <Button
+                disabled={!!areAnyQueryParamsMissing}
                 onClick={() => setIsOpen(true)}
                 sx={{
                   width: "220px",
@@ -327,6 +365,20 @@ const NetworkResolver = () => {
               >
                 Connect wallet
               </Button>
+
+              {!!areAnyQueryParamsMissing && (
+                <Typography
+                  mt={{
+                    xs: "10px",
+                    md: "30px"
+                  }}
+                  color="error"
+                  variant="body"
+                  fontWeight="bold"
+                >
+                  {areAnyQueryParamsMissing}
+                </Typography>
+              )}
 
               <Stack mt={8} direction="row" gap={2}>
                 <Link
@@ -414,13 +466,13 @@ const NetworkResolver = () => {
                 }}
                 variant="h2"
               />
-              {(isLoading || isSigning) && (
+              {(isLoading || isSigning || tryEagerConnect) && (
                 <div style={{ position: "relative", flex: 1 }}>
                   <AutLoading />
                 </div>
               )}
 
-              {!isLoading && !isSigning && (
+              {!isLoading && !isSigning && !tryEagerConnect && (
                 <>
                   {!wallet && (
                     <Typography color="white" variant="subtitle1">
@@ -457,7 +509,7 @@ const NetworkResolver = () => {
                         />
                       </>
                     )}
-                    {wallet && !isLoading && !!connector?.connector && (
+                    {/* {wallet && !isLoading && !!connector?.connector && (
                       <NetworkSelectors
                         networks={networks}
                         onSelect={async (selectedNetwork: NetworkConfig) => {
@@ -473,7 +525,7 @@ const NetworkResolver = () => {
                           }
                         }}
                       />
-                    )}
+                    )} */}
                   </DialogInnerContent>
                 </>
               )}

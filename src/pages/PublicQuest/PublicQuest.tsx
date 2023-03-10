@@ -21,6 +21,7 @@ import Tasks from "./Tasks";
 import CommunityInfo from "./CommunityInfo";
 import QuestInfo from "./QuestInfo";
 import AutLoading from "@components/AutLoading";
+import { RequiredQueryParams } from "./RequiredQueryParams";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 30,
@@ -45,9 +46,11 @@ const PublicQuest = () => {
     isFetching: isFetchingQuest
   } = useGetOnboardingQuestByIdQuery(
     {
-      questId: +searchParams.get("questId"),
-      onboardingQuestAddress: searchParams.get("onboardingQuestAddress"),
-      daoAddress: searchParams.get("daoAddress")
+      questId: +searchParams.get(RequiredQueryParams.QuestId),
+      onboardingQuestAddress: searchParams.get(
+        RequiredQueryParams.OnboardingQuestAddress
+      ),
+      daoAddress: searchParams.get(RequiredQueryParams.DaoAddress)
     },
     {
       refetchOnMountOrArgChange: false,
@@ -66,8 +69,10 @@ const PublicQuest = () => {
     isFetching: isFetchingTasks
   } = useGetAllTasksPerQuestQuery(
     {
-      questId: +searchParams.get("questId"),
-      pluginAddress: searchParams.get("onboardingQuestAddress")
+      questId: +searchParams.get(RequiredQueryParams.QuestId),
+      pluginAddress: searchParams.get(
+        RequiredQueryParams.OnboardingQuestAddress
+      )
     },
     {
       refetchOnMountOrArgChange: false,
@@ -134,51 +139,52 @@ const PublicQuest = () => {
 
       {isSuccess && !isLoadingTasks && !!tasks?.length && (
         <>
-          {appliedQuest === +searchParams.get("questId") && hasQuestStarted && (
-            <Box
-              sx={{
-                mt: 4,
-                boxShadow: 1,
-                border: "2px solid",
-                borderColor: "divider",
-                borderRadius: "16px",
-                p: 3,
-                backgroundColor: "#ffffff0a"
-              }}
-            >
-              <Typography
-                sx={{
-                  mb: 2
-                }}
-                color="white"
-                variant="subtitle1"
-              >
-                Your progress{" "}
-                <Typography className="text-secondary" variant="caption">
-                  (You have completed {completedTasks}/{tasks.length} tasks)
-                </Typography>
-              </Typography>
-              <BorderLinearProgress
-                variant="determinate"
-                value={(completedTasks / tasks.length) * 100}
-              />
+          {appliedQuest === +searchParams.get(RequiredQueryParams.QuestId) &&
+            hasQuestStarted && (
               <Box
                 sx={{
-                  mt: 1,
-                  display: "flex",
-                  justifyContent: "flex-end"
+                  mt: 4,
+                  boxShadow: 1,
+                  border: "2px solid",
+                  borderColor: "divider",
+                  borderRadius: "16px",
+                  p: 3,
+                  backgroundColor: "#ffffff0a"
                 }}
               >
                 <Typography
-                  textAlign="end"
-                  variant="caption"
-                  className="text-secondary"
+                  sx={{
+                    mb: 2
+                  }}
+                  color="white"
+                  variant="subtitle1"
                 >
-                  Complete all the tasks to claim your ĀutID
+                  Your progress{" "}
+                  <Typography className="text-secondary" variant="caption">
+                    (You have completed {completedTasks}/{tasks.length} tasks)
+                  </Typography>
                 </Typography>
+                <BorderLinearProgress
+                  variant="determinate"
+                  value={(completedTasks / tasks.length) * 100}
+                />
+                <Box
+                  sx={{
+                    mt: 1,
+                    display: "flex",
+                    justifyContent: "flex-end"
+                  }}
+                >
+                  <Typography
+                    textAlign="end"
+                    variant="caption"
+                    className="text-secondary"
+                  >
+                    Complete all the tasks to claim your ĀutID
+                  </Typography>
+                </Box>
               </Box>
-            </Box>
-          )}
+            )}
 
           {!appliedQuest && (
             <Typography

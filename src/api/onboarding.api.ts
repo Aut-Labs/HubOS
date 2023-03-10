@@ -181,6 +181,36 @@ const applyForQuest = async (
   };
 };
 
+const withdrawFromAQuest = async (
+  body: {
+    questId: number;
+    onboardingQuestAddress: string;
+  },
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+
+  if (!questOnboarding) {
+    questOnboarding = sdk.initService<QuestOnboarding>(
+      QuestOnboarding,
+      body.onboardingQuestAddress
+    );
+    sdk.questOnboarding = questOnboarding;
+  }
+
+  const response = await questOnboarding.withdrawFromAQuest(body.questId);
+
+  if (!response.isSuccess) {
+    return {
+      error: response.errorMessage
+    };
+  }
+  return {
+    data: response.data
+  };
+};
+
 const fetchTasks = async ({ pluginAddress, questId }, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
   let questOnboarding: QuestOnboarding = sdk.questOnboarding;
@@ -338,6 +368,10 @@ export const onboardingApi = createApi({
       return applyForQuest(body, api);
     }
 
+    if (url === "withdrawFromAQuest") {
+      return withdrawFromAQuest(body, api);
+    }
+
     if (url === "getOnboardingQuestById") {
       return fetchQuestById(body, api);
     }
@@ -444,6 +478,21 @@ export const onboardingApi = createApi({
       },
       invalidatesTags: ["Quest"]
     }),
+    withdrawFromAQuest: builder.mutation<
+      boolean,
+      {
+        questId: number;
+        onboardingQuestAddress: string;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "withdrawFromAQuest"
+        };
+      },
+      invalidatesTags: ["Quest"]
+    }),
     createQuest: builder.mutation<
       Quest,
       Partial<Quest & { pluginAddress: string }>
@@ -529,6 +578,7 @@ export const onboardingApi = createApi({
 export const {
   useCreateQuestMutation,
   useApplyForQuestMutation,
+  useWithdrawFromAQuestMutation,
   useRemoveTaskFromQuestMutation,
   useLazyHasUserCompletedQuestQuery,
   useGetOnboardingQuestByIdQuery,

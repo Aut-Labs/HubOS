@@ -163,8 +163,10 @@ const Quest = ({ plugin }: PluginParams) => {
                 sx={{
                   ml: 1
                 }}
-                label={hasQuestStarted ? "Ongoing" : "Active"}
-                color={hasQuestStarted ? "info" : "success"}
+                label={quest?.active ? "Active" : "Inactive"}
+                color={quest?.active ? "success" : "error"}
+                // label={hasQuestStarted ? "Ongoing" : "Active"}
+                // color={hasQuestStarted ? "info" : "success"}
                 size="small"
               />
             </Typography>
@@ -184,43 +186,45 @@ const Quest = ({ plugin }: PluginParams) => {
             />
           </Box>
 
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              mt: 2,
-              alignItems: "center",
-              justifyContent: "flex-end"
-            }}
-          >
-            <Badge
-              invisible={tasks?.length < 5}
-              badgeContent={
-                <Tooltip title="During beta there is a maximum of 5 tasks per quest">
-                  <ErrorOutlineIcon color="error" />
-                </Tooltip>
-              }
+          {isAdmin && !quest?.active && (
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                mt: 2,
+                alignItems: "center",
+                justifyContent: "flex-end"
+              }}
             >
-              <Button
-                startIcon={<AddIcon />}
-                variant="outlined"
-                disabled={tasks?.length >= 5}
-                size="medium"
-                color="primary"
-                to="/aut-dashboard/modules/Task"
-                preserveParams
-                queryParams={{
-                  questPluginAddress: plugin?.pluginAddress,
-                  returnUrlLinkName: "Back to quest",
-                  returnUrl: location.pathname,
-                  questId: params?.questId.toString()
-                }}
-                component={LinkWithQuery}
+              <Badge
+                invisible={tasks?.length < 5}
+                badgeContent={
+                  <Tooltip title="During beta there is a maximum of 5 tasks per quest">
+                    <ErrorOutlineIcon color="error" />
+                  </Tooltip>
+                }
               >
-                Add task
-              </Button>
-            </Badge>
-          </Box>
+                <Button
+                  startIcon={<AddIcon />}
+                  variant="outlined"
+                  disabled={tasks?.length >= 5}
+                  size="medium"
+                  color="primary"
+                  to="/aut-dashboard/modules/Task"
+                  preserveParams
+                  queryParams={{
+                    questPluginAddress: plugin?.pluginAddress,
+                    returnUrlLinkName: "Back to quest",
+                    returnUrl: location.pathname,
+                    questId: params?.questId.toString()
+                  }}
+                  component={LinkWithQuery}
+                >
+                  Add task
+                </Button>
+              </Badge>
+            </Box>
+          )}
         </Box>
       )}
 
