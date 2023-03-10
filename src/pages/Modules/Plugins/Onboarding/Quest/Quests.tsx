@@ -29,7 +29,7 @@ import LoadingProgressBar from "@components/LoadingProgressBar";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { QuestListItem, QuestStyledTableCell } from "./QuestShared";
 import { useSelector } from "react-redux";
-import { IsAdmin } from "@store/Community/community.reducer";
+import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
 import { setTitle } from "@store/ui-reducer";
 import { useAppDispatch } from "@store/store.model";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
@@ -46,6 +46,7 @@ const Quests = ({ plugin }: PluginParams) => {
   const isAdmin = useSelector(IsAdmin);
   const [search, setSearchState] = useState(null);
   const { account } = useEthers();
+  const communityData = useSelector(CommunityData);
 
   const {
     data: quests,
@@ -276,6 +277,7 @@ const Quests = ({ plugin }: PluginParams) => {
                   {filteredQuests?.map((row, index) => (
                     <QuestListItem
                       isAdmin={isAdmin}
+                      daoAddress={communityData?.properties?.address}
                       pluginAddress={plugin?.pluginAddress}
                       key={`table-row-${index}`}
                       row={row}

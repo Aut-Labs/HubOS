@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { Quest, Task } from "@aut-labs-private/sdk";
 import {
   Box,
@@ -27,6 +28,7 @@ import Tasks from "../../Task/Shared/Tasks";
 import AddIcon from "@mui/icons-material/Add";
 import LinkWithQuery from "@components/LinkWithQuery";
 import OverflowTooltip from "@components/OverflowTooltip";
+import CopyLink from "@components/CopyLink";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
@@ -72,9 +74,11 @@ export const QuestListItem = memo(
   ({
     row,
     pluginAddress,
+    daoAddress,
     isAdmin
   }: {
     row: Quest;
+    daoAddress: string;
     pluginAddress: string;
     isAdmin: boolean;
   }) => {
@@ -129,6 +133,9 @@ export const QuestListItem = memo(
                     {row.metadata?.name || "n/a"}
                   </BtnLink>
                 </Tooltip>
+                <CopyLink
+                  link={`${window?.location.origin}/quest/?questId=${row.questId}&onboardingQuestAddress=${pluginAddress}&daoAddress=${daoAddress}`}
+                />
               </Badge>
             </Box>
             <OverflowTooltip
