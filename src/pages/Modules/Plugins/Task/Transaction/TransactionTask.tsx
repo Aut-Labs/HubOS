@@ -1,15 +1,63 @@
+import { useGetAllTasksPerQuestQuery } from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
-import { Container } from "@mui/material";
+import AutLoading from "@components/AutLoading";
+import { StepperButton } from "@components/Stepper";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Container,
+  Stack,
+  Typography
+} from "@mui/material";
 import { IsAdmin } from "@store/Community/community.reducer";
 import { memo } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
+import { useSearchParams, useParams, Link } from "react-router-dom";
+import TaskDetails from "../Shared/TaskDetails";
 
 interface PluginParams {
   plugin: PluginDefinition;
 }
 
 const TransactionTask = ({ plugin }: PluginParams) => {
+  const [searchParams] = useSearchParams();
+
+  const params = useParams();
+  const { task, isLoading: isLoadingPlugins } = useGetAllTasksPerQuestQuery(
+    {
+      pluginAddress: searchParams.get("questPluginAddress"),
+      questId: +searchParams.get("questId")
+    },
+    {
+      selectFromResult: ({ data, isLoading, isFetching }) => ({
+        isLoading: isLoading || isFetching,
+        task: (data || []).find((t) => t.taskId === +params?.taskId)
+      })
+    }
+  );
+
+  const { control, handleSubmit, getValues, setValue, formState } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      transactionCompleted: false
+    }
+  });
+  const values = useWatch({
+    name: "transactionCompleted",
+    control
+  });
+  const onSubmit = async () => {
+    console.log("Transaction Task onSubmit Values: ", values);
+    //submit
+
+    setValue("transactionCompleted", true);
+  };
+
   const isAdmin = useSelector(IsAdmin);
+
   return (
     <Container
       maxWidth="lg"
@@ -22,9 +70,91 @@ const TransactionTask = ({ plugin }: PluginParams) => {
         position: "relative"
       }}
     >
-      @Iulia - Implement task details
-      {/* <TaskDetails /> */}
-      {/* Transaction task specific */}
+      {task ? (
+        <>
+          <TaskDetails task={task} />
+
+          <Stack
+            direction="column"
+            gap={4}
+            sx={{
+              flex: 1,
+              justifyContent: "space-between",
+              margin: "0 auto",
+              width: {
+                xs: "100%",
+                sm: "400px",
+                xxl: "800px"
+              }
+            }}
+          >
+            <Card
+              sx={{
+                bgcolor: "nightBlack.main",
+                borderColor: "divider",
+                borderRadius: "16px",
+                boxShadow: 3
+              }}
+            >
+              <CardContent
+                sx={{
+                  display: "flex",
+                  flexDirection: "column"
+                }}
+              >
+                <Typography
+                  color="white"
+                  variant="body"
+                  textAlign="center"
+                  p="20px"
+                >
+                  {task?.metadata?.description}
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center"
+                  }}
+                >
+                  <Button
+                    sx={{
+                      width: "200px",
+                      height: "50px"
+                    }}
+                    type="button"
+                    color="offWhite"
+                    variant="outlined"
+                    onClick={handleSubmit(onSubmit)}
+                  >
+                    Sign Transaction
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+
+            {/* button */}
+
+            <Stack
+              sx={{
+                margin: "0 auto",
+                width: {
+                  xs: "100%",
+                  sm: "400px",
+                  xxl: "800px"
+                }
+              }}
+            >
+              <StepperButton
+                label="Submit"
+                onClick={handleSubmit(onSubmit)}
+                disabled={!values}
+              />
+            </Stack>
+          </Stack>
+        </>
+      ) : (
+        <AutLoading></AutLoading>
+      )}
     </Container>
   );
 };

@@ -49,18 +49,26 @@ const TaskStyledTableCell = styled(TableCell)(({ theme }) => ({
   }
 }));
 
-const taskStatses = {
+export const getTaskStatus: any = {
   [TaskStatus.Created]: {
-    label: "Todo",
+    label: "To Do",
     color: "info"
   },
   [TaskStatus.Finished]: {
     label: "Complete",
     color: "success"
+  },
+  [TaskStatus.Submitted]: {
+    label: "Submitted",
+    color: "info"
+  },
+  [TaskStatus.Taken]: {
+    label: "Taken",
+    color: "info"
   }
 };
 
-const taskTypes = {
+export const taskTypes = {
   [TaskType.Open]: {
     pluginType: PluginDefinitionType.OnboardingOpenTaskPlugin,
     label: "Open Task"
@@ -199,7 +207,7 @@ const TaskListItem = memo(
           </BtnLink>
         </TaskStyledTableCell>
         <TaskStyledTableCell align="right">
-          <Chip {...taskStatses[row.status]} size="small" />
+          <Chip {...getTaskStatus[row.status]} size="small" />
         </TaskStyledTableCell>
         <TaskStyledTableCell align="right">
           {taskTypes[row.taskType]?.label}

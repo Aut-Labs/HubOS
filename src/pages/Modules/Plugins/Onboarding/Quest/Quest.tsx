@@ -67,7 +67,7 @@ const Quest = ({ plugin }: PluginParams) => {
   );
 
   useEffect(() => {
-    dispatch(setTitle(`Quest - ${quest.metadata?.name}`));
+    dispatch(setTitle(`Quest - ${quest?.metadata?.name}`));
   }, [dispatch, quest]);
 
   const isLoading = useMemo(() => {

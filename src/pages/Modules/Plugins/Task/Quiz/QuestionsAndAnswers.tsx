@@ -150,7 +150,7 @@ const answers = {
   3: "D"
 };
 
-const GridBox = styled(Box)({
+export const GridBox = styled(Box)({
   boxSizing: "border-box",
   display: "grid",
   gridTemplateColumns: "1fr 1fr",
