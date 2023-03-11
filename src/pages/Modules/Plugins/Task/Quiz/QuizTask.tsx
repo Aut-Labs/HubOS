@@ -28,6 +28,10 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { isNull } from "util";
 import TaskDetails from "../Shared/TaskDetails";
 import { GridBox } from "./QuestionsAndAnswers";
+import { RequiredQueryParams } from "@api/RequiredQueryParams";
+import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import { taskTypes } from "../Shared/Tasks";
+import { useEthers } from "@usedapp/core";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -92,19 +96,30 @@ const Answers = memo(({ control, questionIndex, answers }: any) => {
 
 const QuizTask = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
+  const { account: userAddress } = useEthers();
   const params = useParams();
   const [initialized, setInitialized] = useState(false);
   // const [isEditMode, setEditMode] = useState(false);
 
   const { task, isLoading: isLoadingPlugins } = useGetAllTasksPerQuestQuery(
     {
-      pluginAddress: searchParams.get("questPluginAddress"),
-      questId: +searchParams.get("questId")
+      userAddress,
+      pluginAddress: searchParams.get(
+        RequiredQueryParams.OnboardingQuestAddress
+      ),
+      questId: +searchParams.get(RequiredQueryParams.QuestId)
     },
     {
       selectFromResult: ({ data, isLoading, isFetching }) => ({
         isLoading: isLoading || isFetching,
-        task: (data || []).find((t) => t.taskId === +params?.taskId)
+        task: (data || []).find((t) => {
+          const [pluginType] = location.pathname.split("/").splice(-2);
+          return (
+            t.taskId === +params?.taskId &&
+            PluginDefinitionType[pluginType] ===
+              taskTypes[t.taskType].pluginType
+          );
+        })
       })
     }
   );

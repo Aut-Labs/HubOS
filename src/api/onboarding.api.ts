@@ -8,6 +8,7 @@ import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
 import { CacheTypes, getCache, updateCache } from "./cache.api";
+import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 
 const fetchQuests = async (pluginAddress: any, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
@@ -211,7 +212,10 @@ const withdrawFromAQuest = async (
   };
 };
 
-const fetchTasks = async ({ pluginAddress, questId }, api: BaseQueryApi) => {
+const fetchTasks = async (
+  { pluginAddress, questId, userAddress },
+  api: BaseQueryApi
+) => {
   const sdk = AutSDK.getInstance();
   let questOnboarding: QuestOnboarding = sdk.questOnboarding;
 
@@ -223,7 +227,10 @@ const fetchTasks = async ({ pluginAddress, questId }, api: BaseQueryApi) => {
     sdk.questOnboarding = questOnboarding;
   }
 
-  const response = await questOnboarding.getAllTasksByQuest(questId);
+  const response = await questOnboarding.getAllTasksByQuest(
+    questId,
+    userAddress
+  );
 
   if (response?.isSuccess) {
     const tasksWithMetadata: Task[] = [];
@@ -234,6 +241,10 @@ const fetchTasks = async ({ pluginAddress, questId }, api: BaseQueryApi) => {
         ...def,
         metadata: await fetchMetadata(
           def.metadataUri,
+          environment.nftStorageUrl
+        ),
+        submission: await fetchMetadata(
+          def.submitionUrl,
           environment.nftStorageUrl
         )
       });
@@ -279,7 +290,7 @@ const createTaskPerQuest = async (
     task: Task;
     questId: number;
     pluginAddress: string;
-    questPluginAddress: string;
+    onboardingQuestAddress: string;
     pluginTokenId: number;
   },
   api: BaseQueryApi
@@ -290,7 +301,7 @@ const createTaskPerQuest = async (
   if (!questOnboarding) {
     questOnboarding = sdk.initService<QuestOnboarding>(
       QuestOnboarding,
-      body.questPluginAddress
+      body.onboardingQuestAddress
     );
     sdk.questOnboarding = questOnboarding;
   }
@@ -316,7 +327,7 @@ const removeTaskFromQuest = async (
     task: Task;
     questId: number;
     pluginAddress: string;
-    questPluginAddress: string;
+    onboardingQuestAddress: string;
     pluginTokenId: number;
   },
   api: BaseQueryApi
@@ -327,7 +338,7 @@ const removeTaskFromQuest = async (
   if (!questOnboarding) {
     questOnboarding = sdk.initService<QuestOnboarding>(
       QuestOnboarding,
-      body.questPluginAddress
+      body.onboardingQuestAddress
     );
     sdk.questOnboarding = questOnboarding;
   }
@@ -336,6 +347,78 @@ const removeTaskFromQuest = async (
     [body.task],
     body.questId,
     body.pluginTokenId
+  );
+
+  if (!response.isSuccess) {
+    return {
+      error: response.errorMessage
+    };
+  }
+  return {
+    data: response.data
+  };
+};
+
+const submitTask = async (
+  body: {
+    task: Task;
+    pluginAddress: string;
+    onboardingQuestAddress: string;
+    pluginDefinitionId: PluginDefinitionType;
+  },
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+
+  if (!questOnboarding) {
+    questOnboarding = sdk.initService<QuestOnboarding>(
+      QuestOnboarding,
+      body.onboardingQuestAddress
+    );
+    sdk.questOnboarding = questOnboarding;
+  }
+
+  const response = await questOnboarding.submitTask(
+    body.task,
+    body.pluginAddress,
+    body.pluginDefinitionId
+  );
+
+  if (!response.isSuccess) {
+    return {
+      error: response.errorMessage
+    };
+  }
+  return {
+    data: response.data
+  };
+};
+
+const finalizeTask = async (
+  body: {
+    task: Task;
+    pluginAddress: string;
+    onboardingQuestAddress: string;
+    pluginDefinitionId: PluginDefinitionType;
+  },
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+
+  if (!questOnboarding) {
+    questOnboarding = sdk.initService<QuestOnboarding>(
+      QuestOnboarding,
+      body.onboardingQuestAddress
+    );
+    sdk.questOnboarding = questOnboarding;
+  }
+
+  const response = await questOnboarding.finalizeFor(
+    body.task,
+    body.pluginAddress,
+    body.pluginDefinitionId
   );
 
   if (!response.isSuccess) {
@@ -398,6 +481,14 @@ export const onboardingApi = createApi({
 
     if (url === "removeTaskFromQuest") {
       return removeTaskFromQuest(body, api);
+    }
+
+    if (url === "submitTask") {
+      return submitTask(body, api);
+    }
+
+    if (url === "finalizeTask") {
+      return finalizeTask(body, api);
     }
     return {
       data: "Test"
@@ -525,6 +616,7 @@ export const onboardingApi = createApi({
       Task[],
       {
         questId: number;
+        userAddress: string;
         pluginAddress: string;
       }
     >({
@@ -542,7 +634,7 @@ export const onboardingApi = createApi({
         task: Task;
         questId: number;
         pluginAddress: string;
-        questPluginAddress: string;
+        onboardingQuestAddress: string;
         pluginTokenId: number;
       }
     >({
@@ -560,7 +652,7 @@ export const onboardingApi = createApi({
         task: Task;
         questId: number;
         pluginAddress: string;
-        questPluginAddress: string;
+        onboardingQuestAddress: string;
         pluginTokenId: number;
       }
     >({
@@ -571,6 +663,40 @@ export const onboardingApi = createApi({
         };
       },
       invalidatesTags: ["Tasks"]
+    }),
+    submitTask: builder.mutation<
+      Task,
+      {
+        task: Task;
+        pluginAddress: string;
+        onboardingQuestAddress: string;
+        pluginDefinitionId: PluginDefinitionType;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "submitTask"
+        };
+      },
+      invalidatesTags: ["Tasks"]
+    }),
+    finalizeTask: builder.mutation<
+      Task,
+      {
+        task: Task;
+        pluginAddress: string;
+        onboardingQuestAddress: string;
+        pluginDefinitionId: PluginDefinitionType;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "finalizeTask"
+        };
+      },
+      invalidatesTags: ["Tasks"]
     })
   })
 });
@@ -578,6 +704,8 @@ export const onboardingApi = createApi({
 export const {
   useCreateQuestMutation,
   useApplyForQuestMutation,
+  useFinalizeTaskMutation,
+  useSubmitTaskMutation,
   useWithdrawFromAQuestMutation,
   useRemoveTaskFromQuestMutation,
   useLazyHasUserCompletedQuestQuery,

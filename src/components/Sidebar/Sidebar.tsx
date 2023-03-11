@@ -340,16 +340,11 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
       >
         <div
           style={{
-            height: "100vh",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             overflowY: "auto"
           }}
-          // options={{
-          //   suppressScrollX: true,
-          //   useBothWheelAxes: false,
-          //   swipeEasing: false
-          // }}
         >
           {children}
         </div>

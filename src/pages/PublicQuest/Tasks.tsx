@@ -45,14 +45,22 @@ const TaskStyledTableCell = styled(TableCell)(({ theme }) => ({
   }
 }));
 
-const taskStatses = {
+export const taskStatuses: any = {
   [TaskStatus.Created]: {
-    label: "Todo",
+    label: "To Do",
     color: "info"
   },
   [TaskStatus.Finished]: {
     label: "Complete",
     color: "success"
+  },
+  [TaskStatus.Submitted]: {
+    label: "Submitted",
+    color: "warning"
+  },
+  [TaskStatus.Taken]: {
+    label: "Taken",
+    color: "info"
   }
 };
 
@@ -110,10 +118,8 @@ const TaskListItem = memo(({ row }: { row: Task }) => {
 
   const path = useMemo(() => {
     if (!plugin) return;
-    return `task/${plugin.pluginDefinitionId}`;
+    return `task/${PluginDefinitionType[plugin.pluginDefinitionId]}`;
   }, [plugin]);
-
-  console.log(path, "path");
 
   return (
     <StyledTableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
@@ -150,9 +156,9 @@ const TaskListItem = memo(({ row }: { row: Task }) => {
                   to={`/quest/${path}/${row.taskId}`}
                   preserveParams
                   queryParams={{
-                    questPluginAddress: plugin?.pluginAddress,
+                    onboardingQuestAddress: plugin?.pluginAddress,
                     returnUrlLinkName: "Back to quest",
-                    returnUrl: location?.pathname,
+                    returnUrl: `${location?.pathname}${location?.search}`,
                     questId: params.questId
                   }}
                   component={LinkWithQuery}
@@ -182,7 +188,7 @@ const TaskListItem = memo(({ row }: { row: Task }) => {
         </BtnLink>
       </TaskStyledTableCell>
       <TaskStyledTableCell align="right">
-        <Chip {...taskStatses[row.status]} size="small" />
+        <Chip {...taskStatuses[row.status]} size="small" />
       </TaskStyledTableCell>
       <TaskStyledTableCell align="right">
         {taskTypes[row.taskType]?.label}

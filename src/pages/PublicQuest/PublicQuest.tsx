@@ -21,7 +21,8 @@ import Tasks from "./Tasks";
 import CommunityInfo from "./CommunityInfo";
 import QuestInfo from "./QuestInfo";
 import AutLoading from "@components/AutLoading";
-import { RequiredQueryParams } from "./RequiredQueryParams";
+import { RequiredQueryParams } from "../../api/RequiredQueryParams";
+import { useEthers } from "@usedapp/core";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 30,
@@ -37,6 +38,7 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 }));
 
 const PublicQuest = () => {
+  const { account: userAddress } = useEthers();
   const [searchParams] = useSearchParams();
   const [appliedQuest, setAppliedQuest] = useState(null);
 
@@ -69,6 +71,7 @@ const PublicQuest = () => {
     isFetching: isFetchingTasks
   } = useGetAllTasksPerQuestQuery(
     {
+      userAddress,
       questId: +searchParams.get(RequiredQueryParams.QuestId),
       pluginAddress: searchParams.get(
         RequiredQueryParams.OnboardingQuestAddress

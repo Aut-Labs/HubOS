@@ -57,7 +57,7 @@ const TaskStyledTableCell = styled(TableCell)(({ theme }) => ({
   }
 }));
 
-export const getTaskStatus: any = {
+export const taskStatuses: any = {
   [TaskStatus.Created]: {
     label: "To Do",
     color: "info"
@@ -68,7 +68,7 @@ export const getTaskStatus: any = {
   },
   [TaskStatus.Submitted]: {
     label: "Submitted",
-    color: "info"
+    color: "warning"
   },
   [TaskStatus.Taken]: {
     label: "Taken",
@@ -149,7 +149,7 @@ const TaskListItem = memo(
             questId: +params.questId,
             pluginTokenId: plugin.tokenId,
             pluginAddress: plugin.pluginAddress,
-            questPluginAddress: questOnboarding?.pluginAddress
+            onboardingQuestAddress: questOnboarding?.pluginAddress
           });
         }
       });
@@ -204,7 +204,7 @@ const TaskListItem = memo(
                     to={`/aut-dashboard/${path}/${row.taskId}`}
                     preserveParams
                     queryParams={{
-                      questPluginAddress: plugin?.pluginAddress,
+                      onboardingQuestAddress: plugin?.pluginAddress,
                       returnUrlLinkName: "Back to quest",
                       returnUrl: location?.pathname,
                       questId: params.questId
@@ -238,7 +238,7 @@ const TaskListItem = memo(
           </TaskStyledTableCell>
         )}
         <TaskStyledTableCell align="right">
-          <Chip {...getTaskStatus[row.status]} size="small" />
+          <Chip {...taskStatuses[row.status]} size="small" />
         </TaskStyledTableCell>
         <TaskStyledTableCell align="right">
           {taskTypes[row.taskType]?.label}

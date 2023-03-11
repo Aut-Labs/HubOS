@@ -6,10 +6,7 @@ import {
   setWallet
 } from "@store/WalletProvider/WalletProvider";
 import { useSelector } from "react-redux";
-import AutSDK, {
-  addMetadataToCache,
-  getMetadataFromCache
-} from "@aut-labs-private/sdk";
+import AutSDK from "@aut-labs-private/sdk";
 import { ethers } from "ethers";
 import { Connector, useConnector, useEthers } from "@usedapp/core";
 import AutLoading from "@components/AutLoading";
@@ -25,7 +22,6 @@ import {
   styled
 } from "@mui/material";
 import AppTitle from "@components/AppTitle";
-import { NetworkSelectors } from "@api/ProviderFactory/components/NetworkSelectors";
 import { NetworkConfig } from "@api/ProviderFactory/network.config";
 import ConnectorBtn from "@api/ProviderFactory/components/ConnectorBtn";
 import PublicQuest from "./PublicQuest";
@@ -39,7 +35,7 @@ import { EnableAndChangeNetwork } from "@api/ProviderFactory/web3.network";
 import BubbleTopRight from "@assets/bubble_top_right.png";
 import BubbleBottomLeft from "@assets/bubble_bottom_left.png";
 import { authoriseWithWeb3 } from "@api/auth.api";
-import { RequiredQueryParams } from "./RequiredQueryParams";
+import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 
 const BottomLeftBubble = styled("img")({
   position: "absolute",
@@ -92,10 +88,10 @@ const NetworkResolver = () => {
     deactivate,
     switchNetwork,
     isLoading,
-    account,
-    chainId
+    account
   } = useEthers();
   const [connected, setIsConnected] = useState(false);
+  const [initialAccount, setInitialAccount] = useState("");
 
   const areAnyQueryParamsMissing = useMemo(() => {
     try {
@@ -129,6 +125,12 @@ const NetworkResolver = () => {
     }
   }, []);
 
+  const hasAccountChanged = useMemo(() => {
+    return (
+      connected && !!initialAccount && !!account && initialAccount !== account
+    );
+  }, [connected, initialAccount, account]);
+
   const initialiseSDK = async (
     network: NetworkConfig,
     signer: ethers.providers.JsonRpcSigner
@@ -158,10 +160,6 @@ const NetworkResolver = () => {
     return !!tryEagerConnect && !!connector?.connector && account && isOpen;
   }, [connector, tryEagerConnect, account, isOpen]);
 
-  useEffect(() => {
-    deactivate();
-  }, []);
-
   const tryConnect = async () => {
     const [config] = networks.filter((n) => !n.disabled);
     // .find(
@@ -174,12 +172,6 @@ const NetworkResolver = () => {
       setTryEagerConnect(false);
     }
   };
-
-  useEffect(() => {
-    if (canConnectEagerly) {
-      tryConnect();
-    }
-  }, [canConnectEagerly]);
 
   const changeConnector = async (connectorType: string) => {
     activateBrowserWallet({ type: connectorType });
@@ -213,6 +205,11 @@ const NetworkResolver = () => {
           })
         );
         setIsConnected(true);
+        setInitialAccount(account);
+        navigate({
+          pathname: "/quest",
+          search: searchParams.toString()
+        });
         loadPlugins(null);
       } else {
         setIsConnected(false);
@@ -236,6 +233,22 @@ const NetworkResolver = () => {
     setIsOpen(false);
   };
 
+  useEffect(() => {
+    if (canConnectEagerly) {
+      tryConnect();
+    }
+  }, [canConnectEagerly]);
+
+  useEffect(() => {
+    if (hasAccountChanged) {
+      closeAndDisconnect();
+    }
+  }, [hasAccountChanged]);
+
+  useEffect(() => {
+    deactivate();
+  }, []);
+
   return (
     <Box
       sx={{
@@ -243,41 +256,218 @@ const NetworkResolver = () => {
         width: "100vw"
       }}
     >
-      <BottomLeftBubble loading="lazy" src={BubbleBottomLeft} />
-      <TopRightBubble loading="lazy" src={BubbleTopRight} />
-      <>
-        {!!connected && (
-          <Toolbar
+      <DialogWrapper open={isOpen} onClose={closeAndDisconnect}>
+        <>
+          <AppTitle
+            mb={{
+              xs: "16px",
+              lg: "24px",
+              xxl: "32px"
+            }}
+            variant="h2"
+          />
+          {(isLoading || isSigning || tryEagerConnect) && (
+            <div style={{ position: "relative", flex: 1 }}>
+              <AutLoading />
+            </div>
+          )}
+
+          {!isLoading && !isSigning && !tryEagerConnect && (
+            <>
+              {!wallet && (
+                <Typography color="white" variant="subtitle1">
+                  Connect your wallet
+                </Typography>
+              )}
+              {wallet && (
+                <>
+                  <Typography
+                    mb={{
+                      xs: "8px"
+                    }}
+                    color="white"
+                    variant="subtitle1"
+                  >
+                    Change Network
+                  </Typography>
+
+                  <Typography color="white" variant="body">
+                    You will need to switch your wallet’s network.
+                  </Typography>
+                </>
+              )}
+              <DialogInnerContent>
+                {(!wallet || !connector?.connector) && (
+                  <>
+                    <ConnectorBtn
+                      setConnector={changeConnector}
+                      connectorType={ConnectorTypes.Metamask}
+                    />
+                    <ConnectorBtn
+                      setConnector={changeConnector}
+                      connectorType={ConnectorTypes.WalletConnect}
+                    />
+                  </>
+                )}
+                {/* {wallet && !isLoading && !!connector?.connector && (
+                      <NetworkSelectors
+                        networks={networks}
+                        onSelect={async (selectedNetwork: NetworkConfig) => {
+                          if (selectedNetwork) {
+                            try {
+                              await activateNetwork(
+                                selectedNetwork,
+                                connector.connector
+                              );
+                            } catch (error) {
+                              console.log(error, "error");
+                            }
+                          }
+                        }}
+                      />
+                    )} */}
+              </DialogInnerContent>
+            </>
+          )}
+        </>
+      </DialogWrapper>
+      <BottomLeftBubble src={BubbleBottomLeft} />
+      <TopRightBubble src={BubbleTopRight} />
+      {!!connected && (
+        <Toolbar
+          sx={{
+            width: "100%",
+            zIndex: 99,
+            position: "fixed",
+            top: 0,
+            backgroundColor: "nightBlack.main",
+            boxShadow: 2,
+            "&.MuiToolbar-root": {
+              paddingLeft: 6,
+              paddingRight: 6,
+              minHeight: "84px",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }
+          }}
+        >
+          <AppTitle
             sx={{
-              width: "100%",
-              zIndex: 99,
-              position: "fixed",
-              top: 0,
-              backgroundColor: "nightBlack.main",
-              boxShadow: 2,
-              "&.MuiToolbar-root": {
-                paddingLeft: 6,
-                paddingRight: 6,
-                minHeight: "84px",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }
+              cursor: "pointer"
+            }}
+            onClick={() => navigate("/")}
+            variant="h3"
+          />
+          <Stack
+            flex={1}
+            alignItems="center"
+            justifyContent="center"
+            direction="row"
+            gap={2}
+          >
+            <Link
+              color="offWhite.main"
+              variant="body"
+              target="_blank"
+              href="http://176.34.149.248:4001"
+            >
+              Leaderboard
+            </Link>
+            <Link
+              color="offWhite.main"
+              variant="body"
+              target="_blank"
+              href="http://176.34.149.248:4002"
+            >
+              Nova showcase
+            </Link>
+          </Stack>
+          <Button
+            onClick={closeAndDisconnect}
+            sx={{
+              width: "220px",
+              height: "55px"
+            }}
+            color="offWhite"
+            variant="outlined"
+          >
+            Disconnect
+          </Button>
+        </Toolbar>
+      )}
+      <PerfectScrollbar
+        style={{
+          marginTop: "84px",
+          height: "calc(100% - 84px)",
+          display: "flex",
+          flexDirection: "column"
+        }}
+      >
+        {!connected && (
+          <Container
+            maxWidth="lg"
+            sx={{
+              py: "20px",
+              height: "100%",
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              position: "relative"
             }}
           >
-            <AppTitle
+            <Box
               sx={{
-                cursor: "pointer"
+                display: "flex",
+                flexDirection: "row"
               }}
-              onClick={() => navigate("/")}
-              variant="h3"
-            />
-            <Stack
-              flex={1}
-              alignItems="center"
-              justifyContent="center"
-              direction="row"
-              gap={2}
+              mb={{
+                xs: "25px",
+                md: "50px"
+              }}
             >
+              <AppTitle />
+            </Box>
+            <Typography
+              mb={{
+                xs: "10px",
+                md: "30px"
+              }}
+              color="white"
+              variant="subtitle2"
+              fontWeight="bold"
+            >
+              To see the quest please connect your wallet.
+            </Typography>
+            <Button
+              disabled={!!areAnyQueryParamsMissing}
+              onClick={() => setIsOpen(true)}
+              sx={{
+                width: "220px",
+                height: "55px"
+              }}
+              color="offWhite"
+              variant="outlined"
+            >
+              Connect wallet
+            </Button>
+
+            {!!areAnyQueryParamsMissing && (
+              <Typography
+                mt={{
+                  xs: "10px",
+                  md: "30px"
+                }}
+                color="error"
+                variant="body"
+                fontWeight="bold"
+              >
+                {areAnyQueryParamsMissing}
+              </Typography>
+            )}
+
+            <Stack mt={8} direction="row" gap={2}>
               <Link
                 color="offWhite.main"
                 variant="body"
@@ -295,244 +485,80 @@ const NetworkResolver = () => {
                 Nova showcase
               </Link>
             </Stack>
-            <Button
-              onClick={closeAndDisconnect}
-              sx={{
-                width: "220px",
-                height: "55px"
-              }}
-              color="offWhite"
-              variant="outlined"
-            >
-              Disconnect
-            </Button>
-          </Toolbar>
+          </Container>
         )}
-        <PerfectScrollbar
-          style={{
-            marginTop: "84px",
-            height: "calc(100% - 84px)",
-            display: "flex",
-            flexDirection: "column"
-          }}
-        >
-          {!connected && (
-            <Container
-              maxWidth="lg"
-              sx={{
-                py: "20px",
-                height: "100%",
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative"
-              }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row"
-                }}
-                mb={{
-                  xs: "25px",
-                  md: "50px"
-                }}
-              >
-                <AppTitle />
-              </Box>
-              <Typography
-                mb={{
-                  xs: "10px",
-                  md: "30px"
-                }}
-                color="white"
-                variant="subtitle2"
-                fontWeight="bold"
-              >
-                To see the quest please connect your wallet.
-              </Typography>
-              <Button
-                disabled={!!areAnyQueryParamsMissing}
-                onClick={() => setIsOpen(true)}
-                sx={{
-                  width: "220px",
-                  height: "55px"
-                }}
-                color="offWhite"
-                variant="outlined"
-              >
-                Connect wallet
-              </Button>
-
-              {!!areAnyQueryParamsMissing && (
-                <Typography
-                  mt={{
-                    xs: "10px",
-                    md: "30px"
-                  }}
-                  color="error"
-                  variant="body"
-                  fontWeight="bold"
-                >
-                  {areAnyQueryParamsMissing}
-                </Typography>
-              )}
-
-              <Stack mt={8} direction="row" gap={2}>
-                <Link
-                  color="offWhite.main"
-                  variant="body"
-                  target="_blank"
-                  href={`https://my.aut.id/`}
-                >
-                  Leaderboard
-                </Link>
-                <Link
-                  color="offWhite.main"
-                  variant="body"
-                  target="_blank"
-                  href={`https://my.aut.id/`}
-                >
-                  Nova showcase
-                </Link>
-              </Stack>
-            </Container>
-          )}
-          {connected && (
-            <Suspense fallback={<AutLoading />}>
-              <Routes>
-                <Route index element={<PublicQuest />} />
-                <Route
-                  path={`task/${PluginDefinitionType.OnboardingOpenTaskPlugin}/:taskId`}
-                  element={
-                    <OpenTask
-                      plugin={
-                        taskPluginTypes[
-                          PluginDefinitionType.OnboardingOpenTaskPlugin
-                        ]
-                      }
-                    />
-                  }
-                />
-                <Route
-                  path={`task/${PluginDefinitionType.OnboardingQuizTaskPlugin}/:taskId`}
-                  element={
-                    <QuizTask
-                      plugin={
-                        taskPluginTypes[
-                          PluginDefinitionType.OnboardingQuizTaskPlugin
-                        ]
-                      }
-                    />
-                  }
-                />
-                <Route
-                  path={`task/${PluginDefinitionType.OnboardingJoinDiscordTaskPlugin}/:taskId`}
-                  element={
-                    <JoinDiscordTask
-                      plugin={
-                        taskPluginTypes[
-                          PluginDefinitionType.OnboardingJoinDiscordTaskPlugin
-                        ]
-                      }
-                    />
-                  }
-                />
-                <Route
-                  path={`task/${PluginDefinitionType.OnboardingTransactionTaskPlugin}/:taskId`}
-                  element={
-                    <TransactionTask
-                      plugin={
-                        taskPluginTypes[
-                          PluginDefinitionType.OnboardingTransactionTaskPlugin
-                        ]
-                      }
-                    />
-                  }
-                />
-              </Routes>
-            </Suspense>
-          )}
-
-          <DialogWrapper open={isOpen} onClose={closeAndDisconnect}>
-            <>
-              <AppTitle
-                mb={{
-                  xs: "16px",
-                  lg: "24px",
-                  xxl: "32px"
-                }}
-                variant="h2"
+        {connected && (
+          <Suspense fallback={<AutLoading />}>
+            <Routes>
+              <Route index element={<PublicQuest />} />
+              <Route
+                path={`task/${
+                  PluginDefinitionType[
+                    PluginDefinitionType.OnboardingOpenTaskPlugin
+                  ]
+                }/:taskId`}
+                element={
+                  <OpenTask
+                    plugin={
+                      taskPluginTypes[
+                        PluginDefinitionType.OnboardingOpenTaskPlugin
+                      ]
+                    }
+                  />
+                }
               />
-              {(isLoading || isSigning || tryEagerConnect) && (
-                <div style={{ position: "relative", flex: 1 }}>
-                  <AutLoading />
-                </div>
-              )}
-
-              {!isLoading && !isSigning && !tryEagerConnect && (
-                <>
-                  {!wallet && (
-                    <Typography color="white" variant="subtitle1">
-                      Connect your wallet
-                    </Typography>
-                  )}
-                  {wallet && (
-                    <>
-                      <Typography
-                        mb={{
-                          xs: "8px"
-                        }}
-                        color="white"
-                        variant="subtitle1"
-                      >
-                        Change Network
-                      </Typography>
-
-                      <Typography color="white" variant="body">
-                        You will need to switch your wallet’s network.
-                      </Typography>
-                    </>
-                  )}
-                  <DialogInnerContent>
-                    {(!wallet || !connector?.connector) && (
-                      <>
-                        <ConnectorBtn
-                          setConnector={changeConnector}
-                          connectorType={ConnectorTypes.Metamask}
-                        />
-                        <ConnectorBtn
-                          setConnector={changeConnector}
-                          connectorType={ConnectorTypes.WalletConnect}
-                        />
-                      </>
-                    )}
-                    {/* {wallet && !isLoading && !!connector?.connector && (
-                      <NetworkSelectors
-                        networks={networks}
-                        onSelect={async (selectedNetwork: NetworkConfig) => {
-                          if (selectedNetwork) {
-                            try {
-                              await activateNetwork(
-                                selectedNetwork,
-                                connector.connector
-                              );
-                            } catch (error) {
-                              console.log(error, "error");
-                            }
-                          }
-                        }}
-                      />
-                    )} */}
-                  </DialogInnerContent>
-                </>
-              )}
-            </>
-          </DialogWrapper>
-        </PerfectScrollbar>
-      </>
+              <Route
+                path={`task/${
+                  PluginDefinitionType[
+                    PluginDefinitionType.OnboardingQuizTaskPlugin
+                  ]
+                }/:taskId`}
+                element={
+                  <QuizTask
+                    plugin={
+                      taskPluginTypes[
+                        PluginDefinitionType.OnboardingQuizTaskPlugin
+                      ]
+                    }
+                  />
+                }
+              />
+              <Route
+                path={`task/${
+                  PluginDefinitionType[
+                    PluginDefinitionType.OnboardingJoinDiscordTaskPlugin
+                  ]
+                }/:taskId`}
+                element={
+                  <JoinDiscordTask
+                    plugin={
+                      taskPluginTypes[
+                        PluginDefinitionType.OnboardingJoinDiscordTaskPlugin
+                      ]
+                    }
+                  />
+                }
+              />
+              <Route
+                path={`task/${
+                  PluginDefinitionType[
+                    PluginDefinitionType.OnboardingTransactionTaskPlugin
+                  ]
+                }/:taskId`}
+                element={
+                  <TransactionTask
+                    plugin={
+                      taskPluginTypes[
+                        PluginDefinitionType.OnboardingTransactionTaskPlugin
+                      ]
+                    }
+                  />
+                }
+              />
+            </Routes>
+          </Suspense>
+        )}
+      </PerfectScrollbar>
     </Box>
   );
 };

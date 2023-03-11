@@ -6,8 +6,7 @@ import {
   Tooltip,
   Chip,
   Badge,
-  CircularProgress,
-  Button
+  CircularProgress
 } from "@mui/material";
 import { addDays } from "date-fns";
 import { memo, useEffect, useState } from "react";
@@ -25,7 +24,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import { useConfirmDialog } from "react-mui-confirm";
 import { CacheTypes, deleteCache, getCache, updateCache } from "@api/cache.api";
 import BetaCountdown from "@components/BetaCountdown";
-import { RequiredQueryParams } from "./RequiredQueryParams";
+import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 
 const QuestInfo = ({
   quest,
@@ -98,7 +97,7 @@ const QuestInfo = ({
             onboardingQuestAddress: searchParams.get(
               RequiredQueryParams.OnboardingQuestAddress
             ),
-            daoAddress: searchParams.get("daoAddress"),
+            daoAddress: searchParams.get(RequiredQueryParams.DaoAddress),
             list: [
               {
                 phase: 1,
@@ -144,7 +143,7 @@ const QuestInfo = ({
             onboardingQuestAddress: searchParams.get(
               RequiredQueryParams.OnboardingQuestAddress
             ),
-            daoAddress: searchParams.get("daoAddress")
+            daoAddress: searchParams.get(RequiredQueryParams.DaoAddress)
           });
         }
       } catch (error) {
@@ -198,8 +197,8 @@ const QuestInfo = ({
                   sx={{
                     ml: 1
                   }}
-                  label={hasQuestStarted ? "Ongoing" : "Active"}
-                  color={hasQuestStarted ? "info" : "success"}
+                  label={quest.active ? "Active" : "Inactive"}
+                  color={quest.active ? "success" : "error"}
                   size="small"
                 />
               </Stack>

@@ -35,6 +35,7 @@ import AutLoading from "@components/AutLoading";
 import { addDays, isAfter } from "date-fns";
 import BetaCountdown from "@components/BetaCountdown";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { useEthers } from "@usedapp/core";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -44,6 +45,7 @@ const Quest = ({ plugin }: PluginParams) => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const isAdmin = useSelector(IsAdmin);
+  const { account: userAddress } = useEthers();
   const params = useParams<{ questId: string }>();
 
   const {
@@ -53,6 +55,7 @@ const Quest = ({ plugin }: PluginParams) => {
     refetch
   } = useGetAllTasksPerQuestQuery(
     {
+      userAddress,
       questId: +params.questId,
       pluginAddress: plugin.pluginAddress
     },
@@ -213,7 +216,7 @@ const Quest = ({ plugin }: PluginParams) => {
                   to="/aut-dashboard/modules/Task"
                   preserveParams
                   queryParams={{
-                    questPluginAddress: plugin?.pluginAddress,
+                    onboardingQuestAddress: plugin?.pluginAddress,
                     returnUrlLinkName: "Back to quest",
                     returnUrl: location.pathname,
                     questId: params?.questId.toString()
@@ -250,7 +253,7 @@ const Quest = ({ plugin }: PluginParams) => {
             to="/aut-dashboard/modules/Task"
             preserveParams
             queryParams={{
-              questPluginAddress: plugin.pluginAddress,
+              onboardingQuestAddress: plugin.pluginAddress,
               returnUrlLinkName: "Back to quest",
               returnUrl: location.pathname,
               questId: params.questId
@@ -285,7 +288,7 @@ const Quest = ({ plugin }: PluginParams) => {
                     isLoading,
                     tasks: tasks,
                     isAdmin,
-                    questPluginAddress: plugin.pluginAddress,
+                    onboardingQuestAddress: plugin.pluginAddress,
                     questId: params.questId
                   },
                   component: QuestTasks
@@ -296,7 +299,7 @@ const Quest = ({ plugin }: PluginParams) => {
                     isLoading,
                     isAdmin,
                     tasks: submissions,
-                    questPluginAddress: plugin.pluginAddress,
+                    onboardingQuestAddress: plugin.pluginAddress,
                     questId: params.questId
                   },
                   component: QuestTasks

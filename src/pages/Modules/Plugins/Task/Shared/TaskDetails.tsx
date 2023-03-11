@@ -15,7 +15,7 @@ import { memo } from "react";
 import OverflowTooltip from "@components/OverflowTooltip";
 import { Link, useSearchParams } from "react-router-dom";
 import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
-import { getTaskStatus, taskTypes } from "./Tasks";
+import { taskStatuses, taskTypes } from "./Tasks";
 
 interface TaskDetailsParams {
   task: Task;
@@ -116,9 +116,9 @@ const TaskDetails = ({ task }: TaskDetailsParams) => {
               <Typography
                 fontFamily="FractulAltBold"
                 variant="subtitle2"
-                color={`${getTaskStatus[task?.status]?.color}.main`}
+                color={`${taskStatuses[task?.status]?.color}.main`}
               >
-                {getTaskStatus[task?.status]?.label}
+                {taskStatuses[task?.status]?.label}
               </Typography>
               <Typography variant="caption" className="text-secondary">
                 Status

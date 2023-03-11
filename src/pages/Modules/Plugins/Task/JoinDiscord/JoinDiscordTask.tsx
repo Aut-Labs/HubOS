@@ -17,11 +17,21 @@ import {
 } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { IsAdmin } from "@store/Community/community.reducer";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useParams,
+  useSearchParams
+} from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
+import { RequiredQueryParams } from "@api/RequiredQueryParams";
+import { taskTypes } from "../Shared/Tasks";
+import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
+import { useEthers } from "@usedapp/core";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -29,20 +39,42 @@ interface PluginParams {
 
 const JoinDiscordTask = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const params = useParams();
-  const { task, isLoading: isLoadingPlugins } = useGetAllTasksPerQuestQuery(
+  const { account: userAddress } = useEthers();
+  const isAdmin = useSelector(IsAdmin);
+
+  const { task, isLoading } = useGetAllTasksPerQuestQuery(
     {
-      pluginAddress: searchParams.get("questPluginAddress"),
-      questId: +searchParams.get("questId")
+      userAddress,
+      pluginAddress: searchParams.get(
+        RequiredQueryParams.OnboardingQuestAddress
+      ),
+      questId: +searchParams.get(RequiredQueryParams.QuestId)
     },
     {
       selectFromResult: ({ data, isLoading, isFetching }) => ({
         isLoading: isLoading || isFetching,
-        task: (data || []).find((t) => t.taskId === +params?.taskId)
+        task: (data || []).find((t) => {
+          const [pluginType] = location.pathname.split("/").splice(-2);
+          return (
+            t.taskId === +params?.taskId &&
+            PluginDefinitionType[pluginType] ===
+              taskTypes[t.taskType].pluginType
+          );
+        })
       })
     }
   );
-  const isAdmin = useSelector(IsAdmin);
+
+  const isInReadOnlyModel = useMemo(() => {
+    return (
+      task?.status === TaskStatus.Finished ||
+      task?.status === TaskStatus.Submitted ||
+      isAdmin
+    );
+  }, [task, isAdmin]);
+
   const { control, handleSubmit, getValues, setValue, formState } = useForm({
     mode: "onChange",
     defaultValues: {

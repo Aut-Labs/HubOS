@@ -28,6 +28,7 @@ import { NetworkSelectors } from "./components/NetworkSelectors";
 import { useSearchParams } from "react-router-dom";
 import { AUTH_TOKEN_KEY } from "@api/auth.api";
 import { EnableAndChangeNetwork } from "./web3.network";
+import { RequiredQueryParams } from "@api/RequiredQueryParams";
 
 const DialogInnerContent = styled("div")({
   display: "flex",
@@ -135,15 +136,18 @@ function Web3DautConnect({
       await activateNetwork(network, connector, profile.provider);
     }
 
-    if (searchParams.get("daoAddress")) {
-      localStorage.setItem("temp_dao_address", searchParams.get("daoAddress"));
+    if (searchParams.get(RequiredQueryParams.DaoAddress)) {
+      localStorage.setItem(
+        "temp_dao_address",
+        searchParams.get(RequiredQueryParams.DaoAddress)
+      );
     }
 
     await dispatch(
       communityUpdateState({
         communities: autID.properties.communities,
         selectedCommunityAddress:
-          searchParams.get("daoAddress") ||
+          searchParams.get(RequiredQueryParams.DaoAddress) ||
           daoAddress ||
           "0xf2ce8891bC0DF26e84F2b7528d059978B975e86B"
       })
@@ -194,7 +198,7 @@ function Web3DautConnect({
         id="d-aut"
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
         dao-expander={
-          searchParams.get("daoAddress") ||
+          searchParams.get(RequiredQueryParams.DaoAddress) ||
           daoAddress ||
           "0xf2ce8891bC0DF26e84F2b7528d059978B975e86B"
         }

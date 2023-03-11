@@ -126,7 +126,7 @@ export const QuestListItem = memo(
                     onClick={() =>
                       navigate({
                         pathname: `${row.questId}`,
-                        search: `questPluginAddress=${pluginAddress}`
+                        search: `onboardingQuestAddress=${pluginAddress}`
                       })
                     }
                   >
@@ -153,7 +153,7 @@ export const QuestListItem = memo(
           </QuestStyledTableCell>
         )}
         <QuestStyledTableCell align="right">
-          {row.durationInDays}
+          {row.durationInDays} days
           {/* {dateTypes(row.startDate, row.durationInDays)} */}
         </QuestStyledTableCell>
         <QuestStyledTableCell align="right">
@@ -185,7 +185,7 @@ export const QuestListItem = memo(
                 to="/aut-dashboard/modules/Task"
                 preserveParams
                 queryParams={{
-                  questPluginAddress: pluginAddress,
+                  onboardingQuestAddress: pluginAddress,
                   returnUrlLinkName: "Back to quest",
                   returnUrl: location.pathname,
                   questId: row.questId.toString()
@@ -284,7 +284,7 @@ export const QuestFilters = memo(
 
 interface QuestTasksParams {
   isLoading: boolean;
-  questPluginAddress: string;
+  onboardingQuestAddress: string;
   isAdmin: boolean;
   questId: number;
   tasks: Task[];
@@ -294,7 +294,7 @@ export const QuestTasks = memo(
   ({
     isLoading,
     tasks,
-    questPluginAddress,
+    onboardingQuestAddress,
     questId,
     isAdmin
   }: QuestTasksParams) => {
