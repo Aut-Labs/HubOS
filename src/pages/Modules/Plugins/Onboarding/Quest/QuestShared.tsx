@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { Quest, Task } from "@aut-labs-private/sdk";
 import {
   Box,
@@ -27,6 +28,7 @@ import Tasks from "../../Task/Shared/Tasks";
 import AddIcon from "@mui/icons-material/Add";
 import LinkWithQuery from "@components/LinkWithQuery";
 import OverflowTooltip from "@components/OverflowTooltip";
+import CopyLink from "@components/CopyLink";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
@@ -72,9 +74,11 @@ export const QuestListItem = memo(
   ({
     row,
     pluginAddress,
+    daoAddress,
     isAdmin
   }: {
     row: Quest;
+    daoAddress: string;
     pluginAddress: string;
     isAdmin: boolean;
   }) => {
@@ -117,13 +121,21 @@ export const QuestListItem = memo(
                 <Tooltip title="View quest and submissions">
                   <BtnLink
                     component="button"
-                    color="primary"
+                    color="primary.light"
                     variant="subtitle2"
-                    onClick={() => navigate(`${row.questId}`)}
+                    onClick={() =>
+                      navigate({
+                        pathname: `${row.questId}`,
+                        search: `questPluginAddress=${pluginAddress}`
+                      })
+                    }
                   >
                     {row.metadata?.name || "n/a"}
                   </BtnLink>
                 </Tooltip>
+                <CopyLink
+                  link={`${window?.location.origin}/quest/?questId=${row.questId}&onboardingQuestAddress=${pluginAddress}&daoAddress=${daoAddress}`}
+                />
               </Badge>
             </Box>
             <OverflowTooltip
@@ -141,7 +153,8 @@ export const QuestListItem = memo(
           </QuestStyledTableCell>
         )}
         <QuestStyledTableCell align="right">
-          {dateTypes(row.startDate, row.durationInDays)}
+          {row.durationInDays}
+          {/* {dateTypes(row.startDate, row.durationInDays)} */}
         </QuestStyledTableCell>
         <QuestStyledTableCell align="right">
           <Chip
@@ -151,7 +164,7 @@ export const QuestListItem = memo(
           />
         </QuestStyledTableCell>
 
-        {isAdmin && (
+        {isAdmin && !row.active && (
           <QuestStyledTableCell align="right">
             <Badge
               invisible={row.tasksCount < 5}
@@ -309,64 +322,12 @@ export const QuestTasks = memo(
 
     return (
       <Box>
-        {!!tasks?.length && (
-          <Box
-            sx={{
-              display: "flex",
-              mt: 2,
-              alignItems: "center",
-              justifyContent: "flex-end"
-            }}
-          >
-            {/* <Stack direction="row" alignItems="center" spacing={2}>
-              <AutTextField
-                variant="standard"
-                color="offWhite"
-                onChange={debouncedChangeHandler}
-                placeholder="Name"
-                sx={{
-                  width: {
-                    sm: "200px"
-                  }
-                }}
-              />
-            </Stack> */}
-            <Badge
-              invisible={tasks?.length < 5}
-              badgeContent={
-                <Tooltip title="During beta there is a maximum of 5 tasks per quest">
-                  <ErrorOutlineIcon color="error" />
-                </Tooltip>
-              }
-            >
-              <Button
-                startIcon={<AddIcon />}
-                variant="outlined"
-                disabled={tasks?.length >= 5}
-                size="medium"
-                color="primary"
-                to="/aut-dashboard/modules/Task"
-                preserveParams
-                queryParams={{
-                  questPluginAddress,
-                  returnUrlLinkName: "Back to quest",
-                  returnUrl: location.pathname,
-                  questId: questId.toString()
-                }}
-                component={LinkWithQuery}
-              >
-                Add task
-              </Button>
-            </Badge>
-          </Box>
-        )}
-
         {!isLoading && !!tasks?.length && !filteredTasks?.length && (
           <Box
             sx={{
               display: "flex",
               gap: "20px",
-              mt: 12,
+              pt: 12,
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center"

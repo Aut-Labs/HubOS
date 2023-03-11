@@ -23,6 +23,7 @@ import { ReactComponent as GitHubIcon } from "@assets/SocialIcons/GitHubIcon.svg
 import { ReactComponent as LensfrensIcon } from "@assets/SocialIcons/LensfrensIcon.svg";
 import { ReactComponent as TelegramIcon } from "@assets/SocialIcons/TelegramIcon.svg";
 import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.svg";
+import { RequiredQueryParams } from "./RequiredQueryParams";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -49,15 +50,12 @@ const CommunityInfo = () => {
     }
   }, [selectedNetworkConfig]);
 
-  const {
-    data: communityData,
-    isLoading: isLoadingCommunity,
-    isFetching: isFetchingCommunity,
-    refetch: refetchCommunity
-  } = useGetCommunityQuery(null, {
-    refetchOnMountOrArgChange: false,
-    skip: false
-  });
+  const { data, isError, isLoading, isFetching, refetch } =
+    useGetCommunityQuery(null, {
+      refetchOnMountOrArgChange: false,
+      skip: false
+    });
+
   return (
     <Box
       sx={{
@@ -68,7 +66,7 @@ const CommunityInfo = () => {
         height: "100%",
         borderRadius: "16px",
         p: 3,
-        backgroundColor: "#ffffff0a"
+        backgroundColor: "nightBlack.main"
       }}
     >
       <Box
@@ -81,8 +79,8 @@ const CommunityInfo = () => {
         <Stack direction="column">
           <Typography color="white" variant="subtitle1">
             <Stack direction="row" alignItems="center">
-              {communityData?.community?.name}
-              <Tooltip title={communityData?.community?.description}>
+              {data?.community?.name}
+              <Tooltip title={data?.community?.description}>
                 <DescriptionIcon
                   sx={{
                     color: "offWhite.main",
@@ -117,16 +115,18 @@ const CommunityInfo = () => {
                 border: "1px solid white"
               }}
               aria-label="community-avatar"
-              src={ipfsCIDToHttpUrl(communityData?.community?.image as string)}
+              src={ipfsCIDToHttpUrl(data?.community?.image as string)}
             />
             <Stack gap={2}>
               <Stack direction="row" alignItems="center">
-                <CopyAddress address={searchParams.get("daoAddress")} />
+                <CopyAddress
+                  address={searchParams.get(RequiredQueryParams.DaoAddress)}
+                />
                 <Tooltip title={`Explore in ${selectedNetworkConfig?.name}`}>
                   <IconButton
                     sx={{ color: "white", p: 0, ml: 1 }}
                     href={`${blockExplorer}/address/${searchParams.get(
-                      "daoAddress"
+                      RequiredQueryParams.DaoAddress
                     )}`}
                     target="_blank"
                     color="offWhite"
@@ -136,50 +136,47 @@ const CommunityInfo = () => {
                 </Tooltip>
               </Stack>
               <Stack direction="row">
-                {communityData?.community?.properties.socials.map(
-                  (social, index) => {
-                    const AutIcon =
-                      socialIcons[Object.keys(socialIcons)[index]];
+                {data?.community?.properties.socials.map((social, index) => {
+                  const AutIcon = socialIcons[Object.keys(socialIcons)[index]];
 
-                    return (
-                      <Link
-                        key={`social-icon-${index}`}
-                        {...(!!social.link && {
-                          color: "offwhite.main",
-                          component: "a",
-                          href: social.link,
-                          target: "_blank"
-                        })}
-                        {...(!social.link && {
-                          sx: {
-                            color: "divider"
+                  return (
+                    <Link
+                      key={`social-icon-${index}`}
+                      {...(!!social.link && {
+                        color: "offwhite.main",
+                        component: "a",
+                        href: social.link,
+                        target: "_blank"
+                      })}
+                      {...(!social.link && {
+                        sx: {
+                          color: "divider"
+                        },
+                        component: "button",
+                        disabled: true
+                      })}
+                    >
+                      <SvgIcon
+                        sx={{
+                          height: {
+                            xs: "25px",
+                            xxl: "30px"
                           },
-                          component: "button",
-                          disabled: true
-                        })}
-                      >
-                        <SvgIcon
-                          sx={{
-                            height: {
-                              xs: "25px",
-                              xxl: "30px"
-                            },
-                            width: {
-                              xs: "25px",
-                              xxl: "30px"
-                            },
-                            mr: {
-                              xs: "10px",
-                              xxl: "15px"
-                            }
-                          }}
-                          key={`socials.${index}.icon`}
-                          component={AutIcon}
-                        />
-                      </Link>
-                    );
-                  }
-                )}
+                          width: {
+                            xs: "25px",
+                            xxl: "30px"
+                          },
+                          mr: {
+                            xs: "10px",
+                            xxl: "15px"
+                          }
+                        }}
+                        key={`socials.${index}.icon`}
+                        component={AutIcon}
+                      />
+                    </Link>
+                  );
+                })}
               </Stack>
             </Stack>
           </Box>
@@ -192,9 +189,9 @@ const CommunityInfo = () => {
           }}
           variant="body"
           target="_blank"
-          href={`https://my.aut.id/${communityData?.admin}`}
+          href={`https://my.aut.id/${data?.admin}`}
         >
-          View owner
+          {data?.admin === account ? "View profile" : "View owner"}
         </Link>
       </Box>
     </Box>

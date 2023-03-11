@@ -27,6 +27,7 @@ import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import CopyAddress from "@components/CopyAddress";
 import LinkWithQuery from "@components/LinkWithQuery";
 import OverflowTooltip from "@components/OverflowTooltip";
+import AutLoading from "@components/AutLoading";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
@@ -199,11 +200,7 @@ const Tasks = ({ isLoading, tasks }: TasksParams) => {
   return (
     <Box>
       {isLoading ? (
-        <CircularProgress
-          sx={{ mt: 12 }}
-          className="spinner-center"
-          size="60px"
-        />
+        <AutLoading width="130px" height="130px" />
       ) : (
         <>
           {!!tasks?.length && (

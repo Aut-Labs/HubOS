@@ -56,6 +56,11 @@ const generateConfig = (networks: NetworkConfig[]): Config => {
     connectors: {
       metamask: new MetamaskConnector(),
       walletConnect: new WalletConnectConnector({
+        rpc: networks.reduce((prev, curr) => {
+          // eslint-disable-next-line prefer-destructuring
+          prev[curr.chainId] = curr.rpcUrls[0];
+          return prev;
+        }, {}),
         infuraId: "d8df2cb7844e4a54ab0a782f608749dd"
       })
     }

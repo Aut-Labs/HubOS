@@ -22,6 +22,7 @@ import { useSelector } from "react-redux";
 import { IsAdmin } from "@store/Community/community.reducer";
 import { Link, useSearchParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import AutLoading from "@components/AutLoading";
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -135,7 +136,7 @@ const Plugins = ({ definition }: StackParams) => {
         </Box>
 
         {isLoading ? (
-          <CircularProgress className="spinner-center" size="60px" />
+          <AutLoading width="130px" height="130px" />
         ) : (
           <>
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>

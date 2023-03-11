@@ -7,16 +7,11 @@ import {
   useState
 } from "react";
 import { useAppDispatch } from "@store/store.model";
-import {
-  IsAuthenticated,
-  resetAuthState,
-  setAuthenticated
-} from "@auth/auth.reducer";
+import { resetAuthState, setAuthenticated } from "@auth/auth.reducer";
 import { AutID } from "@api/aut.model";
 import { Init } from "@aut-labs/d-aut";
 import { communityUpdateState } from "@store/Community/community.reducer";
 import {
-  NetworkSelectorIsOpen,
   NetworksConfig,
   updateWalletProviderState
 } from "@store/WalletProvider/WalletProvider";
@@ -30,6 +25,9 @@ import DialogWrapper from "@components/Dialog/DialogWrapper";
 import { Typography, debounce, styled } from "@mui/material";
 import AppTitle from "@components/AppTitle";
 import { NetworkSelectors } from "./components/NetworkSelectors";
+import { useSearchParams } from "react-router-dom";
+import { AUTH_TOKEN_KEY } from "@api/auth.api";
+import { EnableAndChangeNetwork } from "./web3.network";
 
 const DialogInnerContent = styled("div")({
   display: "flex",
@@ -48,18 +46,19 @@ function Web3DautConnect({
   config: Config;
 }) {
   const dispatch = useAppDispatch();
+  const [searchParams] = useSearchParams();
+  const [daoAddress] = useState(localStorage.getItem("temp_dao_address"));
   const abort = useRef<AbortController>();
   const networks = useSelector(NetworksConfig);
-  const isOpen = useSelector(NetworkSelectorIsOpen);
-  const [currentChainId, setCurrentChainId] = useState(null);
-  const [dAutConnected, setDAutConnected] = useState(false);
-  const [loadingNetwork, setIsLoadingNetwork] = useState(false);
-  const { connector, activate } = useConnector();
+  // const [currentChainId, setCurrentChainId] = useState(null);
+  // const [dAutConnected, setDAutConnected] = useState(false);
+  // const [loadingNetwork, setIsLoadingNetwork] = useState(false);
+  const { activate } = useConnector();
   const { activateBrowserWallet, switchNetwork, chainId } = useEthers();
 
-  const openForSelectNetwork = useMemo(() => {
-    return dAutConnected && currentChainId && currentChainId != chainId;
-  }, [chainId, dAutConnected, currentChainId]);
+  // const openForSelectNetwork = useMemo(() => {
+  //   return dAutConnected && currentChainId && currentChainId != chainId;
+  // }, [chainId, dAutConnected, currentChainId]);
 
   const onAutInit = async () => {
     const connetectedAlready = sessionStorage.getItem("aut-data");
@@ -87,10 +86,15 @@ function Web3DautConnect({
     conn: Connector,
     wallet?: string
   ) => {
-    setIsLoadingNetwork(true);
+    // setIsLoadingNetwork(true);
     try {
       await activate(conn);
       await switchNetwork(+network.chainId);
+      if (conn.name === "metamask") {
+        // @ts-ignore
+        const provider = conn.provider.provider;
+        await EnableAndChangeNetwork(provider, network);
+      }
     } catch (error) {
       console.error(error, "error");
     }
@@ -106,8 +110,8 @@ function Web3DautConnect({
     }
     await dispatch(updateWalletProviderState(itemsToUpdate));
     await initialiseSDK(network, signer as ethers.providers.JsonRpcSigner);
-    setCurrentChainId(+network.chainId);
-    setIsLoadingNetwork(false);
+    // setCurrentChainId(+network.chainId);
+    // setIsLoadingNetwork(false);
   };
 
   const onAutLogin = async ({ detail }: any) => {
@@ -119,21 +123,29 @@ function Web3DautConnect({
     autID.properties.address = profile.address;
     autID.properties.network = profile.network?.toLowerCase();
 
-    const network = networks.find(
-      (n) =>
-        n.network?.toLowerCase() === autID?.properties?.network?.toLowerCase()
-    );
+    const [network] = networks.filter((n) => !n.disabled);
+    // .find(
+    //   (n) =>
+    //     n.network?.toLowerCase() === autID?.properties?.network?.toLowerCase()
+    // );
 
-    if (network && !network?.disabled) {
+    if (network) {
       const connector = config.connectors[profile.provider];
       activateBrowserWallet({ type: profile.provider });
       await activateNetwork(network, connector, profile.provider);
     }
 
+    if (searchParams.get("daoAddress")) {
+      localStorage.setItem("temp_dao_address", searchParams.get("daoAddress"));
+    }
+
     await dispatch(
       communityUpdateState({
         communities: autID.properties.communities,
-        selectedCommunityAddress: "0xf2ce8891bC0DF26e84F2b7528d059978B975e86B"
+        selectedCommunityAddress:
+          searchParams.get("daoAddress") ||
+          daoAddress ||
+          "0xf2ce8891bC0DF26e84F2b7528d059978B975e86B"
       })
     );
 
@@ -144,12 +156,13 @@ function Web3DautConnect({
       })
     );
 
-    setDAutConnected(true);
+    // setDAutConnected(true);
     setLoading(false);
   };
 
   const onDisconnected = () => {
     dispatch(resetAuthState());
+    localStorage.removeItem(AUTH_TOKEN_KEY);
     // history.push("/");
   };
 
@@ -180,10 +193,14 @@ function Web3DautConnect({
         }}
         id="d-aut"
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
-        dao-expander="0xf2ce8891bC0DF26e84F2b7528d059978B975e86B"
+        dao-expander={
+          searchParams.get("daoAddress") ||
+          daoAddress ||
+          "0xf2ce8891bC0DF26e84F2b7528d059978B975e86B"
+        }
         button-type="simple"
       />
-      <DialogWrapper open={openForSelectNetwork}>
+      {/* <DialogWrapper open={openForSelectNetwork}>
         <>
           <AppTitle
             mb={{
@@ -226,7 +243,7 @@ function Web3DautConnect({
             </>
           )}
         </>
-      </DialogWrapper>
+      </DialogWrapper> */}
     </>
   );
 }

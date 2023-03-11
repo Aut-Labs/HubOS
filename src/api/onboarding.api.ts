@@ -7,6 +7,7 @@ import AutSDK, {
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
+import { CacheTypes, getCache, updateCache } from "./cache.api";
 
 const fetchQuests = async (pluginAddress: any, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
@@ -115,7 +116,10 @@ const hasUserCompletedQuest = async (
   }
 };
 
-const activateOnboarding = async (pluginAddress: any, api: BaseQueryApi) => {
+const activateOnboarding = async (
+  { quests, pluginAddress, userAddress },
+  api: BaseQueryApi
+) => {
   const sdk = AutSDK.getInstance();
   let questOnboarding: QuestOnboarding = sdk.questOnboarding;
 
@@ -127,12 +131,20 @@ const activateOnboarding = async (pluginAddress: any, api: BaseQueryApi) => {
     sdk.questOnboarding = questOnboarding;
   }
 
-  const response = await questOnboarding.activateOnboarding();
+  const response = await questOnboarding.activateOnboarding(quests);
 
   if (!response.isSuccess) {
     return {
       error: response.errorMessage
     };
+  }
+
+  try {
+    const cache = await getCache(CacheTypes.UserPhases);
+    cache.list[1].status = 1; // complete phase 2
+    await updateCache(cache);
+  } catch (error) {
+    console.log(error);
   }
   return {
     data: response.data
@@ -158,6 +170,36 @@ const applyForQuest = async (
   }
 
   const response = await questOnboarding.applyForAQuest(body.questId);
+
+  if (!response.isSuccess) {
+    return {
+      error: response.errorMessage
+    };
+  }
+  return {
+    data: response.data
+  };
+};
+
+const withdrawFromAQuest = async (
+  body: {
+    questId: number;
+    onboardingQuestAddress: string;
+  },
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+
+  if (!questOnboarding) {
+    questOnboarding = sdk.initService<QuestOnboarding>(
+      QuestOnboarding,
+      body.onboardingQuestAddress
+    );
+    sdk.questOnboarding = questOnboarding;
+  }
+
+  const response = await questOnboarding.withdrawFromAQuest(body.questId);
 
   if (!response.isSuccess) {
     return {
@@ -269,6 +311,43 @@ const createTaskPerQuest = async (
   };
 };
 
+const removeTaskFromQuest = async (
+  body: {
+    task: Task;
+    questId: number;
+    pluginAddress: string;
+    questPluginAddress: string;
+    pluginTokenId: number;
+  },
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+
+  if (!questOnboarding) {
+    questOnboarding = sdk.initService<QuestOnboarding>(
+      QuestOnboarding,
+      body.questPluginAddress
+    );
+    sdk.questOnboarding = questOnboarding;
+  }
+
+  const response = await questOnboarding.removeTasks(
+    [body.task],
+    body.questId,
+    body.pluginTokenId
+  );
+
+  if (!response.isSuccess) {
+    return {
+      error: response.errorMessage
+    };
+  }
+  return {
+    data: response.data
+  };
+};
+
 const KEEP_DATA_UNUSED = 5 * 60;
 
 export const onboardingApi = createApi({
@@ -287,6 +366,10 @@ export const onboardingApi = createApi({
 
     if (url === "applyForQuest") {
       return applyForQuest(body, api);
+    }
+
+    if (url === "withdrawFromAQuest") {
+      return withdrawFromAQuest(body, api);
     }
 
     if (url === "getOnboardingQuestById") {
@@ -311,6 +394,10 @@ export const onboardingApi = createApi({
 
     if (url === "createTaskPerQuest") {
       return createTaskPerQuest(body, api);
+    }
+
+    if (url === "removeTaskFromQuest") {
+      return removeTaskFromQuest(body, api);
     }
     return {
       data: "Test"
@@ -360,7 +447,14 @@ export const onboardingApi = createApi({
       },
       providesTags: ["Quest"]
     }),
-    activateOnboarding: builder.mutation<boolean, string>({
+    activateOnboarding: builder.mutation<
+      boolean,
+      {
+        quests: Quest[];
+        pluginAddress: string;
+        userAddress: string;
+      }
+    >({
       query: (body) => {
         return {
           body,
@@ -380,6 +474,21 @@ export const onboardingApi = createApi({
         return {
           body,
           url: "applyForQuest"
+        };
+      },
+      invalidatesTags: ["Quest"]
+    }),
+    withdrawFromAQuest: builder.mutation<
+      boolean,
+      {
+        questId: number;
+        onboardingQuestAddress: string;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "withdrawFromAQuest"
         };
       },
       invalidatesTags: ["Quest"]
@@ -444,6 +553,24 @@ export const onboardingApi = createApi({
         };
       },
       invalidatesTags: ["Tasks"]
+    }),
+    removeTaskFromQuest: builder.mutation<
+      Task,
+      {
+        task: Task;
+        questId: number;
+        pluginAddress: string;
+        questPluginAddress: string;
+        pluginTokenId: number;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "removeTaskFromQuest"
+        };
+      },
+      invalidatesTags: ["Tasks"]
     })
   })
 });
@@ -451,6 +578,8 @@ export const onboardingApi = createApi({
 export const {
   useCreateQuestMutation,
   useApplyForQuestMutation,
+  useWithdrawFromAQuestMutation,
+  useRemoveTaskFromQuestMutation,
   useLazyHasUserCompletedQuestQuery,
   useGetOnboardingQuestByIdQuery,
   useCreateTaskPerQuestMutation,

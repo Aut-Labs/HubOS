@@ -32,6 +32,14 @@ import { TaskType } from "@aut-labs-private/sdk/dist/models/task";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useConfirmDialog } from "react-mui-confirm";
 import OverflowTooltip from "@components/OverflowTooltip";
+import AutLoading from "@components/AutLoading";
+import {
+  useGetAllOnboardingQuestsQuery,
+  useRemoveTaskFromQuestMutation
+} from "@api/onboarding.api";
+import ErrorDialog from "@components/Dialog/ErrorPopup";
+import LoadingDialog from "@components/Dialog/LoadingPopup";
+import { useEthers } from "@usedapp/core";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
@@ -113,23 +121,38 @@ const TaskListItem = memo(
     const location = useLocation();
     const params = useParams<{ questId: string }>();
     const confirm = useConfirmDialog();
+    const [removeTask, { error, isError, isLoading, reset }] =
+      useRemoveTaskFromQuestMutation();
+
+    const { plugin, questOnboarding } = useGetAllPluginDefinitionsByDAOQuery(
+      null,
+      {
+        selectFromResult: ({ data }) => ({
+          questOnboarding: (data || []).find(
+            (p) =>
+              PluginDefinitionType.QuestOnboardingPlugin ===
+              p.pluginDefinitionId
+          ),
+          plugin: (data || []).find(
+            (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
+          )
+        })
+      }
+    );
 
     const confimDelete = () =>
       confirm({
         title: "Are you sure you want to delete this task?",
         onConfirm: () => {
-          console.log("Confimed");
-          // delete
+          removeTask({
+            task: row,
+            questId: +params.questId,
+            pluginTokenId: plugin.tokenId,
+            pluginAddress: plugin.pluginAddress,
+            questPluginAddress: questOnboarding?.pluginAddress
+          });
         }
       });
-
-    const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
-      selectFromResult: ({ data }) => ({
-        plugin: (data || []).find(
-          (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
-        )
-      })
-    });
 
     const path = useMemo(() => {
       if (!plugin) return;
@@ -142,6 +165,12 @@ const TaskListItem = memo(
       <StyledTableRow
         sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
       >
+        <ErrorDialog
+          handleClose={() => reset()}
+          open={isError}
+          message={error}
+        />
+        <LoadingDialog open={isLoading} message="Removing task..." />
         <TaskStyledTableCell component="th" scope="row">
           <span
             style={{
@@ -195,17 +224,19 @@ const TaskListItem = memo(
             />
           </span>
         </TaskStyledTableCell>
-        <TaskStyledTableCell align="right">
-          <CopyAddress address={row.creator} />
-          <BtnLink
-            color="primary.light"
-            variant="caption"
-            target="_blank"
-            href={`https://my.aut.id/${row.creator}`}
-          >
-            View profile
-          </BtnLink>
-        </TaskStyledTableCell>
+        {!isAdmin && (
+          <TaskStyledTableCell align="right">
+            <CopyAddress address={row.creator} />
+            <BtnLink
+              color="primary.light"
+              variant="caption"
+              target="_blank"
+              href={`https://my.aut.id/${row.creator}`}
+            >
+              View profile
+            </BtnLink>
+          </TaskStyledTableCell>
+        )}
         <TaskStyledTableCell align="right">
           <Chip {...getTaskStatus[row.status]} size="small" />
         </TaskStyledTableCell>
@@ -233,14 +264,11 @@ interface TasksParams {
 }
 
 const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
+  const { account } = useEthers();
   return (
     <Box>
       {isLoading ? (
-        <CircularProgress
-          sx={{ mt: 12 }}
-          className="spinner-center"
-          size="60px"
-        />
+        <AutLoading width="130px" height="130px" />
       ) : (
         <>
           {!!tasks?.length && (
@@ -264,9 +292,13 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
                 <TableHead>
                   <TableRow>
                     <TaskStyledTableCell>Name</TaskStyledTableCell>
-                    <TaskStyledTableCell align="right">
-                      Creator
-                    </TaskStyledTableCell>
+
+                    {!isAdmin && (
+                      <TaskStyledTableCell align="right">
+                        Creator
+                      </TaskStyledTableCell>
+                    )}
+
                     <TaskStyledTableCell align="right">
                       Status
                     </TaskStyledTableCell>
@@ -298,7 +330,7 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
               sx={{
                 display: "flex",
                 gap: "20px",
-                mt: 12,
+                pt: 12,
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center"

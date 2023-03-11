@@ -2,8 +2,8 @@ version: '3.7'
 
 services:
 
-  playground:
-    container_name: playground
+  playground-dashboard:
+    container_name: playground-dashboard
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,4 +11,4 @@ services:
       - '.:/app'
       - '/app/node_modules'
     ports:
-      - '5002:80'
+      - '3002:80'

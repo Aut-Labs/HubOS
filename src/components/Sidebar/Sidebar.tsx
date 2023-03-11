@@ -3,10 +3,8 @@ import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import {
   Button,
-  CssBaseline,
   Divider,
   IconButton,
-  LinearProgress,
   Stack,
   SvgIcon,
   Toolbar,
@@ -22,13 +20,13 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import DashboardTitle from "@components/AppTitle";
 import { ReactComponent as AutWhiteIcon } from "@assets/aut/aut-white.svg";
-import PerfectScrollbar from "react-perfect-scrollbar";
 import { useSelector } from "react-redux";
 import { AppTitle } from "@store/ui-reducer";
 import { SelectedNetworkConfig } from "@store/WalletProvider/WalletProvider";
 import { CommunityData } from "@store/Community/community.reducer";
 import { UserInfo } from "@auth/auth.reducer";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
+import BetaCountdown from "@components/BetaCountdown";
 
 const Main = styled("main", {
   shouldForwardProp: (prop) =>
@@ -190,7 +188,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             }}
           >
             <Typography variant="body" noWrap color="white">
-              Please verify your discord account for your community.
+              Please verify the discord account for your community.
             </Typography>
             <Button
               sx={{
@@ -258,7 +256,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
         >
           <Stack direction="column">
             <Typography
-              fontFamily="FractulAltBold"
+              fontFamily="FractulRegular"
               color="primary"
               variant="subtitle2"
             >
@@ -270,7 +268,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
           </Stack>
           <Stack direction="column">
             <Typography
-              fontFamily="FractulAltBold"
+              fontFamily="FractulRegular"
               color="primary"
               variant="subtitle2"
             >
@@ -288,7 +286,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
           >
             <Stack direction="column">
               <Typography
-                fontFamily="FractulAltBold"
+                fontFamily="FractulRegular"
                 color="primary"
                 variant="subtitle2"
                 maxWidth="120px"
@@ -301,7 +299,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             </Stack>
             <Stack direction="column">
               <Typography
-                fontFamily="FractulAltBold"
+                fontFamily="FractulRegular"
                 color="primary"
                 variant="subtitle2"
               >
@@ -318,12 +316,15 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
         <Box
           sx={{
             display: "flex",
+            flexDirection: "column",
             justifyContent: "center",
             py: 2
           }}
         >
+          <BetaCountdown to={new Date("2023-03-16 01:00:00")} />
           <SvgIcon
             sx={{
+              mt: 5,
               height: "30px",
               width: "100%"
             }}
@@ -337,20 +338,21 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
         drawerWidth={drawerWidth}
         open={open}
       >
-        <PerfectScrollbar
+        <div
           style={{
-            minHeight: "100%",
+            height: "100vh",
             display: "flex",
-            flexDirection: "column"
+            flexDirection: "column",
+            overflowY: "auto"
           }}
           // options={{
           //   suppressScrollX: true,
-          //   useBothWheelAxes: false
-          //   // swipeEasing: true
+          //   useBothWheelAxes: false,
+          //   swipeEasing: false
           // }}
         >
           {children}
-        </PerfectScrollbar>
+        </div>
       </Main>
     </Box>
   );
