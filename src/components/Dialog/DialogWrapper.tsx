@@ -30,7 +30,9 @@ export const DialogWrapper = ({
       sx={{
         ".MuiPaper-root": {
           borderColor: "divider",
-          borderRadius: "16px",
+          borderRadius: {
+            sm: "16px"
+          },
           ...(contentSx?.maxWidth && {
             maxWidth: contentSx.maxWidth
           })
@@ -39,6 +41,7 @@ export const DialogWrapper = ({
     >
       <DialogContent
         sx={{
+          overflow: "hidden",
           ...(!isMobile &&
             !fullScreen && {
               maxWidth: {

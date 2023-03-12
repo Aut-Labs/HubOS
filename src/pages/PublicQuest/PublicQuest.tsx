@@ -124,7 +124,10 @@ const PublicQuest = () => {
         <Box
           sx={{
             display: "flex",
-            flexDirection: "row",
+            flexDirection: {
+              xs: "column",
+              sm: "row"
+            },
             alignItems: "center",
             gap: 4,
             width: "100%",
@@ -157,7 +160,12 @@ const PublicQuest = () => {
               >
                 <Typography
                   sx={{
-                    mb: 2
+                    mb: 2,
+                    display: {
+                      xs: "flex",
+                      sm: "inherit"
+                    },
+                    flexDirection: "column"
                   }}
                   color="white"
                   variant="subtitle1"

@@ -19,7 +19,9 @@ import {
   Stack,
   Toolbar,
   Typography,
-  styled
+  styled,
+  useMediaQuery,
+  useTheme
 } from "@mui/material";
 import AppTitle from "@components/AppTitle";
 import { NetworkConfig } from "@api/ProviderFactory/network.config";
@@ -37,21 +39,35 @@ import BubbleBottomLeft from "@assets/bubble_bottom_left.png";
 import { authoriseWithWeb3 } from "@api/auth.api";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 
-const BottomLeftBubble = styled("img")({
-  position: "absolute",
-  width: "700px",
-  height: "700px",
-  left: "-350px",
-  bottom: "-350px"
-});
+const TOOLBAR_HEIGHT = 84;
 
-const TopRightBubble = styled("img")({
-  position: "absolute",
-  width: "700px",
-  height: "700px",
-  top: "calc(-350px + 84px)",
-  right: "-350px"
-});
+const BottomLeftBubble = styled("img")(({ theme }) => ({
+  position: "fixed",
+  width: "400px",
+  height: "400px",
+  left: "-200px",
+  bottom: "-200px",
+  [theme.breakpoints.up("md")]: {
+    width: "700px",
+    height: "700px",
+    left: "-350px",
+    bottom: "-350px"
+  }
+}));
+
+const TopRightBubble = styled("img")(({ theme }) => ({
+  position: "fixed",
+  width: "400px",
+  height: "400px",
+  top: "-200px",
+  right: "-200px",
+  [theme.breakpoints.up("md")]: {
+    width: "700px",
+    height: "700px",
+    top: "-350px",
+    right: "-350px"
+  }
+}));
 
 const OpenTask = lazy(() => import("../Modules/Plugins/Task/Open/OpenTask"));
 
@@ -74,6 +90,7 @@ const DialogInnerContent = styled("div")({
 });
 
 const NetworkResolver = () => {
+  const theme = useTheme();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -92,6 +109,7 @@ const NetworkResolver = () => {
   } = useEthers();
   const [connected, setIsConnected] = useState(false);
   const [initialAccount, setInitialAccount] = useState("");
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const areAnyQueryParamsMissing = useMemo(() => {
     try {
@@ -345,9 +363,21 @@ const NetworkResolver = () => {
             "&.MuiToolbar-root": {
               paddingLeft: 6,
               paddingRight: 6,
-              minHeight: "84px",
+              minHeight: `${TOOLBAR_HEIGHT}px`,
               justifyContent: "space-between",
-              alignItems: "center"
+              alignItems: "center",
+              gap: {
+                xs: "8px",
+                sm: 0
+              },
+              flexDirection: {
+                xs: "column",
+                sm: "row"
+              },
+              py: {
+                xs: "8px",
+                sm: 0
+              }
             }
           }}
         >
@@ -397,8 +427,14 @@ const NetworkResolver = () => {
       )}
       <PerfectScrollbar
         style={{
-          marginTop: "84px",
-          height: "calc(100% - 84px)",
+          ...(isMobile && {
+            marginTop: `${TOOLBAR_HEIGHT + 70}px`,
+            height: `calc(100% - ${TOOLBAR_HEIGHT + 70 + "px"})`
+          }),
+          ...(!isMobile && {
+            marginTop: `${TOOLBAR_HEIGHT}px`,
+            height: `calc(100% - ${TOOLBAR_HEIGHT + "px"})`
+          }),
           display: "flex",
           flexDirection: "column"
         }}
@@ -427,7 +463,21 @@ const NetworkResolver = () => {
                 md: "50px"
               }}
             >
-              <AppTitle />
+              <AppTitle
+                sx={{
+                  display: {
+                    xs: "flex",
+                    sm: "unset"
+                  },
+                  flexDirection: "column",
+                  ".MuiTypography-root": {
+                    textAlign: {
+                      xs: "end",
+                      sm: "unset"
+                    }
+                  }
+                }}
+              />
             </Box>
             <Typography
               mb={{

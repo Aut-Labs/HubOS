@@ -1,4 +1,4 @@
-import { Typography, TypographyProps } from "@mui/material";
+import { Stack, Typography, TypographyProps } from "@mui/material";
 
 const AppTitle = (props: TypographyProps) => {
   return (

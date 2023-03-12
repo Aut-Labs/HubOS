@@ -77,7 +77,8 @@ function App() {
 
   const returnUrl = useMemo(() => {
     if (!isAutheticated) return "/";
-    const shouldGoToDashboard = location.pathname === "/";
+    const shouldGoToDashboard =
+      location.pathname === "/" || !location.pathname.includes("aut-dashboard");
     const goTo = shouldGoToDashboard ? "/aut-dashboard" : location.pathname;
     const url = location.state?.from;
     return url || goTo;
@@ -132,10 +133,7 @@ function App() {
                         path="aut-dashboard/*"
                         element={<AutDashboardMain />}
                       />
-                      <Route
-                        path="*"
-                        element={<Navigate to={returnUrl} replace />}
-                      />
+                      <Route path="*" element={<Navigate to={returnUrl} />} />
                     </>
                   )}
                 </Routes>

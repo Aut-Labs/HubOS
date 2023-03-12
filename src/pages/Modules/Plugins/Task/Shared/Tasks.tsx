@@ -2,7 +2,6 @@ import { Task } from "@aut-labs-private/sdk";
 import {
   Badge,
   Box,
-  CircularProgress,
   Paper,
   Stack,
   Table,
@@ -33,10 +32,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useConfirmDialog } from "react-mui-confirm";
 import OverflowTooltip from "@components/OverflowTooltip";
 import AutLoading from "@components/AutLoading";
-import {
-  useGetAllOnboardingQuestsQuery,
-  useRemoveTaskFromQuestMutation
-} from "@api/onboarding.api";
+import { useRemoveTaskFromQuestMutation } from "@api/onboarding.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { useEthers } from "@usedapp/core";
@@ -117,7 +113,15 @@ const dateTypes = (start: number, end: number) => {
 };
 
 const TaskListItem = memo(
-  ({ row, isAdmin }: { row: Task; isAdmin: boolean }) => {
+  ({
+    row,
+    isAdmin,
+    canDelete
+  }: {
+    row: Task;
+    isAdmin: boolean;
+    canDelete: boolean;
+  }) => {
     const location = useLocation();
     const params = useParams<{ questId: string }>();
     const confirm = useConfirmDialog();
@@ -243,7 +247,7 @@ const TaskListItem = memo(
         <TaskStyledTableCell align="right">
           {taskTypes[row.taskType]?.label}
         </TaskStyledTableCell>
-        {isAdmin && (
+        {isAdmin && canDelete && (
           <TaskStyledTableCell align="right">
             <Tooltip title="Remove task">
               <IconButton onClick={confimDelete} color="error">
@@ -260,11 +264,13 @@ const TaskListItem = memo(
 interface TasksParams {
   isLoading: boolean;
   tasks: Task[];
+  canDelete?: boolean;
   isAdmin: boolean;
 }
 
-const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
+const Tasks = ({ isLoading, tasks, isAdmin, canDelete }: TasksParams) => {
   const { account } = useEthers();
+
   return (
     <Box>
       {isLoading ? (
@@ -274,7 +280,13 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
           {!!tasks?.length && (
             <TableContainer
               sx={{
-                minWidth: "700px",
+                minWidth: {
+                  sm: "700px"
+                },
+                width: {
+                  xs: "360px",
+                  sm: "unset"
+                },
                 borderRadius: "16px",
                 backgroundColor: "nightBlack.main",
                 borderColor: "divider",
@@ -284,6 +296,10 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
             >
               <Table
                 sx={{
+                  minWidth: {
+                    xs: "700px",
+                    sm: "unset"
+                  },
                   ".MuiTableBody-root > .MuiTableRow-root:hover": {
                     backgroundColor: "#ffffff0a"
                   }
@@ -305,7 +321,7 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
                     <TaskStyledTableCell align="right">
                       Task type
                     </TaskStyledTableCell>
-                    {isAdmin && (
+                    {isAdmin && canDelete && (
                       <TaskStyledTableCell align="right">
                         Action
                       </TaskStyledTableCell>
@@ -316,6 +332,7 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
                   {tasks?.map((row, index) => (
                     <TaskListItem
                       isAdmin={isAdmin}
+                      canDelete={canDelete}
                       key={`table-row-${index}`}
                       row={row}
                     />

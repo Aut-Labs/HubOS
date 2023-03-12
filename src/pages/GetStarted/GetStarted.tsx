@@ -20,21 +20,33 @@ const Grid = styled("div")(({ theme }) => {
   };
 });
 
-const BottomLeftBubble = styled("img")({
-  position: "absolute",
-  width: "700px",
-  height: "700px",
-  left: "-350px",
-  bottom: "-350px"
-});
+const BottomLeftBubble = styled("img")(({ theme }) => ({
+  position: "fixed",
+  width: "400px",
+  height: "400px",
+  left: "-200px",
+  bottom: "-200px",
+  [theme.breakpoints.up("md")]: {
+    width: "700px",
+    height: "700px",
+    left: "-350px",
+    bottom: "-350px"
+  }
+}));
 
-const TopRightBubble = styled("img")({
-  position: "absolute",
-  width: "700px",
-  height: "700px",
-  top: "-350px",
-  right: "-350px"
-});
+const TopRightBubble = styled("img")(({ theme }) => ({
+  position: "fixed",
+  width: "400px",
+  height: "400px",
+  top: "-200px",
+  right: "-200px",
+  [theme.breakpoints.up("md")]: {
+    width: "700px",
+    height: "700px",
+    top: "-350px",
+    right: "-350px"
+  }
+}));
 
 const Content = styled("div")(({ theme }) => {
   return {

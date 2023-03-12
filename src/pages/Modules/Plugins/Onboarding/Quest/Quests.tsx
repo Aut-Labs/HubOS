@@ -135,7 +135,16 @@ const Quests = ({ plugin }: PluginParams) => {
             }}
           >
             {/* <QuestFilters searchCallback={setSearchState} /> */}
-            <Stack direction="row" gap={2}>
+            <Stack
+              width="100%"
+              direction={{
+                sm: "row"
+              }}
+              alignItems={{
+                xs: "center"
+              }}
+              gap={2}
+            >
               {isAdmin && (
                 <>
                   <Box>

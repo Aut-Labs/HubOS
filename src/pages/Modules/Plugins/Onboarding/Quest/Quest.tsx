@@ -81,7 +81,7 @@ const Quest = ({ plugin }: PluginParams) => {
   }, [quest]);
 
   useEffect(() => {
-    dispatch(setTitle(`Quest - ${quest?.metadata?.name}`));
+    dispatch(setTitle(`Quest - ${quest?.metadata?.name || ""}`));
   }, [dispatch, quest]);
 
   const isLoading = useMemo(() => {
@@ -138,8 +138,12 @@ const Quest = ({ plugin }: PluginParams) => {
               startIcon={<ArrowBackIcon />}
               color="offWhite"
               sx={{
-                position: "absolute",
-                left: "42px"
+                position: {
+                  sm: "absolute"
+                },
+                left: {
+                  sm: "42px"
+                }
               }}
               to="/aut-dashboard/modules/Onboarding/QuestOnboardingPlugin"
               component={Link}
@@ -277,7 +281,11 @@ const Quest = ({ plugin }: PluginParams) => {
                   border: 0,
                   ".MuiTableContainer-root": {
                     marginTop: 0,
-                    borderTopLeftRadius: 0
+                    borderTopLeftRadius: 0,
+                    borderTopRightRadius: {
+                      xs: "0",
+                      sm: "16px"
+                    }
                   }
                 }
               }}

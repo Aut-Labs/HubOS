@@ -192,7 +192,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             </Typography>
             <Button
               sx={{
-                ml: 2
+                mx: 2
               }}
               variant="contained"
               color="primary"

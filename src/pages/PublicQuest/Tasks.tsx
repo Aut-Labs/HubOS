@@ -212,7 +212,13 @@ const Tasks = ({ isLoading, tasks }: TasksParams) => {
           {!!tasks?.length && (
             <TableContainer
               sx={{
-                minWidth: "700px",
+                minWidth: {
+                  sm: "700px"
+                },
+                width: {
+                  xs: "360px",
+                  sm: "unset"
+                },
                 borderRadius: "16px",
                 backgroundColor: "nightBlack.main",
                 borderColor: "divider",
@@ -222,6 +228,10 @@ const Tasks = ({ isLoading, tasks }: TasksParams) => {
             >
               <Table
                 sx={{
+                  minWidth: {
+                    xs: "700px",
+                    sm: "unset"
+                  },
                   ".MuiTableBody-root > .MuiTableRow-root:hover": {
                     backgroundColor: "#ffffff0a"
                   }

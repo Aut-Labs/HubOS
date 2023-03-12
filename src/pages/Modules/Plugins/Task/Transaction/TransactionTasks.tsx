@@ -181,8 +181,12 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                 startIcon={<ArrowBackIcon />}
                 color="offWhite"
                 sx={{
-                  position: "absolute",
-                  left: 0
+                  position: {
+                    sm: "absolute"
+                  },
+                  left: {
+                    sm: "0"
+                  }
                 }}
                 to={searchParams.get("returnUrl")}
                 component={Link}
