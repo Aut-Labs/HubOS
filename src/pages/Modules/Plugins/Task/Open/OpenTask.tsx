@@ -7,7 +7,14 @@ import {
 import { PluginDefinition, Task } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
 import { StepperButton } from "@components/Stepper";
-import { Card, CardContent, Container, Stack, Typography } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Chip,
+  Container,
+  Stack,
+  Typography
+} from "@mui/material";
 import { IsAdmin } from "@store/Community/community.reducer";
 import { AutTextField } from "@theme/field-text-styles";
 import { memo, useEffect, useMemo, useState } from "react";
@@ -94,52 +101,111 @@ const UserSubmitContent = ({
     >
       <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
       <LoadingDialog open={isLoading} message="Submitting task..." />
-      <Card
-        sx={{
-          bgcolor: "nightBlack.main",
-          borderColor: "divider",
-          borderRadius: "16px",
-          boxShadow: 3
-        }}
-      >
-        <CardContent
+
+      {task?.status === TaskStatus.Created ||
+      task?.status === TaskStatus.Taken ? (
+        <Card
           sx={{
-            display: "flex",
-            flexDirection: "column"
+            bgcolor: "nightBlack.main",
+            borderColor: "divider",
+            borderRadius: "16px",
+            boxShadow: 3
           }}
         >
-          <Typography color="white" variant="body" textAlign="center" p="20px">
-            {task?.metadata?.description}
-          </Typography>
-          <Controller
-            name="openTask"
-            control={control}
-            rules={{
-              required: true,
-              maxLength: 2000
+          <CardContent
+            sx={{
+              display: "flex",
+              flexDirection: "column"
             }}
-            render={({ field: { name, value, onChange } }) => {
-              return (
-                <AutTextField
-                  name={name}
-                  disabled={
-                    task.status === TaskStatus.Submitted ||
-                    task.status === TaskStatus.Finished
-                  }
-                  value={value || ""}
-                  onChange={onChange}
-                  variant="outlined"
-                  color="offWhite"
-                  required
-                  multiline
-                  rows={5}
-                  placeholder="Enter your answer here..."
-                />
-              );
+          >
+            <Typography
+              color="white"
+              variant="body"
+              textAlign="center"
+              p="20px"
+            >
+              {task?.metadata?.description}
+            </Typography>
+            <Controller
+              name="openTask"
+              control={control}
+              rules={{
+                required: true,
+                maxLength: 2000
+              }}
+              render={({ field: { name, value, onChange } }) => {
+                return (
+                  <AutTextField
+                    name={name}
+                    disabled={
+                      task.status === TaskStatus.Submitted ||
+                      task.status === TaskStatus.Finished
+                    }
+                    value={value || ""}
+                    onChange={onChange}
+                    variant="outlined"
+                    color="offWhite"
+                    required
+                    multiline
+                    rows={5}
+                    placeholder="Enter your answer here..."
+                  />
+                );
+              }}
+            />
+          </CardContent>
+        </Card>
+      ) : (
+        <Card
+          sx={{
+            bgcolor: "nightBlack.main",
+            borderColor: "divider",
+            borderRadius: "16px",
+            boxShadow: 3
+          }}
+        >
+          <CardContent
+            sx={{
+              display: "flex",
+              flexDirection: "column"
             }}
-          />
-        </CardContent>
-      </Card>
+          >
+            {(task as any)?.status === TaskStatus.Finished && (
+              <Stack direction="column" alignItems="flex-end" mb="15px">
+                <Chip label="Approved" color="success" size="small" />
+              </Stack>
+            )}
+
+            <Stack direction="column" alignItems="center" mb="15px">
+              <Typography
+                color="white"
+                variant="body"
+                textAlign="center"
+                p="5px"
+              >
+                {task?.metadata?.description}
+              </Typography>
+              <Typography variant="caption" className="text-secondary">
+                Task Description
+              </Typography>
+            </Stack>
+
+            <Stack direction="column" alignItems="center">
+              <Typography
+                color="white"
+                variant="body"
+                textAlign="center"
+                p="5px"
+              >
+                {task?.submission?.description}
+              </Typography>
+              <Typography variant="caption" className="text-secondary">
+                My Submission
+              </Typography>
+            </Stack>
+          </CardContent>
+        </Card>
+      )}
 
       <Stack
         sx={{
@@ -151,7 +217,8 @@ const UserSubmitContent = ({
           }
         }}
       >
-        {task?.status === TaskStatus.Created && (
+        {(task?.status === TaskStatus.Created ||
+          task?.status === TaskStatus.Taken) && (
           <StepperButton
             label="Submit"
             onClick={handleSubmit(onSubmit)}
@@ -184,6 +251,8 @@ const OwnerFinalizeContent = ({
     });
   };
 
+  console.log("TASK OPEN", task);
+
   return (
     <Stack
       direction="column"
@@ -215,13 +284,29 @@ const OwnerFinalizeContent = ({
             flexDirection: "column"
           }}
         >
-          <Typography color="white" variant="body" textAlign="center" p="20px">
-            {task?.metadata?.description}
-          </Typography>
+          {(task as any)?.status === TaskStatus.Finished && (
+            <Stack direction="column" alignItems="flex-end" mb="15px">
+              <Chip label="Approved" color="success" size="small" />
+            </Stack>
+          )}
 
-          <Typography color="white" variant="body" textAlign="center" p="20px">
-            {task?.submission?.description}
-          </Typography>
+          <Stack direction="column" alignItems="center" mb="15px">
+            <Typography color="white" variant="body" textAlign="center" p="5px">
+              {task?.metadata?.description}
+            </Typography>
+            <Typography variant="caption" className="text-secondary">
+              Task Description
+            </Typography>
+          </Stack>
+
+          <Stack direction="column" alignItems="center">
+            <Typography color="white" variant="body" textAlign="center" p="5px">
+              {task?.submission?.description}
+            </Typography>
+            <Typography variant="caption" className="text-secondary">
+              User Submission
+            </Typography>
+          </Stack>
         </CardContent>
       </Card>
 

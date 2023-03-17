@@ -21,6 +21,7 @@ import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import { useEthers } from "@usedapp/core";
+import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -73,6 +74,10 @@ const TransactionTask = ({ plugin }: PluginParams) => {
 
   const isAdmin = useSelector(IsAdmin);
 
+  if (task) {
+    console.log("TASK TRANSACTION:", task);
+  }
+
   return (
     <Container
       maxWidth="lg"
@@ -89,68 +94,13 @@ const TransactionTask = ({ plugin }: PluginParams) => {
         <>
           <TaskDetails task={task} />
 
-          <Stack
-            direction="column"
-            gap={4}
-            sx={{
-              flex: 1,
-              justifyContent: "space-between",
-              margin: "0 auto",
-              width: {
-                xs: "100%",
-                sm: "400px",
-                xxl: "800px"
-              }
-            }}
-          >
-            <Card
-              sx={{
-                bgcolor: "nightBlack.main",
-                borderColor: "divider",
-                borderRadius: "16px",
-                boxShadow: 3
-              }}
-            >
-              <CardContent
-                sx={{
-                  display: "flex",
-                  flexDirection: "column"
-                }}
-              >
-                <Typography
-                  color="white"
-                  variant="body"
-                  textAlign="center"
-                  p="20px"
-                >
-                  {task?.metadata?.description}
-                </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center"
-                  }}
-                >
-                  <Button
-                    sx={{
-                      width: "200px",
-                      height: "50px"
-                    }}
-                    type="button"
-                    color="offWhite"
-                    variant="outlined"
-                    onClick={handleSubmit(onSubmit)}
-                  >
-                    Sign Transaction
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-
-            {/* button */}
-
+          {isAdmin ? (
             <Stack
+              direction="column"
+              gap={4}
               sx={{
+                flex: 1,
+                justifyContent: "space-between",
                 margin: "0 auto",
                 width: {
                   xs: "100%",
@@ -159,13 +109,174 @@ const TransactionTask = ({ plugin }: PluginParams) => {
                 }
               }}
             >
-              <StepperButton
-                label="Submit"
-                onClick={handleSubmit(onSubmit)}
-                disabled={!values}
-              />
+              <Card
+                sx={{
+                  bgcolor: "nightBlack.main",
+                  borderColor: "divider",
+                  borderRadius: "16px",
+                  boxShadow: 3
+                }}
+              >
+                <CardContent
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column"
+                  }}
+                >
+                  <Stack direction="column" alignItems="center" mb="15px">
+                    <Typography
+                      color="white"
+                      variant="body"
+                      textAlign="center"
+                      p="5px"
+                    >
+                      {task?.metadata?.description}
+                    </Typography>
+                    <Typography variant="caption" className="text-secondary">
+                      Task Description
+                    </Typography>
+                  </Stack>
+                  <Stack direction="column" alignItems="center" mb="15px">
+                    <Typography
+                      color="white"
+                      variant="body"
+                      textAlign="center"
+                      p="5px"
+                    >
+                      {
+                        (task as any)?.metadata?.properties
+                          ?.smartContractAddress
+                      }
+                    </Typography>
+                    <Typography variant="caption" className="text-secondary">
+                      Smart Contract Address
+                    </Typography>
+                  </Stack>
+                  <Stack direction="column" alignItems="center" mb="15px">
+                    <Typography
+                      color="white"
+                      variant="body"
+                      textAlign="center"
+                      p="5px"
+                    >
+                      {(task as any)?.metadata?.properties?.linkToInteractUrl}
+                    </Typography>
+                    <Typography variant="caption" className="text-secondary">
+                      Link To Interact
+                    </Typography>
+                  </Stack>
+                  <Stack direction="column" alignItems="center">
+                    <Typography
+                      color="white"
+                      variant="body"
+                      textAlign="center"
+                      p="5px"
+                    >
+                      {(task as any)?.metadata?.properties?.functionName}
+                    </Typography>
+                    <Typography variant="caption" className="text-secondary">
+                      Function Name
+                    </Typography>
+                  </Stack>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center"
+                    }}
+                  ></Box>
+                </CardContent>
+              </Card>
+
+              {/* button */}
             </Stack>
-          </Stack>
+          ) : (
+            <Stack
+              direction="column"
+              gap={4}
+              sx={{
+                flex: 1,
+                justifyContent: "space-between",
+                margin: "0 auto",
+                width: {
+                  xs: "100%",
+                  sm: "400px",
+                  xxl: "800px"
+                }
+              }}
+            >
+              <Card
+                sx={{
+                  bgcolor: "nightBlack.main",
+                  borderColor: "divider",
+                  borderRadius: "16px",
+                  boxShadow: 3
+                }}
+              >
+                <CardContent
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column"
+                  }}
+                >
+                  <Typography
+                    color="white"
+                    variant="body"
+                    textAlign="center"
+                    p="20px"
+                  >
+                    {task?.metadata?.description}
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center"
+                    }}
+                  >
+                    <Button
+                      sx={{
+                        width: "200px",
+                        height: "50px"
+                      }}
+                      type="button"
+                      color="offWhite"
+                      variant="outlined"
+                      disabled={
+                        task?.status === TaskStatus.Created ||
+                        task?.status === TaskStatus.Taken
+                      }
+                      onClick={handleSubmit(onSubmit)}
+                    >
+                      Sign Transaction
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+
+              {/* button */}
+              {task?.status === TaskStatus.Submitted ||
+              task?.status === TaskStatus.Finished ? (
+                <Stack
+                  sx={{
+                    margin: "0 auto",
+                    width: {
+                      xs: "100%",
+                      sm: "400px",
+                      xxl: "800px"
+                    }
+                  }}
+                >
+                  <StepperButton
+                    label="Submit"
+                    onClick={handleSubmit(onSubmit)}
+                    disabled={!values}
+                  />
+                </Stack>
+              ) : (
+                <Box sx={{ mb: "20px" }}></Box>
+              )}
+            </Stack>
+          )}
         </>
       ) : (
         <AutLoading></AutLoading>

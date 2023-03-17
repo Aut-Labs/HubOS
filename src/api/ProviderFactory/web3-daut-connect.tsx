@@ -149,7 +149,7 @@ function Web3DautConnect({
         selectedCommunityAddress:
           searchParams.get(RequiredQueryParams.DaoAddress) ||
           daoAddress ||
-          "0xf2ce8891bC0DF26e84F2b7528d059978B975e86B"
+          "0xFd553dd03ef66fab7f91ee4B9C5f91Ff055D3612"
       })
     );
 
@@ -200,7 +200,7 @@ function Web3DautConnect({
         dao-expander={
           searchParams.get(RequiredQueryParams.DaoAddress) ||
           daoAddress ||
-          "0xf2ce8891bC0DF26e84F2b7528d059978B975e86B"
+          "0xFd553dd03ef66fab7f91ee4B9C5f91Ff055D3612"
         }
         button-type="simple"
       />

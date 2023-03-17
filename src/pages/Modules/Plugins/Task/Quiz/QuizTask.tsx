@@ -50,7 +50,7 @@ const Row = styled(Box)({
   width: "100%"
 });
 
-const Answers = memo(({ control, questionIndex, answers }: any) => {
+const Answers = memo(({ control, questionIndex, answers, taskStatus }: any) => {
   const values = useWatch({
     name: `questions[${questionIndex}].answers`,
     control
@@ -75,11 +75,18 @@ const Answers = memo(({ control, questionIndex, answers }: any) => {
                       color: "white",
                       "&.Mui-checked": {
                         color: "primary"
+                      },
+                      "&.Mui-disabled": {
+                        color: "nightBlack.light"
                       }
                     }}
                     value={value}
                     tabIndex={-1}
                     onChange={onChange}
+                    disabled={
+                      taskStatus === TaskStatus.Submitted ||
+                      taskStatus === TaskStatus.Finished
+                    }
                   />
                 );
               }}
@@ -87,6 +94,51 @@ const Answers = memo(({ control, questionIndex, answers }: any) => {
             <Typography color="white" variant="body" lineHeight="40px">
               {answer?.value}
             </Typography>
+          </GridRow>
+        );
+      })}
+    </GridBox>
+  );
+});
+
+const AnswersAdminView = memo(({ questionIndex, answers }: any) => {
+  return (
+    <GridBox>
+      {answers.map((answer, index) => {
+        return (
+          <GridRow
+            key={`questions[${questionIndex}].answers[${index}]`}
+            style={{ gridTemplateColumns: "40px 1fr" }}
+          >
+            <Checkbox
+              sx={{
+                color: "white",
+                "&.Mui-checked": {
+                  color: "primary"
+                },
+                "&.Mui-disabled": {
+                  color: "nightBlack.light"
+                }
+              }}
+              checked={answer?.correct}
+              disabled={true}
+            />
+            <Typography
+              color={answer?.correct ? "success.main" : "error.main"}
+              variant="body"
+              lineHeight="40px"
+            >
+              {answer?.value}
+            </Typography>
+            {/* {answer?.correct ? (
+              <Typography color="success.main" variant="body" lineHeight="40px">
+                Correct
+              </Typography>
+            ) : (
+              <Typography color="error.main" variant="body" lineHeight="40px">
+                Incorrect
+              </Typography>
+            )} */}
           </GridRow>
         );
       })}
@@ -175,86 +227,152 @@ const QuizTask = ({ plugin }: PluginParams) => {
       {task ? (
         <>
           <TaskDetails task={task} />
-          <Stack
-            direction="column"
-            gap={4}
-            sx={{
-              mx: "auto",
-              width: {
-                xs: "100%",
-                sm: "600px",
-                xxl: "800px"
-              }
-            }}
-          >
-            {/* {isAdmin ? (
-              <Row>
-                <Button
-                  sx={{
-                    minWidth: "120px",
-                    width: "120px",
-                    justifySelf: "flex-end"
-                  }}
-                  color="offWhite"
-                  size="small"
-                  variant="outlined"
-                  disabled={task.status !== TaskStatus.Created}
-                >
-                  Edit Task
-                </Button>
-              </Row>
-            ) : null} */}
-            {((task as any)?.metadata?.properties?.questions as any[])?.map(
-              (question, questionIndex) => (
-                <Card
-                  key={`questions.${questionIndex}.question`}
-                  sx={{
-                    bgcolor: "nightBlack.main",
-                    borderColor: "divider",
-                    borderRadius: "16px",
-                    boxShadow: 3
-                  }}
-                >
-                  <CardHeader
-                    titleTypographyProps={{
-                      fontFamily: "FractulAltBold",
-                      fontWeight: 900,
-                      color: "white",
-                      variant: "subtitle1"
+
+          {isAdmin ? (
+            <Stack
+              direction="column"
+              gap={4}
+              sx={{
+                mx: "auto",
+                width: {
+                  xs: "100%",
+                  sm: "600px",
+                  xxl: "800px"
+                }
+              }}
+            >
+              {/* {isAdmin ? (
+                   <Row>
+                     <Button
+                       sx={{
+                         minWidth: "120px",
+                         width: "120px",
+                         justifySelf: "flex-end"
+                       }}
+                       color="offWhite"
+                       size="small"
+                       variant="outlined"
+                       disabled={task.status !== TaskStatus.Created}
+                     >
+                       Edit Task
+                     </Button>
+                   </Row>
+                 ) : null} */}
+              {((task as any)?.metadata?.properties?.questions as any[])?.map(
+                (question, questionIndex) => (
+                  <Card
+                    key={`questions.${questionIndex}.question`}
+                    sx={{
+                      bgcolor: "nightBlack.main",
+                      borderColor: "divider",
+                      borderRadius: "16px",
+                      boxShadow: 3
                     }}
-                    title={question?.question}
-                  />
-                  <CardContent>
-                    <Answers
-                      control={control}
-                      answers={question?.answers}
-                      questionIndex={questionIndex}
-                      taskStatus={task?.status}
-                    ></Answers>
-                  </CardContent>
-                </Card>
-              )
-            )}
-            {task?.status === TaskStatus.Created ||
-            task?.status === TaskStatus.Taken ? (
-              <Stack
-                sx={{
-                  margin: "0 auto",
-                  width: {
-                    xs: "100%",
-                    sm: "400px",
-                    xxl: "800px"
-                  }
-                }}
-              >
-                <StepperButton
-                  label="Submit"
-                  onClick={handleSubmit(onSubmit)}
-                  disabled={!formState.isValid}
-                />{" "}
-              </Stack>
-            ) : null}
-          </Stack>
+                  >
+                    <CardHeader
+                      titleTypographyProps={{
+                        fontFamily: "FractulAltBold",
+                        fontWeight: 900,
+                        color: "white",
+                        variant: "subtitle1"
+                      }}
+                      title={question?.question}
+                    />
+                    <CardContent>
+                      <AnswersAdminView
+                        answers={question?.answers}
+                        questionIndex={questionIndex}
+                      ></AnswersAdminView>
+                    </CardContent>
+                  </Card>
+                )
+              )}
+              <Box sx={{ mb: "20px" }}></Box>
+            </Stack>
+          ) : (
+            <Stack
+              direction="column"
+              gap={4}
+              sx={{
+                mx: "auto",
+                width: {
+                  xs: "100%",
+                  sm: "600px",
+                  xxl: "800px"
+                }
+              }}
+            >
+              {/* {isAdmin ? (
+                  <Row>
+                    <Button
+                      sx={{
+                        minWidth: "120px",
+                        width: "120px",
+                        justifySelf: "flex-end"
+                      }}
+                      color="offWhite"
+                      size="small"
+                      variant="outlined"
+                      disabled={task.status !== TaskStatus.Created}
+                    >
+                      Edit Task
+                    </Button>
+                  </Row>
+                ) : null} */}
+              {((task as any)?.metadata?.properties?.questions as any[])?.map(
+                (question, questionIndex) => (
+                  <Card
+                    key={`questions.${questionIndex}.question`}
+                    sx={{
+                      bgcolor: "nightBlack.main",
+                      borderColor: "divider",
+                      borderRadius: "16px",
+                      boxShadow: 3
+                    }}
+                  >
+                    <CardHeader
+                      titleTypographyProps={{
+                        fontFamily: "FractulAltBold",
+                        fontWeight: 900,
+                        color: "white",
+                        variant: "subtitle1"
+                      }}
+                      title={question?.question}
+                    />
+                    <CardContent>
+                      <Answers
+                        control={control}
+                        answers={question?.answers}
+                        questionIndex={questionIndex}
+                        taskStatus={task?.status}
+                      ></Answers>
+                    </CardContent>
+                  </Card>
+                )
+              )}
+              {task?.status === TaskStatus.Created ||
+              task?.status === TaskStatus.Taken ? (
+                <Stack
+                  sx={{
+                    margin: "0 auto",
+                    width: {
+                      xs: "100%",
+                      sm: "400px",
+                      xxl: "800px"
+                    }
+                  }}
+                >
+                  <StepperButton
+                    label="Submit"
+                    onClick={handleSubmit(onSubmit)}
+                    disabled={!formState.isValid}
+                  />{" "}
+                </Stack>
+              ) : (
+                <Box sx={{ mb: "20px" }}></Box>
+              )}
+            </Stack>
+          )}
         </>
       ) : (
         <AutLoading></AutLoading>
