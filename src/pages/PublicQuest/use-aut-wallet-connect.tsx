@@ -73,8 +73,8 @@ export const useAutWalletConnect = () => {
         setErrorMessage("User denied message signature");
         deferredPromise.reject("User denied message signature");
       } else {
-        setErrorMessage(error?.message);
-        deferredPromise.reject(error?.message);
+        setErrorMessage(error?.message || error);
+        deferredPromise.reject(error?.message || error);
       }
     } finally {
       setTryEagerConnect(false);
