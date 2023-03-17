@@ -269,8 +269,6 @@ interface TasksParams {
 }
 
 const Tasks = ({ isLoading, tasks, isAdmin, canDelete }: TasksParams) => {
-  const { account } = useEthers();
-
   return (
     <Box>
       {isLoading ? (

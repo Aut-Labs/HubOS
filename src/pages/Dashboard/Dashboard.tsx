@@ -6,10 +6,8 @@ import {
   CardContent,
   CardHeader,
   Container,
-  Paper,
   TableBody,
   TableCell,
-  TableContainer,
   TableRow,
   Typography,
   styled,
@@ -21,7 +19,6 @@ import { setTitle } from "@store/ui-reducer";
 import { memo, useEffect } from "react";
 import { UserInfo } from "@auth/auth.reducer";
 import CopyAddress from "@components/CopyAddress";
-
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -72,42 +69,10 @@ const getGreeting = () => {
   return welcomeText;
 };
 
-function CommunityStatsValues(value, type) {
-  switch (type) {
-    case "commitment":
-      return (
-        <>
-          <Typography variant="subtitle2" color="white" fontWeight="normal">
-            {`${value} - ${CommitmentMessages(value)}`}
-          </Typography>
-        </>
-      );
-    case "address":
-      return (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end"
-          }}
-        >
-          <CopyAddress address={value} />
-        </div>
-      );
-
-    default:
-      return (
-        <Typography variant="subtitle2" color="white" fontWeight="normal">
-          {value}
-        </Typography>
-      );
-  }
-}
-
 const Dashboard = () => {
   const dispatch = useDispatch();
   const userInfo = useSelector(UserInfo);
   const community = useSelector(CommunityData);
-  // const match = useRouteMatch();
 
   useEffect(() => {
     dispatch(
@@ -118,34 +83,6 @@ const Dashboard = () => {
       )
     );
   }, [dispatch, userInfo]);
-
-  const communityStats = [
-    {
-      title: "Beta Ranking",
-      type: "number",
-      value: "1"
-    },
-    {
-      title: "Total Members",
-      type: "number",
-      value: "20"
-    },
-    {
-      title: "Minimum Commitment",
-      type: "commitment",
-      value: community?.properties?.commitment
-    },
-    {
-      title: "Nova Address",
-      type: "address",
-      value: community?.properties?.address
-    },
-    {
-      title: "Legacy DAO",
-      type: "address",
-      value: community?.properties?.address
-    }
-  ];
 
   return (
     <Container

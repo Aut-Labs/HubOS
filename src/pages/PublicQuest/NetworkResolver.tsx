@@ -8,7 +8,7 @@ import {
 import { useSelector } from "react-redux";
 import AutSDK from "@aut-labs-private/sdk";
 import { ethers } from "ethers";
-import { Connector, useConnector, useEthers } from "@usedapp/core";
+import { useEthers } from "@usedapp/core";
 import AutLoading from "@components/AutLoading";
 import DialogWrapper from "@components/Dialog/DialogWrapper";
 import {
@@ -33,11 +33,10 @@ import { useAppDispatch } from "@store/store.model";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { useLazyGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
-import { EnableAndChangeNetwork } from "@api/ProviderFactory/web3.network";
 import BubbleTopRight from "@assets/bubble_top_right.png";
 import BubbleBottomLeft from "@assets/bubble_bottom_left.png";
-import { authoriseWithWeb3 } from "@api/auth.api";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
+import { useAutWalletConnect } from "./use-aut-wallet-connect";
 
 const TOOLBAR_HEIGHT = 84;
 
@@ -89,6 +88,14 @@ const DialogInnerContent = styled("div")({
   gridGap: "30px"
 });
 
+const ErrorWrapper = styled(Box)({
+  backgroundColor: "rgba(254, 202, 202, 0.16)",
+  padding: "20px",
+  width: "80%",
+  marginBottom: "12px",
+  borderRadius: "16px"
+});
+
 const NetworkResolver = () => {
   const theme = useTheme();
   const dispatch = useAppDispatch();
@@ -97,16 +104,15 @@ const NetworkResolver = () => {
   const wallet = useSelector(SelectedWalletType);
   const networks = useSelector(NetworksConfig);
   const [isOpen, setIsOpen] = useState(false);
-  const [isSigning, setIsSigning] = useState(false);
-  const [tryEagerConnect, setTryEagerConnect] = useState(false);
-  const { connector, activate } = useConnector();
   const {
-    activateBrowserWallet,
-    deactivate,
-    switchNetwork,
-    isLoading,
-    account
-  } = useEthers();
+    connect,
+    disconnect,
+    isLoading: isConnecting,
+    waitingUserConfirmation,
+    errorMessage
+  } = useAutWalletConnect();
+  const { account } = useEthers();
+  const [isLoading, setIsLoading] = useState(false);
   const [connected, setIsConnected] = useState(false);
   const [initialAccount, setInitialAccount] = useState("");
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -174,98 +180,52 @@ const NetworkResolver = () => {
     }, {});
   }, [plugins]);
 
-  const canConnectEagerly = useMemo(() => {
-    return !!tryEagerConnect && !!connector?.connector && account && isOpen;
-  }, [connector, tryEagerConnect, account, isOpen]);
-
-  const tryConnect = async () => {
-    const [config] = networks.filter((n) => !n.disabled);
-    // .find(
-    //   // (n) => n.chainId?.toString() === chainId?.toString()
-    //   (n) => n.chainId?.toString() === chainId?.toString()
-    // );
-    if (config && connector?.connector) {
-      await activateNetwork(config, connector.connector);
-    } else {
-      setTryEagerConnect(false);
-    }
-  };
-
   const changeConnector = async (connectorType: string) => {
-    activateBrowserWallet({ type: connectorType });
-    if (!connector?.connector) {
-      setTryEagerConnect(true);
-    } else {
-      await tryConnect();
-    }
-  };
-
-  const activateNetwork = async (network: NetworkConfig, conn: Connector) => {
     try {
-      setIsSigning(true);
-      await activate(conn);
-      await switchNetwork(+network.chainId);
-      if (conn.name === "metamask") {
-        // @ts-ignore
-        const provider = conn.provider.provider;
-        await EnableAndChangeNetwork(provider, network);
-      }
-      const signer = conn?.provider?.getSigner();
-      const isAuthorised = await authoriseWithWeb3(signer);
+      setIsLoading(true);
+      const [network] = networks.filter((d) => !d.disabled);
+      const { provider, connected, account } = await connect(connectorType);
 
-      if (isAuthorised) {
-        await initialiseSDK(network, signer as ethers.providers.JsonRpcSigner);
-        await dispatch(
-          communityUpdateState({
-            selectedCommunityAddress: searchParams.get(
-              RequiredQueryParams.DaoAddress
-            )
-          })
-        );
-        setIsConnected(true);
-        setInitialAccount(account);
-        navigate({
-          pathname: "/quest",
-          search: searchParams.toString()
-        });
-        loadPlugins(null);
-      } else {
-        setIsConnected(false);
-        dispatch(setWallet(null));
-      }
-    } catch (error) {
-      console.error(error, "error");
-    } finally {
+      if (!connected) throw new Error("not connected");
+      const signer = provider.getSigner();
+      await initialiseSDK(network, signer as ethers.providers.JsonRpcSigner);
+      await dispatch(
+        communityUpdateState({
+          selectedCommunityAddress: searchParams.get(
+            RequiredQueryParams.DaoAddress
+          )
+        })
+      );
+      setIsConnected(true);
       setIsOpen(false);
-      setTryEagerConnect(false);
-      setIsSigning(false);
+      setInitialAccount(account);
+      navigate({
+        pathname: "/quest",
+        search: searchParams.toString()
+      });
+      loadPlugins(null);
+      setIsLoading(false);
+      return account;
+    } catch (error) {
+      setIsOpen(false);
       dispatch(setWallet(null));
+      setIsLoading(false);
     }
   };
 
   const closeAndDisconnect = async () => {
-    deactivate();
+    disconnect();
     setIsConnected(false);
-    setTryEagerConnect(false);
     dispatch(setWallet(null));
+    setIsLoading(false);
     setIsOpen(false);
   };
-
-  useEffect(() => {
-    if (canConnectEagerly) {
-      tryConnect();
-    }
-  }, [canConnectEagerly]);
 
   useEffect(() => {
     if (hasAccountChanged) {
       closeAndDisconnect();
     }
   }, [hasAccountChanged]);
-
-  useEffect(() => {
-    deactivate();
-  }, []);
 
   return (
     <Box
@@ -284,68 +244,44 @@ const NetworkResolver = () => {
             }}
             variant="h2"
           />
-          {(isLoading || isSigning || tryEagerConnect) && (
-            <div style={{ position: "relative", flex: 1 }}>
-              <AutLoading />
-            </div>
-          )}
+          {(isLoading || waitingUserConfirmation || isConnecting) &&
+            !errorMessage && (
+              <div style={{ position: "relative", flex: 1 }}>
+                {waitingUserConfirmation && (
+                  <Typography m="0" color="white" variant="subtitle1">
+                    Waiting confirmation...
+                  </Typography>
+                )}
+                <AutLoading width="130px" height="130px" />
+              </div>
+            )}
 
-          {!isLoading && !isSigning && !tryEagerConnect && (
+          {((!isLoading && !waitingUserConfirmation) || errorMessage) && (
             <>
               {!wallet && (
                 <Typography color="white" variant="subtitle1">
                   Connect your wallet
                 </Typography>
               )}
-              {wallet && (
-                <>
-                  <Typography
-                    mb={{
-                      xs: "8px"
-                    }}
-                    color="white"
-                    variant="subtitle1"
-                  >
-                    Change Network
-                  </Typography>
-
-                  <Typography color="white" variant="body">
-                    You will need to switch your wallet’s network.
-                  </Typography>
-                </>
-              )}
               <DialogInnerContent>
-                {(!wallet || !connector?.connector) && (
-                  <>
-                    <ConnectorBtn
-                      setConnector={changeConnector}
-                      connectorType={ConnectorTypes.Metamask}
-                    />
-                    <ConnectorBtn
-                      setConnector={changeConnector}
-                      connectorType={ConnectorTypes.WalletConnect}
-                    />
-                  </>
-                )}
-                {/* {wallet && !isLoading && !!connector?.connector && (
-                      <NetworkSelectors
-                        networks={networks}
-                        onSelect={async (selectedNetwork: NetworkConfig) => {
-                          if (selectedNetwork) {
-                            try {
-                              await activateNetwork(
-                                selectedNetwork,
-                                connector.connector
-                              );
-                            } catch (error) {
-                              console.log(error, "error");
-                            }
-                          }
-                        }}
-                      />
-                    )} */}
+                <ConnectorBtn
+                  setConnector={changeConnector}
+                  connectorType={ConnectorTypes.Metamask}
+                />
+                <ConnectorBtn
+                  setConnector={changeConnector}
+                  connectorType={ConnectorTypes.WalletConnect}
+                />
               </DialogInnerContent>
             </>
+          )}
+
+          {errorMessage && (
+            <ErrorWrapper>
+              <Typography textAlign="center" color="error" variant="body">
+                {errorMessage}
+              </Typography>
+            </ErrorWrapper>
           )}
         </>
       </DialogWrapper>
