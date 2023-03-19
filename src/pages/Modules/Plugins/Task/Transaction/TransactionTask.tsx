@@ -29,12 +29,14 @@ interface PluginParams {
 
 const TransactionTask = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
+  const isAdmin = useSelector(IsAdmin);
   const { account: userAddress } = useEthers();
 
   const params = useParams();
   const { task, isLoading: isLoadingPlugins } = useGetAllTasksPerQuestQuery(
     {
       userAddress,
+      isAdmin,
       pluginAddress: searchParams.get(
         RequiredQueryParams.OnboardingQuestAddress
       ),
@@ -43,7 +45,7 @@ const TransactionTask = ({ plugin }: PluginParams) => {
     {
       selectFromResult: ({ data, isLoading, isFetching }) => ({
         isLoading: isLoading || isFetching,
-        task: (data || []).find((t) => {
+        task: (data?.tasks || []).find((t) => {
           const [pluginType] = location.pathname.split("/").splice(-2);
           return (
             t.taskId === +params?.taskId &&
@@ -71,8 +73,6 @@ const TransactionTask = ({ plugin }: PluginParams) => {
 
     setValue("transactionCompleted", true);
   };
-
-  const isAdmin = useSelector(IsAdmin);
 
   if (task) {
     console.log("TASK TRANSACTION:", task);

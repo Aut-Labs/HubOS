@@ -124,7 +124,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
         RequiredQueryParams.OnboardingQuestAddress
       ),
       pluginTokenId: plugin.tokenId,
-      questId: +searchParams.get(RequiredQueryParams.OnboardingQuestAddress),
+      questId: +searchParams.get(RequiredQueryParams.QuestId),
       pluginAddress: plugin.pluginAddress,
       task: {
         role: 1,

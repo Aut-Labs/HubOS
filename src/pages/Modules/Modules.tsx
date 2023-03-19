@@ -52,7 +52,7 @@ const Modules = () => {
   const myModules = useMemo(() => {
     return plugins.reduce(
       (prev, curr) => {
-        const stackType = curr?.metadata?.properties?.stack?.type;
+        const stackType = curr?.metadata?.properties?.module?.type;
         if (stackType && !prev[stackType] && stackType === "Onboarding") {
           prev[stackType] = true;
           prev.types.push(curr);

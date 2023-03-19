@@ -66,12 +66,13 @@ const PublicQuest = () => {
   }, [quest]);
 
   const {
-    data: tasks,
+    data: tasksAndSubmissions,
     isLoading: isLoadingTasks,
     isFetching: isFetchingTasks
   } = useGetAllTasksPerQuestQuery(
     {
       userAddress,
+      isAdmin: false,
       questId: +searchParams.get(RequiredQueryParams.QuestId),
       pluginAddress: searchParams.get(
         RequiredQueryParams.OnboardingQuestAddress
@@ -91,8 +92,13 @@ const PublicQuest = () => {
       })
     });
 
+  const tasks = useMemo(
+    () => tasksAndSubmissions?.tasks || [],
+    [tasksAndSubmissions]
+  );
+
   const completedTasks = useMemo(() => {
-    return (tasks || []).reduce((prev, curr) => {
+    return tasks.reduce((prev, curr) => {
       if (curr.status === TaskStatus.Finished) {
         return (prev += 1);
       }

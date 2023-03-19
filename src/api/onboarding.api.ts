@@ -10,7 +10,10 @@ import { environment } from "./environment";
 import { CacheTypes, getCache, updateCache } from "./cache.api";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 
-const fetchQuests = async (pluginAddress: any, api: BaseQueryApi) => {
+const getAllOnboardingQuests = async (
+  pluginAddress: any,
+  api: BaseQueryApi
+) => {
   const sdk = AutSDK.getInstance();
   let questOnboarding: QuestOnboarding = sdk.questOnboarding;
 
@@ -142,7 +145,42 @@ const activateOnboarding = async (
 
   try {
     const cache = await getCache(CacheTypes.UserPhases);
-    cache.list[1].status = 1; // complete phase 2
+    cache.list[2].status = 1; // complete phase 3
+    await updateCache(cache);
+  } catch (error) {
+    console.log(error);
+  }
+  return {
+    data: response.data
+  };
+};
+
+const deactivateOnboarding = async (
+  { quests, pluginAddress, userAddress },
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+
+  if (!questOnboarding) {
+    questOnboarding = sdk.initService<QuestOnboarding>(
+      QuestOnboarding,
+      pluginAddress
+    );
+    sdk.questOnboarding = questOnboarding;
+  }
+
+  const response = await questOnboarding.deactivateOnboarding(quests);
+
+  if (!response.isSuccess) {
+    return {
+      error: response.errorMessage
+    };
+  }
+
+  try {
+    const cache = await getCache(CacheTypes.UserPhases);
+    cache.list[2].status = 0; // complete phase 3
     await updateCache(cache);
   } catch (error) {
     console.log(error);
@@ -212,8 +250,8 @@ const withdrawFromAQuest = async (
   };
 };
 
-const fetchTasks = async (
-  { pluginAddress, questId, userAddress },
+const getAllTasksPerQuest = async (
+  { pluginAddress, questId, isAdmin, userAddress },
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
@@ -227,34 +265,54 @@ const fetchTasks = async (
     sdk.questOnboarding = questOnboarding;
   }
 
-  const response = await questOnboarding.getAllTasksByQuest(
-    questId,
-    userAddress
-  );
+  let tasks: Task[] = [];
+  let submissions: Task[] = [];
 
-  if (response?.isSuccess) {
-    const tasksWithMetadata: Task[] = [];
+  if (isAdmin) {
+    const response = await questOnboarding.getAllTasksAndSubmissionsByQuest(
+      questId
+    );
 
-    for (let i = 0; i < response.data.length; i++) {
-      const def = response.data[i];
-      tasksWithMetadata.push({
-        ...def,
-        metadata: await fetchMetadata(
-          def.metadataUri,
-          environment.nftStorageUrl
-        ),
-        submission: await fetchMetadata(
-          def.submitionUrl,
-          environment.nftStorageUrl
-        )
-      });
-    }
-    return {
-      data: tasksWithMetadata
-    };
+    tasks = response.data.tasks;
+    submissions = response.data.submissions;
+  } else {
+    const response = await questOnboarding.getAllTasksByQuest(
+      questId,
+      userAddress
+    );
+    tasks = response.data;
+  }
+
+  const tasksWithMetadata: Task[] = [];
+  const submissionsWithMetadata: Task[] = [];
+
+  for (let i = 0; i < tasks.length; i++) {
+    const def = tasks[i];
+    tasksWithMetadata.push({
+      ...def,
+      metadata: await fetchMetadata(def.metadataUri, environment.nftStorageUrl),
+      submission: await fetchMetadata(
+        def.submitionUrl,
+        environment.nftStorageUrl
+      )
+    });
+  }
+  for (let i = 0; i < submissions.length; i++) {
+    const def = submissions[i];
+    submissionsWithMetadata.push({
+      ...def,
+      metadata: await fetchMetadata(def.metadataUri, environment.nftStorageUrl),
+      submission: await fetchMetadata(
+        def.submitionUrl,
+        environment.nftStorageUrl
+      )
+    });
   }
   return {
-    error: response.errorMessage
+    data: {
+      tasks: tasksWithMetadata,
+      submissions: submissionsWithMetadata
+    }
   };
 };
 
@@ -274,6 +332,33 @@ const createQuest = async (
   }
 
   const response = await questOnboarding.createQuest(body);
+
+  if (!response.isSuccess) {
+    return {
+      error: response.errorMessage
+    };
+  }
+  return {
+    data: response.data
+  };
+};
+
+const updateQuest = async (
+  body: Quest & { pluginAddress: string },
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+
+  if (!questOnboarding) {
+    questOnboarding = sdk.initService<QuestOnboarding>(
+      QuestOnboarding,
+      body.pluginAddress
+    );
+    sdk.questOnboarding = questOnboarding;
+  }
+
+  const response = await questOnboarding.updateQuest(body);
 
   if (!response.isSuccess) {
     return {
@@ -444,7 +529,7 @@ export const onboardingApi = createApi({
   baseQuery: async (args, api) => {
     const { url, body } = args;
     if (url === "getAllOnboardingQuests") {
-      return fetchQuests(body, api);
+      return getAllOnboardingQuests(body, api);
     }
 
     if (url === "applyForQuest") {
@@ -467,12 +552,20 @@ export const onboardingApi = createApi({
       return createQuest(body, api);
     }
 
+    if (url === "updateQuest") {
+      return updateQuest(body, api);
+    }
+
     if (url === "getAllTasksPerQuest") {
-      return fetchTasks(body, api);
+      return getAllTasksPerQuest(body, api);
     }
 
     if (url === "activateOnboarding") {
       return activateOnboarding(body, api);
+    }
+
+    if (url === "deactivateOnboarding") {
+      return deactivateOnboarding(body, api);
     }
 
     if (url === "createTaskPerQuest") {
@@ -554,6 +647,22 @@ export const onboardingApi = createApi({
       },
       invalidatesTags: ["Quests", "Tasks"]
     }),
+    deactivateOnboarding: builder.mutation<
+      boolean,
+      {
+        quests: Quest[];
+        pluginAddress: string;
+        userAddress: string;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "deactivateOnboarding"
+        };
+      },
+      invalidatesTags: ["Quests", "Tasks"]
+    }),
     applyForQuest: builder.mutation<
       boolean,
       {
@@ -612,11 +721,46 @@ export const onboardingApi = createApi({
         }
       }
     }),
+    updateQuest: builder.mutation<
+      Quest,
+      Partial<Quest & { pluginAddress: string }>
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "updateQuest"
+        };
+      },
+      async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(
+            onboardingApi.util.updateQueryData(
+              "getAllOnboardingQuests",
+              args.pluginAddress,
+              (draft) => {
+                const index = draft.findIndex(
+                  (q) => q.questId === data.questId
+                );
+                draft.splice(index, 1, data);
+                return draft;
+              }
+            )
+          );
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    }),
     getAllTasksPerQuest: builder.query<
-      Task[],
+      {
+        tasks: Task[];
+        submissions: Task[];
+      },
       {
         questId: number;
         userAddress: string;
+        isAdmin: boolean;
         pluginAddress: string;
       }
     >({
@@ -702,6 +846,7 @@ export const onboardingApi = createApi({
 });
 
 export const {
+  useUpdateQuestMutation,
   useCreateQuestMutation,
   useApplyForQuestMutation,
   useFinalizeTaskMutation,
@@ -714,5 +859,6 @@ export const {
   useGetAllTasksPerQuestQuery,
   useLazyGetAllTasksPerQuestQuery,
   useGetAllOnboardingQuestsQuery,
-  useActivateOnboardingMutation
+  useActivateOnboardingMutation,
+  useDeactivateOnboardingMutation
 } = onboardingApi;

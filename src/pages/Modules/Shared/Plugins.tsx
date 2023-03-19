@@ -57,8 +57,8 @@ const Plugins = ({ definition }: StackParams) => {
         isFetching,
         plugins: (data || []).filter(
           (p) =>
-            p.metadata?.properties?.stack?.type ===
-            definition?.properties?.stack?.type
+            p.metadata?.properties?.module?.type ===
+            definition?.properties?.module?.type
         )
       })
     });
@@ -96,7 +96,7 @@ const Plugins = ({ definition }: StackParams) => {
               </Button>
             )}
             <Typography textAlign="center" color="white" variant="h3">
-              {definition.properties.stack.title}
+              {definition.properties.module.title}
               <Tooltip title="Refresh plugins">
                 <IconButton
                   size="medium"

@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { Box, CssBaseline } from "@mui/material";
+import { Box } from "@mui/material";
 import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { useAppDispatch } from "@store/store.model";
 import SWSnackbar from "./components/snackbar";
@@ -9,7 +9,6 @@ import Web3DautConnect from "@api/ProviderFactory/web3-daut-connect";
 import { NetworkConfig } from "@api/ProviderFactory/network.config";
 import { environment } from "@api/environment";
 import { ethers } from "ethers";
-import { Network } from "@ethersproject/networks";
 import { DAppProvider, Config, MetamaskConnector } from "@usedapp/core";
 import { WalletConnectConnector } from "@usedapp/wallet-connect-connector";
 import { setNetworks } from "@store/WalletProvider/WalletProvider";

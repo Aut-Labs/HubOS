@@ -107,9 +107,7 @@ function Web3DautConnect({
       communityUpdateState({
         communities: autID.properties.communities,
         selectedCommunityAddress:
-          searchParams.get(RequiredQueryParams.DaoAddress) ||
-          daoAddress ||
-          "0xFd553dd03ef66fab7f91ee4B9C5f91Ff055D3612"
+          autID.properties.communities[0].properties?.address
       })
     );
 
@@ -155,11 +153,11 @@ function Web3DautConnect({
         }}
         id="d-aut"
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
-        dao-expander={
-          searchParams.get(RequiredQueryParams.DaoAddress) ||
-          daoAddress ||
-          "0xFd553dd03ef66fab7f91ee4B9C5f91Ff055D3612"
-        }
+        // dao-expander={
+        //   searchParams.get(RequiredQueryParams.DaoAddress) ||
+        //   daoAddress ||
+        //   "0xFd553dd03ef66fab7f91ee4B9C5f91Ff055D3612"
+        // }
         button-type="simple"
       />
     </>

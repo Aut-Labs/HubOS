@@ -83,27 +83,6 @@ const taskTypes = {
   }
 };
 
-const dateTypes = (start: number, end: number) => {
-  const startDate = new Date(start);
-  const endDate = new Date(end);
-
-  return (
-    <Stack alignItems="flex-end">
-      <Stack direction="row" flexWrap="wrap">
-        <Stack direction="row">
-          <Typography color="success.main">
-            {startDate.toDateString()}
-          </Typography>
-          <Typography mx={0.5} color="white">
-            -
-          </Typography>
-        </Stack>
-        <Typography color="error">{endDate.toDateString()}</Typography>
-      </Stack>
-    </Stack>
-  );
-};
-
 const TaskListItem = memo(({ row }: { row: Task }) => {
   const location = useLocation();
   const params = useParams<{ questId: string }>();

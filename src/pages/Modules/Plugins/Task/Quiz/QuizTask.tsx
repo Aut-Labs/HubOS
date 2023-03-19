@@ -148,6 +148,7 @@ const AnswersAdminView = memo(({ questionIndex, answers }: any) => {
 
 const QuizTask = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
+  const isAdmin = useSelector(IsAdmin);
   const { account: userAddress } = useEthers();
   const params = useParams();
   const [initialized, setInitialized] = useState(false);
@@ -156,6 +157,7 @@ const QuizTask = ({ plugin }: PluginParams) => {
   const { task, isLoading: isLoadingPlugins } = useGetAllTasksPerQuestQuery(
     {
       userAddress,
+      isAdmin,
       pluginAddress: searchParams.get(
         RequiredQueryParams.OnboardingQuestAddress
       ),
@@ -164,7 +166,7 @@ const QuizTask = ({ plugin }: PluginParams) => {
     {
       selectFromResult: ({ data, isLoading, isFetching }) => ({
         isLoading: isLoading || isFetching,
-        task: (data || []).find((t) => {
+        task: (data?.tasks || []).find((t) => {
           const [pluginType] = location.pathname.split("/").splice(-2);
           return (
             t.taskId === +params?.taskId &&
@@ -176,7 +178,6 @@ const QuizTask = ({ plugin }: PluginParams) => {
     }
   );
 
-  console.log(task, "TASK");
   const { control, handleSubmit, getValues, setValue, formState } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -209,8 +210,6 @@ const QuizTask = ({ plugin }: PluginParams) => {
   if (task) {
     console.log("TASK::", task);
   }
-
-  const isAdmin = useSelector(IsAdmin);
 
   return (
     <Container

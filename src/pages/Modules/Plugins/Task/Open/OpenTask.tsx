@@ -37,6 +37,7 @@ interface PluginParams {
 interface UserSubmitContentProps {
   task: Task;
   userAddress: string;
+  submission?: Task;
   plugin: PluginDefinition;
 }
 
@@ -232,6 +233,7 @@ const UserSubmitContent = ({
 
 const OwnerFinalizeContent = ({
   task,
+  submission,
   userAddress,
   plugin
 }: UserSubmitContentProps) => {
@@ -242,7 +244,7 @@ const OwnerFinalizeContent = ({
 
   const onSubmit = async () => {
     finalizeTask({
-      task,
+      task: submission,
       onboardingQuestAddress: searchParams.get(
         RequiredQueryParams.OnboardingQuestAddress
       ),
@@ -250,8 +252,6 @@ const OwnerFinalizeContent = ({
       pluginDefinitionId: plugin.pluginDefinitionId
     });
   };
-
-  console.log("TASK OPEN", task);
 
   return (
     <Stack
@@ -269,7 +269,7 @@ const OwnerFinalizeContent = ({
       }}
     >
       <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
-      <LoadingDialog open={isLoading} message="Submitting task..." />
+      <LoadingDialog open={isLoading} message="Finalizing task..." />
       <Card
         sx={{
           bgcolor: "nightBlack.main",
@@ -301,7 +301,7 @@ const OwnerFinalizeContent = ({
 
           <Stack direction="column" alignItems="center">
             <Typography color="white" variant="body" textAlign="center" p="5px">
-              {task?.submission?.description}
+              {submission?.submission?.description}
             </Typography>
             <Typography variant="caption" className="text-secondary">
               User Submission
@@ -320,7 +320,7 @@ const OwnerFinalizeContent = ({
           }
         }}
       >
-        {task?.status === TaskStatus.Submitted && (
+        {submission?.status === TaskStatus.Submitted && (
           <StepperButton label="Finalize" onClick={onSubmit} />
         )}
       </Stack>
@@ -335,9 +335,10 @@ const OpenTask = ({ plugin }: PluginParams) => {
 
   const params = useParams();
 
-  const { task } = useGetAllTasksPerQuestQuery(
+  const { task, submission } = useGetAllTasksPerQuestQuery(
     {
       userAddress,
+      isAdmin,
       pluginAddress: searchParams.get(
         RequiredQueryParams.OnboardingQuestAddress
       ),
@@ -346,7 +347,16 @@ const OpenTask = ({ plugin }: PluginParams) => {
     {
       selectFromResult: ({ data, isLoading, isFetching }) => ({
         isLoading: isLoading || isFetching,
-        task: (data || []).find((t) => {
+        submission: (data?.submissions || []).find((t) => {
+          const [pluginType] = location.pathname.split("/").splice(-2);
+          return (
+            t.submitter === searchParams.get("submitter") &&
+            t.taskId === +params?.taskId &&
+            PluginDefinitionType[pluginType] ===
+              taskTypes[t.taskType].pluginType
+          );
+        }),
+        task: (data?.tasks || []).find((t) => {
           const [pluginType] = location.pathname.split("/").splice(-2);
           return (
             t.taskId === +params?.taskId &&
@@ -357,6 +367,8 @@ const OpenTask = ({ plugin }: PluginParams) => {
       })
     }
   );
+
+  console.log(submission, "submission");
 
   return (
     <Container
@@ -385,6 +397,7 @@ const OpenTask = ({ plugin }: PluginParams) => {
           {isAdmin && (
             <OwnerFinalizeContent
               task={task}
+              submission={submission}
               plugin={plugin}
               userAddress={userAddress}
             />

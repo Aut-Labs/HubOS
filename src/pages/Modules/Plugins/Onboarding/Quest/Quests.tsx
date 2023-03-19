@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 import {
   useActivateOnboardingMutation,
+  useDeactivateOnboardingMutation,
   useGetAllOnboardingQuestsQuery
 } from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
@@ -36,6 +37,7 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import AutLoading from "@components/AutLoading";
 import { useEthers } from "@usedapp/core";
+import { useConfirmDialog } from "react-mui-confirm";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -47,6 +49,7 @@ const Quests = ({ plugin }: PluginParams) => {
   const [search, setSearchState] = useState(null);
   const { account } = useEthers();
   const communityData = useSelector(CommunityData);
+  const confirm = useConfirmDialog();
 
   const {
     data: quests,
@@ -60,11 +63,41 @@ const Quests = ({ plugin }: PluginParams) => {
 
   const [
     activateOnboarding,
-    { error, isError, isLoading: isActivating, reset }
+    {
+      error: activateError,
+      isError: activateIsError,
+      isLoading: isActivating,
+      reset: activateReset
+    }
   ] = useActivateOnboardingMutation();
 
-  const isOnboardingActivate = useMemo(() => {
-    return quests?.every((q) => q.active);
+  const [
+    deactivateOnboarding,
+    {
+      error: deactivateError,
+      isError: deactivateIsError,
+      isLoading: isDeactivating,
+      reset: deactivateReset
+    }
+  ] = useDeactivateOnboardingMutation();
+
+  const confimDeactivate = () =>
+    confirm({
+      title: "Are you sure you want to deactivate onboarding?",
+      confirmButtonText: "Deactivate",
+      onConfirm: () => {
+        deactivateOnboarding({
+          quests,
+          userAddress: account,
+          pluginAddress: plugin.pluginAddress
+        });
+      }
+    });
+
+  const isOnboardingActive = useMemo(() => {
+    if (!quests) return false;
+    const atLeastThreeQuests = quests.length >= 3;
+    return atLeastThreeQuests && quests?.every((q) => q.active);
   }, [quests]);
 
   useEffect(() => {
@@ -85,8 +118,24 @@ const Quests = ({ plugin }: PluginParams) => {
   return (
     <Container maxWidth="lg" sx={{ py: "20px" }}>
       <LoadingProgressBar isLoading={isFetching} />
-      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
-      <LoadingDialog open={isActivating} message="Activating onboarding..." />
+      <ErrorDialog
+        handleClose={() => activateReset()}
+        open={activateIsError}
+        message={activateError}
+      />
+      <ErrorDialog
+        handleClose={() => deactivateReset()}
+        open={deactivateIsError}
+        message={deactivateError}
+      />
+      <LoadingDialog
+        open={isActivating || isDeactivating}
+        message={
+          isActivating
+            ? "Launching onboarding..."
+            : "Deactivating onboarding..."
+        }
+      />
       <Box
         sx={{
           boxShadow: 1,
@@ -114,7 +163,7 @@ const Quests = ({ plugin }: PluginParams) => {
             </IconButton>
           </Tooltip>
         </Typography>
-        {isOnboardingActivate && (
+        {isOnboardingActive && (
           <Box
             sx={{
               mt: 1,
@@ -140,6 +189,7 @@ const Quests = ({ plugin }: PluginParams) => {
               direction={{
                 sm: "row"
               }}
+              justifyContent="flex-end"
               alignItems={{
                 xs: "center"
               }}
@@ -147,45 +197,62 @@ const Quests = ({ plugin }: PluginParams) => {
             >
               {isAdmin && (
                 <>
-                  <Box>
-                    <Badge
-                      invisible={quests?.length < 3}
-                      badgeContent={
-                        <Tooltip title="During beta there is a maximum of 3 quests, one for each role.">
-                          <ErrorOutlineIcon color="error" />
-                        </Tooltip>
-                      }
-                    >
+                  {!isOnboardingActive ? (
+                    <>
+                      <Box>
+                        <Badge
+                          invisible={quests?.length < 3}
+                          badgeContent={
+                            <Tooltip title="During beta there is a maximum of 3 quests, one for each role.">
+                              <ErrorOutlineIcon color="error" />
+                            </Tooltip>
+                          }
+                        >
+                          <Button
+                            startIcon={<AddIcon />}
+                            disabled={quests?.length >= 3}
+                            variant="outlined"
+                            size="medium"
+                            color="primary"
+                            to="create"
+                            component={Link}
+                          >
+                            Create quest
+                          </Button>
+                        </Badge>
+                      </Box>
+
                       <Button
                         startIcon={<AddIcon />}
-                        disabled={quests?.length >= 3}
+                        disabled={quests?.length < 3}
                         variant="outlined"
                         size="medium"
                         color="primary"
-                        to={`create`}
-                        component={Link}
+                        onClick={() =>
+                          activateOnboarding({
+                            quests,
+                            userAddress: account,
+                            pluginAddress: plugin.pluginAddress
+                          })
+                        }
                       >
-                        Create quest
+                        Launch quest onboarding
                       </Button>
-                    </Badge>
-                  </Box>
-
-                  <Button
-                    startIcon={<AddIcon />}
-                    disabled={quests?.length < 3 || isOnboardingActivate}
-                    variant="outlined"
-                    size="medium"
-                    color="primary"
-                    onClick={() =>
-                      activateOnboarding({
-                        quests,
-                        userAddress: account,
-                        pluginAddress: plugin.pluginAddress
-                      })
-                    }
-                  >
-                    Activate Quest onboarding
-                  </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        startIcon={<AddIcon />}
+                        disabled={quests?.length < 3}
+                        variant="outlined"
+                        size="medium"
+                        color="error"
+                        onClick={() => confimDeactivate()}
+                      >
+                        Deactivate onboarding
+                      </Button>
+                    </>
+                  )}
                 </>
               )}
             </Stack>
@@ -275,7 +342,7 @@ const Quests = ({ plugin }: PluginParams) => {
                     <QuestStyledTableCell align="right">
                       Status
                     </QuestStyledTableCell>
-                    {isAdmin && !isOnboardingActivate && (
+                    {isAdmin && !isOnboardingActive && (
                       <QuestStyledTableCell align="right">
                         Action
                       </QuestStyledTableCell>

@@ -270,7 +270,7 @@ export const PluginDefinitionCard = ({
           color: "white",
           variant: "subtitle1"
         }}
-        title={plugin?.metadata?.properties?.stack?.title}
+        title={plugin?.metadata?.properties?.module?.title}
       />
       <CardContent
         sx={{
@@ -281,8 +281,7 @@ export const PluginDefinitionCard = ({
       >
         <Stack flex={1}>
           <Typography className="text-secondary" variant="body">
-            {plugin?.metadata?.description} {plugin?.metadata?.description}{" "}
-            {plugin?.metadata?.description}
+            {plugin?.metadata?.properties?.module?.longDescription}
           </Typography>
         </Stack>
 
@@ -293,7 +292,7 @@ export const PluginDefinitionCard = ({
           }}
           variant="outlined"
           color="offWhite"
-          to={plugin?.metadata?.properties?.stack?.type}
+          to={plugin?.metadata?.properties?.module?.type}
           component={Link}
         >
           View module

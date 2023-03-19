@@ -160,7 +160,7 @@ const TaskListItem = memo(
 
     const path = useMemo(() => {
       if (!plugin) return;
-      const stackType = plugin.metadata.properties.stack.type;
+      const stackType = plugin.metadata.properties.module.type;
       const stack = `modules/${stackType}`;
       return `${stack}/${PluginDefinitionType[plugin.pluginDefinitionId]}`;
     }, [plugin]);
@@ -211,7 +211,8 @@ const TaskListItem = memo(
                       onboardingQuestAddress: plugin?.pluginAddress,
                       returnUrlLinkName: "Back to quest",
                       returnUrl: location?.pathname,
-                      questId: params.questId
+                      questId: params.questId,
+                      submitter: row?.submitter
                     }}
                     component={LinkWithQuery}
                   >

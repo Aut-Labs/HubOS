@@ -2,7 +2,6 @@ import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import {
   ConnectorTypes,
   NetworksConfig,
-  SelectedWalletType,
   setWallet
 } from "@store/WalletProvider/WalletProvider";
 import { useSelector } from "react-redux";
@@ -37,6 +36,7 @@ import BubbleTopRight from "@assets/bubble_top_right.png";
 import BubbleBottomLeft from "@assets/bubble_bottom_left.png";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useAutWalletConnect } from "./use-aut-wallet-connect";
+import ErrorDialog from "@components/Dialog/ErrorPopup";
 
 const TOOLBAR_HEIGHT = 84;
 
@@ -102,7 +102,6 @@ const NetworkResolver = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const wallet = useSelector(SelectedWalletType);
   const networks = useSelector(NetworksConfig);
   const [isOpen, setIsOpen] = useState(false);
   const {
@@ -171,8 +170,10 @@ const NetworkResolver = () => {
     });
   };
 
-  const [loadPlugins, { data: plugins }] =
-    useLazyGetAllPluginDefinitionsByDAOQuery();
+  const [
+    loadPlugins,
+    { data: plugins, isError, isSuccess: isSuccessPlugins, error }
+  ] = useLazyGetAllPluginDefinitionsByDAOQuery();
 
   const taskPluginTypes = useMemo(() => {
     return (plugins || []).reduce((prev, curr) => {
@@ -180,6 +181,8 @@ const NetworkResolver = () => {
       return prev;
     }, {});
   }, [plugins]);
+
+  console.log("taskPluginTypes: ", taskPluginTypes);
 
   const changeConnector = async (connectorType: string) => {
     try {
@@ -197,15 +200,18 @@ const NetworkResolver = () => {
           )
         })
       );
-      setIsConnected(true);
-      setIsOpen(false);
-      setInitialAccount(account);
-      navigate({
-        pathname: "/quest",
-        search: searchParams.toString()
-      });
+
       loadPlugins(null);
-      setIsLoading(false);
+      setTimeout(() => {
+        setInitialAccount(account);
+        setIsLoading(false);
+        setIsOpen(false);
+        setIsConnected(true);
+        navigate({
+          pathname: "/quest",
+          search: searchParams.toString()
+        });
+      }, 500);
       return account;
     } catch (error) {
       dispatch(setWallet(null));
@@ -234,6 +240,13 @@ const NetworkResolver = () => {
         width: "100vw"
       }}
     >
+      <ErrorDialog
+        handleClose={() => {
+          // handle error
+        }}
+        open={isError}
+        message={error}
+      />
       <DialogWrapper open={isOpen} onClose={closeAndDisconnect}>
         <>
           <AppTitle
@@ -471,75 +484,81 @@ const NetworkResolver = () => {
           </Container>
         )}
         {connected && (
-          <Suspense fallback={<AutLoading />}>
-            <Routes>
-              <Route index element={<PublicQuest />} />
-              <Route
-                path={`task/${
-                  PluginDefinitionType[
-                    PluginDefinitionType.OnboardingOpenTaskPlugin
-                  ]
-                }/:taskId`}
-                element={
-                  <OpenTask
-                    plugin={
-                      taskPluginTypes[
+          <>
+            {!plugins?.length ? (
+              <AutLoading width="130px" height="130px" />
+            ) : (
+              <Suspense fallback={<AutLoading width="130px" height="130px" />}>
+                <Routes>
+                  <Route index element={<PublicQuest />} />
+                  <Route
+                    path={`task/${
+                      PluginDefinitionType[
                         PluginDefinitionType.OnboardingOpenTaskPlugin
                       ]
+                    }/:taskId`}
+                    element={
+                      <OpenTask
+                        plugin={
+                          taskPluginTypes[
+                            PluginDefinitionType.OnboardingOpenTaskPlugin
+                          ]
+                        }
+                      />
                     }
                   />
-                }
-              />
-              <Route
-                path={`task/${
-                  PluginDefinitionType[
-                    PluginDefinitionType.OnboardingQuizTaskPlugin
-                  ]
-                }/:taskId`}
-                element={
-                  <QuizTask
-                    plugin={
-                      taskPluginTypes[
+                  <Route
+                    path={`task/${
+                      PluginDefinitionType[
                         PluginDefinitionType.OnboardingQuizTaskPlugin
                       ]
+                    }/:taskId`}
+                    element={
+                      <QuizTask
+                        plugin={
+                          taskPluginTypes[
+                            PluginDefinitionType.OnboardingQuizTaskPlugin
+                          ]
+                        }
+                      />
                     }
                   />
-                }
-              />
-              <Route
-                path={`task/${
-                  PluginDefinitionType[
-                    PluginDefinitionType.OnboardingJoinDiscordTaskPlugin
-                  ]
-                }/:taskId`}
-                element={
-                  <JoinDiscordTask
-                    plugin={
-                      taskPluginTypes[
+                  <Route
+                    path={`task/${
+                      PluginDefinitionType[
                         PluginDefinitionType.OnboardingJoinDiscordTaskPlugin
                       ]
+                    }/:taskId`}
+                    element={
+                      <JoinDiscordTask
+                        plugin={
+                          taskPluginTypes[
+                            PluginDefinitionType.OnboardingJoinDiscordTaskPlugin
+                          ]
+                        }
+                      />
                     }
                   />
-                }
-              />
-              <Route
-                path={`task/${
-                  PluginDefinitionType[
-                    PluginDefinitionType.OnboardingTransactionTaskPlugin
-                  ]
-                }/:taskId`}
-                element={
-                  <TransactionTask
-                    plugin={
-                      taskPluginTypes[
+                  <Route
+                    path={`task/${
+                      PluginDefinitionType[
                         PluginDefinitionType.OnboardingTransactionTaskPlugin
                       ]
+                    }/:taskId`}
+                    element={
+                      <TransactionTask
+                        plugin={
+                          taskPluginTypes[
+                            PluginDefinitionType.OnboardingTransactionTaskPlugin
+                          ]
+                        }
+                      />
                     }
                   />
-                }
-              />
-            </Routes>
-          </Suspense>
+                </Routes>
+              </Suspense>
+            )}
+          </>
         )}
       </PerfectScrollbar>
     </Box>

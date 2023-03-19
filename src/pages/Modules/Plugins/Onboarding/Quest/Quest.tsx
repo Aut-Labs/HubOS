@@ -49,13 +49,14 @@ const Quest = ({ plugin }: PluginParams) => {
   const params = useParams<{ questId: string }>();
 
   const {
-    data: allTasks,
+    data: tasksAndSubmissions,
     isLoading: isLoadingTasks,
     isFetching,
     refetch
   } = useGetAllTasksPerQuestQuery(
     {
       userAddress,
+      isAdmin,
       questId: +params.questId,
       pluginAddress: plugin.pluginAddress
     },
@@ -63,6 +64,11 @@ const Quest = ({ plugin }: PluginParams) => {
       refetchOnMountOrArgChange: false,
       skip: false
     }
+  );
+
+  const { tasks, submissions } = useMemo(
+    () => tasksAndSubmissions || ({} as unknown as any),
+    [tasksAndSubmissions]
   );
 
   const { quest, isLoading: isLoadingPlugins } = useGetAllOnboardingQuestsQuery(
@@ -75,11 +81,6 @@ const Quest = ({ plugin }: PluginParams) => {
     }
   );
 
-  const hasQuestStarted = useMemo(() => {
-    if (!quest?.startDate) return false;
-    return isAfter(new Date(), new Date(quest.startDate));
-  }, [quest]);
-
   useEffect(() => {
     dispatch(setTitle(`Quest - ${quest?.metadata?.name || ""}`));
   }, [dispatch, quest]);
@@ -87,23 +88,6 @@ const Quest = ({ plugin }: PluginParams) => {
   const isLoading = useMemo(() => {
     return isLoadingPlugins || isLoadingTasks;
   }, [isLoadingTasks, isLoadingPlugins]);
-
-  const { tasks, submissions } = useMemo(() => {
-    return (allTasks || []).reduce(
-      (prev, curr) => {
-        if (curr.status === TaskStatus.Submitted) {
-          prev.submissions = [...prev.submissions, curr];
-        } else {
-          prev.tasks = [...prev.tasks, curr];
-        }
-        return prev;
-      },
-      {
-        tasks: [],
-        submissions: []
-      }
-    );
-  }, [allTasks]);
 
   return (
     <Container

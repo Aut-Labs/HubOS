@@ -23,9 +23,9 @@ import { useSelector } from "react-redux";
 import { AutSelectField } from "@theme/field-select-styles";
 import { AutTextField } from "@theme/field-text-styles";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { addDays } from "date-fns";
 import Tasks from "../../Task/Shared/Tasks";
 import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
 import LinkWithQuery from "@components/LinkWithQuery";
 import OverflowTooltip from "@components/OverflowTooltip";
 import CopyLink from "@components/CopyLink";
@@ -45,30 +45,6 @@ export const QuestStyledTableCell = styled(TableCell)(({ theme }) => ({
     borderColor: theme.palette.divider
   }
 }));
-
-const dateTypes = (date: number, durationInDays: number) => {
-  const startDate = new Date(date);
-  const endDate = addDays(startDate, durationInDays);
-
-  return (
-    <Stack alignItems="flex-end">
-      <Typography color="white" variant="body">
-        {durationInDays} {durationInDays === 1 ? "day" : "days"}
-      </Typography>
-      <Stack direction="row" flexWrap="wrap">
-        <Stack direction="row">
-          <Typography color="success.main">
-            {startDate.toDateString()}
-          </Typography>
-          <Typography mx={0.5} color="white">
-            -
-          </Typography>
-        </Stack>
-        <Typography color="error">{endDate.toDateString()}</Typography>
-      </Stack>
-    </Stack>
-  );
-};
 
 export const QuestListItem = memo(
   ({
@@ -154,7 +130,6 @@ export const QuestListItem = memo(
         )}
         <QuestStyledTableCell align="right">
           {row.durationInDays} days
-          {/* {dateTypes(row.startDate, row.durationInDays)} */}
         </QuestStyledTableCell>
         <QuestStyledTableCell align="right">
           <Chip
@@ -166,14 +141,7 @@ export const QuestListItem = memo(
 
         {isAdmin && !row.active && (
           <QuestStyledTableCell align="right">
-            <Badge
-              invisible={row.tasksCount < 5}
-              badgeContent={
-                <Tooltip title="During beta there is a maximum of 5 tasks per quest">
-                  <ErrorOutlineIcon color="error" />
-                </Tooltip>
-              }
-            >
+            <Stack gap={1}>
               <Button
                 sx={{
                   minWidth: "120px"
@@ -181,6 +149,7 @@ export const QuestListItem = memo(
                 color="offWhite"
                 size="small"
                 variant="outlined"
+                startIcon={<AddIcon />}
                 disabled={row.tasksCount >= 5}
                 to="/aut-dashboard/modules/Task"
                 preserveParams
@@ -194,7 +163,28 @@ export const QuestListItem = memo(
               >
                 Add task
               </Button>
-            </Badge>
+              <Button
+                sx={{
+                  minWidth: "120px"
+                }}
+                color="offWhite"
+                size="small"
+                variant="outlined"
+                startIcon={<EditIcon />}
+                disabled={row.tasksCount >= 5}
+                to="create"
+                preserveParams
+                queryParams={{
+                  onboardingQuestAddress: pluginAddress,
+                  returnUrlLinkName: "Back to quest",
+                  returnUrl: location.pathname,
+                  questId: row.questId.toString()
+                }}
+                component={LinkWithQuery}
+              >
+                Edit quest
+              </Button>
+            </Stack>
           </QuestStyledTableCell>
         )}
       </StyledTableRow>
@@ -286,6 +276,7 @@ interface QuestTasksParams {
   isLoading: boolean;
   onboardingQuestAddress: string;
   isAdmin: boolean;
+  isSubmission: boolean;
   questId: number;
   tasks: Task[];
 }
@@ -295,6 +286,7 @@ export const QuestTasks = memo(
     isLoading,
     tasks,
     onboardingQuestAddress,
+    isSubmission,
     questId,
     isAdmin
   }: QuestTasksParams) => {
