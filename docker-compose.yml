@@ -2,8 +2,8 @@ version: '3.7'
 
 services:
 
-  playground-dashboard:
-    container_name: playground-dashboard
+  aut_dashboard_dev:
+    container_name: aut_dashboard_dev
     build:
       context: .
       dockerfile: Dockerfile
