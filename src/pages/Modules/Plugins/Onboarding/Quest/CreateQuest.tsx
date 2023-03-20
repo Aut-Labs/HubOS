@@ -177,7 +177,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         pluginAddress: plugin.pluginAddress,
         role: values.role,
         durationInDays: values.durationInDays,
-        startDate: getUnixTime(new Date(values.startDate)) * 1000,
+        startDate: getUnixTime(new Date(values.startDate)),
         metadata: {
           name:
             values.title || roles.find((r) => r.id === values.role)?.roleName,
@@ -190,7 +190,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         pluginAddress: plugin.pluginAddress,
         role: values.role,
         durationInDays: values.durationInDays,
-        startDate: getUnixTime(new Date(values.startDate)) * 1000,
+        startDate: getUnixTime(new Date(values.startDate)),
         metadata: {
           name:
             values.title || roles.find((r) => r.id === values.role)?.roleName,
@@ -207,7 +207,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         title: quest.metadata.name,
         description: quest.metadata.description,
         durationInDays: quest.durationInDays,
-        startDate: new Date(quest.startDate),
+        startDate: new Date(),
         role: quest.role
       });
       setInitialized(true);
