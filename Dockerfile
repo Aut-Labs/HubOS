@@ -4,9 +4,10 @@ ENV PATH /app/node_modules/.bin:$PATH
 ENV GENERATE_SOURCEMAP=false
 ENV NODE_OPTIONS=--openssl-legacy-provider
 
+COPY .npmrc ./
 COPY package.json ./
 COPY package-lock.json ./
-RUN npm install
+RUN npm install --legacy-peer-dep
 COPY . ./
 RUN npm run build
 

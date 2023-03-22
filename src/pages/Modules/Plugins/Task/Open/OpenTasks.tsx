@@ -23,6 +23,7 @@ import { dateToUnix } from "@utils/date-format";
 import { addMinutes } from "date-fns";
 import { countWords } from "@utils/helpers";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { RequiredQueryParams } from "@api/RequiredQueryParams";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
@@ -119,9 +120,11 @@ const OpenTasks = ({ plugin }: PluginParams) => {
   const onSubmit = async () => {
     const values = getValues();
     createTask({
-      questPluginAddress: searchParams.get("questPluginAddress"),
+      onboardingQuestAddress: searchParams.get(
+        RequiredQueryParams.OnboardingQuestAddress
+      ),
       pluginTokenId: plugin.tokenId,
-      questId: +searchParams.get("questId"),
+      questId: +searchParams.get(RequiredQueryParams.QuestId),
       pluginAddress: plugin.pluginAddress,
       task: {
         role: 1,
@@ -171,8 +174,12 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                 startIcon={<ArrowBackIcon />}
                 color="offWhite"
                 sx={{
-                  position: "absolute",
-                  left: 0
+                  position: {
+                    sm: "absolute"
+                  },
+                  left: {
+                    sm: "0"
+                  }
                 }}
                 to={searchParams.get("returnUrl")}
                 component={Link}

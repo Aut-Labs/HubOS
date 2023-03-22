@@ -150,13 +150,17 @@ const answers = {
   3: "D"
 };
 
-const GridBox = styled(Box)({
+export const GridBox = styled(Box)(({ theme }) => ({
   boxSizing: "border-box",
-  display: "grid",
-  gridTemplateColumns: "1fr 1fr",
+  display: "flex",
+  flexDirection: "column",
   gridGap: "20px",
-  marginTop: "20px"
-});
+  marginTop: "20px",
+  [theme.breakpoints.up("sm")]: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr"
+  }
+}));
 
 const GridRow = styled(Box)({
   boxSizing: "border-box",

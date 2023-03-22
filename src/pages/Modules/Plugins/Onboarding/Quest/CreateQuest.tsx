@@ -1,7 +1,8 @@
 /* eslint-disable max-len */
 import {
   useCreateQuestMutation,
-  useGetAllOnboardingQuestsQuery
+  useGetAllOnboardingQuestsQuery,
+  useUpdateQuestMutation
 } from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
@@ -16,19 +17,19 @@ import {
   MenuItem,
   Stack,
   Tooltip,
-  Typography,
-  styled
+  Typography
 } from "@mui/material";
 import { allRoles } from "@store/Community/community.reducer";
 import { AutSelectField } from "@theme/field-select-styles";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import { addDays, getUnixTime } from "date-fns";
+import { addMinutes, getUnixTime } from "date-fns";
+import { RequiredQueryParams } from "@api/RequiredQueryParams";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
@@ -36,13 +37,11 @@ const errorTypes = {
   maxLength: `Characters cannot be more than 280`
 };
 
-const startDate = addDays(new Date(), 1);
-
 interface PluginParams {
   plugin: PluginDefinition;
 }
 
-const QuestSuccess = ({ pluginId }) => {
+const QuestSuccess = ({ newQuestId, existingQuestId }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -63,7 +62,8 @@ const QuestSuccess = ({ pluginId }) => {
         }}
       >
         <Typography align="center" color="white" variant="h2" component="div">
-          Success! Your Quest call has been created and deployed on the
+          Success! Your Quest call has been{" "}
+          {existingQuestId ? "edited" : "created"} and deployed on the
           Blockchain 🎉
         </Typography>
 
@@ -93,7 +93,9 @@ const QuestSuccess = ({ pluginId }) => {
             }}
             onClick={() =>
               navigate(
-                `${location.pathname.replaceAll("/create", "")}/${pluginId}`
+                `${location.pathname.replaceAll("/create", "")}/${
+                  newQuestId || existingQuestId
+                }`
               )
             }
             type="submit"
@@ -111,47 +113,114 @@ const QuestSuccess = ({ pluginId }) => {
 
 const CreateQuest = ({ plugin }: PluginParams) => {
   const [roles] = useState(useSelector(allRoles));
-  const { control, handleSubmit, getValues, formState } = useForm({
+  const [searchParams] = useSearchParams();
+  const [initialized, setInitialized] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    getValues,
+    reset: resetForm,
+    formState
+  } = useForm({
     mode: "onChange",
     defaultValues: {
       title: "",
       description: "",
       durationInDays: 3,
-      startDate: getUnixTime(startDate) * 1000,
+      startDate: addMinutes(new Date(), 30),
       role: null
     }
   });
 
-  const { quests } = useGetAllOnboardingQuestsQuery(plugin.pluginAddress, {
-    selectFromResult: ({ data }) => ({
-      quests: data || []
-    })
-  });
+  const { quests, quest } = useGetAllOnboardingQuestsQuery(
+    plugin.pluginAddress,
+    {
+      selectFromResult: ({ data }) => ({
+        quests: data || [],
+        quest: (data || []).find(
+          (q) => q.questId === +searchParams.get(RequiredQueryParams.QuestId)
+        )
+      })
+    }
+  );
 
   const [
     createQuest,
-    { error, isError, isSuccess, data: quest, isLoading, reset }
+    {
+      error: createError,
+      isError: createIsError,
+      data: newQuest,
+      isSuccess: createIsSuccess,
+      isLoading: createIsLoading,
+      reset: createReset
+    }
   ] = useCreateQuestMutation();
+
+  const [
+    updateQuest,
+    {
+      error: updateError,
+      isError: updateIsError,
+      data: updatedQuest,
+      isSuccess: updateIsSuccess,
+      isLoading: updateIsLoading,
+      reset: updateReset
+    }
+  ] = useUpdateQuestMutation();
 
   const onSubmit = async () => {
     const values = getValues();
-    createQuest({
-      pluginAddress: plugin.pluginAddress,
-      role: values.role,
-      durationInDays: values.durationInDays,
-      startDate: values.startDate,
-      metadata: {
-        name: values.title || roles.find((r) => r.id === values.role)?.roleName,
-        description: values.description,
-        properties: {}
-      }
-    });
+
+    if (quest?.questId) {
+      updateQuest({
+        ...quest,
+        pluginAddress: plugin.pluginAddress,
+        role: values.role,
+        durationInDays: values.durationInDays,
+        startDate: getUnixTime(new Date(values.startDate)),
+        metadata: {
+          name:
+            values.title || roles.find((r) => r.id === values.role)?.roleName,
+          description: values.description,
+          properties: {}
+        }
+      });
+    } else {
+      createQuest({
+        pluginAddress: plugin.pluginAddress,
+        role: values.role,
+        durationInDays: values.durationInDays,
+        startDate: getUnixTime(new Date(values.startDate)),
+        metadata: {
+          name:
+            values.title || roles.find((r) => r.id === values.role)?.roleName,
+          description: values.description,
+          properties: {}
+        }
+      });
+    }
   };
+
+  useEffect(() => {
+    if (!initialized && quest) {
+      resetForm({
+        title: quest.metadata.name,
+        description: quest.metadata.description,
+        durationInDays: quest.durationInDays,
+        startDate: new Date(),
+        role: quest.role
+      });
+      setInitialized(true);
+    }
+  }, [initialized, quest]);
 
   return (
     <>
-      {isSuccess ? (
-        <QuestSuccess pluginId={quest?.questId} />
+      {createIsSuccess || updateIsSuccess ? (
+        <QuestSuccess
+          existingQuestId={quest?.questId}
+          newQuestId={newQuest?.questId}
+        />
       ) : (
         <Container
           sx={{ py: "20px", display: "flex", flexDirection: "column" }}
@@ -161,11 +230,17 @@ const CreateQuest = ({ plugin }: PluginParams) => {
           onSubmit={handleSubmit(onSubmit)}
         >
           <ErrorDialog
-            handleClose={() => reset()}
-            open={isError}
-            message={error}
+            handleClose={() => createReset()}
+            open={createIsError}
+            message={createError}
           />
-          <LoadingDialog open={isLoading} message="Creating quest..." />
+          <ErrorDialog
+            handleClose={() => updateReset()}
+            open={updateIsError}
+            message={updateError}
+          />
+          <LoadingDialog open={createIsLoading} message="Creating quest..." />
+          <LoadingDialog open={updateIsLoading} message="Updating quest..." />
 
           <Box
             sx={{
@@ -177,7 +252,9 @@ const CreateQuest = ({ plugin }: PluginParams) => {
             }}
           >
             <Typography textAlign="center" color="white" variant="h3">
-              Creating onboarding quest
+              {quest?.questId
+                ? "Editing onboarding quest"
+                : "Creating onboarding quest"}
             </Typography>
           </Box>
           <Stack
@@ -192,42 +269,6 @@ const CreateQuest = ({ plugin }: PluginParams) => {
               }
             }}
           >
-            {/* <Controller
-              name="title"
-              control={control}
-              rules={{
-                required: true,
-                validate: {
-                  maxNameChars: (v) => v.length <= 24
-                }
-              }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
-                    variant="standard"
-                    color="offWhite"
-                    required
-                    autoFocus
-                    name={name}
-                    value={value || ""}
-                    onChange={onChange}
-                    placeholder="Title"
-                    helperText={
-                      <FormHelperText
-                        errorTypes={errorTypes}
-                        value={value}
-                        name={name}
-                        errors={formState.errors}
-                      >
-                        <span>
-                          {24 - (value?.length || 0)}/24 characters left
-                        </span>
-                      </FormHelperText>
-                    }
-                  />
-                );
-              }}
-            /> */}
             <Controller
               name="role"
               control={control}
@@ -282,6 +323,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
                 );
               }}
             />
+
             <Controller
               name="durationInDays"
               control={control}
@@ -375,7 +417,10 @@ const CreateQuest = ({ plugin }: PluginParams) => {
               }}
             />
 
-            <StepperButton label="Create Quest" disabled={!formState.isValid} />
+            <StepperButton
+              label={quest?.questId ? "Edit Quest" : "Create Quest"}
+              disabled={!formState.isValid}
+            />
           </Stack>
         </Container>
       )}

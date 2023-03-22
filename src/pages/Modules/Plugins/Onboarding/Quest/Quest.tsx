@@ -11,7 +11,9 @@ import {
   Stack,
   CircularProgress,
   IconButton,
-  Tooltip
+  Tooltip,
+  Chip,
+  Badge
 } from "@mui/material";
 import { Link, useLocation, useParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -29,6 +31,11 @@ import LoadingProgressBar from "@components/LoadingProgressBar";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { setTitle } from "@store/ui-reducer";
 import { useAppDispatch } from "@store/store.model";
+import AutLoading from "@components/AutLoading";
+import { addDays, isAfter } from "date-fns";
+import BetaCountdown from "@components/BetaCountdown";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { useEthers } from "@usedapp/core";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -38,15 +45,18 @@ const Quest = ({ plugin }: PluginParams) => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const isAdmin = useSelector(IsAdmin);
+  const { account: userAddress } = useEthers();
   const params = useParams<{ questId: string }>();
 
   const {
-    data: allTasks,
+    data: tasksAndSubmissions,
     isLoading: isLoadingTasks,
     isFetching,
     refetch
   } = useGetAllTasksPerQuestQuery(
     {
+      userAddress,
+      isAdmin,
       questId: +params.questId,
       pluginAddress: plugin.pluginAddress
     },
@@ -54,6 +64,11 @@ const Quest = ({ plugin }: PluginParams) => {
       refetchOnMountOrArgChange: false,
       skip: false
     }
+  );
+
+  const { tasks, submissions } = useMemo(
+    () => tasksAndSubmissions || ({} as unknown as any),
+    [tasksAndSubmissions]
   );
 
   const { quest, isLoading: isLoadingPlugins } = useGetAllOnboardingQuestsQuery(
@@ -67,29 +82,12 @@ const Quest = ({ plugin }: PluginParams) => {
   );
 
   useEffect(() => {
-    dispatch(setTitle(`Quest - ${quest.metadata?.name}`));
+    dispatch(setTitle(`Quest - ${quest?.metadata?.name || ""}`));
   }, [dispatch, quest]);
 
   const isLoading = useMemo(() => {
     return isLoadingPlugins || isLoadingTasks;
   }, [isLoadingTasks, isLoadingPlugins]);
-
-  const { tasks, submissions } = useMemo(() => {
-    return (allTasks || []).reduce(
-      (prev, curr) => {
-        if (curr.status === TaskStatus.Submitted) {
-          prev.submissions = [...prev.submissions, curr];
-        } else {
-          prev.tasks = [...prev.tasks, curr];
-        }
-        return prev;
-      },
-      {
-        tasks: [],
-        submissions: []
-      }
-    );
-  }, [allTasks]);
 
   return (
     <Container
@@ -104,15 +102,19 @@ const Quest = ({ plugin }: PluginParams) => {
     >
       <LoadingProgressBar isLoading={isFetching} />
       {isLoading ? (
-        <CircularProgress className="spinner-center" size="60px" />
+        <AutLoading width="130px" height="130px" />
       ) : (
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 1,
-            position: "relative"
+            boxShadow: 1,
+            border: "2px solid",
+            borderColor: "divider",
+            borderRadius: "16px",
+            p: 3,
+            backgroundColor: "nightBlack.main"
           }}
         >
           <Stack alignItems="center" justifyContent="center">
@@ -120,8 +122,12 @@ const Quest = ({ plugin }: PluginParams) => {
               startIcon={<ArrowBackIcon />}
               color="offWhite"
               sx={{
-                position: "absolute",
-                left: 0
+                position: {
+                  sm: "absolute"
+                },
+                left: {
+                  sm: "42px"
+                }
               }}
               to="/aut-dashboard/modules/Onboarding/QuestOnboardingPlugin"
               component={Link}
@@ -144,61 +150,72 @@ const Quest = ({ plugin }: PluginParams) => {
                   <RefreshIcon />
                 </IconButton>
               </Tooltip>
+              <Chip
+                sx={{
+                  ml: 1
+                }}
+                label={quest?.active ? "Active" : "Inactive"}
+                color={quest?.active ? "success" : "error"}
+                // label={hasQuestStarted ? "Ongoing" : "Active"}
+                // color={hasQuestStarted ? "info" : "success"}
+                size="small"
+              />
             </Typography>
           </Stack>
 
-          <OverflowTooltip
-            typography={{
-              maxWidth: "400px"
-            }}
-            text={quest?.metadata?.description}
-          />
-
           <Box
             sx={{
-              display: "grid",
-              alignItems: "center",
-              mx: "auto",
-              gridTemplateColumns: "1fr 1fr 1fr"
+              display: "flex",
+              justifyContent: "center"
             }}
           >
-            <Stack direction="column" alignItems="center">
-              <Typography
-                fontFamily="FractulAltBold"
-                variant="subtitle2"
-                color={quest?.active ? "success" : "error"}
-              >
-                {quest?.active ? "Active" : "Inactive"}
-              </Typography>
-              <Typography variant="caption" className="text-secondary">
-                Status
-              </Typography>
-            </Stack>
-            <Stack direction="column" alignItems="center">
-              <Typography
-                fontFamily="FractulAltBold"
-                color="white"
-                variant="subtitle2"
-              >
-                {new Date(quest?.startDate * 1000).toDateString()}
-              </Typography>
-              <Typography variant="caption" className="text-secondary">
-                Start date
-              </Typography>
-            </Stack>
-            <Stack direction="column" alignItems="center">
-              <Typography
-                fontFamily="FractulAltBold"
-                color="white"
-                variant="subtitle2"
-              >
-                {quest?.tasksCount}
-              </Typography>
-              <Typography variant="caption" className="text-secondary">
-                Total tasks
-              </Typography>
-            </Stack>
+            <OverflowTooltip
+              typography={{
+                maxWidth: "400px"
+              }}
+              text={quest?.metadata?.description}
+            />
           </Box>
+
+          {isAdmin && !quest?.active && (
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                mt: 2,
+                alignItems: "center",
+                justifyContent: "flex-end"
+              }}
+            >
+              <Badge
+                invisible={tasks?.length < 5}
+                badgeContent={
+                  <Tooltip title="During beta there is a maximum of 5 tasks per quest">
+                    <ErrorOutlineIcon color="error" />
+                  </Tooltip>
+                }
+              >
+                <Button
+                  startIcon={<AddIcon />}
+                  variant="outlined"
+                  disabled={tasks?.length >= 5}
+                  size="medium"
+                  color="primary"
+                  to="/aut-dashboard/modules/Task"
+                  preserveParams
+                  queryParams={{
+                    onboardingQuestAddress: plugin?.pluginAddress,
+                    returnUrlLinkName: "Back to quest",
+                    returnUrl: location.pathname,
+                    questId: params?.questId.toString()
+                  }}
+                  component={LinkWithQuery}
+                >
+                  Add task
+                </Button>
+              </Badge>
+            </Box>
+          )}
         </Box>
       )}
 
@@ -224,7 +241,7 @@ const Quest = ({ plugin }: PluginParams) => {
             to="/aut-dashboard/modules/Task"
             preserveParams
             queryParams={{
-              questPluginAddress: plugin.pluginAddress,
+              onboardingQuestAddress: plugin.pluginAddress,
               returnUrlLinkName: "Back to quest",
               returnUrl: location.pathname,
               questId: params.questId
@@ -242,16 +259,28 @@ const Quest = ({ plugin }: PluginParams) => {
             <AutTabs
               tabStyles={{
                 mt: 4,
-                flex: 1
+                flex: 1,
+                ".tab-content": {
+                  padding: 0,
+                  border: 0,
+                  ".MuiTableContainer-root": {
+                    marginTop: 0,
+                    borderTopLeftRadius: 0,
+                    borderTopRightRadius: {
+                      xs: "0",
+                      sm: "16px"
+                    }
+                  }
+                }
               }}
               tabs={[
                 {
-                  label: "Task",
+                  label: "Tasks",
                   props: {
                     isLoading,
                     tasks: tasks,
                     isAdmin,
-                    questPluginAddress: plugin.pluginAddress,
+                    onboardingQuestAddress: plugin.pluginAddress,
                     questId: params.questId
                   },
                   component: QuestTasks
@@ -262,7 +291,7 @@ const Quest = ({ plugin }: PluginParams) => {
                     isLoading,
                     isAdmin,
                     tasks: submissions,
-                    questPluginAddress: plugin.pluginAddress,
+                    onboardingQuestAddress: plugin.pluginAddress,
                     questId: params.questId
                   },
                   component: QuestTasks

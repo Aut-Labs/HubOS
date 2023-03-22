@@ -1,12 +1,13 @@
 import { ethers } from "ethers";
-import {
-  PollsABI,
-  PollsByteCode,
-  CommunityCallABI,
-  CommunityCallByteCode,
-  TasksABI,
-  TasksByteCode
-} from "@aut-labs-private/abi-types";
+
+// import {
+//   PollsABI,
+//   PollsByteCode,
+//   CommunityCallABI,
+//   CommunityCallByteCode,
+//   TasksABI,
+//   TasksByteCode
+// } from "@aut-labs-private/abi-types";
 
 export const deployPolls = async (
   communityAddress: string,
@@ -16,15 +17,15 @@ export const deployPolls = async (
   const webProvider = new ethers.providers.Web3Provider(window.ethereum);
 
   const signer = webProvider.getSigner();
-  const Contract = new ethers.ContractFactory(
-    PollsABI,
-    PollsByteCode.bytecode,
-    signer
-  );
+  // const Contract = new ethers.ContractFactory(
+  //   PollsABI,
+  //   PollsByteCode.bytecode,
+  //   signer
+  // );
 
-  const activities = await Contract.deploy(communityAddress, discordBotAddress);
-  await activities.deployed();
-  return activities.address;
+  // const activities = await Contract.deploy(communityAddress, discordBotAddress);
+  // await activities.deployed();
+  // return activities.address;
 };
 
 export const deployGatherings = async (
@@ -35,15 +36,15 @@ export const deployGatherings = async (
   const webProvider = new ethers.providers.Web3Provider(window.ethereum);
 
   const signer = webProvider.getSigner();
-  const Contract = new ethers.ContractFactory(
-    CommunityCallABI,
-    CommunityCallByteCode.bytecode,
-    signer
-  );
+  // const Contract = new ethers.ContractFactory(
+  //   CommunityCallABI,
+  //   CommunityCallByteCode.bytecode,
+  //   signer
+  // );
 
-  const activities = await Contract.deploy(communityAddress, discordBotAddress);
-  await activities.deployed();
-  return activities.address;
+  // const activities = await Contract.deploy(communityAddress, discordBotAddress);
+  // await activities.deployed();
+  // return activities.address;
 };
 
 export const deployTasks = async (
@@ -53,14 +54,14 @@ export const deployTasks = async (
   // await EnableAndChangeNetwork();
   const webProvider = new ethers.providers.Web3Provider(window.ethereum);
 
-  const signer = webProvider.getSigner();
-  const Contract = new ethers.ContractFactory(
-    TasksABI,
-    TasksByteCode.bytecode,
-    signer
-  );
+  // const signer = webProvider.getSigner();
+  // const Contract = new ethers.ContractFactory(
+  //   TasksABI,
+  //   TasksByteCode.bytecode,
+  //   signer
+  // );
 
-  const activities = await Contract.deploy(communityAddress, discordBotAddress);
-  await activities.deployed();
-  return activities.address;
+  // const activities = await Contract.deploy(communityAddress, discordBotAddress);
+  // await activities.deployed();
+  // return activities.address;
 };

@@ -17,6 +17,9 @@ import { countWords } from "@utils/helpers";
 import AddIcon from "@mui/icons-material/Add";
 import QuestionsAndAnswers, { emptyQuestion } from "./QuestionsAndAnswers";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { RequiredQueryParams } from "@api/RequiredQueryParams";
+import { updateCache } from "@api/cache.api";
+import { useEthers } from "@usedapp/core";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
@@ -99,6 +102,7 @@ addMinutes(endDatetime, 45);
 
 const QuizTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
+  const { account: userAddress } = useEthers();
   const { control, handleSubmit, getValues, formState } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -113,10 +117,32 @@ const QuizTasks = ({ plugin }: PluginParams) => {
 
   const onSubmit = async () => {
     const values = getValues();
+
+    const questionsWithoutAnswers = [];
+
+    for (let i = 0; i < values.questions.length; i++) {
+      const { question, answers } = values.questions[i];
+      // store answers in the db
+      await updateCache({
+        cacheKey: question,
+        address: userAddress,
+        list: answers
+      });
+      const questionWithoutAnswer = {
+        question,
+        answers: answers.map((answer) => ({
+          value: answer.value
+        }))
+      };
+      questionsWithoutAnswers.push(questionWithoutAnswer);
+    }
+
     createTask({
-      questPluginAddress: searchParams.get("questPluginAddress"),
+      onboardingQuestAddress: searchParams.get(
+        RequiredQueryParams.OnboardingQuestAddress
+      ),
       pluginTokenId: plugin.tokenId,
-      questId: +searchParams.get("questId"),
+      questId: +searchParams.get(RequiredQueryParams.QuestId),
       pluginAddress: plugin.pluginAddress,
       task: {
         role: 1,
@@ -124,7 +150,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
           name: values.title,
           description: values.description,
           properties: {
-            questions: values.questions
+            questions: questionsWithoutAnswers
           }
         },
         startDate: dateToUnix(new Date()),
@@ -168,8 +194,12 @@ const QuizTasks = ({ plugin }: PluginParams) => {
                 startIcon={<ArrowBackIcon />}
                 color="offWhite"
                 sx={{
-                  position: "absolute",
-                  left: 0
+                  position: {
+                    sm: "absolute"
+                  },
+                  left: {
+                    sm: "0"
+                  }
                 }}
                 to={searchParams.get("returnUrl")}
                 component={Link}

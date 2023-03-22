@@ -1,9 +1,7 @@
-import { PluginDefinition, Task } from "@aut-labs-private/sdk";
+import { Task } from "@aut-labs-private/sdk";
 import {
   Badge,
   Box,
-  Button,
-  CircularProgress,
   Paper,
   Stack,
   Table,
@@ -33,6 +31,11 @@ import { TaskType } from "@aut-labs-private/sdk/dist/models/task";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useConfirmDialog } from "react-mui-confirm";
 import OverflowTooltip from "@components/OverflowTooltip";
+import AutLoading from "@components/AutLoading";
+import { useRemoveTaskFromQuestMutation } from "@api/onboarding.api";
+import ErrorDialog from "@components/Dialog/ErrorPopup";
+import LoadingDialog from "@components/Dialog/LoadingPopup";
+import { useEthers } from "@usedapp/core";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
@@ -50,14 +53,26 @@ const TaskStyledTableCell = styled(TableCell)(({ theme }) => ({
   }
 }));
 
-const taskStatses = {
+export const taskStatuses: any = {
   [TaskStatus.Created]: {
-    label: "Open",
+    label: "To Do",
+    color: "info"
+  },
+  [TaskStatus.Finished]: {
+    label: "Complete",
+    color: "success"
+  },
+  [TaskStatus.Submitted]: {
+    label: "Submitted",
+    color: "warning"
+  },
+  [TaskStatus.Taken]: {
+    label: "Taken",
     color: "info"
   }
 };
 
-const taskTypes = {
+export const taskTypes = {
   [TaskType.Open]: {
     pluginType: PluginDefinitionType.OnboardingOpenTaskPlugin,
     label: "Open Task"
@@ -98,31 +113,54 @@ const dateTypes = (start: number, end: number) => {
 };
 
 const TaskListItem = memo(
-  ({ row, isAdmin }: { row: Task; isAdmin: boolean }) => {
+  ({
+    row,
+    isAdmin,
+    canDelete
+  }: {
+    row: Task;
+    isAdmin: boolean;
+    canDelete: boolean;
+  }) => {
     const location = useLocation();
     const params = useParams<{ questId: string }>();
     const confirm = useConfirmDialog();
+    const [removeTask, { error, isError, isLoading, reset }] =
+      useRemoveTaskFromQuestMutation();
+
+    const { plugin, questOnboarding } = useGetAllPluginDefinitionsByDAOQuery(
+      null,
+      {
+        selectFromResult: ({ data }) => ({
+          questOnboarding: (data || []).find(
+            (p) =>
+              PluginDefinitionType.QuestOnboardingPlugin ===
+              p.pluginDefinitionId
+          ),
+          plugin: (data || []).find(
+            (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
+          )
+        })
+      }
+    );
 
     const confimDelete = () =>
       confirm({
         title: "Are you sure you want to delete this task?",
         onConfirm: () => {
-          console.log("Confimed");
-          // delete
+          removeTask({
+            task: row,
+            questId: +params.questId,
+            pluginTokenId: plugin.tokenId,
+            pluginAddress: plugin.pluginAddress,
+            onboardingQuestAddress: questOnboarding?.pluginAddress
+          });
         }
       });
 
-    const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
-      selectFromResult: ({ data }) => ({
-        plugin: (data || []).find(
-          (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
-        )
-      })
-    });
-
     const path = useMemo(() => {
       if (!plugin) return;
-      const stackType = plugin.metadata.properties.stack.type;
+      const stackType = plugin.metadata.properties.module.type;
       const stack = `modules/${stackType}`;
       return `${stack}/${PluginDefinitionType[plugin.pluginDefinitionId]}`;
     }, [plugin]);
@@ -131,6 +169,12 @@ const TaskListItem = memo(
       <StyledTableRow
         sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
       >
+        <ErrorDialog
+          handleClose={() => reset()}
+          open={isError}
+          message={error}
+        />
+        <LoadingDialog open={isLoading} message="Removing task..." />
         <TaskStyledTableCell component="th" scope="row">
           <span
             style={{
@@ -157,15 +201,18 @@ const TaskListItem = memo(
               >
                 <Tooltip title="View task details">
                   <BtnLink
-                    color="primary"
                     variant="subtitle2"
+                    sx={{
+                      color: "primary.light"
+                    }}
                     to={`/aut-dashboard/${path}/${row.taskId}`}
                     preserveParams
                     queryParams={{
-                      questPluginAddress: plugin?.pluginAddress,
+                      onboardingQuestAddress: plugin?.pluginAddress,
                       returnUrlLinkName: "Back to quest",
                       returnUrl: location?.pathname,
-                      questId: params.questId
+                      questId: params.questId,
+                      submitter: row?.submitter
                     }}
                     component={LinkWithQuery}
                   >
@@ -182,27 +229,26 @@ const TaskListItem = memo(
             />
           </span>
         </TaskStyledTableCell>
+        {!isAdmin && (
+          <TaskStyledTableCell align="right">
+            <CopyAddress address={row.creator} />
+            <BtnLink
+              color="primary.light"
+              variant="caption"
+              target="_blank"
+              href={`https://my.aut.id/${row.creator}`}
+            >
+              View profile
+            </BtnLink>
+          </TaskStyledTableCell>
+        )}
         <TaskStyledTableCell align="right">
-          <CopyAddress address={row.creator} />
-          <BtnLink
-            color="primary"
-            variant="caption"
-            target="_blank"
-            href={`https://my.aut.id/${row.creator}`}
-          >
-            View profile
-          </BtnLink>
-        </TaskStyledTableCell>
-        {/* <TaskStyledTableCell align="right">
-          {dateTypes(row.startDate, row.endDate)}
-        </TaskStyledTableCell> */}
-        <TaskStyledTableCell align="right">
-          <Chip {...taskStatses[row.status]} size="small" />
+          <Chip {...taskStatuses[row.status]} size="small" />
         </TaskStyledTableCell>
         <TaskStyledTableCell align="right">
           {taskTypes[row.taskType]?.label}
         </TaskStyledTableCell>
-        {isAdmin && (
+        {isAdmin && canDelete && (
           <TaskStyledTableCell align="right">
             <Tooltip title="Remove task">
               <IconButton onClick={confimDelete} color="error">
@@ -219,24 +265,27 @@ const TaskListItem = memo(
 interface TasksParams {
   isLoading: boolean;
   tasks: Task[];
+  canDelete?: boolean;
   isAdmin: boolean;
 }
 
-const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
+const Tasks = ({ isLoading, tasks, isAdmin, canDelete }: TasksParams) => {
   return (
     <Box>
       {isLoading ? (
-        <CircularProgress
-          sx={{ mt: 12 }}
-          className="spinner-center"
-          size="60px"
-        />
+        <AutLoading width="130px" height="130px" />
       ) : (
         <>
           {!!tasks?.length && (
             <TableContainer
               sx={{
-                minWidth: "700px",
+                minWidth: {
+                  sm: "700px"
+                },
+                width: {
+                  xs: "360px",
+                  sm: "unset"
+                },
                 borderRadius: "16px",
                 backgroundColor: "nightBlack.main",
                 borderColor: "divider",
@@ -246,6 +295,10 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
             >
               <Table
                 sx={{
+                  minWidth: {
+                    xs: "700px",
+                    sm: "unset"
+                  },
                   ".MuiTableBody-root > .MuiTableRow-root:hover": {
                     backgroundColor: "#ffffff0a"
                   }
@@ -254,19 +307,20 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
                 <TableHead>
                   <TableRow>
                     <TaskStyledTableCell>Name</TaskStyledTableCell>
-                    <TaskStyledTableCell align="right">
-                      Creator
-                    </TaskStyledTableCell>
-                    {/* <TaskStyledTableCell align="right">
-                      Time
-                    </TaskStyledTableCell> */}
+
+                    {!isAdmin && (
+                      <TaskStyledTableCell align="right">
+                        Creator
+                      </TaskStyledTableCell>
+                    )}
+
                     <TaskStyledTableCell align="right">
                       Status
                     </TaskStyledTableCell>
                     <TaskStyledTableCell align="right">
                       Task type
                     </TaskStyledTableCell>
-                    {isAdmin && (
+                    {isAdmin && canDelete && (
                       <TaskStyledTableCell align="right">
                         Action
                       </TaskStyledTableCell>
@@ -277,6 +331,7 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
                   {tasks?.map((row, index) => (
                     <TaskListItem
                       isAdmin={isAdmin}
+                      canDelete={canDelete}
                       key={`table-row-${index}`}
                       row={row}
                     />
@@ -291,7 +346,7 @@ const Tasks = ({ isLoading, tasks, isAdmin }: TasksParams) => {
               sx={{
                 display: "flex",
                 gap: "20px",
-                mt: 12,
+                pt: 12,
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center"

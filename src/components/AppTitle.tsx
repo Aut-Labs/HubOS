@@ -1,4 +1,4 @@
-import { Typography, TypographyProps } from "@mui/material";
+import { Stack, Typography, TypographyProps } from "@mui/material";
 
 const AppTitle = (props: TypographyProps) => {
   return (
@@ -8,6 +8,7 @@ const AppTitle = (props: TypographyProps) => {
       component="h1"
       variant="h1"
       color="white"
+      whiteSpace="nowrap"
       {...(props as any)}
     >
       <strong
@@ -17,7 +18,7 @@ const AppTitle = (props: TypographyProps) => {
       >
         Āut
       </strong>{" "}
-      Dashboard
+      Dashboard <Typography variant="body">(beta)</Typography>
     </Typography>
   );
 };

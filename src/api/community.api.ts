@@ -368,6 +368,32 @@ const getMembers = async (body, api: BaseQueryApi) => {
   };
 };
 
+const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
+  const sdk = AutSDK.getInstance();
+
+  const response = await sdk.daoExpander.contract.metadata.getMetadataUri();
+
+  if (!response.isSuccess) {
+    return {
+      error: response.errorMessage
+    };
+  }
+
+  const metadata = await fetchMetadata<Community>(
+    response.data,
+    environment.nftStorageUrl
+  );
+
+  const adminResponse = await sdk.daoExpander.contract.admins.getAdmins();
+  const community = new Community(metadata);
+  return {
+    data: {
+      community,
+      admin: adminResponse.data[0]
+    }
+  };
+};
+
 export const communityApi = createApi({
   reducerPath: "communityApi",
   baseQuery: async (args, api, extraOptions) => {
@@ -376,9 +402,9 @@ export const communityApi = createApi({
       return getMembers(body, api);
     }
 
-    // if (url === "createQuest") {
-    //   return createQuest(body, api);
-    // }
+    if (url === "getCommunity") {
+      return getCommunity(body, api);
+    }
     return {
       data: "Test"
     };
@@ -391,19 +417,22 @@ export const communityApi = createApi({
           url: "getAllMembers"
         };
       }
+    }),
+    getCommunity: builder.query<
+      {
+        community: Community;
+        admin: string;
+      },
+      void
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "getCommunity"
+        };
+      }
     })
-    // createQuest: builder.mutation<
-    //   Quest,
-    //   Partial<Quest & { pluginAddress: string }>
-    // >({
-    //   query: (body) => {
-    //     return {
-    //       body,
-    //       url: "createQuest"
-    //     };
-    //   }
-    // })
   })
 });
 
-export const { useGetAllMembersQuery } = communityApi;
+export const { useGetAllMembersQuery, useGetCommunityQuery } = communityApi;

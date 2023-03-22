@@ -6,8 +6,12 @@ import {
   CardContent,
   CardHeader,
   Container,
+  TableBody,
+  TableCell,
+  TableRow,
   Typography,
-  styled
+  styled,
+  tableCellClasses
 } from "@mui/material";
 import { CommunityData } from "@store/Community/community.reducer";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,69 +19,24 @@ import { setTitle } from "@store/ui-reducer";
 import { memo, useEffect } from "react";
 import { UserInfo } from "@auth/auth.reducer";
 import CopyAddress from "@components/CopyAddress";
-
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 
-const AutTable = styled("table")(({ theme }) => ({
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
   width: "100%",
-
-  tr: {
-    "&:first-of-type": {
-      td: {
-        borderTop: `1px solid ${theme.palette.divider}`
-      }
-    }
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover
   },
-
-  td: {
-    padding: "20px 0",
-    height: "32px",
-    borderTop: "0",
-
-    [theme.breakpoints.down("md")]: {
-      padding: "10px 5px"
-    },
-
-    "&:not(:first-of-type)": {
-      paddingLeft: "30px",
-      [theme.breakpoints.down("md")]: {
-        paddingLeft: "15px"
-      }
-    },
-    borderBottom: `1px solid ${theme.palette.divider}`
-  },
-
-  th: {
-    height: "32px",
-    padding: "20px 0px",
-
-    [theme.breakpoints.down("md")]: {
-      padding: "10px 5px"
-    },
-    "&:not(:first-of-type)": {
-      paddingLeft: "30px",
-      [theme.breakpoints.down("md")]: {
-        paddingLeft: "15px"
-      }
-    },
-    borderBottom: `1px solid ${theme.palette.divider}`
+  "&:last-child td, &:last-child th": {
+    border: 0
   }
 }));
 
-const userStats = [
-  {
-    title: "Your Interactions",
-    value: "0"
-  },
-  {
-    title: "Your Open Tasks",
-    value: "0"
-  },
-  {
-    title: "Total Completed Tasks",
-    value: "100"
+const TaskStyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}, &.${tableCellClasses.body}`]: {
+    color: theme.palette.common.white,
+    borderColor: theme.palette.divider
   }
-];
+}));
 
 export const CommitmentMessages = (value: number) => {
   switch (+value) {
@@ -110,84 +69,10 @@ const getGreeting = () => {
   return welcomeText;
 };
 
-function CommunityStatsValues(value, type) {
-  switch (type) {
-    case "commitment":
-      return (
-        <>
-          <Typography
-            variant="subtitle2"
-            color="white"
-            textAlign="end"
-            fontWeight="normal"
-            sx={{ pb: "5px", pr: "30px" }}
-          >
-            {`${value} - ${CommitmentMessages(value)}`}
-          </Typography>
-          {/* <Typography
-            variant="subtitle2"
-            color="white"
-            textAlign="end"
-            fontWeight="normal"
-            sx={{ pb: "5px", pr: "30px" }}
-          >
-            {`${value}/10`}
-          </Typography>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              alignItems: "flex-end",
-              paddingRight: "30px"
-            }}
-          >
-            <Typography
-              variant="caption"
-              textAlign="center"
-              color="white"
-              style={{
-                margin: "0"
-              }}
-            >
-              {CommitmentMessages(+value)}
-            </Typography>
-          </div> */}
-        </>
-      );
-    case "address":
-      return (
-        <div
-          style={{
-            paddingRight: "30px",
-            paddingBottom: "5px",
-            display: "flex",
-            justifyContent: "flex-end"
-          }}
-        >
-          <CopyAddress address={value} variant="subtitle2" />
-        </div>
-      );
-
-    default:
-      return (
-        <Typography
-          variant="subtitle2"
-          color="white"
-          textAlign="end"
-          fontWeight="normal"
-          sx={{ pb: "5px", pr: "30px" }}
-        >
-          {value}
-        </Typography>
-      );
-  }
-}
-
 const Dashboard = () => {
   const dispatch = useDispatch();
   const userInfo = useSelector(UserInfo);
   const community = useSelector(CommunityData);
-  // const match = useRouteMatch();
 
   useEffect(() => {
     dispatch(
@@ -199,34 +84,6 @@ const Dashboard = () => {
     );
   }, [dispatch, userInfo]);
 
-  const communityStats = [
-    {
-      title: "Beta Ranking",
-      type: "number",
-      value: "1"
-    },
-    {
-      title: "Total Members",
-      type: "number",
-      value: "20"
-    },
-    {
-      title: "Minimum Commitment",
-      type: "commitment",
-      value: community?.properties?.commitment
-    },
-    {
-      title: "Nova Address",
-      type: "address",
-      value: community?.properties?.address
-    },
-    {
-      title: "Legacy DAO",
-      type: "address",
-      value: community?.properties?.address
-    }
-  ];
-
   return (
     <Container
       maxWidth="sm"
@@ -235,7 +92,7 @@ const Dashboard = () => {
       <Card
         sx={{
           maxWidth: {
-            xs: "80%",
+            xs: "100%",
             md: "600px",
             xxl: "800px"
           },
@@ -291,10 +148,7 @@ const Dashboard = () => {
                       <SvgIcon component={EditPencil} />
                     </IconButton> */}
               </Box>
-              <CopyAddress
-                address={community.properties.address}
-                variant="subtitle2"
-              />
+              <CopyAddress address={community.properties.address} />
               <Box sx={{ display: "flex", flexDirection: "column" }}>
                 <Typography color="white" variant="body" sx={{ mb: "20px" }}>
                   {community.properties.market}
@@ -314,27 +168,83 @@ const Dashboard = () => {
             justifyContent: "space-between"
           }}
         >
-          <AutTable aria-label="table" cellSpacing="0">
-            <tbody>
-              {communityStats.map(({ title, value, type }, index) => (
-                <tr key={`row-key-${index}`}>
-                  <td>
-                    <Typography
-                      variant="subtitle2"
-                      fontWeight="normal"
-                      textAlign="start"
-                      color="white"
-                      sx={{ pb: "5px", pl: "30px" }}
-                    >
-                      {title}
-                    </Typography>
-                  </td>
-
-                  <td>{CommunityStatsValues(value, type)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </AutTable>
+          <TableBody
+            sx={{
+              display: "table",
+              ".MuiTableBody-root > .MuiTableRow-root:hover": {
+                backgroundColor: "#ffffff0a"
+              }
+            }}
+          >
+            <StyledTableRow>
+              <TaskStyledTableCell>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="normal"
+                  color="white"
+                >
+                  Beta Ranking
+                </Typography>
+              </TaskStyledTableCell>
+              <TaskStyledTableCell align="right">1</TaskStyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow>
+              <TaskStyledTableCell>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="normal"
+                  color="white"
+                >
+                  Total Members
+                </Typography>
+              </TaskStyledTableCell>
+              <TaskStyledTableCell align="right">22</TaskStyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow>
+              <TaskStyledTableCell>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="normal"
+                  color="white"
+                >
+                  Minimum Commitment
+                </Typography>
+              </TaskStyledTableCell>
+              <TaskStyledTableCell align="right">
+                {`${community?.properties?.commitment} - ${CommitmentMessages(
+                  community?.properties?.commitment
+                )}`}
+              </TaskStyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow>
+              <TaskStyledTableCell>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="normal"
+                  color="white"
+                >
+                  Nova Address
+                </Typography>
+              </TaskStyledTableCell>
+              <TaskStyledTableCell align="right">
+                <CopyAddress address={community?.properties?.address} />
+              </TaskStyledTableCell>
+            </StyledTableRow>
+            <StyledTableRow>
+              <TaskStyledTableCell>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="normal"
+                  color="white"
+                >
+                  Legacy DAO
+                </Typography>
+              </TaskStyledTableCell>
+              <TaskStyledTableCell align="right">
+                <CopyAddress address={community?.properties?.address} />
+              </TaskStyledTableCell>
+            </StyledTableRow>
+          </TableBody>
         </CardContent>
       </Card>
     </Container>

@@ -1,7 +1,13 @@
-import { Fade, LinearProgress } from "@mui/material";
+import { Fade, LinearProgress, SxProps, Theme } from "@mui/material";
 import { memo } from "react";
 
-const LoadingProgressBar = ({ isLoading }) => {
+const LoadingProgressBar = ({
+  isLoading,
+  sx = {}
+}: {
+  isLoading: boolean;
+  sx?: SxProps<Theme>;
+}) => {
   return (
     <Fade in={isLoading} unmountOnExit>
       <LinearProgress
@@ -9,7 +15,8 @@ const LoadingProgressBar = ({ isLoading }) => {
           position: "fixed",
           top: "72px",
           width: "100%",
-          left: 0
+          left: 0,
+          ...sx
         }}
       />
     </Fade>

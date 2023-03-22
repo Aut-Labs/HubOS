@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { Box, CssBaseline } from "@mui/material";
+import { Box } from "@mui/material";
 import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { useAppDispatch } from "@store/store.model";
 import SWSnackbar from "./components/snackbar";
@@ -9,7 +9,6 @@ import Web3DautConnect from "@api/ProviderFactory/web3-daut-connect";
 import { NetworkConfig } from "@api/ProviderFactory/network.config";
 import { environment } from "@api/environment";
 import { ethers } from "ethers";
-import { Network } from "@ethersproject/networks";
 import { DAppProvider, Config, MetamaskConnector } from "@usedapp/core";
 import { WalletConnectConnector } from "@usedapp/wallet-connect-connector";
 import { setNetworks } from "@store/WalletProvider/WalletProvider";
@@ -21,11 +20,12 @@ import GetStarted from "./pages/GetStarted/GetStarted";
 import AutLoading from "@components/AutLoading";
 import ErrorPage from "@components/ErrorPage";
 import Callback from "./pages/Oauth2Callback/Callback";
+import NetworkResolver from "./pages/PublicQuest/NetworkResolver";
 
 const generateConfig = (networks: NetworkConfig[]): Config => {
   const readOnlyUrls = networks.reduce((prev, curr) => {
     if (!curr.disabled) {
-      const network: Network = {
+      const network = {
         name: "mumbai",
         chainId: 80001,
         _defaultProvider: (providers) =>
@@ -39,23 +39,29 @@ const generateConfig = (networks: NetworkConfig[]): Config => {
 
   return {
     readOnlyUrls,
+    autoConnect: false,
+    // @ts-ignore
     networks: networks
       .filter((n) => !n.disabled)
-      .map(
-        (n) =>
-          ({
-            isLocalChain: false,
-            isTestChain: environment.networkEnv === "testing",
-            chainId: n.chainId,
-            chainName: n.network,
-            rpcUrl: n.rpcUrls[0],
-            nativeCurrency: n.nativeCurrency
-          } as any)
-      ),
+      .map((n) => ({
+        isLocalChain: false,
+        isTestChain: environment.networkEnv === "testing",
+        chainId: n.chainId,
+        chainName: n.network,
+        rpcUrl: n.rpcUrls[0],
+        nativeCurrency: n.nativeCurrency
+      })),
     gasLimitBufferPercentage: 50000,
     connectors: {
       metamask: new MetamaskConnector(),
       walletConnect: new WalletConnectConnector({
+        rpc: networks
+          .filter((n) => !n.disabled)
+          .reduce((prev, curr) => {
+            // eslint-disable-next-line prefer-destructuring
+            prev[curr.chainId] = curr.rpcUrls[0];
+            return prev;
+          }, {}),
         infuraId: "d8df2cb7844e4a54ab0a782f608749dd"
       })
     }
@@ -72,7 +78,8 @@ function App() {
 
   const returnUrl = useMemo(() => {
     if (!isAutheticated) return "/";
-    const shouldGoToDashboard = location.pathname === "/";
+    const shouldGoToDashboard =
+      location.pathname === "/" || !location.pathname.includes("aut-dashboard");
     const goTo = shouldGoToDashboard ? "/aut-dashboard" : location.pathname;
     const url = location.state?.from;
     return url || goTo;
@@ -115,6 +122,7 @@ function App() {
                   {!isAutheticated && (
                     <>
                       <Route path="/" element={<GetStarted />} />
+                      <Route path="/quest/*" element={<NetworkResolver />} />
                       <Route
                         path="*"
                         element={<Navigate to="/" state={{ from: location }} />}
@@ -127,10 +135,7 @@ function App() {
                         path="aut-dashboard/*"
                         element={<AutDashboardMain />}
                       />
-                      <Route
-                        path="*"
-                        element={<Navigate to={returnUrl} replace />}
-                      />
+                      <Route path="*" element={<Navigate to={returnUrl} />} />
                     </>
                   )}
                 </Routes>

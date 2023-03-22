@@ -15,6 +15,7 @@ import LoadingProgressBar from "@components/LoadingProgressBar";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { setTitle } from "@store/ui-reducer";
 import { useAppDispatch } from "@store/store.model";
+import AutLoading from "@components/AutLoading";
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -51,7 +52,7 @@ const Modules = () => {
   const myModules = useMemo(() => {
     return plugins.reduce(
       (prev, curr) => {
-        const stackType = curr?.metadata?.properties?.stack?.type;
+        const stackType = curr?.metadata?.properties?.module?.type;
         if (stackType && !prev[stackType] && stackType === "Onboarding") {
           prev[stackType] = true;
           prev.types.push(curr);
@@ -126,7 +127,7 @@ const Modules = () => {
         )}
 
         {isLoading ? (
-          <CircularProgress className="spinner-center" size="60px" />
+          <AutLoading width="130px" height="130px" />
         ) : (
           <>
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>

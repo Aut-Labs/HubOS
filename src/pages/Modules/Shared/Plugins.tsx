@@ -22,6 +22,7 @@ import { useSelector } from "react-redux";
 import { IsAdmin } from "@store/Community/community.reducer";
 import { Link, useSearchParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import AutLoading from "@components/AutLoading";
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -56,8 +57,8 @@ const Plugins = ({ definition }: StackParams) => {
         isFetching,
         plugins: (data || []).filter(
           (p) =>
-            p.metadata?.properties?.stack?.type ===
-            definition?.properties?.stack?.type
+            p.metadata?.properties?.module?.type ===
+            definition?.properties?.module?.type
         )
       })
     });
@@ -95,7 +96,7 @@ const Plugins = ({ definition }: StackParams) => {
               </Button>
             )}
             <Typography textAlign="center" color="white" variant="h3">
-              {definition.properties.stack.title}
+              {definition.properties.module.title}
               <Tooltip title="Refresh plugins">
                 <IconButton
                   size="medium"
@@ -135,7 +136,7 @@ const Plugins = ({ definition }: StackParams) => {
         </Box>
 
         {isLoading ? (
-          <CircularProgress className="spinner-center" size="60px" />
+          <AutLoading width="130px" height="130px" />
         ) : (
           <>
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>

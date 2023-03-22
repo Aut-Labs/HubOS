@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 import {
   useActivateOnboardingMutation,
+  useDeactivateOnboardingMutation,
   useGetAllOnboardingQuestsQuery
 } from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
@@ -16,10 +17,10 @@ import {
   TableHead,
   TableRow,
   Stack,
-  CircularProgress,
   IconButton,
   Tooltip,
-  Badge
+  Badge,
+  Chip
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -27,17 +28,16 @@ import { memo, useEffect, useMemo, useState } from "react";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import {
-  QuestFilters,
-  QuestListItem,
-  QuestStyledTableCell
-} from "./QuestShared";
+import { QuestListItem, QuestStyledTableCell } from "./QuestShared";
 import { useSelector } from "react-redux";
-import { IsAdmin } from "@store/Community/community.reducer";
+import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
 import { setTitle } from "@store/ui-reducer";
 import { useAppDispatch } from "@store/store.model";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
+import AutLoading from "@components/AutLoading";
+import { useEthers } from "@usedapp/core";
+import { useConfirmDialog } from "react-mui-confirm";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -47,6 +47,10 @@ const Quests = ({ plugin }: PluginParams) => {
   const dispatch = useAppDispatch();
   const isAdmin = useSelector(IsAdmin);
   const [search, setSearchState] = useState(null);
+  const { account } = useEthers();
+  const communityData = useSelector(CommunityData);
+  const confirm = useConfirmDialog();
+
   const {
     data: quests,
     isLoading,
@@ -59,11 +63,45 @@ const Quests = ({ plugin }: PluginParams) => {
 
   const [
     activateOnboarding,
-    { error, isError, data: quest, isLoading: isActivating, reset }
+    {
+      error: activateError,
+      isError: activateIsError,
+      isLoading: isActivating,
+      reset: activateReset
+    }
   ] = useActivateOnboardingMutation();
 
+  const [
+    deactivateOnboarding,
+    {
+      error: deactivateError,
+      isError: deactivateIsError,
+      isLoading: isDeactivating,
+      reset: deactivateReset
+    }
+  ] = useDeactivateOnboardingMutation();
+
+  const confimDeactivate = () =>
+    confirm({
+      title: "Are you sure you want to deactivate onboarding?",
+      confirmButtonText: "Deactivate",
+      onConfirm: () => {
+        deactivateOnboarding({
+          quests,
+          userAddress: account,
+          pluginAddress: plugin.pluginAddress
+        });
+      }
+    });
+
+  const isOnboardingActive = useMemo(() => {
+    if (!quests) return false;
+    const atLeastThreeQuests = quests.length >= 3;
+    return atLeastThreeQuests && quests?.every((q) => q.active);
+  }, [quests]);
+
   useEffect(() => {
-    dispatch(setTitle(`Quests`));
+    dispatch(setTitle(`Onboarding quest`));
   }, [dispatch]);
 
   const filteredQuests = useMemo(() => {
@@ -80,14 +118,32 @@ const Quests = ({ plugin }: PluginParams) => {
   return (
     <Container maxWidth="lg" sx={{ py: "20px" }}>
       <LoadingProgressBar isLoading={isFetching} />
-      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
-      <LoadingDialog open={isActivating} message="Activating onboarding..." />
+      <ErrorDialog
+        handleClose={() => activateReset()}
+        open={activateIsError}
+        message={activateError}
+      />
+      <ErrorDialog
+        handleClose={() => deactivateReset()}
+        open={deactivateIsError}
+        message={deactivateError}
+      />
+      <LoadingDialog
+        open={isActivating || isDeactivating}
+        message={
+          isActivating
+            ? "Launching onboarding..."
+            : "Deactivating onboarding..."
+        }
+      />
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          flex: 1,
-          position: "relative"
+          boxShadow: 1,
+          border: "2px solid",
+          borderColor: "divider",
+          borderRadius: "16px",
+          p: 3,
+          backgroundColor: "nightBlack.main"
         }}
       >
         <Typography textAlign="center" color="white" variant="h3">
@@ -107,6 +163,17 @@ const Quests = ({ plugin }: PluginParams) => {
             </IconButton>
           </Tooltip>
         </Typography>
+        {isOnboardingActive && (
+          <Box
+            sx={{
+              mt: 1,
+              display: "flex",
+              justifyContent: "center"
+            }}
+          >
+            <Chip color="success" label="ACTIVATED"></Chip>
+          </Box>
+        )}
         {!!quests?.length && (
           <Box
             sx={{
@@ -117,42 +184,75 @@ const Quests = ({ plugin }: PluginParams) => {
             }}
           >
             {/* <QuestFilters searchCallback={setSearchState} /> */}
-            <Stack direction="row" gap={2}>
+            <Stack
+              width="100%"
+              direction={{
+                sm: "row"
+              }}
+              justifyContent="flex-end"
+              alignItems={{
+                xs: "center"
+              }}
+              gap={2}
+            >
               {isAdmin && (
                 <>
-                  <Box>
-                    <Badge
-                      invisible={quests?.length < 3}
-                      badgeContent={
-                        <Tooltip title="During beta there is a maximum of 3 quests, one for each role.">
-                          <ErrorOutlineIcon color="error" />
-                        </Tooltip>
-                      }
-                    >
+                  {!isOnboardingActive ? (
+                    <>
+                      <Box>
+                        <Badge
+                          invisible={quests?.length < 3}
+                          badgeContent={
+                            <Tooltip title="During beta there is a maximum of 3 quests, one for each role.">
+                              <ErrorOutlineIcon color="error" />
+                            </Tooltip>
+                          }
+                        >
+                          <Button
+                            startIcon={<AddIcon />}
+                            disabled={quests?.length >= 3}
+                            variant="outlined"
+                            size="medium"
+                            color="primary"
+                            to="create"
+                            component={Link}
+                          >
+                            Create quest
+                          </Button>
+                        </Badge>
+                      </Box>
+
                       <Button
                         startIcon={<AddIcon />}
-                        disabled={quests?.length >= 3}
+                        disabled={quests?.length < 3}
                         variant="outlined"
                         size="medium"
                         color="primary"
-                        to={`create`}
-                        component={Link}
+                        onClick={() =>
+                          activateOnboarding({
+                            quests,
+                            userAddress: account,
+                            pluginAddress: plugin.pluginAddress
+                          })
+                        }
                       >
-                        Create quest
+                        Launch quest onboarding
                       </Button>
-                    </Badge>
-                  </Box>
-
-                  <Button
-                    startIcon={<AddIcon />}
-                    disabled={quests?.length < 3}
-                    variant="outlined"
-                    size="medium"
-                    color="primary"
-                    onClick={() => activateOnboarding(plugin.pluginAddress)}
-                  >
-                    Activate Quest onboarding
-                  </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        startIcon={<AddIcon />}
+                        disabled={quests?.length < 3}
+                        variant="outlined"
+                        size="medium"
+                        color="error"
+                        onClick={() => confimDeactivate()}
+                      >
+                        Deactivate onboarding
+                      </Button>
+                    </>
+                  )}
                 </>
               )}
             </Stack>
@@ -205,7 +305,7 @@ const Quests = ({ plugin }: PluginParams) => {
       )}
 
       {isLoading ? (
-        <CircularProgress className="spinner-center" size="60px" />
+        <AutLoading width="130px" height="130px" />
       ) : (
         <>
           {!!filteredQuests?.length && (
@@ -242,7 +342,7 @@ const Quests = ({ plugin }: PluginParams) => {
                     <QuestStyledTableCell align="right">
                       Status
                     </QuestStyledTableCell>
-                    {isAdmin && (
+                    {isAdmin && !isOnboardingActive && (
                       <QuestStyledTableCell align="right">
                         Action
                       </QuestStyledTableCell>
@@ -253,6 +353,7 @@ const Quests = ({ plugin }: PluginParams) => {
                   {filteredQuests?.map((row, index) => (
                     <QuestListItem
                       isAdmin={isAdmin}
+                      daoAddress={communityData?.properties?.address}
                       pluginAddress={plugin?.pluginAddress}
                       key={`table-row-${index}`}
                       row={row}

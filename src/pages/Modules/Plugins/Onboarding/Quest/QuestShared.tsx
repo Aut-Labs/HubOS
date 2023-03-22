@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { Quest, Task } from "@aut-labs-private/sdk";
 import {
   Box,
@@ -22,11 +23,12 @@ import { useSelector } from "react-redux";
 import { AutSelectField } from "@theme/field-select-styles";
 import { AutTextField } from "@theme/field-text-styles";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { addDays } from "date-fns";
 import Tasks from "../../Task/Shared/Tasks";
 import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
 import LinkWithQuery from "@components/LinkWithQuery";
 import OverflowTooltip from "@components/OverflowTooltip";
+import CopyLink from "@components/CopyLink";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
@@ -44,37 +46,15 @@ export const QuestStyledTableCell = styled(TableCell)(({ theme }) => ({
   }
 }));
 
-const dateTypes = (date: number, durationInDays: number) => {
-  const startDate = new Date(date);
-  const endDate = addDays(startDate, durationInDays);
-
-  return (
-    <Stack alignItems="flex-end">
-      <Typography color="white" variant="body">
-        {durationInDays} {durationInDays === 1 ? "day" : "days"}
-      </Typography>
-      <Stack direction="row" flexWrap="wrap">
-        <Stack direction="row">
-          <Typography color="success.main">
-            {startDate.toDateString()}
-          </Typography>
-          <Typography mx={0.5} color="white">
-            -
-          </Typography>
-        </Stack>
-        <Typography color="error">{endDate.toDateString()}</Typography>
-      </Stack>
-    </Stack>
-  );
-};
-
 export const QuestListItem = memo(
   ({
     row,
     pluginAddress,
+    daoAddress,
     isAdmin
   }: {
     row: Quest;
+    daoAddress: string;
     pluginAddress: string;
     isAdmin: boolean;
   }) => {
@@ -117,13 +97,21 @@ export const QuestListItem = memo(
                 <Tooltip title="View quest and submissions">
                   <BtnLink
                     component="button"
-                    color="primary"
+                    color="primary.light"
                     variant="subtitle2"
-                    onClick={() => navigate(`${row.questId}`)}
+                    onClick={() =>
+                      navigate({
+                        pathname: `${row.questId}`,
+                        search: `onboardingQuestAddress=${pluginAddress}`
+                      })
+                    }
                   >
                     {row.metadata?.name || "n/a"}
                   </BtnLink>
                 </Tooltip>
+                <CopyLink
+                  link={`${window?.location.origin}/quest/?questId=${row.questId}&onboardingQuestAddress=${pluginAddress}&daoAddress=${daoAddress}`}
+                />
               </Badge>
             </Box>
             <OverflowTooltip
@@ -141,7 +129,7 @@ export const QuestListItem = memo(
           </QuestStyledTableCell>
         )}
         <QuestStyledTableCell align="right">
-          {dateTypes(row.startDate, row.durationInDays)}
+          {row.durationInDays} days
         </QuestStyledTableCell>
         <QuestStyledTableCell align="right">
           <Chip
@@ -151,16 +139,9 @@ export const QuestListItem = memo(
           />
         </QuestStyledTableCell>
 
-        {isAdmin && (
+        {isAdmin && !row.active && (
           <QuestStyledTableCell align="right">
-            <Badge
-              invisible={row.tasksCount < 5}
-              badgeContent={
-                <Tooltip title="During beta there is a maximum of 5 tasks per quest">
-                  <ErrorOutlineIcon color="error" />
-                </Tooltip>
-              }
-            >
+            <Stack gap={1}>
               <Button
                 sx={{
                   minWidth: "120px"
@@ -168,11 +149,12 @@ export const QuestListItem = memo(
                 color="offWhite"
                 size="small"
                 variant="outlined"
+                startIcon={<AddIcon />}
                 disabled={row.tasksCount >= 5}
                 to="/aut-dashboard/modules/Task"
                 preserveParams
                 queryParams={{
-                  questPluginAddress: pluginAddress,
+                  onboardingQuestAddress: pluginAddress,
                   returnUrlLinkName: "Back to quest",
                   returnUrl: location.pathname,
                   questId: row.questId.toString()
@@ -181,7 +163,28 @@ export const QuestListItem = memo(
               >
                 Add task
               </Button>
-            </Badge>
+              <Button
+                sx={{
+                  minWidth: "120px"
+                }}
+                color="offWhite"
+                size="small"
+                variant="outlined"
+                startIcon={<EditIcon />}
+                disabled={row.tasksCount >= 5}
+                to="create"
+                preserveParams
+                queryParams={{
+                  onboardingQuestAddress: pluginAddress,
+                  returnUrlLinkName: "Back to quest",
+                  returnUrl: location.pathname,
+                  questId: row.questId.toString()
+                }}
+                component={LinkWithQuery}
+              >
+                Edit quest
+              </Button>
+            </Stack>
           </QuestStyledTableCell>
         )}
       </StyledTableRow>
@@ -271,8 +274,9 @@ export const QuestFilters = memo(
 
 interface QuestTasksParams {
   isLoading: boolean;
-  questPluginAddress: string;
+  onboardingQuestAddress: string;
   isAdmin: boolean;
+  isSubmission: boolean;
   questId: number;
   tasks: Task[];
 }
@@ -281,7 +285,8 @@ export const QuestTasks = memo(
   ({
     isLoading,
     tasks,
-    questPluginAddress,
+    onboardingQuestAddress,
+    isSubmission,
     questId,
     isAdmin
   }: QuestTasksParams) => {
@@ -309,64 +314,12 @@ export const QuestTasks = memo(
 
     return (
       <Box>
-        {!!tasks?.length && (
-          <Box
-            sx={{
-              display: "flex",
-              mt: 2,
-              alignItems: "center",
-              justifyContent: "flex-end"
-            }}
-          >
-            {/* <Stack direction="row" alignItems="center" spacing={2}>
-              <AutTextField
-                variant="standard"
-                color="offWhite"
-                onChange={debouncedChangeHandler}
-                placeholder="Name"
-                sx={{
-                  width: {
-                    sm: "200px"
-                  }
-                }}
-              />
-            </Stack> */}
-            <Badge
-              invisible={tasks?.length < 5}
-              badgeContent={
-                <Tooltip title="During beta there is a maximum of 5 tasks per quest">
-                  <ErrorOutlineIcon color="error" />
-                </Tooltip>
-              }
-            >
-              <Button
-                startIcon={<AddIcon />}
-                variant="outlined"
-                disabled={tasks?.length >= 5}
-                size="medium"
-                color="primary"
-                to="/aut-dashboard/modules/Task"
-                preserveParams
-                queryParams={{
-                  questPluginAddress,
-                  returnUrlLinkName: "Back to quest",
-                  returnUrl: location.pathname,
-                  questId: questId.toString()
-                }}
-                component={LinkWithQuery}
-              >
-                Add task
-              </Button>
-            </Badge>
-          </Box>
-        )}
-
         {!isLoading && !!tasks?.length && !filteredTasks?.length && (
           <Box
             sx={{
               display: "flex",
               gap: "20px",
-              mt: 12,
+              pt: 12,
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center"

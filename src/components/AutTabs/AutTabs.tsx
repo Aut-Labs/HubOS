@@ -33,12 +33,13 @@ function TabPanel(props: any) {
     >
       {value === index && (
         <Box
+          className="tab-content"
           sx={{
             p: "10px 30px 0 30px",
             borderTopRightRadius: "16px",
-            boxShadow: 3,
+            // boxShadow: 3,
             border: "2px solid",
-            bgcolor: "nightBlack.main",
+            // bgcolor: "nightBlack.main",
             borderColor: "divider",
             borderBottomRightRadius: "16px",
             borderBottomLeftRadius: "16px",
@@ -86,6 +87,7 @@ function AutTabs(props: AutTabsParams) {
               display: "none"
             },
             ".MuiButtonBase-root": {
+              boxShadow: 3,
               height: {
                 xs: "45px",
                 xxl: "70px"

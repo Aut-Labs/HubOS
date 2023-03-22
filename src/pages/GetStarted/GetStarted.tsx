@@ -1,7 +1,9 @@
-import { Box, Button, Container, styled, Typography } from "@mui/material";
-import { ReactComponent as Trifold } from "@assets/trifold.svg";
+import { Box, Container, styled, Typography } from "@mui/material";
 import AppTitle from "@components/AppTitle";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
+import BubbleTopRight from "@assets/bubble_top_right.png";
+import BubbleBottomLeft from "@assets/bubble_bottom_left.png";
+import TryFoldImage from "@assets/tryfold.png";
 import { useOAuth } from "@components/Oauth2/oauth2";
 
 const Grid = styled("div")(({ theme }) => {
@@ -19,6 +21,34 @@ const Grid = styled("div")(({ theme }) => {
   };
 });
 
+const BottomLeftBubble = styled("img")(({ theme }) => ({
+  position: "fixed",
+  width: "400px",
+  height: "400px",
+  left: "-200px",
+  bottom: "-200px",
+  [theme.breakpoints.up("md")]: {
+    width: "700px",
+    height: "700px",
+    left: "-350px",
+    bottom: "-350px"
+  }
+}));
+
+const TopRightBubble = styled("img")(({ theme }) => ({
+  position: "fixed",
+  width: "400px",
+  height: "400px",
+  top: "-200px",
+  right: "-200px",
+  [theme.breakpoints.up("md")]: {
+    width: "700px",
+    height: "700px",
+    top: "-350px",
+    right: "-350px"
+  }
+}));
+
 const Content = styled("div")(({ theme }) => {
   return {
     flex: 1,
@@ -30,7 +60,7 @@ const Content = styled("div")(({ theme }) => {
   };
 });
 
-const StyledTrifold = styled(Trifold)(({ theme }) => {
+const StyledTrifold = styled("img")(({ theme }) => {
   return {
     maxWidth: "500px",
     [theme.breakpoints.up("xxl")]: {
@@ -81,6 +111,8 @@ const GetStarted = () => {
 
   return (
     <Container maxWidth="lg" sx={{ flexGrow: 1, height: "100%" }}>
+      <BottomLeftBubble loading="lazy" src={BubbleBottomLeft} />
+      <TopRightBubble loading="lazy" src={BubbleTopRight} />
       <Grid>
         <Content>
           <Box
@@ -164,7 +196,7 @@ const GetStarted = () => {
           </Button>
         </Content>
         <ImageWrapper>
-          <StyledTrifold></StyledTrifold>
+          <StyledTrifold loading="lazy" src={TryFoldImage}></StyledTrifold>
         </ImageWrapper>
       </Grid>
     </Container>

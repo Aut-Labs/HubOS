@@ -1,12 +1,9 @@
 import { ethers } from "ethers";
-import {
-  CommunityCallContractEventType,
-  PollsContractEventType,
-  TasksContractEventType,
-  Web3CommunityCallProvider,
-  Web3PollsProvider,
-  Web3TasksProvider
-} from "@aut-labs-private/abi-types";
+// import {
+//   CommunityCallContractEventType,
+//   PollsContractEventType,
+//   TasksContractEventType
+// } from "@aut-labs-private/abi-types";
 import { Task, TaskStatus } from "@store/model";
 import axios from "axios";
 import { dateToUnix } from "@utils/date-format";
@@ -148,8 +145,8 @@ export const getCalls = callThunkProvider(
 
 export const addActivityTask = taskThunkProvider(
   {
-    type: "aut-dashboard/activities/task/add",
-    event: TasksContractEventType.TaskCreated
+    type: "aut-dashboard/activities/task/add"
+    // event: TasksContractEventType.TaskCreated
   },
   (thunkApi) => contractAddress(thunkApi, ActivityTypes.Tasks),
   async (contract, task, { getState, dispatch }) => {
@@ -217,8 +214,8 @@ export const addActivityTask = taskThunkProvider(
 
 export const takeActivityTask = taskThunkProvider(
   {
-    type: "aut-dashboard/activities/task/take",
-    event: TasksContractEventType.TaskTaken
+    type: "aut-dashboard/activities/task/take"
+    // event: TasksContractEventType.TaskTaken
   },
   (thunkApi) => contractAddress(thunkApi, ActivityTypes.Tasks),
   async (contract, requestData) => {
@@ -233,8 +230,8 @@ export const takeActivityTask = taskThunkProvider(
 
 export const finalizeActivityTask = taskThunkProvider(
   {
-    type: "aut-dashboard/activities/task/finalize",
-    event: TasksContractEventType.TaskFinalized
+    type: "aut-dashboard/activities/task/finalize"
+    // event: TasksContractEventType.TaskFinalized
   },
   (thunkApi) => contractAddress(thunkApi, ActivityTypes.Tasks),
   async (contract, requestData) => {
@@ -249,8 +246,8 @@ export const finalizeActivityTask = taskThunkProvider(
 
 export const submitActivityTask = taskThunkProvider(
   {
-    type: "aut-dashboard/activities/task/submit",
-    event: TasksContractEventType.TaskSubmitted
+    type: "aut-dashboard/activities/task/submit"
+    // event: TasksContractEventType.TaskSubmitted
   },
   (thunkApi) => contractAddress(thunkApi, ActivityTypes.Tasks),
   async (contract, { task, values }) => {
@@ -270,8 +267,8 @@ export const submitActivityTask = taskThunkProvider(
 
 export const addGroupCall = callThunkProvider(
   {
-    type: "aut-dashboard/activities/group-call/add",
-    event: CommunityCallContractEventType.CommunityCallCreated
+    type: "aut-dashboard/activities/group-call/add"
+    // event: CommunityCallContractEventType.CommunityCallCreated
   },
   (thunkApi) => contractAddress(thunkApi, ActivityTypes.Gatherings),
   async (contract, callData, { getState, dispatch }) => {
@@ -371,8 +368,8 @@ export const publishPoll = (poll) => {
 
 export const addPoll = pollsThunkProvider(
   {
-    type: "aut-dashboard/activities/poll/add",
-    event: PollsContractEventType.PollCreated
+    type: "aut-dashboard/activities/poll/add"
+    // event: PollsContractEventType.PollCreated
   },
   (thunkApi) => contractAddress(thunkApi, ActivityTypes.Polls),
   async (contract, callData, { getState }) => {

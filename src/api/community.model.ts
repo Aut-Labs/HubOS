@@ -6,6 +6,7 @@ import {
   Role,
   RoleSet
 } from "@aut-labs-private/sdk/dist/models/dao";
+import { AutSocial } from "./api.model";
 
 export const MarketTemplates = [
   {
@@ -35,6 +36,8 @@ export const findRoleName = (roleId: string, rolesSets: RoleSet[]) => {
 export class CommunityProperties extends DAOProperties {
   address?: string;
 
+  socials: AutSocial[];
+
   userData?: {
     role: string;
     roleName?: string;
@@ -55,9 +58,10 @@ export class CommunityProperties extends DAOProperties {
       this.commitment = data.commitment;
       this.rolesSets = data.rolesSets;
       this.address = data.address;
+      this.socials = data.socials;
       this.additionalProps = data.additionalProps;
       this.userData =
-        JSON.parse(JSON.stringify(data.userData)) ||
+        JSON.parse(JSON.stringify(data?.userData || {})) ||
         ({} as typeof this.userData);
 
       if (this.userData?.role) {
