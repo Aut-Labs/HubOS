@@ -178,26 +178,6 @@ const GetStarted = () => {
             There is no community like yours - Set your own Standard. Opt Āut.
           </Typography>
           <DautPlaceholder />
-          <Button
-            onClick={() => authenticateTwitter()}
-            sx={{
-              width: "140px",
-              height: "48px"
-            }}
-            type="button"
-            size="square"
-            color="offWhite"
-            variant="outlined"
-          >
-            Verify
-            {/* {handleVerified ? (
-              "VERIFIED"
-            ) : authenticating ? (
-              <CircularProgress />
-            ) : (
-              "Verify"
-            )} */}
-          </Button>
         </Content>
         <ImageWrapper>
           <StyledTrifold loading="lazy" src={TryFoldImage}></StyledTrifold>
