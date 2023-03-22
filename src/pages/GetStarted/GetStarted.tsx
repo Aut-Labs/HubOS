@@ -4,6 +4,7 @@ import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
 import BubbleTopRight from "@assets/bubble_top_right.png";
 import BubbleBottomLeft from "@assets/bubble_bottom_left.png";
 import TryFoldImage from "@assets/tryfold.png";
+import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 
 const Grid = styled("div")(({ theme }) => {
   return {
@@ -89,6 +90,9 @@ const GetStarted = () => {
       <TopRightBubble loading="lazy" src={BubbleTopRight} />
       <Grid>
         <Content>
+          <DiscordServerVerificationPopup
+            open={true}
+          ></DiscordServerVerificationPopup>
           <Box
             sx={{
               display: "flex",
