@@ -58,7 +58,7 @@ export const useOAuth = () => {
             debugger;
 
             setAuthenticating(false);
-            onSuccess(response.data.results);
+            onSuccess(response.data);
           }
         }
       } catch (genericError) {

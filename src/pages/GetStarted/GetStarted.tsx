@@ -85,40 +85,12 @@ const ImageWrapper = styled("div")(({ theme }) => {
 });
 
 const GetStarted = () => {
-  const { getAuth, authenticating } = useOAuth();
-
-  const authenticateTwitter = () => {
-    getAuth(
-      (data) => {
-        console.log(data);
-        // if (data.screen_name === getValues("daoTwitter")) {
-        //   dispatch(
-        //     integrateUpdateCommunity({
-        //       handleVerified: true
-        //     })
-        //   );
-        // } else {
-        //   setError("daoTwitter", {
-        //     type: "validationFailed",
-        //     message: `Twitter handle doesn't match the one used to validate.`
-        //   });
-        // }
-      },
-      (e) => {
-        console.log(e);
-      }
-    );
-  };
-
   return (
     <Container maxWidth="lg" sx={{ flexGrow: 1, height: "100%" }}>
       <BottomLeftBubble loading="lazy" src={BubbleBottomLeft} />
       <TopRightBubble loading="lazy" src={BubbleTopRight} />
       <Grid>
         <Content>
-          <DiscordServerVerificationPopup
-            open={true}
-          ></DiscordServerVerificationPopup>
           <Box
             sx={{
               display: "flex",
