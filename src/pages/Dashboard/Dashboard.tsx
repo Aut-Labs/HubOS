@@ -11,23 +11,53 @@ import {
   TableRow,
   Typography,
   styled,
-  tableCellClasses
+  tableCellClasses,
+  Stack,
+  Button,
+  CircularProgress
 } from "@mui/material";
-import { CommunityData } from "@store/Community/community.reducer";
+import { allRoles, CommunityData } from "@store/Community/community.reducer";
 import { useDispatch, useSelector } from "react-redux";
 import { setTitle } from "@store/ui-reducer";
 import { memo, useEffect } from "react";
 import { UserInfo } from "@auth/auth.reducer";
 import CopyAddress from "@components/CopyAddress";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
+import { Link } from "react-router-dom";
+import { useGetAllMembersQuery } from "@api/community.api";
+import LoadingProgressBar from "@components/LoadingProgressBar";
+
+const StyledTableTitle = styled("div")(({ theme }) => ({
+  alignItems: "flex-start",
+  display: "flex",
+  marginBottom: "10px"
+}));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   width: "100%",
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover
+  // "&:nth-of-type(odd)": {
+  //   backgroundColor: theme.palette.action.hover
+  // },
+  "&:first-child td, &:first-child th": {
+    borderTop: `2px solid ${theme.palette.divider}`
   },
   "&:last-child td, &:last-child th": {
     border: 0
+  }
+}));
+
+const StyledMembersTableRow = styled(TableRow)(({ theme }) => ({
+  width: "100%",
+  "&:last-of-type": {
+    backgroundColor: theme.palette.nightBlack.light
+  },
+  border: 0,
+  "&:first-child td, &:first-child th": {
+    borderTop: `2px solid ${theme.palette.divider}`
+  },
+
+  "&:last-child td, &:last-child th": {
+    borderBottom: `2px solid ${theme.palette.divider}`
   }
 }));
 
@@ -35,6 +65,14 @@ const TaskStyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}, &.${tableCellClasses.body}`]: {
     color: theme.palette.common.white,
     borderColor: theme.palette.divider
+  }
+}));
+
+const MembersStyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}, &.${tableCellClasses.body}`]: {
+    color: theme.palette.common.white,
+    border: 0,
+    lineHeight: "20px"
   }
 }));
 
@@ -73,6 +111,38 @@ const Dashboard = () => {
   const dispatch = useDispatch();
   const userInfo = useSelector(UserInfo);
   const community = useSelector(CommunityData);
+  const roles = useSelector(allRoles);
+
+  const { data, isLoading, isFetching } = useGetAllMembersQuery(null, {
+    refetchOnMountOrArgChange: true,
+    skip: false
+  });
+
+  const membersTableData = {
+    totalMembers: 0
+  };
+
+  let averageCommitment = 0;
+
+  if (data && roles && data?.length) {
+    membersTableData.totalMembers = data.length;
+    roles.forEach((role) => {
+      const membersByRole = data.reduce(function (n, member) {
+        return n + +(member?.properties?.role.id == role.id);
+      }, 0);
+
+      console.log(membersByRole);
+
+      membersTableData[role.id] = membersByRole;
+    });
+
+    const commitmentSum = data.reduce(
+      (prev, curr) => prev + +curr.properties.commitment,
+      0
+    );
+
+    averageCommitment = Math.round(commitmentSum / data.length);
+  }
 
   useEffect(() => {
     dispatch(
@@ -86,20 +156,25 @@ const Dashboard = () => {
 
   return (
     <Container
-      maxWidth="sm"
-      sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}
+      sx={{
+        flexGrow: 1,
+        display: "flex",
+        alignItems: "center",
+        maxWidth: {
+          xs: "sm",
+          sm: "100%"
+        }
+      }}
     >
+      <LoadingProgressBar isLoading={isFetching} />
       <Card
         sx={{
-          maxWidth: {
-            xs: "100%",
-            md: "600px",
-            xxl: "800px"
-          },
           width: "100%",
           margin: "0 auto",
           display: "flex",
           flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
           background: "transparent",
           border: "none",
           boxShadow: "none"
@@ -109,11 +184,11 @@ const Dashboard = () => {
           avatar={
             <Avatar
               sx={{
-                height: {
+                width: {
                   xs: "120px",
                   xxl: "300px"
                 },
-                width: "100%"
+                height: "100%"
               }}
               variant="square"
               srcSet={ipfsCIDToHttpUrl(community?.image as string)}
@@ -125,6 +200,18 @@ const Dashboard = () => {
               xs: "column",
               md: "row"
             },
+            maxWidth: {
+              xs: "100%",
+              sm: "400px",
+              md: "600px",
+              xxl: "800px"
+            },
+
+            ".MuiCardContent-root": {
+              padding: "0px 16px"
+            },
+
+            width: "100%",
             ".MuiAvatar-root": {
               backgroundColor: "transparent"
             }
@@ -165,86 +252,234 @@ const Dashboard = () => {
             flex: 1,
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between"
+            justifyContent: "space-between",
+            width: {
+              xs: "90%",
+              xl: "80%"
+            }
           }}
         >
-          <TableBody
+          <Box
             sx={{
-              display: "table",
-              ".MuiTableBody-root > .MuiTableRow-root:hover": {
-                backgroundColor: "#ffffff0a"
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                md: "1fr 1fr"
+              },
+              gridGap: {
+                xs: "30px",
+                lg: "50px"
+              },
+              maxWidth: {
+                xs: "600px",
+                md: "90%"
               }
             }}
           >
-            <StyledTableRow>
-              <TaskStyledTableCell>
-                <Typography
-                  variant="subtitle2"
-                  fontWeight="normal"
-                  color="white"
-                >
-                  Beta Ranking
+            <Stack
+              sx={{
+                marginBottom: {
+                  xs: "30px",
+                  md: "40px",
+                  xxl: "50px"
+                }
+              }}
+            >
+              <StyledTableTitle>
+                <Typography color="white" variant="subtitle1">
+                  Roles in your Nova
                 </Typography>
-              </TaskStyledTableCell>
-              <TaskStyledTableCell align="right">1</TaskStyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow>
-              <TaskStyledTableCell>
-                <Typography
-                  variant="subtitle2"
-                  fontWeight="normal"
-                  color="white"
+              </StyledTableTitle>
+
+              <TableBody
+                sx={{
+                  display: "table",
+                  ".MuiTableBody-root > .MuiTableRow-root:hover": {
+                    backgroundColor: "#ffffff0a"
+                  },
+                  position: "relative"
+                }}
+              >
+                {roles.map((role) => (
+                  <StyledMembersTableRow>
+                    <MembersStyledTableCell>
+                      <Typography
+                        variant="subtitle2"
+                        fontWeight="normal"
+                        color="white"
+                      >
+                        {role?.roleName}
+                      </Typography>
+                    </MembersStyledTableCell>
+                    <MembersStyledTableCell align="right">
+                      {!isLoading && membersTableData?.[role.id]}
+                    </MembersStyledTableCell>
+                  </StyledMembersTableRow>
+                ))}
+                {isLoading && (
+                  <CircularProgress
+                    className="spinner-center"
+                    size="60px"
+                    style={{ top: "calc(50% - 30px)" }}
+                  />
+                )}
+
+                <StyledMembersTableRow>
+                  <MembersStyledTableCell>
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight="normal"
+                      color="white"
+                    >
+                      Total Members
+                    </Typography>
+                  </MembersStyledTableCell>
+                  <MembersStyledTableCell align="right">
+                    {!isLoading && membersTableData?.totalMembers}
+                  </MembersStyledTableCell>
+                </StyledMembersTableRow>
+              </TableBody>
+              <Stack
+                sx={{
+                  display: "flex",
+                  justifyContent: {
+                    xs: "center",
+                    md: "flex-start"
+                  },
+                  alignItems: {
+                    xs: "center",
+                    md: "flex-start"
+                  },
+                  marginTop: {
+                    xs: "20px",
+                    md: "20px",
+                    xxl: "30px"
+                  }
+                }}
+              >
+                <Button
+                  sx={{
+                    height: "50px"
+                  }}
+                  type="button"
+                  color="offWhite"
+                  variant="outlined"
+                  size="medium"
+                  component={Link}
+                  // to="https://leaderboard.aut.id"
+                  to="http://176.34.149.248:4001/"
+                  target="_blank"
                 >
-                  Total Members
+                  See your Nova Ranking
+                </Button>
+              </Stack>
+            </Stack>
+
+            <Stack>
+              <StyledTableTitle>
+                <Typography color="white" variant="subtitle1">
+                  Your Community Data
                 </Typography>
-              </TaskStyledTableCell>
-              <TaskStyledTableCell align="right">22</TaskStyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow>
-              <TaskStyledTableCell>
-                <Typography
-                  variant="subtitle2"
-                  fontWeight="normal"
-                  color="white"
-                >
-                  Minimum Commitment
-                </Typography>
-              </TaskStyledTableCell>
-              <TaskStyledTableCell align="right">
-                {`${community?.properties?.commitment} - ${CommitmentMessages(
-                  community?.properties?.commitment
-                )}`}
-              </TaskStyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow>
-              <TaskStyledTableCell>
-                <Typography
-                  variant="subtitle2"
-                  fontWeight="normal"
-                  color="white"
-                >
-                  Nova Address
-                </Typography>
-              </TaskStyledTableCell>
-              <TaskStyledTableCell align="right">
-                <CopyAddress address={community?.properties?.address} />
-              </TaskStyledTableCell>
-            </StyledTableRow>
-            <StyledTableRow>
-              <TaskStyledTableCell>
-                <Typography
-                  variant="subtitle2"
-                  fontWeight="normal"
-                  color="white"
-                >
-                  Legacy DAO
-                </Typography>
-              </TaskStyledTableCell>
-              <TaskStyledTableCell align="right">
-                <CopyAddress address={community?.properties?.address} />
-              </TaskStyledTableCell>
-            </StyledTableRow>
-          </TableBody>
+              </StyledTableTitle>
+              <TableBody
+                sx={{
+                  display: "table",
+                  ".MuiTableBody-root > .MuiTableRow-root:hover": {
+                    backgroundColor: "#ffffff0a"
+                  }
+                }}
+              >
+                <StyledTableRow>
+                  <TaskStyledTableCell>
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight="normal"
+                      color="white"
+                    >
+                      Average Commitment
+                    </Typography>
+                  </TaskStyledTableCell>
+                  <TaskStyledTableCell
+                    align="right"
+                    style={{ position: "relative" }}
+                  >
+                    {isLoading ? (
+                      <CircularProgress
+                        className="spinner-center"
+                        size="20px"
+                        style={{
+                          top: "calc(50% - 10px)",
+                          left: "calc(50% + 10px)"
+                        }}
+                      />
+                    ) : (
+                      `${averageCommitment} - ${CommitmentMessages(
+                        averageCommitment
+                      )}`
+                    )}
+                  </TaskStyledTableCell>
+                </StyledTableRow>
+                <StyledTableRow>
+                  <TaskStyledTableCell>
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight="normal"
+                      color="white"
+                    >
+                      Minimum Commitment
+                    </Typography>
+                  </TaskStyledTableCell>
+                  <TaskStyledTableCell align="right">
+                    {`${
+                      community?.properties?.commitment
+                    } - ${CommitmentMessages(
+                      community?.properties?.commitment
+                    )}`}
+                  </TaskStyledTableCell>
+                </StyledTableRow>
+                <StyledTableRow>
+                  <TaskStyledTableCell>
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight="normal"
+                      color="white"
+                    >
+                      Nova Address
+                    </Typography>
+                  </TaskStyledTableCell>
+                  <TaskStyledTableCell align="right">
+                    <CopyAddress address={community?.properties?.address} />
+                  </TaskStyledTableCell>
+                </StyledTableRow>
+
+                <StyledTableRow>
+                  <TaskStyledTableCell>
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight="normal"
+                      color="white"
+                    >
+                      Legacy DAO
+                    </Typography>
+                  </TaskStyledTableCell>
+                  <TaskStyledTableCell align="right">
+                    {community?.properties?.additionalProps
+                      ?.legacyDaoAddress ? (
+                      // TODO: Replace with correct property reflecting the Legacy Dao Address
+                      <CopyAddress
+                        address={
+                          community?.properties?.additionalProps
+                            ?.legacyDaoAddress
+                        }
+                      />
+                    ) : (
+                      "N/A"
+                    )}
+                  </TaskStyledTableCell>
+                </StyledTableRow>
+              </TableBody>
+            </Stack>
+          </Box>
         </CardContent>
       </Card>
     </Container>
