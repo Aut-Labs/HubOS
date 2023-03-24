@@ -1,5 +1,6 @@
 import { environment } from "@api/environment";
 import axios from "axios";
+import { finishDraft } from "immer";
 import { useCallback, useState, useRef } from "react";
 
 const POPUP_HEIGHT = 700;
@@ -28,6 +29,7 @@ const cleanup = (intervalRef, popupRef, handleMessageListener) => {
 
 export const useOAuth = () => {
   const [authenticating, setAuthenticating] = useState(false);
+  const [finsihedFlow, setFinishedFlow] = useState(false);
   const popupRef = useRef<Window>();
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
 
@@ -55,13 +57,14 @@ export const useOAuth = () => {
                 code: message.data.payload.code
               }
             );
-            debugger;
-
             setAuthenticating(false);
+            clearInterval(intervalRef.current);
+            popupRef.current.close();
             onSuccess(response.data);
           }
         }
       } catch (genericError) {
+        onFailure(genericError);
         console.error(genericError);
       }
     }
@@ -77,8 +80,9 @@ export const useOAuth = () => {
         setAuthenticating(false);
         clearInterval(intervalRef.current);
         window.removeEventListener("message", handleMessageListener);
+        onFailure();
       }
-    }, 250);
+    }, 550);
 
     return () => {
       setAuthenticating(false);

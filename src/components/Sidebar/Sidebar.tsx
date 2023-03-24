@@ -171,7 +171,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
         </Toolbar>
       </AppBar>
 
-      {!isDiscordVerified && (
+      {true && (
         <AppBar
           sx={{
             top: `${toolbarHeight}px`,

@@ -153,24 +153,20 @@ export const updateDiscordSocials = createAsyncThunk(
   "community/update",
   async (args: UpdateDiscordData, { rejectWithValue }) => {
     const sdk = AutSDK.getInstance();
-    debugger;
     const updatedCommunity = Community.updateCommunity(args.community);
     const uri = await sdk.client.storeAsBlob(updatedCommunity);
 
-    debugger;
     console.log("New metadata: ->", ipfsCIDToHttpUrl(uri));
     const response = await sdk.autID.contract.setMetadataUri(uri);
 
-    debugger;
     if (response.isSuccess) {
-      debugger;
-      const autIdData = JSON.parse(window.localStorage.getItem("aut-data"));
+      const autIdData = JSON.parse(window.sessionStorage.getItem("aut-data"));
       let foundSocial = false;
-      for (let i = 0; i < autIdData.communities.length; i++) {
+      for (let i = 0; i < autIdData.properties.communities.length; i++) {
         if (foundSocial) {
           break;
         }
-        const community = autIdData.communities[i];
+        const community = autIdData.properties.communities[i];
         if (community.name === args.community.name)
           for (let i = 0; i < community.properties.socials.length; i++) {
             const social = community.properties.socials[i];
@@ -181,6 +177,7 @@ export const updateDiscordSocials = createAsyncThunk(
             }
           }
       }
+      window.sessionStorage.setItem("aut-data", JSON.stringify(autIdData));
       return args.community;
     }
     return rejectWithValue(response?.errorMessage);

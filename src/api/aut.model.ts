@@ -8,8 +8,8 @@ import { CommitmentMessages } from "@utils/misc";
 export const socialUrls = {
   discord: {
     hidePrefix: true,
-    placeholder: "name#1234",
-    prefix: "https://discord.com/users/"
+    placeholder: "inviteLInk",
+    prefix: ""
   },
   github: {
     prefix: "https://github.com/",
