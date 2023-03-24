@@ -368,8 +368,6 @@ const OpenTask = ({ plugin }: PluginParams) => {
     }
   );
 
-  console.log(submission, "submission");
-
   return (
     <Container
       maxWidth="lg"
@@ -384,7 +382,7 @@ const OpenTask = ({ plugin }: PluginParams) => {
     >
       {task ? (
         <>
-          <TaskDetails task={task} />
+          <TaskDetails task={submission || task} />
 
           {!isAdmin && (
             <UserSubmitContent

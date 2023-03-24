@@ -127,7 +127,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       title: "",
       description: "",
       durationInDays: 3,
-      startDate: addMinutes(new Date(), 5),
+      startDate: addMinutes(new Date(), 20),
       role: null
     }
   });
@@ -171,8 +171,6 @@ const CreateQuest = ({ plugin }: PluginParams) => {
   const onSubmit = async () => {
     const values = getValues();
     const startDate = Math.floor(new Date(values.startDate).getTime() / 1000);
-
-    debugger;
     if (quest?.questId) {
       updateQuest({
         ...quest,

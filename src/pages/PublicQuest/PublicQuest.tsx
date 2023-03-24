@@ -32,8 +32,7 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
       theme.palette.grey[theme.palette.mode === "light" ? 200 : 800]
   },
   [`& .${linearProgressClasses.bar}`]: {
-    borderRadius: "30px",
-    backgroundColor: theme.palette.primary.main
+    borderRadius: "30px"
   }
 }));
 
@@ -183,6 +182,9 @@ const PublicQuest = () => {
                 </Typography>
                 <BorderLinearProgress
                   variant="determinate"
+                  color={
+                    completedTasks === tasks?.length ? "success" : "primary"
+                  }
                   value={(completedTasks / tasks.length) * 100}
                 />
                 <Box
@@ -215,7 +217,12 @@ const PublicQuest = () => {
             </Typography>
           )}
 
-          <Tasks isLoading={isLoadingTasks} tasks={tasks} />
+          <Tasks
+            hasAppliedForQuest={!!appliedQuest}
+            quest={quest}
+            isLoading={isLoadingTasks}
+            tasks={tasks}
+          />
         </>
       )}
     </Container>

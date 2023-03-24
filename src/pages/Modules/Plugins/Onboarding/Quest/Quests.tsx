@@ -38,6 +38,7 @@ import LoadingDialog from "@components/Dialog/LoadingPopup";
 import AutLoading from "@components/AutLoading";
 import { useEthers } from "@usedapp/core";
 import { useConfirmDialog } from "react-mui-confirm";
+import InfoIcon from "@mui/icons-material/Info";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -147,7 +148,7 @@ const Quests = ({ plugin }: PluginParams) => {
         }}
       >
         <Typography textAlign="center" color="white" variant="h3">
-          Onboarding quests
+          Onboarding Quests
           <Tooltip title="Refresh quests">
             <IconButton
               size="medium"
@@ -217,27 +218,42 @@ const Quests = ({ plugin }: PluginParams) => {
                             to="create"
                             component={Link}
                           >
-                            Create quest
+                            Create an Onboarding Quest
                           </Button>
                         </Badge>
                       </Box>
 
-                      <Button
-                        startIcon={<AddIcon />}
-                        disabled={quests?.length < 3}
-                        variant="outlined"
-                        size="medium"
-                        color="primary"
-                        onClick={() =>
-                          activateOnboarding({
-                            quests,
-                            userAddress: account,
-                            pluginAddress: plugin.pluginAddress
-                          })
-                        }
-                      >
-                        Launch quest onboarding
-                      </Button>
+                      <Box>
+                        <Badge
+                          invisible={quests?.length >= 3}
+                          badgeContent={
+                            <Tooltip title="You need 3 active quests to launch.">
+                              <InfoIcon
+                                sx={{
+                                  color: "offWhite.main"
+                                }}
+                              />
+                            </Tooltip>
+                          }
+                        >
+                          <Button
+                            startIcon={<AddIcon />}
+                            disabled={quests?.length < 3}
+                            variant="outlined"
+                            size="medium"
+                            color="primary"
+                            onClick={() =>
+                              activateOnboarding({
+                                quests,
+                                userAddress: account,
+                                pluginAddress: plugin.pluginAddress
+                              })
+                            }
+                          >
+                            Launch quest onboarding
+                          </Button>
+                        </Badge>
+                      </Box>
                     </>
                   ) : (
                     <>
@@ -272,7 +288,7 @@ const Quests = ({ plugin }: PluginParams) => {
           }}
         >
           <Typography color="rgb(107, 114, 128)" variant="subtitle2">
-            You have not created any onboarding quest...
+            You have not created any onboarding quests...
           </Typography>
           <Button
             startIcon={<AddIcon />}
@@ -282,7 +298,7 @@ const Quests = ({ plugin }: PluginParams) => {
             to={`create`}
             component={Link}
           >
-            Create you first quest
+            Create your first quest
           </Button>
         </Box>
       )}
