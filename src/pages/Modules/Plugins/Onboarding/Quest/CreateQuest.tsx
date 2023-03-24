@@ -28,8 +28,8 @@ import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import { addMinutes, getUnixTime } from "date-fns";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
+import { addMinutes } from "date-fns";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
@@ -127,7 +127,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       title: "",
       description: "",
       durationInDays: 3,
-      startDate: addMinutes(new Date(), 30),
+      startDate: addMinutes(new Date(), 20),
       role: null
     }
   });
@@ -170,14 +170,14 @@ const CreateQuest = ({ plugin }: PluginParams) => {
 
   const onSubmit = async () => {
     const values = getValues();
-
+    const startDate = Math.floor(new Date(values.startDate).getTime() / 1000);
     if (quest?.questId) {
       updateQuest({
         ...quest,
         pluginAddress: plugin.pluginAddress,
         role: values.role,
         durationInDays: values.durationInDays,
-        startDate: getUnixTime(new Date(values.startDate)),
+        startDate,
         metadata: {
           name:
             values.title || roles.find((r) => r.id === values.role)?.roleName,
@@ -190,7 +190,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         pluginAddress: plugin.pluginAddress,
         role: values.role,
         durationInDays: values.durationInDays,
-        startDate: getUnixTime(new Date(values.startDate)),
+        startDate,
         metadata: {
           name:
             values.title || roles.find((r) => r.id === values.role)?.roleName,

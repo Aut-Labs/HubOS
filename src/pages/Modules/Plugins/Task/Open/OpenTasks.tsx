@@ -5,14 +5,7 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { FormHelperText } from "@components/Fields";
 import { StepperButton } from "@components/Stepper";
-import {
-  Box,
-  Button,
-  Container,
-  InputAdornment,
-  Stack,
-  Typography
-} from "@mui/material";
+import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
 import { memo } from "react";
@@ -21,7 +14,6 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { dateToUnix } from "@utils/date-format";
 import { addMinutes } from "date-fns";
-import { countWords } from "@utils/helpers";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 
@@ -226,10 +218,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
               name="title"
               control={control}
               rules={{
-                required: true,
-                validate: {
-                  maxWords: (v: string) => countWords(v) <= 6
-                }
+                required: true
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
@@ -248,9 +237,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                         value={value}
                         name={name}
                         errors={formState.errors}
-                      >
-                        <span>{6 - countWords(value)}/6 words left</span>
-                      </FormHelperText>
+                      />
                     }
                   />
                 );

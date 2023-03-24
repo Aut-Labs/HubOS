@@ -614,6 +614,26 @@ export const onboardingApi = createApi({
       },
       providesTags: ["Quest"]
     }),
+    getAllTasksPerQuest: builder.query<
+      {
+        tasks: Task[];
+        submissions: Task[];
+      },
+      {
+        questId: number;
+        userAddress: string;
+        isAdmin: boolean;
+        pluginAddress: string;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "getAllTasksPerQuest"
+        };
+      },
+      providesTags: ["Tasks"]
+    }),
     hasUserCompletedQuest: builder.query<
       Quest,
       {
@@ -629,7 +649,7 @@ export const onboardingApi = createApi({
           url: "hasUserCompletedQuest"
         };
       },
-      providesTags: ["Quest"]
+      providesTags: []
     }),
     activateOnboarding: builder.mutation<
       boolean,
@@ -752,26 +772,6 @@ export const onboardingApi = createApi({
         }
       }
     }),
-    getAllTasksPerQuest: builder.query<
-      {
-        tasks: Task[];
-        submissions: Task[];
-      },
-      {
-        questId: number;
-        userAddress: string;
-        isAdmin: boolean;
-        pluginAddress: string;
-      }
-    >({
-      query: (body) => {
-        return {
-          body,
-          url: "getAllTasksPerQuest"
-        };
-      },
-      providesTags: ["Tasks"]
-    }),
     createTaskPerQuest: builder.mutation<
       Task,
       {
@@ -788,7 +788,7 @@ export const onboardingApi = createApi({
           url: "createTaskPerQuest"
         };
       },
-      invalidatesTags: ["Tasks"]
+      invalidatesTags: ["Tasks", "Quests"]
     }),
     removeTaskFromQuest: builder.mutation<
       Task,
@@ -806,7 +806,7 @@ export const onboardingApi = createApi({
           url: "removeTaskFromQuest"
         };
       },
-      invalidatesTags: ["Tasks"]
+      invalidatesTags: ["Tasks", "Quests"]
     }),
     submitTask: builder.mutation<
       Task,
@@ -823,7 +823,7 @@ export const onboardingApi = createApi({
           url: "submitTask"
         };
       },
-      invalidatesTags: ["Tasks"]
+      invalidatesTags: ["Tasks", "Quest"]
     }),
     finalizeTask: builder.mutation<
       Task,

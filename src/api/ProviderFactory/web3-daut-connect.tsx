@@ -153,7 +153,7 @@ function Web3DautConnect({
         }}
         id="d-aut"
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
-        dao-expander="0x78c97539CC63ac311a246E70AF0e24e9047ebC48"
+        // dao-expander="0xb5413A2A7A83bAe2a8A8B8AAD10980fe9C067751"
         // dao-expander={
         //   searchParams.get(RequiredQueryParams.DaoAddress) ||
         //   daoAddress ||

@@ -40,7 +40,8 @@ const QuestInfo = ({
   const [appliedQuest, setAppliedQuest] = useState(null);
   const [cache, setCache] = useState(null);
   const confirm = useConfirmDialog();
-  const [hasUserCompletedQuest] = useLazyHasUserCompletedQuestQuery();
+  const [hasUserCompletedQuest, { data: isQuestComplete }] =
+    useLazyHasUserCompletedQuestQuery();
   const [apply, { isLoading: isApplying, isError, error, reset, isSuccess }] =
     useApplyForQuestMutation();
 
@@ -67,6 +68,22 @@ const QuestInfo = ({
         });
       }
     });
+
+  useEffect(() => {
+    if (isQuestComplete) {
+      const start = async () => {
+        try {
+          const cacheResult = await getCache(CacheTypes.UserPhases);
+          cacheResult.list[1].status = 1;
+          await updateCache(cacheResult);
+          setCache(cacheResult);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      start();
+    }
+  }, [isQuestComplete]);
 
   useEffect(() => {
     if (withdrawIsSuccess) {
