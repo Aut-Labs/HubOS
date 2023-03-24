@@ -254,8 +254,7 @@ const Dashboard = () => {
             flexDirection: "column",
             justifyContent: "space-between",
             width: {
-              xs: "90%",
-              xl: "80%"
+              xs: "90%"
             }
           }}
         >
