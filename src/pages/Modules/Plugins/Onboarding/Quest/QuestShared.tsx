@@ -176,7 +176,7 @@ export const QuestListItem = memo(
                 preserveParams
                 queryParams={{
                   onboardingQuestAddress: pluginAddress,
-                  returnUrlLinkName: "Back to quest",
+                  returnUrlLinkName: "Back to quests",
                   returnUrl: location.pathname,
                   questId: row.questId.toString()
                 }}

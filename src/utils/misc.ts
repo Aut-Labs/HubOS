@@ -27,7 +27,7 @@ export const CommitmentMessages = (value: number) => {
     case 2:
     case 3:
     case 4:
-      return "gm gm 😪";
+      return "gm gm ☕";
     case 5:
     case 6:
     case 7:

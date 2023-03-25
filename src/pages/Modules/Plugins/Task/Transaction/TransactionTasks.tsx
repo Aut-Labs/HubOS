@@ -56,7 +56,7 @@ const TaskSuccess = ({ pluginId, reset }) => {
         }}
       >
         <Typography align="center" color="white" variant="h2" component="div">
-          Success! Join Discord task has been created and deployed on the
+          Success! Transaction task has been created and deployed on the
           Blockchain 🎉
         </Typography>
 
@@ -233,10 +233,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
               name="title"
               control={control}
               rules={{
-                required: true,
-                validate: {
-                  maxWords: (v: string) => countWords(v) <= 6
-                }
+                required: true
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
@@ -255,9 +252,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                         value={value}
                         name={name}
                         errors={formState.errors}
-                      >
-                        <span>{6 - countWords(value)}/6 words left</span>
-                      </FormHelperText>
+                      />
                     }
                   />
                 );
@@ -268,8 +263,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
               name="description"
               control={control}
               rules={{
-                required: true,
-                maxLength: 280
+                required: true
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
@@ -289,11 +283,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                         value={value}
                         name={name}
                         errors={formState.errors}
-                      >
-                        <span>
-                          {280 - (value?.length || 0)}/280 characters left
-                        </span>
-                      </FormHelperText>
+                      />
                     }
                   />
                 );

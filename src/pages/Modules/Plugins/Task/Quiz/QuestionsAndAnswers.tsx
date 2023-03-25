@@ -14,9 +14,20 @@ import {
 } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { memo, useState } from "react";
-import { useFieldArray, Controller, useWatch, Control } from "react-hook-form";
+import {
+  useFieldArray,
+  Controller,
+  useWatch,
+  Control,
+  useFormState
+} from "react-hook-form";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import { FormHelperText } from "@components/Fields";
+
+const errorTypes = {
+  uniqueQuestion: `Question should be unique`
+};
 
 interface AnswersParams {
   control: Control<any, any>;
@@ -24,7 +35,7 @@ interface AnswersParams {
 }
 
 const Answers = memo(({ control, questionIndex }: AnswersParams) => {
-  const { fields, update } = useFieldArray({
+  const { fields } = useFieldArray({
     control,
     name: `questions[${questionIndex}].answers`
   });
@@ -34,7 +45,10 @@ const Answers = memo(({ control, questionIndex }: AnswersParams) => {
     control
   });
 
-  console.log("values: ", values);
+  const formState = useFormState({
+    name: `questions[${questionIndex}].answers`,
+    control
+  });
 
   return (
     <GridBox>
@@ -67,6 +81,14 @@ const Answers = memo(({ control, questionIndex }: AnswersParams) => {
                     value={value || ""}
                     onChange={onChange}
                     placeholder={`Answer ${index + 1}`}
+                    helperText={
+                      <FormHelperText
+                        errorTypes={errorTypes}
+                        value={value}
+                        name={name}
+                        errors={formState.errors}
+                      />
+                    }
                   />
                 );
               }}
@@ -175,6 +197,11 @@ const QuestionsAndAnswers = ({ control }) => {
     name: "questions"
   });
 
+  const values = useWatch({
+    name: `questions`,
+    control
+  });
+
   return (
     <Stack
       direction="column"
@@ -191,7 +218,7 @@ const QuestionsAndAnswers = ({ control }) => {
     >
       {fields.map((field, index) => (
         <Card
-          key={`questions.${index}.question`}
+          key={`questions[${index}].question`}
           sx={{
             bgcolor: "nightBlack.main",
             borderColor: "divider",
@@ -220,12 +247,26 @@ const QuestionsAndAnswers = ({ control }) => {
           />
           <CardContent>
             <Controller
-              name={`questions.${index}.question`}
+              name={`questions[${index}].question`}
               control={control}
               rules={{
-                required: true
+                required: true,
+                validate: {
+                  uniqueQuestion: (v) => {
+                    const counts = {
+                      [v]: v
+                    };
+                    const count = values.reduce((prev, curr) => {
+                      if (counts[curr.question] === curr.question) {
+                        prev += 1;
+                      }
+                      return prev;
+                    }, 0);
+                    return count === 0;
+                  }
+                }
               }}
-              render={({ field: { name, value, onChange } }) => {
+              render={({ formState, field: { name, value, onChange } }) => {
                 return (
                   <AutTextField
                     variant="standard"
@@ -238,12 +279,36 @@ const QuestionsAndAnswers = ({ control }) => {
                     value={value || ""}
                     onChange={onChange}
                     placeholder="Question"
+                    helperText={
+                      <FormHelperText
+                        errorTypes={errorTypes}
+                        value={value}
+                        name={name}
+                        errors={formState.errors}
+                      />
+                    }
                   />
                 );
               }}
             />
 
             <Answers control={control} questionIndex={index} />
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end"
+              }}
+            >
+              <Typography
+                className="text-secondary"
+                mt={2}
+                textAlign="end"
+                color="white"
+                variant="body1"
+              >
+                Tick the box next to the correct answer(s)
+              </Typography>
+            </Box>
           </CardContent>
         </Card>
       ))}
@@ -268,4 +333,4 @@ const QuestionsAndAnswers = ({ control }) => {
   );
 };
 
-export default memo(QuestionsAndAnswers);
+export default QuestionsAndAnswers;

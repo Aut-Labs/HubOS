@@ -257,9 +257,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                         value={value}
                         name={name}
                         errors={formState.errors}
-                      >
-                        <span>{6 - countWords(value)}/6 words left</span>
-                      </FormHelperText>
+                      />
                     }
                   />
                 );
@@ -270,8 +268,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
               name="description"
               control={control}
               rules={{
-                required: true,
-                maxLength: 280
+                required: true
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
@@ -291,11 +288,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                         value={value}
                         name={name}
                         errors={formState.errors}
-                      >
-                        <span>
-                          {280 - (value?.length || 0)}/280 characters left
-                        </span>
-                      </FormHelperText>
+                      />
                     }
                   />
                 );

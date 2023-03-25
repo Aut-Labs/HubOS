@@ -26,6 +26,7 @@ import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import { Link } from "react-router-dom";
 import { useGetAllMembersQuery } from "@api/community.api";
 import LoadingProgressBar from "@components/LoadingProgressBar";
+import { CommitmentMessages } from "@utils/misc";
 
 const StyledTableTitle = styled("div")(({ theme }) => ({
   alignItems: "flex-start",
@@ -75,27 +76,6 @@ const MembersStyledTableCell = styled(TableCell)(({ theme }) => ({
     lineHeight: "20px"
   }
 }));
-
-export const CommitmentMessages = (value: number) => {
-  switch (+value) {
-    case 1:
-      return `Just lurking 👀`;
-    case 2:
-    case 3:
-    case 4:
-      return "gm gm ☕";
-    case 5:
-    case 6:
-    case 7:
-      return "Trusted seed 🌱";
-    case 8:
-    case 9:
-    case 10:
-      return `Soulbound ⛓️`;
-    default:
-      return `Minimum Commitment Level for new Members.`;
-  }
-};
 
 const getGreeting = () => {
   const hour = new Date().getHours();

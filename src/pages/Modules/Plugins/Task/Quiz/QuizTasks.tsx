@@ -52,8 +52,7 @@ const TaskSuccess = ({ pluginId, reset }) => {
         }}
       >
         <Typography align="center" color="white" variant="h2" component="div">
-          Success! Join Discord task has been created and deployed on the
-          Blockchain 🎉
+          Success! Quiz task has been created and deployed on the Blockchain 🎉
         </Typography>
 
         <Box
@@ -104,13 +103,15 @@ const QuizTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const { account: userAddress } = useEthers();
   const { control, handleSubmit, getValues, formState } = useForm({
-    mode: "onChange",
+    mode: "all",
     defaultValues: {
       title: "",
       description: "",
       questions: [emptyQuestion]
     }
   });
+
+  // console.log(formState, "parent - formState---");
 
   const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
     useCreateTaskPerQuestMutation();
@@ -245,10 +246,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
               name="title"
               control={control}
               rules={{
-                required: true,
-                validate: {
-                  maxWords: (v: string) => countWords(v) <= 6
-                }
+                required: true
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
@@ -268,11 +266,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
                         name={name}
                         errors={formState.errors}
                       >
-                        {!value ? (
-                          <span>e.g. Community Manager Quiz</span>
-                        ) : (
-                          <span>{6 - countWords(value)}/6 words left</span>
-                        )}
+                        <span>e.g. Community Manager Quiz</span>
                       </FormHelperText>
                     }
                   />

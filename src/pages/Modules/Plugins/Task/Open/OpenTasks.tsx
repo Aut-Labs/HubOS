@@ -48,8 +48,7 @@ const TaskSuccess = ({ pluginId, reset }) => {
         }}
       >
         <Typography align="center" color="white" variant="h2" component="div">
-          Success! Join Discord task has been created and deployed on the
-          Blockchain 🎉
+          Success! Open task has been created and deployed on the Blockchain 🎉
         </Typography>
 
         <Box
@@ -248,8 +247,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
               name="description"
               control={control}
               rules={{
-                required: true,
-                maxLength: 280
+                required: true
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
@@ -269,11 +267,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                         value={value}
                         name={name}
                         errors={formState.errors}
-                      >
-                        <span>
-                          {280 - (value?.length || 0)}/280 characters left
-                        </span>
-                      </FormHelperText>
+                      />
                     }
                   />
                 );

@@ -24,6 +24,12 @@ export default {
     dark: "#b9b9bf",
     contrastText: "#000000"
   },
+  autGrey: {
+    main: "rgb(107, 114, 128)",
+    light: "rgb(136, 142, 153)",
+    dark: "rgb(74, 79, 89)",
+    contrastText: "#fff"
+  },
   nightBlack: {
     main: "#262626",
     light: "#4e4e4e",

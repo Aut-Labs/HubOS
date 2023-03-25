@@ -22,6 +22,36 @@ const defaultErrorTypes = {
   required: "Field is required!"
 };
 
+function extractObject(obj, prop) {
+  if (!obj || !Object.keys(obj).length) return false;
+  // Split the property string into an array of keys
+  const keys = prop.split(".");
+
+  if (keys.length === 1) {
+    return obj[prop];
+  }
+
+  // Loop through each key to access the nested object
+  let nestedObj = obj;
+  for (let i = 0; i < keys.length; i++) {
+    try {
+      const regex = /\[(\d+)\]/;
+      if (regex.test(keys[i])) {
+        const [key, index] = regex.exec(keys[i]);
+        const childProp = keys[i].replace(key, "");
+        nestedObj = nestedObj[childProp][+index];
+      } else {
+        nestedObj = nestedObj[keys[i]];
+      }
+    } catch (error) {
+      // console.log(error);
+    }
+  }
+
+  // Return the nested object
+  return nestedObj;
+}
+
 export function FormHelperText({
   errors,
   name,
@@ -29,8 +59,9 @@ export function FormHelperText({
   children = null,
   value
 }: FormHelperTextProps) {
-  if (errors[name]) {
-    const { type } = errors[name];
+  const obj = extractObject(errors, name);
+  if (obj) {
+    const type = obj?.type;
     const types = {
       ...defaultErrorTypes,
       ...(errorTypes || {})

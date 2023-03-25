@@ -23,13 +23,21 @@ import { allRoles } from "@store/Community/community.reducer";
 import { AutSelectField } from "@theme/field-select-styles";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams
+} from "react-router-dom";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { addMinutes } from "date-fns";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import LinkWithQuery from "@components/LinkWithQuery";
+import AddIcon from "@mui/icons-material/Add";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
@@ -41,9 +49,16 @@ interface PluginParams {
   plugin: PluginDefinition;
 }
 
-const QuestSuccess = ({ newQuestId, existingQuestId }) => {
+const QuestSuccess = ({ newQuestId, existingQuestId, pluginAddress }) => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const path = useMemo(() => {
+    if (existingQuestId) {
+      return location.pathname.replaceAll("/create", `/${existingQuestId}`);
+    }
+    return location.pathname.replaceAll("/create", `/${newQuestId}`);
+  }, [location.pathname]);
 
   return (
     <Container
@@ -62,7 +77,7 @@ const QuestSuccess = ({ newQuestId, existingQuestId }) => {
         }}
       >
         <Typography align="center" color="white" variant="h2" component="div">
-          Success! Your Quest call has been{" "}
+          Success! Your Onboarding Quest call has been{" "}
           {existingQuestId ? "edited" : "created"} and deployed on the
           Blockchain 🎉
         </Typography>
@@ -78,26 +93,26 @@ const QuestSuccess = ({ newQuestId, existingQuestId }) => {
             sx={{
               my: pxToRem(50)
             }}
-            disabled
-            type="submit"
-            variant="outlined"
-            size="medium"
             color="offWhite"
+            size="small"
+            variant="outlined"
+            startIcon={<AddIcon />}
+            to="/aut-dashboard/modules/Task"
+            queryParams={{
+              onboardingQuestAddress: pluginAddress,
+              returnUrlLinkName: "Back to quest",
+              returnUrl: path,
+              questId: (newQuestId || existingQuestId).toString()
+            }}
+            component={LinkWithQuery}
           >
-            Add Tasks
+            Add task
           </Button>
-
           <Button
             sx={{
               my: pxToRem(50)
             }}
-            onClick={() =>
-              navigate(
-                `${location.pathname.replaceAll("/create", "")}/${
-                  newQuestId || existingQuestId
-                }`
-              )
-            }
+            onClick={() => navigate(path)}
             type="submit"
             variant="outlined"
             size="medium"
@@ -216,9 +231,10 @@ const CreateQuest = ({ plugin }: PluginParams) => {
 
   return (
     <>
-      {createIsSuccess || updateIsSuccess ? (
+      {!createIsSuccess && !updateIsSuccess ? (
         <QuestSuccess
           existingQuestId={quest?.questId}
+          pluginAddress={plugin.pluginAddress}
           newQuestId={newQuest?.questId}
         />
       ) : (
@@ -248,15 +264,39 @@ const CreateQuest = ({ plugin }: PluginParams) => {
               flexDirection: "column",
               flex: 1,
               mb: 4,
-              position: "relative"
+              position: "relative",
+              mx: "auto",
+              width: "100%"
             }}
           >
-            <Typography textAlign="center" color="white" variant="h3">
-              {quest?.questId
-                ? "Editing onboarding quest"
-                : "Creating onboarding quest"}
-            </Typography>
+            <Stack alignItems="center" justifyContent="center">
+              {quest?.questId && (
+                <Button
+                  startIcon={<ArrowBackIcon />}
+                  color="offWhite"
+                  sx={{
+                    position: {
+                      sm: "absolute"
+                    },
+                    left: {
+                      sm: "0"
+                    }
+                  }}
+                  to={searchParams.get("returnUrl")}
+                  component={Link}
+                >
+                  {searchParams.get("returnUrlLinkName") || "Back"}
+                </Button>
+              )}
+
+              <Typography textAlign="center" color="white" variant="h3">
+                {quest?.questId
+                  ? "Editing onboarding quest"
+                  : "Creating onboarding quest"}
+              </Typography>
+            </Stack>
           </Box>
+
           <Stack
             direction="column"
             gap={4}
@@ -385,8 +425,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
               name="description"
               control={control}
               rules={{
-                required: true,
-                maxLength: 280
+                required: true
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
@@ -406,11 +445,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
                         value={value}
                         name={name}
                         errors={formState.errors}
-                      >
-                        <span>
-                          {280 - (value?.length || 0)}/280 characters left
-                        </span>
-                      </FormHelperText>
+                      />
                     }
                   />
                 );
@@ -418,7 +453,11 @@ const CreateQuest = ({ plugin }: PluginParams) => {
             />
 
             <StepperButton
-              label={quest?.questId ? "Edit Quest" : "Create Quest"}
+              label={
+                quest?.questId
+                  ? "Edit Onboarding Quest"
+                  : "Create Onboarding Quest"
+              }
               disabled={!formState.isValid}
             />
           </Stack>
