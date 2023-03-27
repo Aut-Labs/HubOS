@@ -231,7 +231,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
 
   return (
     <>
-      {!createIsSuccess && !updateIsSuccess ? (
+      {createIsSuccess || updateIsSuccess ? (
         <QuestSuccess
           existingQuestId={quest?.questId}
           pluginAddress={plugin.pluginAddress}
