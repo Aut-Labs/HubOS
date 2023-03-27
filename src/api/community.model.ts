@@ -7,6 +7,7 @@ import {
   RoleSet
 } from "@aut-labs-private/sdk/dist/models/dao";
 import { AutSocial } from "./api.model";
+import { socialUrls } from "./aut.model";
 
 export const MarketTemplates = [
   {
@@ -95,7 +96,11 @@ export class Community extends BaseNFTModel<CommunityProperties> {
       properties: {
         market: market?.title || 0,
         commitment: community.properties.commitment,
-        rolesSets: community.properties.rolesSets
+        rolesSets: community.properties.rolesSets,
+        socials: community.properties.socials.map((social) => {
+          social.link = `${socialUrls[social.type].prefix}${social.link}`;
+          return social;
+        })
       }
     } as Partial<Community>;
   }

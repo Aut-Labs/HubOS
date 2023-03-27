@@ -8,6 +8,7 @@ import AutSDK, { DAOExpander, fetchMetadata } from "@aut-labs-private/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { base64toFile } from "@utils/to-base-64";
 import { environment } from "./environment";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
 const communityExtensionThunkProvider = Web3ThunkProviderFactory(
   "CommunityExtension",
@@ -140,6 +141,46 @@ export const removeAsCoreTeam = communityExtensionThunkProvider(
   async (contract, memberAddress) => {
     const result = await contract.removeFromCoreTeam(memberAddress);
     return memberAddress;
+  }
+);
+
+interface UpdateDiscordData {
+  community: Community;
+  inviteLink: string;
+}
+
+export const updateDiscordSocials = createAsyncThunk(
+  "community/update",
+  async (args: UpdateDiscordData, { rejectWithValue }) => {
+    const sdk = AutSDK.getInstance();
+    const updatedCommunity = Community.updateCommunity(args.community);
+    const uri = await sdk.client.storeAsBlob(updatedCommunity);
+
+    console.log("New metadata: ->", ipfsCIDToHttpUrl(uri));
+    const response = await sdk.autID.contract.setMetadataUri(uri);
+
+    if (response.isSuccess) {
+      const autIdData = JSON.parse(window.sessionStorage.getItem("aut-data"));
+      let foundSocial = false;
+      for (let i = 0; i < autIdData.properties.communities.length; i++) {
+        if (foundSocial) {
+          break;
+        }
+        const community = autIdData.properties.communities[i];
+        if (community.name === args.community.name)
+          for (let i = 0; i < community.properties.socials.length; i++) {
+            const social = community.properties.socials[i];
+            if (social.type === "discord") {
+              social.link = args.inviteLink;
+              foundSocial = true;
+              break;
+            }
+          }
+      }
+      window.sessionStorage.setItem("aut-data", JSON.stringify(autIdData));
+      return args.community;
+    }
+    return rejectWithValue(response?.errorMessage);
   }
 );
 

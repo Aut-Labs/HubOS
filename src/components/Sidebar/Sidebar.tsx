@@ -23,10 +23,14 @@ import { ReactComponent as AutWhiteIcon } from "@assets/aut/aut-white.svg";
 import { useSelector } from "react-redux";
 import { AppTitle } from "@store/ui-reducer";
 import { SelectedNetworkConfig } from "@store/WalletProvider/WalletProvider";
-import { CommunityData } from "@store/Community/community.reducer";
+import {
+  CommunityData,
+  IsDiscordVerified
+} from "@store/Community/community.reducer";
 import { UserInfo } from "@auth/auth.reducer";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
 import BetaCountdown from "@components/BetaCountdown";
+import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 
 const Main = styled("main", {
   shouldForwardProp: (prop) =>
@@ -100,15 +104,13 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
   const theme = useTheme();
   const community = useSelector(CommunityData);
   const userInfo = useSelector(UserInfo);
+  const isDiscordVerified = useSelector(IsDiscordVerified);
   const network = useSelector(SelectedNetworkConfig);
   const appTitle = useSelector(AppTitle);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isExtraLarge = useMediaQuery(theme.breakpoints.up("xxl"));
   const [open, setOpen] = useState(!isMobile);
-  const [warningAppBarOpen, setWarningAppBarOpen] = useState(
-    !sessionStorage.getItem("warning-toolbar-flag")
-  );
-
+  const [discordDialogOpen, setDiscordDialogOpen] = useState(false);
   const drawerWidth = useMemo(() => {
     return isExtraLarge ? 350 : 300;
   }, [isExtraLarge]);
@@ -118,21 +120,20 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
   }, [isExtraLarge]);
 
   const warningToolbarHeight = useMemo(() => {
-    if (!warningAppBarOpen) return 0;
+    if (isDiscordVerified) return 0;
     return toolbarHeight / 1.5;
-  }, [toolbarHeight, warningAppBarOpen]);
+  }, [toolbarHeight, isDiscordVerified]);
 
   const handleDrawerToggle = () => {
     setOpen(!open);
   };
 
-  const closeWarningBar = () => {
-    sessionStorage.setItem("warning-toolbar-flag", "false");
-    setWarningAppBarOpen(false);
-  };
-
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
+      <DiscordServerVerificationPopup
+        open={discordDialogOpen}
+        handleClose={() => setDiscordDialogOpen(false)}
+      ></DiscordServerVerificationPopup>
       <AppBar
         sx={{
           boxShadow: 2
@@ -169,7 +170,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
         </Toolbar>
       </AppBar>
 
-      {warningAppBarOpen && (
+      {!isDiscordVerified && (
         <AppBar
           sx={{
             top: `${toolbarHeight}px`,
@@ -191,6 +192,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
               Please verify the discord account for your community.
             </Typography>
             <Button
+              onClick={() => setDiscordDialogOpen(true)}
               sx={{
                 mx: 2
               }}
@@ -205,13 +207,13 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
               }}
             ></span>
 
-            <IconButton
+            {/* <IconButton
               onClick={() => closeWarningBar()}
               color="offWhite"
               edge="start"
-            >
-              <CloseIcon />
-            </IconButton>
+            > */}
+            {/* <CloseIcon />
+            </IconButton> */}
           </Toolbar>
         </AppBar>
       )}

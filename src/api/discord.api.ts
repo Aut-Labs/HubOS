@@ -1,10 +1,17 @@
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { Community } from "./community.model";
 import { environment } from "./environment";
 
 export interface TaskData {
   role: string;
   description: string;
   name: string;
+}
+
+export interface GuildVerificationData {
+  accessToken: string;
+  guildId: string;
 }
 
 export const oauthGetToken = (code: string) => {
@@ -32,6 +39,38 @@ export const getUser = (accessToken: string) => {
     })
     .then((res) => res.data);
 };
+
+export const getServerDetails = (inviteLink: string) => {
+  const serverCode = inviteLink.match(/discord\.gg\/(.+)/i)[1];
+  return axios
+    .get(`https://discord.com/api/invites/${serverCode}`)
+    .then((res) => res.data);
+};
+
+export const getUserGuilds = (accessToken: string) => {
+  return axios
+    .get(`${environment.discordApiUrl}/users/@me/guilds`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
+    .then((res) => res.data);
+};
+
+export const verifyDiscordServerOwnership = createAsyncThunk(
+  "discord/verify",
+  async (
+    guildVerificationData: GuildVerificationData,
+    { rejectWithValue, getState }
+  ) => {
+    const guilds = await getUserGuilds(guildVerificationData.accessToken);
+    const guild = guilds.find((g) => g.id === guildVerificationData.guildId);
+    if (!guild.owner) {
+      return rejectWithValue("User is not the owner.");
+    }
+    return true;
+  }
+);
 
 export interface DiscordMessageInputField {
   name: string;

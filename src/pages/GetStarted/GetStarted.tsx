@@ -4,6 +4,7 @@ import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
 import BubbleTopRight from "@assets/bubble_top_right.png";
 import BubbleBottomLeft from "@assets/bubble_bottom_left.png";
 import TryFoldImage from "@assets/tryfold.png";
+import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 import { useOAuth } from "@components/Oauth2/oauth2";
 
 const Grid = styled("div")(({ theme }) => {
@@ -84,31 +85,6 @@ const ImageWrapper = styled("div")(({ theme }) => {
 });
 
 const GetStarted = () => {
-  const { getAuth, authenticating } = useOAuth();
-
-  const authenticateTwitter = () => {
-    getAuth(
-      (data) => {
-        console.log(data);
-        // if (data.screen_name === getValues("daoTwitter")) {
-        //   dispatch(
-        //     integrateUpdateCommunity({
-        //       handleVerified: true
-        //     })
-        //   );
-        // } else {
-        //   setError("daoTwitter", {
-        //     type: "validationFailed",
-        //     message: `Twitter handle doesn't match the one used to validate.`
-        //   });
-        // }
-      },
-      (e) => {
-        console.log(e);
-      }
-    );
-  };
-
   return (
     <Container maxWidth="lg" sx={{ flexGrow: 1, height: "100%" }}>
       <BottomLeftBubble loading="lazy" src={BubbleBottomLeft} />
