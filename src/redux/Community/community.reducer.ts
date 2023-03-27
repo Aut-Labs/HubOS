@@ -153,6 +153,10 @@ export const DiscordLink = createSelector(CommunityData, (c) => {
   return c.properties.socials.find((s) => s.type === "discord")?.link;
 });
 
+export const IsDiscordVerified = createSelector(CommunityData, (c) => {
+  return !!c.properties.socials.find((s) => s.type === "discord")?.link;
+});
+
 export const allRoles = createSelector(CommunityData, (c) => {
   return c.properties?.rolesSets[0]?.roles || [];
 });
