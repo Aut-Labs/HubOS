@@ -9,6 +9,7 @@ import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
 import { CacheTypes, getCache, updateCache } from "./cache.api";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import axios from "axios";
 
 const getAllOnboardingQuests = async (
   pluginAddress: any,
@@ -480,6 +481,39 @@ const submitTask = async (
   };
 };
 
+const submitDiscordTask = async (
+  body: {
+    task: Task;
+    bearerToken: string;
+    inviteLink: string;
+    userAddress: string;
+    pluginAddress: string;
+    onboardingQuestAddress: string;
+    pluginDefinitionId: PluginDefinitionType;
+  },
+  api: BaseQueryApi
+) => {
+  const response = await axios.post(
+    `${environment.apiUrl}/taskVerifier/discordJoin`,
+    {
+      taskId: body.task.taskId,
+      taskAddress: body.task.pluginAddress,
+      bearerToken: body.bearerToken,
+      inviteLink: body.inviteLink,
+      onboardingPluginAddress: body.pluginAddress,
+      submitter: body.userAddress
+    }
+  );
+  if (response.status !== 200) {
+    return {
+      error: response.data
+    };
+  }
+  return {
+    data: response.data
+  };
+};
+
 const finalizeTask = async (
   body: {
     task: Task;
@@ -578,6 +612,10 @@ export const onboardingApi = createApi({
 
     if (url === "submitTask") {
       return submitTask(body, api);
+    }
+
+    if (url === "submitDiscordTask") {
+      return submitDiscordTask(body, api);
     }
 
     if (url === "finalizeTask") {
@@ -821,6 +859,23 @@ export const onboardingApi = createApi({
         return {
           body,
           url: "submitTask"
+        };
+      },
+      invalidatesTags: ["Tasks", "Quest"]
+    }),
+    submitJoinDiscordTask: builder.mutation<
+      Task,
+      {
+        task: Task;
+        pluginAddress: string;
+        onboardingQuestAddress: string;
+        pluginDefinitionId: PluginDefinitionType;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "submitDiscordTask"
         };
       },
       invalidatesTags: ["Tasks", "Quest"]

@@ -31,6 +31,8 @@ import { addMinutes } from "date-fns";
 import { countWords } from "@utils/helpers";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
+import { useSelector } from "react-redux";
+import { DiscordLink } from "@store/Community/community.reducer";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
@@ -112,12 +114,13 @@ const endDatetime = new Date();
 addMinutes(endDatetime, 45);
 
 const JoinDiscordTasks = ({ plugin }: PluginParams) => {
+  const inviteLink = useSelector(DiscordLink);
   const [searchParams] = useSearchParams();
   const { control, handleSubmit, getValues, formState } = useForm({
     mode: "onChange",
     defaultValues: {
       title: "",
-      inviteUrl: "",
+      inviteUrl: inviteLink || "",
       description: ""
     }
   });
