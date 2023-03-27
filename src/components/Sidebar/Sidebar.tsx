@@ -111,7 +111,6 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
   const isExtraLarge = useMediaQuery(theme.breakpoints.up("xxl"));
   const [open, setOpen] = useState(!isMobile);
   const [discordDialogOpen, setDiscordDialogOpen] = useState(false);
-  console.warn(isDiscordVerified);
   const drawerWidth = useMemo(() => {
     return isExtraLarge ? 350 : 300;
   }, [isExtraLarge]);
@@ -171,7 +170,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
         </Toolbar>
       </AppBar>
 
-      {true && (
+      {!isDiscordVerified && (
         <AppBar
           sx={{
             top: `${toolbarHeight}px`,
