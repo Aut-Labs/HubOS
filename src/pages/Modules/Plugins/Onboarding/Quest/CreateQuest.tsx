@@ -142,7 +142,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       title: "",
       description: "",
       durationInDays: 3,
-      startDate: addMinutes(new Date(), 20),
+      startDate: addMinutes(new Date(), 300),
       role: null
     }
   });

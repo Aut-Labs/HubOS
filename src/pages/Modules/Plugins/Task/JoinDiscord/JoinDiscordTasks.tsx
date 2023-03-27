@@ -238,10 +238,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
               name="title"
               control={control}
               rules={{
-                required: true,
-                validate: {
-                  maxWords: (v: string) => countWords(v) <= 6
-                }
+                required: true
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
@@ -302,10 +299,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
               name="inviteUrl"
               control={control}
               rules={{
-                required: true,
-                validate: {
-                  maxNameChars: (v) => v.length <= 24
-                }
+                required: true
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
@@ -317,20 +311,20 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                     value={value || ""}
                     onChange={onChange}
                     placeholder="1234"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <p
-                            style={{
-                              color: "white",
-                              marginRight: "-5px"
-                            }}
-                          >
-                            https://discord.com/invite/
-                          </p>
-                        </InputAdornment>
-                      )
-                    }}
+                    // InputProps={{
+                    //   startAdornment: (
+                    //     <InputAdornment position="start">
+                    //       <p
+                    //         style={{
+                    //           color: "white",
+                    //           marginRight: "-5px"
+                    //         }}
+                    //       >
+                    //         https://discord.com/invite/
+                    //       </p>
+                    //     </InputAdornment>
+                    //   )
+                    // }}
                     helperText={
                       <FormHelperText
                         value={value}

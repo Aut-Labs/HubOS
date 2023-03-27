@@ -844,7 +844,7 @@ export const onboardingApi = createApi({
       },
       invalidatesTags: ["Tasks", "Quests"]
     }),
-    submitTask: builder.mutation<
+    submitOpenTask: builder.mutation<
       Task,
       {
         task: Task;
@@ -903,7 +903,7 @@ export const {
   useCreateQuestMutation,
   useApplyForQuestMutation,
   useFinalizeTaskMutation,
-  useSubmitTaskMutation,
+  useSubmitOpenTaskMutation,
   useWithdrawFromAQuestMutation,
   useRemoveTaskFromQuestMutation,
   useLazyHasUserCompletedQuestQuery,

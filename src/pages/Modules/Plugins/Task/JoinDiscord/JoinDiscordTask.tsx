@@ -1,9 +1,9 @@
-import { useGetAllTasksPerQuestQuery } from "@api/onboarding.api";
+import {
+  useGetAllTasksPerQuestQuery,
+  useSubmitJoinDiscordTaskMutation
+} from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
-import { AutButton } from "@components/buttons";
-import ErrorDialog from "@components/Dialog/ErrorPopup";
-import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { StepperButton } from "@components/Stepper";
 import {
   Box,
@@ -11,14 +11,13 @@ import {
   Card,
   CardContent,
   Container,
-  FormHelperText,
   Stack,
   Typography
 } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { IsAdmin } from "@store/Community/community.reducer";
-import { memo, useMemo } from "react";
-import { Controller, useForm, useWatch } from "react-hook-form";
+import { memo } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
 import {
   Link,
@@ -32,6 +31,12 @@ import { taskTypes } from "../Shared/Tasks";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
 import { useEthers } from "@usedapp/core";
+import { useOAuth } from "@components/Oauth2/oauth2";
+import {
+  getServerDetails,
+  verifyDiscordServerOwnership
+} from "@api/discord.api";
+import { useAppDispatch } from "@store/store.model";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -41,10 +46,12 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const params = useParams();
+  const dispatch = useAppDispatch();
   const { account: userAddress } = useEthers();
   const isAdmin = useSelector(IsAdmin);
+  const { getAuth, authenticating } = useOAuth();
 
-  const { task, isLoading } = useGetAllTasksPerQuestQuery(
+  const { task } = useGetAllTasksPerQuestQuery(
     {
       userAddress,
       isAdmin,
@@ -68,14 +75,6 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
     }
   );
 
-  const isInReadOnlyModel = useMemo(() => {
-    return (
-      task?.status === TaskStatus.Finished ||
-      task?.status === TaskStatus.Submitted ||
-      isAdmin
-    );
-  }, [task, isAdmin]);
-
   const { control, handleSubmit, getValues, setValue, formState } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -86,9 +85,49 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
     name: "inviteClicked",
     control
   });
-  const onSubmit = async () => {
-    console.log("JoinDiscordTask onSubmit Values: ", values);
-    //submit
+
+  console.log(task, "task");
+  const [submitTask, { error, isError, isLoading, reset }] =
+    useSubmitJoinDiscordTaskMutation();
+
+  const onSubmit = async (values) => {
+    // @ts-ignore
+    const url = `https://discord.com/invite/${task.metadata.properties.inviteUrl}`;
+    const serverDetails = await getServerDetails(
+      // @ts-ignore
+      task.metadata.properties.inviteUrl
+    );
+    await getAuth(
+      async (data) => {
+        const { access_token } = data;
+        const result = await dispatch(
+          verifyDiscordServerOwnership({
+            accessToken: access_token,
+            guildId: serverDetails.guild.id
+          })
+        );
+      },
+      () => {
+        // setLoading(false);
+      }
+    );
+    // submitTask({
+    //   task: {
+    //     ...task,
+    //     submission: {
+    //       name: "Open task submission",
+    //       description: values.openTask,
+    //       properties: {
+    //         submitter: userAddress
+    //       }
+    //     }
+    //   },
+    //   onboardingQuestAddress: searchParams.get(
+    //     RequiredQueryParams.OnboardingQuestAddress
+    //   ),
+    //   pluginAddress: plugin.pluginAddress,
+    //   pluginDefinitionId: plugin.pluginDefinitionId
+    // });
   };
 
   const setButtonClicked = () => {

@@ -1,7 +1,6 @@
 import { updateDiscordSocials } from "@api/community.api";
 import {
   getServerDetails,
-  getUserGuilds,
   verifyDiscordServerOwnership
 } from "@api/discord.api";
 import { AutButton } from "@components/buttons";
@@ -12,7 +11,6 @@ import { CommunityData } from "@store/Community/community.reducer";
 import { useAppDispatch } from "@store/store.model";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
-import { da } from "date-fns/locale";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";

@@ -2,7 +2,7 @@
 import {
   useFinalizeTaskMutation,
   useGetAllTasksPerQuestQuery,
-  useSubmitTaskMutation
+  useSubmitOpenTaskMutation
 } from "@api/onboarding.api";
 import { PluginDefinition, Task } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
@@ -63,7 +63,7 @@ const UserSubmitContent = ({
   }, [initialized, task]);
 
   const [submitTask, { error, isError, isLoading, reset }] =
-    useSubmitTaskMutation();
+    useSubmitOpenTaskMutation();
 
   const onSubmit = async (values) => {
     submitTask({

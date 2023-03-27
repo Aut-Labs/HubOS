@@ -34,21 +34,18 @@ interface AnswersParams {
   questionIndex: number;
 }
 
-const Answers = memo(({ control, questionIndex }: AnswersParams) => {
+const Answers = ({ control, questionIndex }: AnswersParams) => {
   const { fields } = useFieldArray({
     control,
     name: `questions[${questionIndex}].answers`
-  });
-
-  const values = useWatch({
-    name: `questions[${questionIndex}].answers`,
-    control
   });
 
   const formState = useFormState({
     name: `questions[${questionIndex}].answers`,
     control
   });
+
+  console.log(formState, "formState");
 
   return (
     <GridBox>
@@ -93,7 +90,7 @@ const Answers = memo(({ control, questionIndex }: AnswersParams) => {
                 );
               }}
             />
-            <Controller
+            {/* <Controller
               name={`questions[${questionIndex}].answers[${index}].correct`}
               control={control}
               rules={{
@@ -109,39 +106,15 @@ const Answers = memo(({ control, questionIndex }: AnswersParams) => {
                     tabIndex={-1}
                     onChange={onChange}
                   />
-                  // <Tooltip
-                  //   title={
-                  //     selectedValue === answers[index]
-                  //       ? "Correct Answer"
-                  //       : "Set as correct answer"
-                  //   }
-                  // >
-                  //   <Radio
-                  //     color="primary"
-                  //     tabIndex={-1}
-                  //     checked={selectedValue === answers[index]}
-                  //     onChange={(e) => {
-                  //       setSelectedValue(answers[index]);
-                  //       fields.forEach((field, fIndex) => {
-                  //         update(fIndex, {
-                  //           ...values[fIndex],
-                  //           correct: fIndex === index
-                  //         });
-                  //       });
-                  //     }}
-                  //     value={value}
-                  //     name={name}
-                  //   />
-                  // </Tooltip>
                 );
               }}
-            />
+            /> */}
           </GridRow>
         );
       })}
     </GridBox>
   );
-});
+};
 
 export const emptyQuestion = {
   question: "",

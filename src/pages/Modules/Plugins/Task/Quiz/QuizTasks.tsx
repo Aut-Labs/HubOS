@@ -13,7 +13,6 @@ import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { dateToUnix } from "@utils/date-format";
 import { addMinutes } from "date-fns";
-import { countWords } from "@utils/helpers";
 import AddIcon from "@mui/icons-material/Add";
 import QuestionsAndAnswers, { emptyQuestion } from "./QuestionsAndAnswers";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -102,16 +101,14 @@ addMinutes(endDatetime, 45);
 const QuizTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const { account: userAddress } = useEthers();
-  const { control, handleSubmit, getValues, formState } = useForm({
-    mode: "all",
+  const { control, handleSubmit, getValues, watch, formState } = useForm({
+    mode: "onChange",
     defaultValues: {
       title: "",
       description: "",
       questions: [emptyQuestion]
     }
   });
-
-  // console.log(formState, "parent - formState---");
 
   const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
     useCreateTaskPerQuestMutation();
