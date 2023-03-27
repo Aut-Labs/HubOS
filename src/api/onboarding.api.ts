@@ -481,15 +481,13 @@ const submitTask = async (
   };
 };
 
-const submitDiscordTask = async (
+const submitJoinDiscordTask = async (
   body: {
     task: Task;
     bearerToken: string;
     inviteLink: string;
     userAddress: string;
     pluginAddress: string;
-    onboardingQuestAddress: string;
-    pluginDefinitionId: PluginDefinitionType;
   },
   api: BaseQueryApi
 ) => {
@@ -614,8 +612,8 @@ export const onboardingApi = createApi({
       return submitTask(body, api);
     }
 
-    if (url === "submitDiscordTask") {
-      return submitDiscordTask(body, api);
+    if (url === "submitJoinDiscordTask") {
+      return submitJoinDiscordTask(body, api);
     }
 
     if (url === "finalizeTask") {
@@ -875,7 +873,7 @@ export const onboardingApi = createApi({
       query: (body) => {
         return {
           body,
-          url: "submitDiscordTask"
+          url: "submitJoinDiscordTask"
         };
       },
       invalidatesTags: ["Tasks", "Quest"]
@@ -915,5 +913,6 @@ export const {
   useLazyGetAllTasksPerQuestQuery,
   useGetAllOnboardingQuestsQuery,
   useActivateOnboardingMutation,
-  useDeactivateOnboardingMutation
+  useDeactivateOnboardingMutation,
+  useSubmitJoinDiscordTaskMutation
 } = onboardingApi;
