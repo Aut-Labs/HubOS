@@ -29,7 +29,9 @@ export const swEnvVariables = {
   discordRedirectUri: "REACT_APP_DISCORD_REDIRECT_URL",
   discordApiUrl: "REACT_APP_DISCORD_API_URL",
   discordBotAddress: "REACT_APP_DISCORD_BOT_ADDRESS",
-  discordBotUrl: "REACT_APP_DISCORD_BOT_API_URL"
+  discordBotUrl: "REACT_APP_DISCORD_BOT_API_URL",
+
+  discordCallbackUri: "REACT_APP_DISCORD_CALLBACK_URI"
 };
 
 export const environment: typeof swEnvVariables =
