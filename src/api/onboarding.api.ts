@@ -10,6 +10,7 @@ import { environment } from "./environment";
 import { CacheTypes, getCache, updateCache } from "./cache.api";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import axios from "axios";
+import { AUTH_TOKEN_KEY } from "./auth.api";
 
 const getAllOnboardingQuests = async (
   pluginAddress: any,
@@ -485,31 +486,34 @@ const submitJoinDiscordTask = async (
   body: {
     task: Task;
     bearerToken: string;
-    inviteLink: string;
-    userAddress: string;
-    pluginAddress: string;
+    onboardingPluginAddress: string;
   },
   api: BaseQueryApi
 ) => {
-  const response = await axios.post(
-    `${environment.apiUrl}/taskVerifier/discordJoin`,
-    {
-      taskId: body.task.taskId,
-      taskAddress: body.task.pluginAddress,
-      bearerToken: body.bearerToken,
-      inviteLink: body.inviteLink,
-      onboardingPluginAddress: body.pluginAddress,
-      submitter: body.userAddress
-    }
-  );
-  if (response.status !== 200) {
+  try {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    const response = await axios.post(
+      `${environment.apiUrl}/taskVerifier/discordJoin`,
+      {
+        taskId: body.task.taskId,
+        taskAddress: body.task.pluginAddress,
+        bearerToken: body.bearerToken,
+        onboardingPluginAddress: body.onboardingPluginAddress
+      },
+      {
+        headers: {
+          Authorization: token
+        }
+      }
+    );
     return {
-      error: response.data
+      data: true
+    };
+  } catch (e) {
+    return {
+      error: e.response?.data?.error || "Failed to submit task."
     };
   }
-  return {
-    data: response.data
-  };
 };
 
 const finalizeTask = async (
@@ -865,9 +869,8 @@ export const onboardingApi = createApi({
       Task,
       {
         task: Task;
-        pluginAddress: string;
-        onboardingQuestAddress: string;
-        pluginDefinitionId: PluginDefinitionType;
+        bearerToken: string;
+        onboardingPluginAddress: string;
       }
     >({
       query: (body) => {

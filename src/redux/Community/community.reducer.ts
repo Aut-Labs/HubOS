@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { fetchCommunity, updateCommunity } from "@api/community.api";
 import { createSelector } from "reselect";
 import { Community } from "@api/community.model";
+import { debug } from "console";
 
 export interface CommunityState {
   selectedCommunityAddress: string;

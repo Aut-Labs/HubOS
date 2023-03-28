@@ -37,6 +37,8 @@ import {
   verifyDiscordServerOwnership
 } from "@api/discord.api";
 import { useAppDispatch } from "@store/store.model";
+import ErrorDialog from "@components/Dialog/ErrorPopup";
+import LoadingDialog from "@components/Dialog/LoadingPopup";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -87,47 +89,26 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
   });
 
   console.log(task, "task");
-  const [submitTask, { error, isError, isLoading, reset }] =
+  const [submitJoinDiscordTask, { error, isError, isLoading, reset }] =
     useSubmitJoinDiscordTaskMutation();
 
   const onSubmit = async (values) => {
-    // @ts-ignore
-    const url = `https://discord.com/invite/${task.metadata.properties.inviteUrl}`;
-    const serverDetails = await getServerDetails(
-      // @ts-ignore
-      task.metadata.properties.inviteUrl
-    );
     await getAuth(
       async (data) => {
         const { access_token } = data;
-        const result = await dispatch(
-          verifyDiscordServerOwnership({
-            accessToken: access_token,
-            guildId: serverDetails.guild.id
-          })
-        );
+
+        submitJoinDiscordTask({
+          task,
+          bearerToken: access_token,
+          onboardingPluginAddress: searchParams.get(
+            RequiredQueryParams.OnboardingQuestAddress
+          )
+        });
       },
       () => {
         // setLoading(false);
       }
     );
-    // submitTask({
-    //   task: {
-    //     ...task,
-    //     submission: {
-    //       name: "Open task submission",
-    //       description: values.openTask,
-    //       properties: {
-    //         submitter: userAddress
-    //       }
-    //     }
-    //   },
-    //   onboardingQuestAddress: searchParams.get(
-    //     RequiredQueryParams.OnboardingQuestAddress
-    //   ),
-    //   pluginAddress: plugin.pluginAddress,
-    //   pluginDefinitionId: plugin.pluginDefinitionId
-    // });
   };
 
   const setButtonClicked = () => {
@@ -150,6 +131,9 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
         position: "relative"
       }}
     >
+      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <LoadingDialog open={isLoading} message="Submitting task..." />
+
       {task ? (
         <>
           <TaskDetails task={task} />
