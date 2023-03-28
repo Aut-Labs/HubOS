@@ -61,6 +61,7 @@ export const useOAuth = () => {
             clearInterval(intervalRef.current);
             popupRef.current.close();
             onSuccess(response.data);
+            cleanup(intervalRef, popupRef, handleMessageListener);
           }
         }
       } catch (genericError) {
