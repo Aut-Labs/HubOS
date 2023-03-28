@@ -1,4 +1,7 @@
-import { useGetAllTasksPerQuestQuery } from "@api/onboarding.api";
+import {
+  useGetAllTasksPerQuestQuery,
+  useSubmitQuizTaskMutation
+} from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
 import AutLoading from "@components/AutLoading";
@@ -32,6 +35,7 @@ import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import { useEthers } from "@usedapp/core";
+import { getQestions } from "@api/tasks.api";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -120,7 +124,7 @@ const AnswersAdminView = memo(({ questionIndex, answers }: any) => {
                   color: "nightBlack.light"
                 }
               }}
-              checked={answer?.correct}
+              checked={!!answer?.correct}
               disabled={true}
             />
             <Typography
@@ -190,11 +194,6 @@ const QuizTask = ({ plugin }: PluginParams) => {
     name: "questions"
   });
 
-  const values = useWatch({
-    name: `questions`,
-    control
-  });
-
   useEffect(() => {
     if (!initialized && task) {
       setValue("questions", (task as any)?.metadata?.properties?.questions);
@@ -202,14 +201,27 @@ const QuizTask = ({ plugin }: PluginParams) => {
     }
   }, [initialized, task]);
 
-  const onSubmit = async () => {
-    console.log("QuizTask onSubmit Values: ", values);
-    console.log(formState, "FORM STATE");
-  };
+  const [submitTask, { error, isError, isLoading, reset }] =
+    useSubmitQuizTaskMutation();
 
-  if (task) {
-    console.log("TASK::", task);
-  }
+  const onSubmit = async () => {
+    const values = getValues();
+    submitTask({
+      task,
+      questionsAndAnswers: values.questions.map((q) => ({
+        ...q,
+        answers: q.answers.map((a) => ({
+          ...a,
+          correct: a.checked || false
+        }))
+      })),
+      onboardingQuestAddress: searchParams.get(
+        RequiredQueryParams.OnboardingQuestAddress
+      ),
+      pluginAddress: plugin.pluginAddress,
+      pluginDefinitionId: plugin.pluginDefinitionId
+    });
+  };
 
   return (
     <Container
@@ -223,6 +235,8 @@ const QuizTask = ({ plugin }: PluginParams) => {
         position: "relative"
       }}
     >
+      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <LoadingDialog open={isLoading} message="Submitting task..." />
       {task ? (
         <>
           <TaskDetails task={task} />

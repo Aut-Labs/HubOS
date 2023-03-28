@@ -2,7 +2,7 @@ import { Typography, styled } from "@mui/material";
 import { memo } from "react";
 import FlipClockCountdown from "@leenguyen/react-flip-clock-countdown";
 import "@leenguyen/react-flip-clock-countdown/dist/index.css";
-import { isAfter } from "date-fns";
+import { isAfter, isBefore } from "date-fns";
 
 const Countdown = styled("div")({
   display: "flex",
@@ -34,7 +34,7 @@ const BetaCountdown = ({
         mb={1}
         className="text-secondary"
       >
-        {isAfter(to, new Date()) ? "Beta ends in" : "Beta starts in"}
+        {isBefore(to, new Date()) ? "Beta ends in" : "Beta starts in"}
       </Typography>
       <FlipClockCountdown
         digitBlockStyle={{

@@ -294,14 +294,7 @@ const QuestInfo = ({
             gridTemplateColumns: "1fr 2fr"
           }}
         >
-          <BetaCountdown
-            textAlign="left"
-            to={
-              hasQuestStarted
-                ? addDays(new Date(quest?.startDate), 15)
-                : new Date(quest?.startDate)
-            }
-          />
+          <BetaCountdown textAlign="left" to={new Date(quest?.startDate)} />
         </Box>
       </Box>
     </>

@@ -8,7 +8,7 @@ import { StepperButton } from "@components/Stepper";
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { dateToUnix } from "@utils/date-format";
@@ -17,8 +17,8 @@ import AddIcon from "@mui/icons-material/Add";
 import QuestionsAndAnswers, { emptyQuestion } from "./QuestionsAndAnswers";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { updateCache } from "@api/cache.api";
 import { useEthers } from "@usedapp/core";
+import { saveQestions } from "@api/tasks.api";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
@@ -100,9 +100,16 @@ addMinutes(endDatetime, 45);
 
 const QuizTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
-  const { account: userAddress } = useEthers();
-  const { control, handleSubmit, getValues, watch, formState } = useForm({
-    mode: "onChange",
+  const [answersSaved, setAnswersSaved] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    getValues,
+    reset: resetForm,
+    formState
+  } = useForm({
+    mode: "all",
+    reValidateMode: "onChange",
     defaultValues: {
       title: "",
       description: "",
@@ -113,6 +120,26 @@ const QuizTasks = ({ plugin }: PluginParams) => {
   const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
     useCreateTaskPerQuestMutation();
 
+  useEffect(() => {
+    const start = async () => {
+      if (isSuccess && data && !answersSaved) {
+        setAnswersSaved(true);
+        const values = getValues();
+        // store answers in the db
+        try {
+          await saveQestions(
+            plugin.pluginAddress,
+            data.taskId,
+            values.questions
+          );
+        } catch (error) {
+          // reset
+        }
+      }
+    };
+    start();
+  }, [isSuccess, data, answersSaved]);
+
   const onSubmit = async () => {
     const values = getValues();
 
@@ -120,12 +147,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
 
     for (let i = 0; i < values.questions.length; i++) {
       const { question, answers } = values.questions[i];
-      // store answers in the db
-      await updateCache({
-        cacheKey: question,
-        address: userAddress,
-        list: answers
-      });
+
       const questionWithoutAnswer = {
         question,
         answers: answers.map((answer) => ({
@@ -160,7 +182,18 @@ const QuizTasks = ({ plugin }: PluginParams) => {
   return (
     <>
       {isSuccess ? (
-        <TaskSuccess reset={reset} pluginId={data?.taskId} />
+        <TaskSuccess
+          reset={() => {
+            reset();
+            setAnswersSaved(false);
+            resetForm({
+              title: "",
+              description: "",
+              questions: [emptyQuestion]
+            });
+          }}
+          pluginId={data?.taskId}
+        />
       ) : (
         <Container
           sx={{ py: "20px", display: "flex", flexDirection: "column" }}

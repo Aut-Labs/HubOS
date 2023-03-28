@@ -13,7 +13,6 @@ import {
   Checkbox
 } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
-import { memo, useState } from "react";
 import {
   useFieldArray,
   Controller,
@@ -45,7 +44,10 @@ const Answers = ({ control, questionIndex }: AnswersParams) => {
     control
   });
 
-  console.log(formState, "formState");
+  const values = useWatch({
+    name: `questions[${questionIndex}].answers`,
+    control
+  });
 
   return (
     <GridBox>
@@ -90,7 +92,7 @@ const Answers = ({ control, questionIndex }: AnswersParams) => {
                 );
               }}
             />
-            {/* <Controller
+            <Controller
               name={`questions[${questionIndex}].answers[${index}].correct`}
               control={control}
               rules={{
@@ -108,7 +110,7 @@ const Answers = ({ control, questionIndex }: AnswersParams) => {
                   />
                 );
               }}
-            /> */}
+            />
           </GridRow>
         );
       })}
@@ -235,7 +237,7 @@ const QuestionsAndAnswers = ({ control }) => {
                       }
                       return prev;
                     }, 0);
-                    return count === 0;
+                    return count <= 1;
                   }
                 }
               }}

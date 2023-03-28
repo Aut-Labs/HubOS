@@ -23,8 +23,9 @@ import Callback from "./pages/Oauth2Callback/Callback";
 import NetworkResolver from "./pages/PublicQuest/NetworkResolver";
 
 const generateConfig = (networks: NetworkConfig[]): Config => {
-  const readOnlyUrls = networks.reduce((prev, curr) => {
-    if (!curr.disabled) {
+  const readOnlyUrls = networks
+    .filter((n) => !n.disabled)
+    .reduce((prev, curr) => {
       const network = {
         name: "mumbai",
         chainId: 80001,
@@ -33,12 +34,14 @@ const generateConfig = (networks: NetworkConfig[]): Config => {
       };
       const provider = ethers.getDefaultProvider(network);
       prev[curr.chainId] = provider;
-    }
-    return prev;
-  }, {});
+      return prev;
+    }, {});
 
   return {
     readOnlyUrls,
+    notifications: {
+      expirationPeriod: 0
+    },
     autoConnect: false,
     // @ts-ignore
     networks: networks
@@ -52,6 +55,12 @@ const generateConfig = (networks: NetworkConfig[]): Config => {
         nativeCurrency: n.nativeCurrency
       })),
     gasLimitBufferPercentage: 50000,
+    pollingIntervals: networks
+      .filter((n) => !n.disabled)
+      .reduce((prev, curr) => {
+        prev[curr.chainId] = 40000;
+        return prev;
+      }, {}),
     connectors: {
       metamask: new MetamaskConnector(),
       walletConnect: new WalletConnectConnector({
