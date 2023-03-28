@@ -1,4 +1,7 @@
-import { useGetAllTasksPerQuestQuery } from "@api/onboarding.api";
+import {
+  useGetAllTasksPerQuestQuery,
+  useSubmitTransactionTaskMutation
+} from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
 import { StepperButton } from "@components/Stepper";
@@ -15,13 +18,15 @@ import { IsAdmin } from "@store/Community/community.reducer";
 import { memo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { useSearchParams, useParams, Link } from "react-router-dom";
+import { useSearchParams, useParams } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import { useEthers } from "@usedapp/core";
 import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
+import ErrorDialog from "@components/Dialog/ErrorPopup";
+import LoadingDialog from "@components/Dialog/LoadingPopup";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -33,7 +38,7 @@ const TransactionTask = ({ plugin }: PluginParams) => {
   const { account: userAddress } = useEthers();
 
   const params = useParams();
-  const { task, isLoading: isLoadingPlugins } = useGetAllTasksPerQuestQuery(
+  const { task } = useGetAllTasksPerQuestQuery(
     {
       userAddress,
       isAdmin,
@@ -57,7 +62,7 @@ const TransactionTask = ({ plugin }: PluginParams) => {
     }
   );
 
-  const { control, handleSubmit, getValues, setValue, formState } = useForm({
+  const { control, handleSubmit } = useForm({
     mode: "onChange",
     defaultValues: {
       transactionCompleted: false
@@ -67,16 +72,20 @@ const TransactionTask = ({ plugin }: PluginParams) => {
     name: "transactionCompleted",
     control
   });
+
+  const [submitTask, { error, isError, isLoading, reset }] =
+    useSubmitTransactionTaskMutation();
+
   const onSubmit = async () => {
-    console.log("Transaction Task onSubmit Values: ", values);
-    //submit
-
-    setValue("transactionCompleted", true);
+    submitTask({
+      task,
+      onboardingQuestAddress: searchParams.get(
+        RequiredQueryParams.OnboardingQuestAddress
+      ),
+      pluginAddress: plugin.pluginAddress,
+      pluginDefinitionId: plugin.pluginDefinitionId
+    });
   };
-
-  if (task) {
-    console.log("TASK TRANSACTION:", task);
-  }
 
   return (
     <Container
@@ -90,6 +99,8 @@ const TransactionTask = ({ plugin }: PluginParams) => {
         position: "relative"
       }}
     >
+      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <LoadingDialog open={isLoading} message="Submitting task..." />
       {task ? (
         <>
           <TaskDetails task={task} />

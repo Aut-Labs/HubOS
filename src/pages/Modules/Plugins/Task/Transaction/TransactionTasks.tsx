@@ -335,9 +335,6 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
             <Controller
               name="functionName"
               control={control}
-              rules={{
-                required: true
-              }}
               render={({ field: { name, value, onChange } }) => {
                 return (
                   <AutTextField
@@ -347,7 +344,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                     name={name}
                     value={value || ""}
                     onChange={onChange}
-                    placeholder="Function Name "
+                    placeholder="Function Name"
                   />
                 );
               }}

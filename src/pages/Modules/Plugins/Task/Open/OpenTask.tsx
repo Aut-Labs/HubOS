@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import {
-  useFinalizeTaskMutation,
+  useFinaliseOpenTaskMutation,
   useGetAllTasksPerQuestQuery,
   useSubmitOpenTaskMutation
 } from "@api/onboarding.api";
@@ -240,7 +240,7 @@ const OwnerFinalizeContent = ({
   const [searchParams] = useSearchParams();
 
   const [finalizeTask, { error, isError, isLoading, reset }] =
-    useFinalizeTaskMutation();
+    useFinaliseOpenTaskMutation();
 
   const onSubmit = async () => {
     finalizeTask({

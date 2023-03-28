@@ -17,6 +17,7 @@ import { debounce } from "@mui/material";
 import { useSearchParams } from "react-router-dom";
 import { AUTH_TOKEN_KEY } from "@api/auth.api";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
+import { IAutButtonConfig } from "@aut-labs/d-aut/build/components/AutButtonMenu/AutMenuUtils";
 
 function Web3DautConnect({
   setLoading,
@@ -131,7 +132,28 @@ function Web3DautConnect({
     window.addEventListener("aut-onConnected", onAutLogin);
     window.addEventListener("aut-onDisconnected", onDisconnected);
 
-    Init();
+    const config: IAutButtonConfig = {
+      defaultText: "Connect Wallet",
+      textAlignment: "right",
+      menuTextAlignment: "left",
+      theme: {
+        color: "offWhite",
+        // color: 'nightBlack',
+        // color: colors.amber['500'],
+        // color: '#7b1fa2',
+        type: "main"
+      },
+      // size: "default" // large & extraLarge or see below
+      size: {
+        width: 240,
+        height: 50,
+        padding: 3
+      }
+    };
+
+    Init({
+      config
+    });
 
     return () => {
       window.removeEventListener("aut-Init", onAutInit);
@@ -153,12 +175,6 @@ function Web3DautConnect({
         }}
         id="d-aut"
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
-        // dao-expander="0xb5413A2A7A83bAe2a8A8B8AAD10980fe9C067751"
-        // dao-expander={
-        //   searchParams.get(RequiredQueryParams.DaoAddress) ||
-        //   daoAddress ||
-        //   "0xFd553dd03ef66fab7f91ee4B9C5f91Ff055D3612"
-        // }
         button-type="simple"
       />
     </>

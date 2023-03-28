@@ -9,8 +9,11 @@ import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
 import { CacheTypes, getCache, updateCache } from "./cache.api";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
-import axios from "axios";
-import { AUTH_TOKEN_KEY } from "./auth.api";
+import {
+  finaliseJoinDiscordTask,
+  finaliseQuizTask,
+  finaliseTransactionTask
+} from "./tasks.api";
 
 const getAllOnboardingQuests = async (
   pluginAddress: any,
@@ -182,7 +185,7 @@ const deactivateOnboarding = async (
 
   try {
     const cache = await getCache(CacheTypes.UserPhases);
-    cache.list[2].status = 0; // complete phase 3
+    cache.list[2].status = 0; // reset phase 3
     await updateCache(cache);
   } catch (error) {
     console.log(error);
@@ -446,7 +449,7 @@ const removeTaskFromQuest = async (
   };
 };
 
-const submitTask = async (
+const submitOpenTask = async (
   body: {
     task: Task;
     pluginAddress: string;
@@ -482,6 +485,59 @@ const submitTask = async (
   };
 };
 
+const submitQuizTask = async (
+  body: {
+    task: Task;
+    questionsAndAnswers: any[];
+    pluginAddress: string;
+    onboardingQuestAddress: string;
+    pluginDefinitionId: PluginDefinitionType;
+  },
+  api: BaseQueryApi
+) => {
+  try {
+    await finaliseQuizTask(
+      body.pluginAddress,
+      body.onboardingQuestAddress,
+      body.task.taskId,
+      body.questionsAndAnswers
+    );
+
+    return {
+      data: true
+    };
+  } catch (error) {
+    return {
+      error: error?.response?.data?.error || "Task could not be finalised!"
+    };
+  }
+};
+
+const submitTransactionTask = async (
+  body: {
+    task: Task;
+    pluginAddress: string;
+    onboardingQuestAddress: string;
+    pluginDefinitionId: PluginDefinitionType;
+  },
+  api: BaseQueryApi
+) => {
+  try {
+    await finaliseTransactionTask(
+      body.pluginAddress,
+      body.onboardingQuestAddress,
+      body.task.taskId
+    );
+    return {
+      data: true
+    };
+  } catch (error) {
+    return {
+      error: error?.response?.data?.error || "Task could not be finalised!"
+    };
+  }
+};
+
 const submitJoinDiscordTask = async (
   body: {
     task: Task;
@@ -491,32 +547,22 @@ const submitJoinDiscordTask = async (
   api: BaseQueryApi
 ) => {
   try {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    const response = await axios.post(
-      `${environment.apiUrl}/taskVerifier/discordJoin`,
-      {
-        taskId: body.task.taskId,
-        taskAddress: body.task.pluginAddress,
-        bearerToken: body.bearerToken,
-        onboardingPluginAddress: body.onboardingPluginAddress
-      },
-      {
-        headers: {
-          Authorization: token
-        }
-      }
+    await finaliseJoinDiscordTask(
+      body.task.pluginAddress,
+      body.onboardingPluginAddress,
+      body.task.taskId
     );
     return {
       data: true
     };
   } catch (e) {
     return {
-      error: e.response?.data?.error || "Failed to submit task."
+      error: e.response?.data?.error || "Task could not be finalised!"
     };
   }
 };
 
-const finalizeTask = async (
+const finaliseOpenTask = async (
   body: {
     task: Task;
     pluginAddress: string;
@@ -612,16 +658,24 @@ export const onboardingApi = createApi({
       return removeTaskFromQuest(body, api);
     }
 
-    if (url === "submitTask") {
-      return submitTask(body, api);
+    if (url === "submitOpenTask") {
+      return submitOpenTask(body, api);
     }
 
     if (url === "submitJoinDiscordTask") {
       return submitJoinDiscordTask(body, api);
     }
 
-    if (url === "finalizeTask") {
-      return finalizeTask(body, api);
+    if (url === "finaliseOpenTask") {
+      return finaliseOpenTask(body, api);
+    }
+
+    if (url === "submitQuizTask") {
+      return submitQuizTask(body, api);
+    }
+
+    if (url === "submitTransactionTask") {
+      return submitTransactionTask(body, api);
     }
     return {
       data: "Test"
@@ -860,7 +914,7 @@ export const onboardingApi = createApi({
       query: (body) => {
         return {
           body,
-          url: "submitTask"
+          url: "submitOpenTask"
         };
       },
       invalidatesTags: ["Tasks", "Quest"]
@@ -881,7 +935,25 @@ export const onboardingApi = createApi({
       },
       invalidatesTags: ["Tasks", "Quest"]
     }),
-    finalizeTask: builder.mutation<
+    submitQuizTask: builder.mutation<
+      Task,
+      {
+        task: Task;
+        questionsAndAnswers: any[];
+        pluginAddress: string;
+        onboardingQuestAddress: string;
+        pluginDefinitionId: PluginDefinitionType;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "submitQuizTask"
+        };
+      },
+      invalidatesTags: ["Tasks", "Quest"]
+    }),
+    submitTransactionTask: builder.mutation<
       Task,
       {
         task: Task;
@@ -893,7 +965,24 @@ export const onboardingApi = createApi({
       query: (body) => {
         return {
           body,
-          url: "finalizeTask"
+          url: "submitTransactionTask"
+        };
+      },
+      invalidatesTags: ["Tasks", "Quest"]
+    }),
+    finaliseOpenTask: builder.mutation<
+      Task,
+      {
+        task: Task;
+        pluginAddress: string;
+        onboardingQuestAddress: string;
+        pluginDefinitionId: PluginDefinitionType;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "finaliseOpenTask"
         };
       },
       invalidatesTags: ["Tasks"]
@@ -905,7 +994,9 @@ export const {
   useUpdateQuestMutation,
   useCreateQuestMutation,
   useApplyForQuestMutation,
-  useFinalizeTaskMutation,
+  useSubmitQuizTaskMutation,
+  useSubmitTransactionTaskMutation,
+  useFinaliseOpenTaskMutation,
   useSubmitOpenTaskMutation,
   useWithdrawFromAQuestMutation,
   useRemoveTaskFromQuestMutation,
