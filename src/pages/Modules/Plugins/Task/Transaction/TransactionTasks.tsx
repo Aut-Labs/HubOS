@@ -340,7 +340,6 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                   <AutTextField
                     variant="standard"
                     color="offWhite"
-                    required
                     name={name}
                     value={value || ""}
                     onChange={onChange}
