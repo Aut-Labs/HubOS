@@ -95,7 +95,8 @@ export const finaliseTransactionTask = async (
 export const finaliseJoinDiscordTask = async (
   taskAddress: string,
   onboardingPluginAddress: string,
-  taskId: number
+  taskId: number,
+  discordAccessToken: string
 ): Promise<{
   isFinalized: boolean;
   txHash: string;
@@ -106,7 +107,7 @@ export const finaliseJoinDiscordTask = async (
     `${environment.apiUrl}/taskVerifier/discordJoin`,
     {
       onboardingPluginAddress,
-      bearerToken: token,
+      bearerToken: `Bearer ${discordAccessToken}`,
       taskAddress,
       taskId
     },

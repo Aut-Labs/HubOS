@@ -550,7 +550,8 @@ const submitJoinDiscordTask = async (
     await finaliseJoinDiscordTask(
       body.task.pluginAddress,
       body.onboardingPluginAddress,
-      body.task.taskId
+      body.task.taskId,
+      body.bearerToken
     );
     return {
       data: true
