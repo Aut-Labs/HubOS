@@ -38,10 +38,10 @@ export const useOAuth = () => {
     if (popupRef.current && !popupRef.current.closed) {
       popupRef.current.close();
     }
+
+    const callbackUrl = encodeURI(`${window.location.origin}/callback`);
     popupRef.current = openPopup(
-      `https://discord.com/oauth2/authorize?response_type=code&client_id=1080508975780474900&scope=guilds&state=15773059ghq9183habn&redirect_uri=${encodeURI(
-        environment.discordCallbackUri
-      )}&prompt=consent`
+      `https://discord.com/oauth2/authorize?response_type=code&client_id=1080508975780474900&scope=guilds&state=15773059ghq9183habn&redirect_uri=${callbackUrl}&prompt=consent`
     ) as any;
 
     async function handleMessageListener(message) {
