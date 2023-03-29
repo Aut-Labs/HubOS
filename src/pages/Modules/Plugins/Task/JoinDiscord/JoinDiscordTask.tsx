@@ -188,14 +188,10 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
                       textAlign="center"
                       component={Link}
                       target="_blank"
-                      to={`https://discord.com/invite/${
-                        (task as any)?.metadata?.properties?.inviteUrl
-                      }`}
+                      to={(task as any)?.metadata?.properties?.inviteUrl}
                       p="5px"
                     >
-                      {`https://discord.com/invite/${
-                        (task as any)?.metadata?.properties?.inviteUrl
-                      }`}
+                      {(task as any)?.metadata?.properties?.inviteUrl}
                     </Typography>
                     <Typography variant="caption" className="text-secondary">
                       Invite URL
@@ -269,9 +265,7 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
                       variant="outlined"
                       component={Link}
                       target="_blank"
-                      to={`https://discord.gg/${
-                        (task as any)?.metadata?.properties?.inviteUrl
-                      }`}
+                      to={(task as any)?.metadata?.properties?.inviteUrl}
                       onClick={setButtonClicked}
                     >
                       Join Discord
@@ -294,7 +288,7 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
                   <StepperButton
                     label="Submit"
                     onClick={handleSubmit(onSubmit)}
-                    disabled={!values}
+                    // disabled={!values}
                   />
                 </Stack>
               ) : (

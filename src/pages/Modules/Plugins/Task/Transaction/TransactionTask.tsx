@@ -18,7 +18,7 @@ import { IsAdmin } from "@store/Community/community.reducer";
 import { memo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { useSearchParams, useParams } from "react-router-dom";
+import { useSearchParams, useParams, Link } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
@@ -253,10 +253,14 @@ const TransactionTask = ({ plugin }: PluginParams) => {
                       color="offWhite"
                       variant="outlined"
                       disabled={
-                        task?.status === TaskStatus.Created ||
-                        task?.status === TaskStatus.Taken
+                        task?.status === TaskStatus.Submitted ||
+                        task?.status === TaskStatus.Finished
                       }
-                      onClick={handleSubmit(onSubmit)}
+                      component={Link}
+                      target="_blank"
+                      to={
+                        (task as any)?.metadata?.properties?.linkToInteractUrl
+                      }
                     >
                       Sign Transaction
                     </Button>
@@ -265,8 +269,8 @@ const TransactionTask = ({ plugin }: PluginParams) => {
               </Card>
 
               {/* button */}
-              {task?.status === TaskStatus.Submitted ||
-              task?.status === TaskStatus.Finished ? (
+              {task?.status === TaskStatus.Created ||
+              task?.status === TaskStatus.Taken ? (
                 <Stack
                   sx={{
                     margin: "0 auto",
@@ -280,7 +284,7 @@ const TransactionTask = ({ plugin }: PluginParams) => {
                   <StepperButton
                     label="Submit"
                     onClick={handleSubmit(onSubmit)}
-                    disabled={!values}
+                    // disabled={!values}
                   />
                 </Stack>
               ) : (
