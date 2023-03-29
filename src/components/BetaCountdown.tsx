@@ -20,9 +20,11 @@ const Countdown = styled("div")({
 
 const BetaCountdown = ({
   to,
-  textAlign = "center"
+  textAlign = "center",
+  hasStarted = false
 }: {
   to: Date;
+  hasStarted: boolean;
   textAlign?: string;
 }) => {
   return (
@@ -34,7 +36,7 @@ const BetaCountdown = ({
         mb={1}
         className="text-secondary"
       >
-        {isBefore(to, new Date()) ? "Beta ends in" : "Beta starts in"}
+        {hasStarted ? "Beta ends in" : "Beta starts in"}
       </Typography>
       <FlipClockCountdown
         digitBlockStyle={{

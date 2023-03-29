@@ -323,7 +323,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             py: 2
           }}
         >
-          <BetaCountdown to={new Date("2023-03-16 01:00:00")} />
+          {/* <BetaCountdown to={new Date("2023-03-16 01:00:00")} /> */}
           <SvgIcon
             sx={{
               mt: 5,

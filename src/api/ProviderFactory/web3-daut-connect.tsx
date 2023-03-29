@@ -18,6 +18,7 @@ import { useSearchParams } from "react-router-dom";
 import { AUTH_TOKEN_KEY } from "@api/auth.api";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { IAutButtonConfig } from "@aut-labs/d-aut/build/components/AutButtonMenu/AutMenuUtils";
+import { resetState } from "@store/store";
 
 function Web3DautConnect({
   setLoading,
@@ -123,7 +124,7 @@ function Web3DautConnect({
   };
 
   const onDisconnected = () => {
-    dispatch(resetAuthState());
+    dispatch(resetState);
     localStorage.removeItem(AUTH_TOKEN_KEY);
   };
 

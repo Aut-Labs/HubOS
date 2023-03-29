@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { Action, configureStore } from "@reduxjs/toolkit";
 import logger from "redux-logger";
 import { reducers } from "./reducers";
 import { pluginRegistryApi } from "@api/plugin-registry.api";
@@ -25,6 +25,17 @@ import { communityApi } from "@api/community.api";
 // };
 // const persistedReducer = persistReducer(persistConfig, reducers);
 
+type RootState = ReturnType<typeof reducers>;
+
+const rootReducer = (state: RootState, action: Action) => {
+  if (action.type === "RESET_ALL") {
+    state = undefined;
+  }
+  return reducers(state, action);
+};
+
+export const resetState = { type: "RESET_ALL" };
+
 export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -39,7 +50,7 @@ export const store = configureStore({
       onboardingApi.middleware,
       communityApi.middleware
     ),
-  reducer: reducers
+  reducer: rootReducer
 });
 
 export default store;
