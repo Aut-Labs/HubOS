@@ -59,6 +59,8 @@ const PluginCard = ({
     return `${PluginDefinitionType[plugin.pluginDefinitionId]}`;
   }, []);
 
+  console.log(plugin, "plugin");
+
   return (
     <>
       <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
@@ -95,7 +97,7 @@ const PluginCard = ({
             </>
           }
           title={plugin?.metadata?.properties?.title}
-          subheader={plugin?.metadata?.description}
+          subheader={plugin?.metadata?.properties?.module?.shortDescription}
         />
         <CardContent
           sx={{
@@ -282,7 +284,7 @@ export const PluginDefinitionCard = ({
       >
         <Stack flex={1}>
           <Typography className="text-secondary" variant="body">
-            {plugin?.metadata?.properties?.module?.longDescription}
+            {plugin?.metadata?.properties?.module?.shortDescription}
           </Typography>
         </Stack>
 
