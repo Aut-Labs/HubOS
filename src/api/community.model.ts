@@ -78,7 +78,7 @@ export class CommunityProperties extends DAOProperties {
         );
       }
       // @TODO - Tao to fix
-      this.userData.isAdmin = (data as any).isAdmin?.data;
+      this.userData.isAdmin = (data as any).isAdmin;
     }
   }
 }
