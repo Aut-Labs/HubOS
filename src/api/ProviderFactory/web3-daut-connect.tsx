@@ -128,7 +128,13 @@ function Web3DautConnect({
     localStorage.removeItem(AUTH_TOKEN_KEY);
   };
 
+  const onAutMenuProfile = () => {
+    const profile = JSON.parse(sessionStorage.getItem("aut-data"));
+    window.open(`https://my.aut.id/${profile.name}`, "_blank");
+  };
+
   useEffect(() => {
+    window.addEventListener("aut_profile", onAutMenuProfile);
     window.addEventListener("aut-Init", onAutInit);
     window.addEventListener("aut-onConnected", onAutLogin);
     window.addEventListener("aut-onDisconnected", onDisconnected);
@@ -157,6 +163,7 @@ function Web3DautConnect({
     });
 
     return () => {
+      window.removeEventListener("aut_profile", onAutMenuProfile);
       window.removeEventListener("aut-Init", onAutInit);
       window.removeEventListener("aut-onConnected", onAutLogin);
       window.removeEventListener("aut-onDisconnected", onAutLogin);
@@ -175,6 +182,8 @@ function Web3DautConnect({
           zIndex: 99999
         }}
         id="d-aut"
+        menu-items='[{"name":"Profile","actionType":"event_emit","eventName":"aut_profile"}]'
+        flow-config='{"mode" : "dashboard", "customCongratsMessage": ""}'
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
         button-type="simple"
       />

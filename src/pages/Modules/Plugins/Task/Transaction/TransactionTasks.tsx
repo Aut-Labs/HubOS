@@ -9,7 +9,7 @@ import {
   Box,
   Button,
   Container,
-  InputAdornment,
+  MenuItem,
   Stack,
   Typography
 } from "@mui/material";
@@ -21,9 +21,10 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { dateToUnix } from "@utils/date-format";
 import { addMinutes } from "date-fns";
-import { countWords } from "@utils/helpers";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
+import { AutSelectField } from "@theme/field-select-styles";
+import { InteractionNetworks } from "@utils/transaction-networks";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
@@ -113,7 +114,8 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
       description: "",
       linkToInteractUrl: "",
       smartContractAddress: "",
-      functionName: ""
+      functionName: "",
+      network: ""
     }
   });
 
@@ -135,6 +137,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
           name: values.title,
           description: values.description,
           properties: {
+            network: values.network,
             linkToInteractUrl: values.linkToInteractUrl,
             smartContractAddress: values.smartContractAddress,
             functionName: values.functionName
@@ -286,6 +289,58 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                       />
                     }
                   />
+                );
+              }}
+            />
+
+            <Controller
+              name="network"
+              control={control}
+              rules={{
+                validate: {
+                  selected: (v) => !!v
+                }
+              }}
+              render={({ field: { name, value, onChange } }) => {
+                return (
+                  <AutSelectField
+                    variant="standard"
+                    color="offWhite"
+                    renderValue={(selected) => {
+                      if (!selected) {
+                        return "Network" as any;
+                      }
+                      const network = InteractionNetworks.find(
+                        (t) => t.network === selected
+                      );
+                      return network?.name || selected;
+                    }}
+                    name={name}
+                    value={value || ""}
+                    displayEmpty
+                    required
+                    onChange={onChange}
+                    helperText={
+                      <FormHelperText
+                        value={value}
+                        name={name}
+                        errors={formState.errors}
+                      >
+                        Select a role with which members can join
+                      </FormHelperText>
+                    }
+                  >
+                    {InteractionNetworks.map((type) => {
+                      return (
+                        <MenuItem
+                          key={`role-${type.network}`}
+                          value={type.network}
+                        >
+                          {type.name}
+                        </MenuItem>
+                      );
+                    })}
+                  </AutSelectField>
                 );
               }}
             />

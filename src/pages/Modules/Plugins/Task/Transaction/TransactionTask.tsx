@@ -15,7 +15,7 @@ import {
   Typography
 } from "@mui/material";
 import { IsAdmin } from "@store/Community/community.reducer";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useSearchParams, useParams, Link } from "react-router-dom";
@@ -27,6 +27,7 @@ import { useEthers } from "@usedapp/core";
 import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
+import { InteractionNetworks } from "@utils/transaction-networks";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -87,6 +88,15 @@ const TransactionTask = ({ plugin }: PluginParams) => {
     });
   };
 
+  const transactionNetwork = useMemo(() => {
+    if (!task) return;
+    const net = InteractionNetworks.find(
+      // @ts-ignore
+      (n) => n.network === task.metadata.properties.network
+    );
+    return net?.name;
+  }, [task]);
+
   return (
     <Container
       maxWidth="lg"
@@ -145,6 +155,19 @@ const TransactionTask = ({ plugin }: PluginParams) => {
                     </Typography>
                     <Typography variant="caption" className="text-secondary">
                       Task Description
+                    </Typography>
+                  </Stack>
+                  <Stack direction="column" alignItems="center" mb="15px">
+                    <Typography
+                      color="white"
+                      variant="body"
+                      textAlign="center"
+                      p="5px"
+                    >
+                      {transactionNetwork}
+                    </Typography>
+                    <Typography variant="caption" className="text-secondary">
+                      Network
                     </Typography>
                   </Stack>
                   <Stack direction="column" alignItems="center" mb="15px">

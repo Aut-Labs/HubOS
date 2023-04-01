@@ -23,19 +23,18 @@ import Callback from "./pages/Oauth2Callback/Callback";
 import NetworkResolver from "./pages/PublicQuest/NetworkResolver";
 
 const generateConfig = (networks: NetworkConfig[]): Config => {
-  const readOnlyUrls = networks
-    .filter((n) => !n.disabled)
-    .reduce((prev, curr) => {
-      const network = {
-        name: "mumbai",
-        chainId: 80001,
-        _defaultProvider: (providers) =>
-          new providers.JsonRpcProvider(curr.rpcUrls[0])
-      };
-      const provider = ethers.getDefaultProvider(network);
-      prev[curr.chainId] = provider;
-      return prev;
-    }, {});
+  const enabled_networks = networks.filter((n) => !n.disabled);
+  const readOnlyUrls = enabled_networks.reduce((prev, curr) => {
+    const network = {
+      name: "mumbai",
+      chainId: 80001,
+      _defaultProvider: (providers) =>
+        new providers.JsonRpcProvider(curr.rpcUrls[0])
+    };
+    const provider = ethers.getDefaultProvider(network);
+    prev[curr.chainId] = provider;
+    return prev;
+  }, {});
 
   return {
     readOnlyUrls,
@@ -44,33 +43,27 @@ const generateConfig = (networks: NetworkConfig[]): Config => {
     },
     autoConnect: false,
     // @ts-ignore
-    networks: networks
-      .filter((n) => !n.disabled)
-      .map((n) => ({
-        isLocalChain: false,
-        isTestChain: environment.networkEnv === "testing",
-        chainId: n.chainId,
-        chainName: n.network,
-        rpcUrl: n.rpcUrls[0],
-        nativeCurrency: n.nativeCurrency
-      })),
+    networks: enabled_networks.map((n) => ({
+      isLocalChain: false,
+      isTestChain: environment.networkEnv === "testing",
+      chainId: n.chainId,
+      chainName: n.network,
+      rpcUrl: n.rpcUrls[0],
+      nativeCurrency: n.nativeCurrency
+    })),
     gasLimitBufferPercentage: 50000,
-    pollingIntervals: networks
-      .filter((n) => !n.disabled)
-      .reduce((prev, curr) => {
-        prev[curr.chainId] = 40000;
-        return prev;
-      }, {}),
+    pollingIntervals: enabled_networks.reduce((prev, curr) => {
+      prev[curr.chainId] = 40000;
+      return prev;
+    }, {}),
     connectors: {
       metamask: new MetamaskConnector(),
       walletConnect: new WalletConnectConnector({
-        rpc: networks
-          .filter((n) => !n.disabled)
-          .reduce((prev, curr) => {
-            // eslint-disable-next-line prefer-destructuring
-            prev[curr.chainId] = curr.rpcUrls[0];
-            return prev;
-          }, {}),
+        rpc: enabled_networks.reduce((prev, curr) => {
+          // eslint-disable-next-line prefer-destructuring
+          prev[curr.chainId] = curr.rpcUrls[0];
+          return prev;
+        }, {}),
         infuraId: "d8df2cb7844e4a54ab0a782f608749dd"
       })
     }

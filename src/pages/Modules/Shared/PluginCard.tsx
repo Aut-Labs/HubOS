@@ -50,6 +50,7 @@ const PluginCard = ({
     useAddPluginToDAOMutation();
 
   const exploreAddressUrl = useMemo(() => {
+    if (!selectedNetworkConfig) return;
     const [exploreUrl] = selectedNetworkConfig.explorerUrls;
     return `${exploreUrl}address/${plugin?.pluginAddress}`;
   }, [selectedNetworkConfig?.explorerUrls, plugin?.pluginAddress]);

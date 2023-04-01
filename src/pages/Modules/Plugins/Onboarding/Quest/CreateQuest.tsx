@@ -142,7 +142,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       title: "",
       description: "",
       durationInDays: 3,
-      startDate: new Date("03.29.2023 21:00:00"),
+      startDate: new Date("April 1, 2023 20:00:00 GMT+0100"),
       // startDate: addMinutes(new Date(), 25),
       role: null
     }
@@ -223,7 +223,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         title: quest.metadata.name,
         description: quest.metadata.description,
         durationInDays: quest.durationInDays,
-        startDate: new Date(),
+        startDate: new Date(quest.startDate),
         role: quest.role
       });
       setInitialized(true);
