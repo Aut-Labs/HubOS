@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, memo, useEffect, useMemo, useState } from "react";
 import {
   ConnectorTypes,
   NetworksConfig,
@@ -170,10 +170,8 @@ const NetworkResolver = () => {
     });
   };
 
-  const [
-    loadPlugins,
-    { data: plugins, isError, isSuccess: isSuccessPlugins, error }
-  ] = useLazyGetAllPluginDefinitionsByDAOQuery();
+  const [loadPlugins, { data: plugins, isError, error }] =
+    useLazyGetAllPluginDefinitionsByDAOQuery();
 
   const taskPluginTypes = useMemo(() => {
     return (plugins || []).reduce((prev, curr) => {
@@ -181,8 +179,6 @@ const NetworkResolver = () => {
       return prev;
     }, {});
   }, [plugins]);
-
-  console.log("taskPluginTypes: ", taskPluginTypes);
 
   const changeConnector = async (connectorType: string) => {
     try {
@@ -565,4 +561,4 @@ const NetworkResolver = () => {
   );
 };
 
-export default NetworkResolver;
+export default memo(NetworkResolver);

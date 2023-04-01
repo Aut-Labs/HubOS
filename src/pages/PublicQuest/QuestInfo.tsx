@@ -8,12 +8,12 @@ import {
   Badge,
   CircularProgress
 } from "@mui/material";
-import { addDays } from "date-fns";
-import { memo, useEffect, useState } from "react";
+import { addDays, isAfter } from "date-fns";
+import { memo, useEffect, useMemo, useState } from "react";
 import DescriptionIcon from "@mui/icons-material/Description";
-import { Quest } from "@aut-labs-private/sdk";
 import {
   useApplyForQuestMutation,
+  useGetOnboardingQuestByIdQuery,
   useLazyHasUserCompletedQuestQuery,
   useWithdrawFromAQuestMutation
 } from "@api/onboarding.api";
@@ -27,13 +27,9 @@ import BetaCountdown from "@components/BetaCountdown";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 
 const QuestInfo = ({
-  quest,
-  hasQuestStarted,
   setAppliedQuestFn
 }: {
-  quest: Quest;
   setAppliedQuestFn: (state: number) => void;
-  hasQuestStarted: boolean;
 }) => {
   const [searchParams] = useSearchParams();
   const { account } = useEthers();
@@ -44,6 +40,26 @@ const QuestInfo = ({
     useLazyHasUserCompletedQuestQuery();
   const [apply, { isLoading: isApplying, isError, error, reset, isSuccess }] =
     useApplyForQuestMutation();
+
+  const { data: quest } = useGetOnboardingQuestByIdQuery(
+    {
+      questId: +searchParams.get(RequiredQueryParams.QuestId),
+      onboardingQuestAddress: searchParams.get(
+        RequiredQueryParams.OnboardingQuestAddress
+      ),
+      daoAddress: searchParams.get(RequiredQueryParams.DaoAddress)
+    },
+    {
+      selectFromResult: ({ data }) => ({
+        data
+      })
+    }
+  );
+
+  const hasQuestStarted = useMemo(() => {
+    if (!quest?.startDate) return false;
+    return isAfter(new Date(), new Date(quest.startDate));
+  }, [quest]);
 
   const [
     withdraw,

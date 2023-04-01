@@ -139,11 +139,7 @@ const PublicQuest = () => {
             position: "relative"
           }}
         >
-          <QuestInfo
-            quest={quest}
-            hasQuestStarted={hasQuestStarted}
-            setAppliedQuestFn={setAppliedQuest}
-          />
+          <QuestInfo setAppliedQuestFn={setAppliedQuest} />
           <CommunityInfo />
         </Box>
       )}
@@ -218,8 +214,11 @@ const PublicQuest = () => {
           )}
 
           <Tasks
-            hasAppliedForQuest={!!appliedQuest}
+            hasAppliedForQuest={
+              appliedQuest === +searchParams.get(RequiredQueryParams.QuestId)
+            }
             quest={quest}
+            hasQuestStarted={hasQuestStarted}
             isLoading={isLoadingTasks}
             tasks={tasks}
           />

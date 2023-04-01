@@ -87,10 +87,12 @@ const TaskListItem = memo(
   ({
     row,
     quest,
-    hasAppliedForQuest
+    hasAppliedForQuest,
+    hasQuestStarted
   }: {
     row: Task;
     quest: Quest;
+    hasQuestStarted: boolean;
     hasAppliedForQuest: boolean;
   }) => {
     const location = useLocation();
@@ -138,8 +140,12 @@ const TaskListItem = memo(
                 }
               >
                 <Tooltip
-                  disableHoverListener={quest?.active}
-                  title={quest?.active ? "" : "View task details"}
+                  disableHoverListener={!quest?.active || !hasQuestStarted}
+                  title={
+                    !quest?.active || !hasQuestStarted
+                      ? ""
+                      : "View task details"
+                  }
                 >
                   <BtnLink
                     variant="subtitle2"
@@ -147,12 +153,15 @@ const TaskListItem = memo(
                       color: "primary.light",
                       "&:hover": {
                         textDecoration:
-                          !quest?.active || !hasAppliedForQuest
+                          !quest?.active ||
+                          !hasAppliedForQuest ||
+                          !hasQuestStarted
                             ? "unset"
                             : "underline"
                       }
                     }}
                     {...(quest?.active &&
+                      hasQuestStarted &&
                       hasAppliedForQuest && {
                         to: `/quest/${path}/${row.taskId}`,
                         preserveParams: true,
@@ -204,6 +213,7 @@ interface TasksParams {
   isLoading: boolean;
   tasks: Task[];
   quest: Quest;
+  hasQuestStarted: boolean;
   hasAppliedForQuest: boolean;
 }
 
@@ -211,6 +221,7 @@ const Tasks = ({
   isLoading,
   tasks,
   quest,
+  hasQuestStarted,
   hasAppliedForQuest
 }: TasksParams) => {
   return (
@@ -265,6 +276,7 @@ const Tasks = ({
                   {tasks?.map((row, index) => (
                     <TaskListItem
                       quest={quest}
+                      hasQuestStarted={hasQuestStarted}
                       hasAppliedForQuest={hasAppliedForQuest}
                       key={`table-row-${index}`}
                       row={row}
