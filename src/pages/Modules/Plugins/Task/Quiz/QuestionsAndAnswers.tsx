@@ -58,7 +58,7 @@ const Answers = ({ control, questionIndex }: AnswersParams) => {
               name={`questions[${questionIndex}].answers[${index}].value`}
               control={control}
               rules={{
-                required: true
+                required: index <= 1
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
@@ -75,7 +75,7 @@ const Answers = ({ control, questionIndex }: AnswersParams) => {
                         </Typography>
                       )
                     }}
-                    required
+                    required={index <= 1}
                     name={name}
                     value={value || ""}
                     onChange={onChange}
