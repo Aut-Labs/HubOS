@@ -386,7 +386,7 @@ const OpenTask = ({ plugin }: PluginParams) => {
 
           {!isAdmin && (
             <UserSubmitContent
-              task={task}
+              task={submission || task}
               plugin={plugin}
               userAddress={userAddress}
             />
