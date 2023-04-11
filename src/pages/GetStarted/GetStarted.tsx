@@ -1,8 +1,8 @@
 import { Box, Container, styled, Typography } from "@mui/material";
 import AppTitle from "@components/AppTitle";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
-import BubbleTopRight from "@assets/bubble_top_right.png";
-import BubbleBottomLeft from "@assets/bubble_bottom_left.png";
+import BubbleTopRight from "@assets/bubble.svg";
+import BubbleBottomLeft from "@assets/bubble2.svg";
 import TryFoldImage from "@assets/tryfold.png";
 import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 import { useOAuth } from "@components/Oauth2/oauth2";
@@ -28,6 +28,8 @@ const BottomLeftBubble = styled("img")(({ theme }) => ({
   height: "400px",
   left: "-200px",
   bottom: "-200px",
+  filter: "blur(50px)",
+  transform: "rotate(-50deg)",
   [theme.breakpoints.up("md")]: {
     width: "700px",
     height: "700px",
@@ -42,6 +44,7 @@ const TopRightBubble = styled("img")(({ theme }) => ({
   height: "400px",
   top: "-200px",
   right: "-200px",
+  filter: "blur(50px)",
   [theme.breakpoints.up("md")]: {
     width: "700px",
     height: "700px",

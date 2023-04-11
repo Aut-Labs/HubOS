@@ -32,8 +32,8 @@ import { useAppDispatch } from "@store/store.model";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { useLazyGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
-import BubbleTopRight from "@assets/bubble_top_right.png";
-import BubbleBottomLeft from "@assets/bubble_bottom_left.png";
+import BubbleTopRight from "@assets/bubble.svg";
+import BubbleBottomLeft from "@assets/bubble2.svg";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useAutWalletConnect } from "./use-aut-wallet-connect";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
@@ -46,6 +46,8 @@ const BottomLeftBubble = styled("img")(({ theme }) => ({
   height: "400px",
   left: "-200px",
   bottom: "-200px",
+  filter: "blur(50px)",
+  transform: "rotate(-50deg)",
   [theme.breakpoints.up("md")]: {
     width: "700px",
     height: "700px",
@@ -60,6 +62,7 @@ const TopRightBubble = styled("img")(({ theme }) => ({
   height: "400px",
   top: "-200px",
   right: "-200px",
+  filter: "blur(50px)",
   [theme.breakpoints.up("md")]: {
     width: "700px",
     height: "700px",
