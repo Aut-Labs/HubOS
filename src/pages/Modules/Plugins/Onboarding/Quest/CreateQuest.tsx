@@ -126,6 +126,20 @@ const QuestSuccess = ({ newQuestId, existingQuestId, pluginAddress }) => {
   );
 };
 
+const questDate = () => {
+  // Create a new Date object
+  const date = new Date();
+
+  // Set the time to 20:00 CET
+  date.setUTCHours(18); // 18 = 20:00 CET
+
+  // Set the minutes, seconds, and milliseconds to 0
+  date.setUTCMinutes(0);
+  date.setUTCSeconds(0);
+  date.setUTCMilliseconds(0);
+  return date;
+};
+
 const CreateQuest = ({ plugin }: PluginParams) => {
   const [roles] = useState(useSelector(allRoles));
   const [searchParams] = useSearchParams();
@@ -142,7 +156,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       title: "",
       description: "",
       durationInDays: 3,
-      startDate: new Date("April 4, 2023 20:00:00 GMT+0100"),
+      startDate: questDate(),
       // startDate: addMinutes(new Date(), 25),
       role: null
     }
