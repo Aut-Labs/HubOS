@@ -126,19 +126,32 @@ const QuestSuccess = ({ newQuestId, existingQuestId, pluginAddress }) => {
   );
 };
 
-const questDate = () => {
-  // Create a new Date object
-  const date = new Date();
+function questStartDate() {
+  const phaseOneStartDate = new Date("2023-04-13T07:00:00.000Z");
+  // set the time zone to CET
+  phaseOneStartDate.setUTCHours(7);
+  phaseOneStartDate.setMinutes(0);
+  phaseOneStartDate.setSeconds(0);
+  phaseOneStartDate.setMilliseconds(0);
 
-  // Set the time to 20:00 CET
-  date.setUTCHours(18); // 18 = 20:00 CET
+  const phaseOneDuration = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
+  const phaseTwoDuration = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
+  const phaseThreeDuration = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
 
-  // Set the minutes, seconds, and milliseconds to 0
-  date.setUTCMinutes(0);
-  date.setUTCSeconds(0);
-  date.setUTCMilliseconds(0);
-  return date;
-};
+  const phaseOneEndDate = new Date(
+    phaseOneStartDate.getTime() + phaseOneDuration
+  );
+  const phaseTwoStartDate = new Date(phaseOneEndDate.getTime());
+  const phaseTwoEndDate = new Date(
+    phaseTwoStartDate.getTime() + phaseTwoDuration
+  );
+  const phaseThreeStartDate = new Date(phaseTwoEndDate.getTime());
+  const phaseThreeEndDate = new Date(
+    phaseThreeStartDate.getTime() + phaseThreeDuration
+  );
+
+  return phaseThreeEndDate;
+}
 
 const CreateQuest = ({ plugin }: PluginParams) => {
   const [roles] = useState(useSelector(allRoles));
@@ -156,7 +169,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       title: "",
       description: "",
       durationInDays: 3,
-      startDate: questDate(),
+      startDate: questStartDate(),
       // startDate: addMinutes(new Date(), 25),
       role: null
     }
