@@ -7,11 +7,11 @@ export enum CacheTypes {
   AnswerStore = "AnswerStore"
 }
 
-interface CacheModel {
+export interface CacheModel {
   cacheKey: string;
   address: string;
   daoAddress: string;
-  onboardingPluginAddress: string;
+  onboardingQuestAddress: string;
   questId: number;
   list: any[];
 }

@@ -2,7 +2,6 @@ import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import {
   Box,
   Button,
-  CircularProgress,
   Container,
   FormControlLabel,
   IconButton,
@@ -46,7 +45,7 @@ interface StackParams {
 const Plugins = ({ definition }: StackParams) => {
   const isAdmin = useSelector(IsAdmin);
   const [searchParams] = useSearchParams();
-  const [hideInstalled, setToggleInstalled] = useState(false);
+  const [showInstalled, setToggleInstalled] = useState(false);
 
   const { plugins, isLoading, isFetching, refetch } =
     useGetAllPluginDefinitionsByDAOQuery(null, {
@@ -64,9 +63,9 @@ const Plugins = ({ definition }: StackParams) => {
     });
 
   const filteredPlugins = useMemo(() => {
-    if (!hideInstalled) return plugins;
-    return plugins.filter((p) => !p.pluginAddress);
-  }, [hideInstalled, plugins]);
+    if (!showInstalled) return plugins;
+    return plugins.filter((p) => p.pluginAddress);
+  }, [showInstalled, plugins]);
 
   return (
     <>
@@ -128,8 +127,8 @@ const Plugins = ({ definition }: StackParams) => {
                   color: "white"
                 }}
                 onChange={(_, checked) => setToggleInstalled(checked)}
-                control={<Switch checked={hideInstalled} color="primary" />}
-                label="Hide installed"
+                control={<Switch checked={showInstalled} color="primary" />}
+                label="Show installed"
               />
             </Box>
           )}

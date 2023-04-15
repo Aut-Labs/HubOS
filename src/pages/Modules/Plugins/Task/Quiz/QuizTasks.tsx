@@ -17,8 +17,8 @@ import AddIcon from "@mui/icons-material/Add";
 import QuestionsAndAnswers, { emptyQuestion } from "./QuestionsAndAnswers";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { useEthers } from "@usedapp/core";
 import { saveQestions } from "@api/tasks.api";
+import LinkWithQuery from "@components/LinkWithQuery";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
@@ -62,15 +62,16 @@ const TaskSuccess = ({ pluginId, reset }) => {
           }}
         >
           <Button
+            startIcon={<AddIcon />}
+            variant="outlined"
             sx={{
               my: pxToRem(50)
             }}
-            type="submit"
-            startIcon={<AddIcon />}
-            variant="outlined"
             size="medium"
-            onClick={reset}
             color="offWhite"
+            to="/aut-dashboard/modules/Task"
+            preserveParams
+            component={LinkWithQuery}
           >
             Add another task
           </Button>

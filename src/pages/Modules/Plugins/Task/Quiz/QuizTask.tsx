@@ -7,35 +7,29 @@ import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
 import AutLoading from "@components/AutLoading";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
-import LinkWithQuery from "@components/LinkWithQuery";
 import { StepperButton } from "@components/Stepper";
 import {
   Box,
-  Button,
   Card,
   CardContent,
   CardHeader,
   Checkbox,
   Container,
-  IconButton,
   Stack,
   styled,
   Typography
 } from "@mui/material";
 import { IsAdmin } from "@store/Community/community.reducer";
-import { AutTextField } from "@theme/field-text-styles";
 import { memo, useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
-import { isNull } from "util";
 import TaskDetails from "../Shared/TaskDetails";
 import { GridBox } from "./QuestionsAndAnswers";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import { useEthers } from "@usedapp/core";
-import { getQestions } from "@api/tasks.api";
 
 interface PluginParams {
   plugin: PluginDefinition;

@@ -59,8 +59,6 @@ const PluginCard = ({
     return `${PluginDefinitionType[plugin.pluginDefinitionId]}`;
   }, []);
 
-  console.log(plugin, "plugin");
-
   return (
     <>
       <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
@@ -173,7 +171,7 @@ const PluginCard = ({
             {plugin.pluginAddress ? "Go to plugin" : "Install"}
           </LoadingButton>
 
-          <Stack direction="row" justifyContent="flex-end">
+          {/* <Stack direction="row" justifyContent="flex-end">
             <Typography
               className="text-secondary"
               sx={{
@@ -185,7 +183,7 @@ const PluginCard = ({
             >
               {plugin?.metadata?.name}
             </Typography>
-          </Stack>
+          </Stack> */}
         </CardContent>
       </GridCard>
     </>
@@ -300,8 +298,7 @@ export const PluginDefinitionCard = ({
         >
           View module
         </Button>
-
-        <Stack direction="row" justifyContent="flex-end">
+        {/* <Stack direction="row" justifyContent="flex-end">
           <Typography
             className="text-secondary"
             sx={{
@@ -313,7 +310,7 @@ export const PluginDefinitionCard = ({
           >
             {plugin?.metadata?.name}
           </Typography>
-        </Stack>
+        </Stack> */}
       </CardContent>
     </GridCard>
   );

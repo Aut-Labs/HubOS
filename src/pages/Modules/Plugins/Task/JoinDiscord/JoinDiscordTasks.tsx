@@ -1,38 +1,27 @@
-import {
-  useCreateQuestMutation,
-  useCreateTaskPerQuestMutation
-} from "@api/onboarding.api";
+import { useCreateTaskPerQuestMutation } from "@api/onboarding.api";
 import { PluginDefinition, Task } from "@aut-labs-private/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { FormHelperText } from "@components/Fields";
 import { StepperButton } from "@components/Stepper";
-import {
-  Box,
-  Button,
-  Container,
-  InputAdornment,
-  Stack,
-  Typography
-} from "@mui/material";
+import { Box, Button, Chip, Container, Stack, Typography } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
-import { memo } from "react";
+import { memo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import {
-  Link,
-  useNavigate,
-  useParams,
-  useSearchParams
-} from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { dateToUnix } from "@utils/date-format";
 import { addMinutes } from "date-fns";
-import { countWords } from "@utils/helpers";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useSelector } from "react-redux";
-import { DiscordLink } from "@store/Community/community.reducer";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import {
+  DiscordLink,
+  IsDiscordVerified
+} from "@store/Community/community.reducer";
+import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
+import LinkWithQuery from "@components/LinkWithQuery";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
@@ -77,15 +66,16 @@ const TaskSuccess = ({ pluginId, reset }) => {
           }}
         >
           <Button
+            startIcon={<AddIcon />}
+            variant="outlined"
             sx={{
               my: pxToRem(50)
             }}
-            type="submit"
-            startIcon={<AddIcon />}
-            variant="outlined"
             size="medium"
-            onClick={reset}
             color="offWhite"
+            to="/aut-dashboard/modules/Task"
+            preserveParams
+            component={LinkWithQuery}
           >
             Add another task
           </Button>
@@ -114,13 +104,15 @@ const endDatetime = new Date();
 addMinutes(endDatetime, 45);
 
 const JoinDiscordTasks = ({ plugin }: PluginParams) => {
+  const isDiscordVerified = useSelector(IsDiscordVerified);
   const inviteLink = useSelector(DiscordLink);
   const [searchParams] = useSearchParams();
+  const [discordDialogOpen, setDiscordDialogOpen] = useState(false);
   const { control, handleSubmit, getValues, formState } = useForm({
     mode: "onChange",
     defaultValues: {
       title: "",
-      inviteUrl: inviteLink || "",
+      // inviteUrl: inviteLink || "",
       description: ""
     }
   });
@@ -143,7 +135,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
           name: values.title,
           description: values.description,
           properties: {
-            inviteUrl: values.inviteUrl
+            inviteUrl: inviteLink
           }
         },
         startDate: dateToUnix(new Date()),
@@ -164,6 +156,10 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
           autoComplete="off"
           onSubmit={handleSubmit(onSubmit)}
         >
+          <DiscordServerVerificationPopup
+            open={discordDialogOpen}
+            handleClose={() => setDiscordDialogOpen(false)}
+          ></DiscordServerVerificationPopup>
           <ErrorDialog
             handleClose={() => reset()}
             open={isError}
@@ -294,8 +290,38 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                 );
               }}
             />
+            {!isDiscordVerified && (
+              <Stack>
+                <Typography
+                  className="text-secondary"
+                  mx="auto"
+                  my={2}
+                  textAlign="center"
+                  color="white"
+                  variant="body1"
+                >
+                  Please verify the discord account for your community.
+                </Typography>
+                <Button
+                  sx={{
+                    mb: pxToRem(50)
+                  }}
+                  onClick={() => setDiscordDialogOpen(true)}
+                  type="button"
+                  variant="outlined"
+                  size="medium"
+                  color="offWhite"
+                >
+                  "Verify Discord
+                </Button>
+              </Stack>
+            )}
 
-            <Controller
+            {isDiscordVerified && (
+              <Chip color="success" label="Discord Verified" />
+            )}
+
+            {/* <Controller
               name="inviteUrl"
               control={control}
               rules={{
@@ -311,20 +337,6 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                     value={value || ""}
                     onChange={onChange}
                     placeholder="1234"
-                    // InputProps={{
-                    //   startAdornment: (
-                    //     <InputAdornment position="start">
-                    //       <p
-                    //         style={{
-                    //           color: "white",
-                    //           marginRight: "-5px"
-                    //         }}
-                    //       >
-                    //         https://discord.com/invite/
-                    //       </p>
-                    //     </InputAdornment>
-                    //   )
-                    // }}
                     helperText={
                       <FormHelperText
                         value={value}
@@ -337,9 +349,12 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                   />
                 );
               }}
-            />
+            /> */}
 
-            <StepperButton label="Create Task" disabled={!formState.isValid} />
+            <StepperButton
+              label="Create Task"
+              disabled={!formState.isValid || !inviteLink}
+            />
           </Stack>
         </Container>
       )}

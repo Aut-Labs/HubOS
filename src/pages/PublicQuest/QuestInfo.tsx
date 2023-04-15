@@ -22,19 +22,25 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { useSearchParams } from "react-router-dom";
 import InfoIcon from "@mui/icons-material/Info";
 import { useConfirmDialog } from "react-mui-confirm";
-import { CacheTypes, deleteCache, getCache, updateCache } from "@api/cache.api";
+import {
+  CacheModel,
+  CacheTypes,
+  deleteCache,
+  getCache,
+  updateCache
+} from "@api/cache.api";
 import BetaCountdown from "@components/BetaCountdown";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
+import { useGetCommunityQuery } from "@api/community.api";
 
 const QuestInfo = ({
-  setAppliedQuestFn
+  onUpdateCache
 }: {
-  setAppliedQuestFn: (state: number) => void;
+  onUpdateCache: (cache: CacheModel) => void;
 }) => {
   const [searchParams] = useSearchParams();
   const { account } = useEthers();
-  const [appliedQuest, setAppliedQuest] = useState(null);
-  const [cache, setCache] = useState(null);
+  const [cache, setCache] = useState<CacheModel>(null);
   const confirm = useConfirmDialog();
   const [hasUserCompletedQuest, { data: isQuestComplete }] =
     useLazyHasUserCompletedQuestQuery();
@@ -56,10 +62,40 @@ const QuestInfo = ({
     }
   );
 
+  const { data: communityData } = useGetCommunityQuery(null, {
+    refetchOnMountOrArgChange: false,
+    skip: false
+  });
+
+  const isOwner = useMemo(() => {
+    return communityData?.admin === account;
+  }, [account, communityData]);
+
   const hasQuestStarted = useMemo(() => {
     if (!quest?.startDate) return false;
     return isAfter(new Date(), new Date(quest.startDate));
   }, [quest]);
+
+  const hasQuestEnded = useMemo(() => {
+    if (!quest?.startDate) return false;
+    return isAfter(
+      new Date(),
+      addDays(new Date(quest.startDate), quest.durationInDays)
+    );
+  }, [quest]);
+
+  const canApplyForAQuest = useMemo(() => {
+    return !isOwner && !cache && !!hasQuestStarted && !hasQuestEnded;
+  }, [cache, hasQuestStarted, hasQuestEnded, isOwner]);
+
+  const hasAppliedForQuest = useMemo(() => {
+    return (
+      !!cache &&
+      cache?.onboardingQuestAddress ==
+        searchParams.get(RequiredQueryParams.OnboardingQuestAddress) &&
+      cache?.questId === +searchParams.get(RequiredQueryParams.QuestId)
+    );
+  }, [cache, hasQuestStarted, hasQuestEnded]);
 
   const [
     withdraw,
@@ -92,6 +128,7 @@ const QuestInfo = ({
           const cacheResult = await getCache(CacheTypes.UserPhases);
           cacheResult.list[1].status = 1;
           await updateCache(cacheResult);
+          onUpdateCache(cacheResult);
           setCache(cacheResult);
         } catch (error) {
           console.log(error);
@@ -106,8 +143,7 @@ const QuestInfo = ({
       const start = async () => {
         try {
           await deleteCache(CacheTypes.UserPhases);
-          setAppliedQuest(null);
-          setAppliedQuestFn(null);
+          onUpdateCache(null);
           setCache(null);
           withdrawReset();
         } catch (error) {
@@ -146,9 +182,8 @@ const QuestInfo = ({
               }
             ]
           });
-          setAppliedQuest(updatedCache?.questId);
-          setAppliedQuestFn(updatedCache?.questId);
           setCache(updatedCache);
+          onUpdateCache(updatedCache);
           reset();
         } catch (error) {
           console.log(error);
@@ -162,13 +197,13 @@ const QuestInfo = ({
     const start = async () => {
       try {
         const cacheResult = await getCache(CacheTypes.UserPhases);
-        setAppliedQuest(cacheResult?.questId);
-        setAppliedQuestFn(cacheResult?.questId);
         setCache(cacheResult);
+        onUpdateCache(cacheResult);
         if (
-          !!cacheResult?.questId &&
-          cacheResult?.questId ===
-            +searchParams.get(RequiredQueryParams.QuestId)
+          !!cache &&
+          cache?.onboardingQuestAddress &&
+          searchParams.get(RequiredQueryParams.OnboardingQuestAddress) &&
+          cache?.questId === +searchParams.get(RequiredQueryParams.QuestId)
         ) {
           hasUserCompletedQuest({
             questId: +searchParams.get(RequiredQueryParams.QuestId),
@@ -230,8 +265,8 @@ const QuestInfo = ({
                   sx={{
                     ml: 1
                   }}
-                  label={quest.active ? "Active" : "Inactive"}
-                  color={quest.active ? "success" : "error"}
+                  label={quest?.active ? "Active" : "Inactive"}
+                  color={quest?.active ? "success" : "error"}
                   size="small"
                 />
               </Stack>
@@ -245,7 +280,7 @@ const QuestInfo = ({
             
           )} */}
           <>
-            {!appliedQuest && (
+            {canApplyForAQuest && (
               <Badge
                 badgeContent={
                   <Tooltip title="You can only apply to one quest, but you can withdraw before it starts.">
@@ -282,8 +317,7 @@ const QuestInfo = ({
                 </LoadingButton>
               </Badge>
             )}
-            {appliedQuest ===
-              +searchParams.get(RequiredQueryParams.QuestId) && (
+            {hasAppliedForQuest && (
               <LoadingButton
                 onClick={confimWithdrawal}
                 disabled={isWithdrawing}
@@ -316,8 +350,8 @@ const QuestInfo = ({
             to={
               new Date(
                 hasQuestStarted
-                  ? addDays(quest?.startDate, quest.durationInDays)
-                  : quest.startDate
+                  ? addDays(quest?.startDate, quest?.durationInDays)
+                  : quest?.startDate
               )
             }
           />

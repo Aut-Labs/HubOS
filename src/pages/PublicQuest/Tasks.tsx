@@ -2,9 +2,7 @@ import { Quest, Task } from "@aut-labs-private/sdk";
 import {
   Badge,
   Box,
-  CircularProgress,
   Paper,
-  Stack,
   Table,
   TableBody,
   TableCell,
@@ -140,9 +138,11 @@ const TaskListItem = memo(
                 }
               >
                 <Tooltip
-                  disableHoverListener={!quest?.active || !hasQuestStarted}
+                  disableHoverListener={
+                    !quest?.active || !hasAppliedForQuest || !hasQuestStarted
+                  }
                   title={
-                    !quest?.active || !hasQuestStarted
+                    !quest?.active || !hasAppliedForQuest || !hasQuestStarted
                       ? ""
                       : "View task details"
                   }
@@ -299,7 +299,7 @@ const Tasks = ({
               }}
             >
               <Typography className="text-secondary" variant="subtitle2">
-                No tasks yet...
+                There are no tasks on this quest yet...
               </Typography>
             </Box>
           )}

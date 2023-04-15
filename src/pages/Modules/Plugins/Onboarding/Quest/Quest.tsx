@@ -177,7 +177,7 @@ const Quest = ({ plugin }: PluginParams) => {
             />
           </Box>
 
-          {isAdmin && !quest?.active && (
+          {isAdmin && !quest?.active && quest?.tasksCount > 0 && (
             <Box
               sx={{
                 width: "100%",

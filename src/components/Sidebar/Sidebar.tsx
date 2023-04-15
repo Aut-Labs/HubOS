@@ -2,7 +2,6 @@
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import {
-  Button,
   Divider,
   IconButton,
   Stack,
@@ -17,7 +16,6 @@ import MenuItems from "./MenuItems";
 import { memo, useMemo, useState } from "react";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import MenuIcon from "@mui/icons-material/Menu";
-import CloseIcon from "@mui/icons-material/Close";
 import DashboardTitle from "@components/AppTitle";
 import { ReactComponent as AutWhiteIcon } from "@assets/aut/aut-white.svg";
 import { useSelector } from "react-redux";
@@ -29,7 +27,6 @@ import {
 } from "@store/Community/community.reducer";
 import { UserInfo } from "@auth/auth.reducer";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
-import BetaCountdown from "@components/BetaCountdown";
 import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 
 const Main = styled("main", {
@@ -170,7 +167,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
         </Toolbar>
       </AppBar>
 
-      {!isDiscordVerified && (
+      {/* {!isDiscordVerified && (
         <AppBar
           sx={{
             top: `${toolbarHeight}px`,
@@ -207,16 +204,9 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
               }}
             ></span>
 
-            {/* <IconButton
-              onClick={() => closeWarningBar()}
-              color="offWhite"
-              edge="start"
-            > */}
-            {/* <CloseIcon />
-            </IconButton> */}
           </Toolbar>
         </AppBar>
-      )}
+      )} */}
 
       <Drawer
         variant={isMobile ? "temporary" : "persistent"}
@@ -323,7 +313,6 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             py: 2
           }}
         >
-          {/* <BetaCountdown to={new Date("2023-03-16 01:00:00")} /> */}
           <SvgIcon
             sx={{
               mt: 5,

@@ -156,7 +156,7 @@ export const QuestListItem = memo(
                 queryParams={{
                   onboardingQuestAddress: pluginAddress,
                   returnUrlLinkName: "Back to quest",
-                  returnUrl: location.pathname,
+                  returnUrl: `${location.pathname}/${row.questId.toString()}`,
                   questId: row.questId.toString()
                 }}
                 component={LinkWithQuery}
@@ -176,8 +176,8 @@ export const QuestListItem = memo(
                 preserveParams
                 queryParams={{
                   onboardingQuestAddress: pluginAddress,
-                  returnUrlLinkName: "Back to quests",
-                  returnUrl: location.pathname,
+                  returnUrlLinkName: "Back to quest",
+                  returnUrl: `${location.pathname}/${row.questId.toString()}`,
                   questId: row.questId.toString()
                 }}
                 component={LinkWithQuery}

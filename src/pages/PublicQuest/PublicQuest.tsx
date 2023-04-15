@@ -6,7 +6,6 @@ import {
   Container,
   Box,
   Typography,
-  CircularProgress,
   LinearProgress,
   linearProgressClasses,
   styled
@@ -16,13 +15,15 @@ import { memo, useMemo, useState } from "react";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
-import { isAfter } from "date-fns";
+import { addDays, isAfter } from "date-fns";
 import Tasks from "./Tasks";
 import CommunityInfo from "./CommunityInfo";
 import QuestInfo from "./QuestInfo";
 import AutLoading from "@components/AutLoading";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useEthers } from "@usedapp/core";
+import { useGetCommunityQuery } from "@api/community.api";
+import { CacheModel } from "@api/cache.api";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 30,
@@ -39,7 +40,7 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 const PublicQuest = () => {
   const { account: userAddress } = useEthers();
   const [searchParams] = useSearchParams();
-  const [appliedQuest, setAppliedQuest] = useState(null);
+  const [cache, setCache] = useState<CacheModel>();
 
   const {
     data: quest,
@@ -59,10 +60,37 @@ const PublicQuest = () => {
     }
   );
 
+  const { data: communityData } = useGetCommunityQuery(null, {
+    refetchOnMountOrArgChange: false,
+    skip: false
+  });
+
+  const isOwner = useMemo(() => {
+    return communityData?.admin === userAddress;
+  }, [userAddress, communityData]);
+
   const hasQuestStarted = useMemo(() => {
     if (!quest?.startDate) return false;
     return isAfter(new Date(), new Date(quest.startDate));
   }, [quest]);
+
+  const hasQuestEnded = useMemo(() => {
+    if (!quest?.startDate) return false;
+    return isAfter(
+      new Date(),
+      addDays(new Date(quest.startDate), quest.durationInDays)
+    );
+  }, [quest]);
+
+  const hasAppliedForQuest = useMemo(() => {
+    return (
+      !isOwner &&
+      !!cache &&
+      cache?.onboardingQuestAddress ==
+        searchParams.get(RequiredQueryParams.OnboardingQuestAddress) &&
+      cache?.questId === +searchParams.get(RequiredQueryParams.QuestId)
+    );
+  }, [cache, hasQuestStarted, hasQuestEnded, isOwner]);
 
   const {
     data: tasksAndSubmissions,
@@ -139,84 +167,77 @@ const PublicQuest = () => {
             position: "relative"
           }}
         >
-          <QuestInfo setAppliedQuestFn={setAppliedQuest} />
+          <QuestInfo onUpdateCache={setCache} />
           <CommunityInfo />
         </Box>
       )}
 
-      {isSuccess && !isLoadingTasks && !!tasks?.length && (
+      {isSuccess && !isLoadingTasks && (
         <>
-          {appliedQuest === +searchParams.get(RequiredQueryParams.QuestId) &&
-            hasQuestStarted && (
+          {hasAppliedForQuest && hasQuestStarted && (
+            <Box
+              sx={{
+                mt: 4,
+                boxShadow: 1,
+                border: "2px solid",
+                borderColor: "divider",
+                borderRadius: "16px",
+                p: 3,
+                backgroundColor: "#ffffff0a"
+              }}
+            >
+              <Typography
+                sx={{
+                  mb: 2,
+                  display: {
+                    xs: "flex",
+                    sm: "inherit"
+                  },
+                  flexDirection: "column"
+                }}
+                color="white"
+                variant="subtitle1"
+              >
+                Your progress{" "}
+                <Typography className="text-secondary" variant="caption">
+                  (You have completed {completedTasks}/{tasks.length} tasks)
+                </Typography>
+              </Typography>
+              <BorderLinearProgress
+                variant="determinate"
+                color={completedTasks === tasks?.length ? "success" : "primary"}
+                value={(completedTasks / tasks.length) * 100}
+              />
               <Box
                 sx={{
-                  mt: 4,
-                  boxShadow: 1,
-                  border: "2px solid",
-                  borderColor: "divider",
-                  borderRadius: "16px",
-                  p: 3,
-                  backgroundColor: "#ffffff0a"
+                  mt: 1,
+                  display: "flex",
+                  justifyContent: "flex-end"
                 }}
               >
                 <Typography
-                  sx={{
-                    mb: 2,
-                    display: {
-                      xs: "flex",
-                      sm: "inherit"
-                    },
-                    flexDirection: "column"
-                  }}
-                  color="white"
-                  variant="subtitle1"
+                  textAlign="end"
+                  variant="caption"
+                  className="text-secondary"
                 >
-                  Your progress{" "}
-                  <Typography className="text-secondary" variant="caption">
-                    (You have completed {completedTasks}/{tasks.length} tasks)
-                  </Typography>
+                  Complete all the tasks to claim your ĀutID
                 </Typography>
-                <BorderLinearProgress
-                  variant="determinate"
-                  color={
-                    completedTasks === tasks?.length ? "success" : "primary"
-                  }
-                  value={(completedTasks / tasks.length) * 100}
-                />
-                <Box
-                  sx={{
-                    mt: 1,
-                    display: "flex",
-                    justifyContent: "flex-end"
-                  }}
-                >
-                  <Typography
-                    textAlign="end"
-                    variant="caption"
-                    className="text-secondary"
-                  >
-                    Complete all the tasks to claim your ĀutID
-                  </Typography>
-                </Box>
               </Box>
-            )}
-
-          {!appliedQuest && (
-            <Typography
-              sx={{
-                mt: 8
-              }}
-              color="white"
-              variant="subtitle1"
-            >
-              Quest tasks
-            </Typography>
+            </Box>
           )}
 
+          <Typography
+            sx={{
+              mt: 8
+            }}
+            color="white"
+            variant="subtitle1"
+          >
+            Quest tasks
+          </Typography>
+
           <Tasks
-            hasAppliedForQuest={
-              appliedQuest === +searchParams.get(RequiredQueryParams.QuestId)
-            }
+            hasAppliedForQuest={hasAppliedForQuest}
             quest={quest}
             hasQuestStarted={hasQuestStarted}
             isLoading={isLoadingTasks}

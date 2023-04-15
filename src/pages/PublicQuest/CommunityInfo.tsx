@@ -50,11 +50,11 @@ const CommunityInfo = () => {
     }
   }, [selectedNetworkConfig]);
 
-  const { data, isError, isLoading, isFetching, refetch } =
-    useGetCommunityQuery(null, {
-      refetchOnMountOrArgChange: false,
-      skip: false
-    });
+  const { data } = useGetCommunityQuery(null, {
+    selectFromResult: ({ data }) => ({
+      data
+    })
+  });
 
   return (
     <Box

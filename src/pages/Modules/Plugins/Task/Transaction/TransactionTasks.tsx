@@ -25,6 +25,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { AutSelectField } from "@theme/field-select-styles";
 import { InteractionNetworks } from "@utils/transaction-networks";
+import LinkWithQuery from "@components/LinkWithQuery";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
@@ -69,15 +70,16 @@ const TaskSuccess = ({ pluginId, reset }) => {
           }}
         >
           <Button
+            startIcon={<AddIcon />}
+            variant="outlined"
             sx={{
               my: pxToRem(50)
             }}
-            type="submit"
-            startIcon={<AddIcon />}
-            variant="outlined"
             size="medium"
-            onClick={reset}
             color="offWhite"
+            to="/aut-dashboard/modules/Task"
+            preserveParams
+            component={LinkWithQuery}
           >
             Add another task
           </Button>
@@ -320,15 +322,6 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                     displayEmpty
                     required
                     onChange={onChange}
-                    helperText={
-                      <FormHelperText
-                        value={value}
-                        name={name}
-                        errors={formState.errors}
-                      >
-                        Select a role with which members can join
-                      </FormHelperText>
-                    }
                   >
                     {InteractionNetworks.map((type) => {
                       return (

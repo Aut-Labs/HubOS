@@ -37,6 +37,8 @@ import BubbleBottomLeft from "@assets/bubble2.svg";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useAutWalletConnect } from "./use-aut-wallet-connect";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
+import { resetState } from "@store/store";
+import { AUTH_TOKEN_KEY } from "@api/auth.api";
 
 const TOOLBAR_HEIGHT = 84;
 
@@ -224,6 +226,8 @@ const NetworkResolver = () => {
     dispatch(setWallet(null));
     setIsLoading(false);
     setIsOpen(false);
+    dispatch(resetState);
+    localStorage.removeItem(AUTH_TOKEN_KEY);
   };
 
   useEffect(() => {

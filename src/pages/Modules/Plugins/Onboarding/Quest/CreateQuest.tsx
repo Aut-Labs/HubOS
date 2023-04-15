@@ -34,10 +34,10 @@ import {
 } from "react-router-dom";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { addMinutes } from "date-fns";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LinkWithQuery from "@components/LinkWithQuery";
 import AddIcon from "@mui/icons-material/Add";
+import { getMemberPhases, getOwnerPhases } from "@utils/beta-phases";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 3`,
@@ -126,31 +126,11 @@ const QuestSuccess = ({ newQuestId, existingQuestId, pluginAddress }) => {
   );
 };
 
-function questStartDate() {
-  const phaseOneStartDate = new Date("2023-04-13T07:00:00.000Z");
-  // set the time zone to CET
-  phaseOneStartDate.setUTCHours(7);
-  phaseOneStartDate.setMinutes(0);
-  phaseOneStartDate.setSeconds(0);
-  phaseOneStartDate.setMilliseconds(0);
-
-  const phaseOneDuration = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
-  const phaseTwoDuration = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
-  const phaseThreeDuration = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
-
-  const phaseOneEndDate = new Date(
-    phaseOneStartDate.getTime() + phaseOneDuration
-  );
-  const phaseTwoStartDate = new Date(phaseOneEndDate.getTime());
-  const phaseTwoEndDate = new Date(
-    phaseTwoStartDate.getTime() + phaseTwoDuration
-  );
-  const phaseThreeStartDate = new Date(phaseTwoEndDate.getTime());
-  const phaseThreeEndDate = new Date(
-    phaseThreeStartDate.getTime() + phaseThreeDuration
-  );
-
-  return phaseThreeEndDate;
+function questDurationInDays() {
+  const { phaseOneDuration, phaseTwoDuration } = getMemberPhases();
+  const totalDuration = phaseOneDuration + phaseTwoDuration;
+  const numberOfDays = totalDuration / (24 * 60 * 60 * 1000); // number of milliseconds in a day
+  return numberOfDays;
 }
 
 const CreateQuest = ({ plugin }: PluginParams) => {
@@ -168,9 +148,8 @@ const CreateQuest = ({ plugin }: PluginParams) => {
     defaultValues: {
       title: "",
       description: "",
-      durationInDays: 3,
-      startDate: questStartDate(),
-      // startDate: addMinutes(new Date(), 25),
+      durationInDays: questDurationInDays(),
+      startDate: getOwnerPhases().phaseThreeEndDate,
       role: null
     }
   });

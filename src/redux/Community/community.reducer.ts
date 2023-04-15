@@ -1,9 +1,12 @@
 import { ResultState } from "@store/result-status";
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchCommunity, updateCommunity } from "@api/community.api";
+import {
+  fetchCommunity,
+  updateCommunity,
+  updateDiscordSocials
+} from "@api/community.api";
 import { createSelector } from "reselect";
 import { Community } from "@api/community.model";
-import { debug } from "console";
 
 export interface CommunityState {
   selectedCommunityAddress: string;
@@ -30,64 +33,6 @@ export const communitySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // get community
-      // .addCase(setAsCoreTeam.pending, (state) => {
-      //   state.status = ResultState.Loading;
-      // })
-      // .addCase(setAsCoreTeam.fulfilled, (state, action) => {
-      //   const address = action.payload as string;
-      //   state.members = Object.keys(state.members).reduce((prev, curr) => {
-      //     const members = state.members[curr].map((member: AutID) => {
-      //       if (member.properties.address === address) {
-      //         member.properties.isAdmin = true;
-      //         prev.Admins.push(member);
-      //       }
-      //       return member;
-      //     });
-      //     return {
-      //       ...prev,
-      //       [curr]: members
-      //     };
-      //   }, state.members);
-      //   state.status = ResultState.Idle;
-      // })
-      // .addCase(setAsCoreTeam.rejected, (state, action) => {
-      //   if (!action.meta.aborted) {
-      //     state.status = ResultState.Failed;
-      //   } else {
-      //     state.status = ResultState.Idle;
-      //   }
-      // })
-      // .addCase(removeAsCoreTeam.pending, (state) => {
-      //   state.status = ResultState.Loading;
-      // })
-      // .addCase(removeAsCoreTeam.fulfilled, (state, action) => {
-      //   const address = action.payload as string;
-      //   state.status = ResultState.Idle;
-      //   state.members = Object.keys(state.members).reduce((prev, curr) => {
-      //     const members = state.members[curr].map((member: AutID) => {
-      //       if (member.properties.address === address) {
-      //         member.properties.isAdmin = false;
-      //         prev.Admins.filter(
-      //           (m: AutID) => m.properties.address !== address
-      //         );
-      //       }
-      //       return member;
-      //     });
-      //     return {
-      //       ...prev,
-      //       [curr]: members
-      //     };
-      //   }, state.members);
-      // })
-      // .addCase(removeAsCoreTeam.rejected, (state, action) => {
-      //   if (!action.meta.aborted) {
-      //     state.status = ResultState.Failed;
-      //   } else {
-      //     state.status = ResultState.Idle;
-      //   }
-      // })
-      // get community
       .addCase(fetchCommunity.pending, (state) => {
         state.status = ResultState.Loading;
       })
@@ -123,6 +68,25 @@ export const communitySlice = createSlice({
         state.status = ResultState.Idle;
       })
       .addCase(updateCommunity.rejected, (state, action) => {
+        if (!action.meta.aborted) {
+          state.status = ResultState.Failed;
+        } else {
+          state.status = ResultState.Idle;
+        }
+      })
+      .addCase(updateDiscordSocials.pending, (state) => {
+        state.status = ResultState.Loading;
+      })
+      .addCase(updateDiscordSocials.fulfilled, (state, action) => {
+        state.communities = state.communities.map((c) => {
+          if (c.properties.address === state.selectedCommunityAddress) {
+            return action.payload;
+          }
+          return c;
+        });
+        state.status = ResultState.Idle;
+      })
+      .addCase(updateDiscordSocials.rejected, (state, action) => {
         if (!action.meta.aborted) {
           state.status = ResultState.Failed;
         } else {
