@@ -111,6 +111,7 @@ const QuestInfo = ({
   const confimWithdrawal = () =>
     confirm({
       title: "Are you sure you want to withdraw from quest?",
+      confirmButtonText: "Withdraw",
       onConfirm: async () => {
         withdraw({
           onboardingQuestAddress: searchParams.get(
@@ -239,6 +240,7 @@ const QuestInfo = ({
           borderRadius: "16px",
           height: "100%",
           p: 3,
+          width: "100%",
           backgroundColor: "nightBlack.main"
         }}
       >

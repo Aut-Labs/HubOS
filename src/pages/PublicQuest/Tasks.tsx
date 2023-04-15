@@ -253,6 +253,9 @@ const Tasks = ({
                     xs: "700px",
                     sm: "unset"
                   },
+                  width: {
+                    xs: "100%"
+                  },
                   ".MuiTableBody-root > .MuiTableRow-root:hover": {
                     backgroundColor: "#ffffff0a"
                   }

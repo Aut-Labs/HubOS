@@ -66,6 +66,7 @@ const CommunityInfo = () => {
         height: "100%",
         borderRadius: "16px",
         p: 3,
+        width: "100%",
         backgroundColor: "nightBlack.main"
       }}
     >
