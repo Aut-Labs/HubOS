@@ -324,7 +324,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
                     errors={formState.errors}
                   >
                     <span>
-                      {280 - (value?.length || 0)}/280 characters left
+                      {257 - (value?.length || 0)}/257 characters left
                     </span>
                   </FormHelperText>
                 }

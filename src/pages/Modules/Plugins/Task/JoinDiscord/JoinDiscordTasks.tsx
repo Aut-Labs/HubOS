@@ -16,6 +16,7 @@ import { addMinutes } from "date-fns";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useSelector } from "react-redux";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import DoneIcon from "@mui/icons-material/Done";
 import {
   DiscordLink,
   IsDiscordVerified
@@ -233,6 +234,36 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
           }
         }}
       >
+        {!isDiscordVerified && (
+          <Stack>
+            <Typography
+              className="text-secondary"
+              mx="auto"
+              my={2}
+              textAlign="center"
+              color="white"
+              variant="body1"
+            >
+              Please verify the discord account for your community.
+            </Typography>
+            <Button
+              sx={{
+                mb: pxToRem(50)
+              }}
+              onClick={() => setDiscordDialogOpen(true)}
+              type="button"
+              variant="outlined"
+              size="medium"
+              color="offWhite"
+            >
+              Verify Discord
+            </Button>
+          </Stack>
+        )}
+
+        {isDiscordVerified && (
+          <Chip icon={<DoneIcon />} color="success" label="Discord Verified" />
+        )}
         <Controller
           name="title"
           control={control}
@@ -287,40 +318,16 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                     value={value}
                     name={name}
                     errors={formState.errors}
-                  />
+                  >
+                    <span>
+                      {257 - (value?.length || 0)}/257 characters left
+                    </span>
+                  </FormHelperText>
                 }
               />
             );
           }}
         />
-        {!isDiscordVerified && (
-          <Stack>
-            <Typography
-              className="text-secondary"
-              mx="auto"
-              my={2}
-              textAlign="center"
-              color="white"
-              variant="body1"
-            >
-              Please verify the discord account for your community.
-            </Typography>
-            <Button
-              sx={{
-                mb: pxToRem(50)
-              }}
-              onClick={() => setDiscordDialogOpen(true)}
-              type="button"
-              variant="outlined"
-              size="medium"
-              color="offWhite"
-            >
-              "Verify Discord
-            </Button>
-          </Stack>
-        )}
-
-        {isDiscordVerified && <Chip color="success" label="Discord Verified" />}
 
         {/* <Controller
         name="inviteUrl"

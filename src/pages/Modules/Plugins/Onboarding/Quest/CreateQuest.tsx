@@ -155,7 +155,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
     mode: "onChange",
     defaultValues: {
       title: "",
-      description: "",
+      // description: "",
       // durationInDays: questDurationInDays(),
       startDate: getOwnerPhases().phaseThreeEndDate,
       role: null
@@ -212,7 +212,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         metadata: {
           name:
             values.title || roles.find((r) => r.id === values.role)?.roleName,
-          description: values.description,
+          description: "",
           properties: {}
         }
       });
@@ -226,7 +226,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         metadata: {
           name:
             values.title || roles.find((r) => r.id === values.role)?.roleName,
-          description: values.description,
+          description: "",
           properties: {}
         }
       });
@@ -237,7 +237,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
     if (!initialized && quest) {
       resetForm({
         title: quest.metadata.name,
-        description: quest.metadata.description,
+        // description: quest.metadata.description,
         // durationInDays: quest.durationInDays,
         startDate: new Date(quest.startDate),
         role: quest.role
@@ -455,7 +455,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
               }}
             /> */}
 
-        <Controller
+        {/* <Controller
           name="description"
           control={control}
           rules={{
@@ -485,7 +485,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
               />
             );
           }}
-        />
+        /> */}
 
         <Typography color="white" variant="body">
           *: During the closed beta, the duration of each onboarding quest will

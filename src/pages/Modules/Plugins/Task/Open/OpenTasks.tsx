@@ -272,7 +272,11 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                     value={value}
                     name={name}
                     errors={formState.errors}
-                  />
+                  >
+                    <span>
+                      {257 - (value?.length || 0)}/257 characters left
+                    </span>
+                  </FormHelperText>
                 }
               />
             );
