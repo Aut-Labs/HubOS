@@ -10,10 +10,9 @@ import { pluginRoutes } from "./Modules/Shared/routes";
 import Modules from "./Modules/Modules";
 import { useSelector } from "react-redux";
 import { IsAdmin } from "@store/Community/community.reducer";
-import useBreadcrumbs from "use-react-router-breadcrumbs";
+import { useGetAllModuleDefinitionsQuery } from "@api/module-registry.api";
 
 const AutDashboardMain = () => {
-  const breadcrumbs = useBreadcrumbs();
   const isAdmin = useSelector(IsAdmin);
   const { data: plugins, isLoading } = useGetAllPluginDefinitionsByDAOQuery(
     null,
@@ -23,8 +22,18 @@ const AutDashboardMain = () => {
     }
   );
 
-  const modules = useMemo(() => {
-    const { allRoutes, menuItems } = pluginRoutes(plugins || [], isAdmin);
+  const { data: modules, isLoading: isLoadingModules } =
+    useGetAllModuleDefinitionsQuery(null, {
+      refetchOnMountOrArgChange: false,
+      skip: false
+    });
+
+  const modulesRoutes = useMemo(() => {
+    const { allRoutes, menuItems } = pluginRoutes(
+      plugins || [],
+      modules || [],
+      isAdmin
+    );
     return {
       menuItem: {
         title: "Modules",
@@ -35,20 +44,20 @@ const AutDashboardMain = () => {
       },
       routes: allRoutes
     };
-  }, [plugins, isAdmin]);
+  }, [plugins, modules, isAdmin]);
 
   return (
     <>
-      {isLoading ? (
+      {isLoading || isLoadingModules ? (
         <AutLoading />
       ) : (
-        <SidebarDrawer addonMenuItems={[modules.menuItem]}>
+        <SidebarDrawer addonMenuItems={[modulesRoutes.menuItem]}>
           <Suspense fallback={<AutLoading />}>
             <Routes>
               <Route index element={<Dashboard />} />
               <Route path="members" element={<Members />} />
               <Route path="modules" element={<Modules />} />
-              {modules.routes.map((r) => r)}
+              {modulesRoutes.routes.map((r) => r)}
               <Route path="*" element={<Navigate to="/aut-dashboard" />} />
             </Routes>
           </Suspense>

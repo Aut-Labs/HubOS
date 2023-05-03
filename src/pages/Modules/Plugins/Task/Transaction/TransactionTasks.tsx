@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -109,6 +109,7 @@ addMinutes(endDatetime, 45);
 
 const TransactionTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { control, handleSubmit, getValues, formState } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -151,257 +152,255 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
     });
   };
 
-  return (
-    <>
-      {isSuccess ? (
-        <TaskSuccess reset={reset} pluginId={data?.taskId} />
-      ) : (
-        <Container
-          sx={{ py: "20px", display: "flex", flexDirection: "column" }}
-          maxWidth="lg"
-          component="form"
-          autoComplete="off"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <ErrorDialog
-            handleClose={() => reset()}
-            open={isError}
-            message={error}
-          />
-          <LoadingDialog open={isLoading} message="Creating task..." />
+  useEffect(() => {
+    if (isSuccess) {
+      navigate({
+        pathname: `/aut-dashboard/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
+          RequiredQueryParams.QuestId
+        )}`
+      });
+    }
+  }, [isSuccess]);
 
-          <Box
+  return (
+    <Container
+      sx={{ py: "20px", display: "flex", flexDirection: "column" }}
+      maxWidth="lg"
+      component="form"
+      autoComplete="off"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <LoadingDialog open={isLoading} message="Creating task..." />
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          mb: 4,
+          position: "relative",
+          mx: "auto",
+          width: "100%"
+        }}
+      >
+        <Stack alignItems="center" justifyContent="center">
+          <Button
+            startIcon={<ArrowBackIcon />}
+            color="offWhite"
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              mb: 4,
-              position: "relative",
-              mx: "auto",
-              width: "100%"
-            }}
-          >
-            <Stack alignItems="center" justifyContent="center">
-              <Button
-                startIcon={<ArrowBackIcon />}
-                color="offWhite"
-                sx={{
-                  position: {
-                    sm: "absolute"
-                  },
-                  left: {
-                    sm: "0"
-                  }
-                }}
-                to={searchParams.get("returnUrl")}
-                component={Link}
-              >
-                {searchParams.get("returnUrlLinkName") || "Back"}
-              </Button>
-              <Typography textAlign="center" color="white" variant="h3">
-                Create a Smart Contract Task
-              </Typography>
-            </Stack>
-            <Typography
-              className="text-secondary"
-              mt={2}
-              sx={{
-                width: {
-                  xs: "100%",
-                  sm: "600px",
-                  xxl: "800px"
-                }
-              }}
-              mx="auto"
-              textAlign="center"
-              color="white"
-              variant="body1"
-            >
-              Create a task based on a Smart Contract Interaction. We will
-              automatically validate the interaction on the chosen smart
-              contract(s) in order to approve the submission.
-            </Typography>
-          </Box>
-          <Stack
-            direction="column"
-            gap={4}
-            sx={{
-              margin: "0 auto",
-              width: {
-                xs: "100%",
-                sm: "400px",
-                xxl: "800px"
+              position: {
+                sm: "absolute"
+              },
+              left: {
+                sm: "0"
               }
             }}
+            to={searchParams.get("returnUrl")}
+            component={Link}
           >
-            <Controller
-              name="title"
-              control={control}
-              rules={{
-                required: true
-              }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
-                    variant="standard"
-                    color="offWhite"
-                    required
-                    autoFocus
+            {searchParams.get("returnUrlLinkName") || "Back"}
+          </Button>
+          <Typography textAlign="center" color="white" variant="h3">
+            Create a Smart Contract Task
+          </Typography>
+        </Stack>
+        <Typography
+          className="text-secondary"
+          mt={2}
+          sx={{
+            width: {
+              xs: "100%",
+              sm: "600px",
+              xxl: "800px"
+            }
+          }}
+          mx="auto"
+          textAlign="center"
+          color="white"
+          variant="body1"
+        >
+          Create a task based on a Smart Contract Interaction. We will
+          automatically validate the interaction on the chosen smart contract(s)
+          in order to approve the submission.
+        </Typography>
+      </Box>
+      <Stack
+        direction="column"
+        gap={4}
+        sx={{
+          margin: "0 auto",
+          width: {
+            xs: "100%",
+            sm: "400px",
+            xxl: "800px"
+          }
+        }}
+      >
+        <Controller
+          name="title"
+          control={control}
+          rules={{
+            required: true
+          }}
+          render={({ field: { name, value, onChange } }) => {
+            return (
+              <AutTextField
+                variant="standard"
+                color="offWhite"
+                required
+                autoFocus
+                name={name}
+                value={value || ""}
+                onChange={onChange}
+                placeholder="Title"
+                helperText={
+                  <FormHelperText
+                    errorTypes={errorTypes}
+                    value={value}
                     name={name}
-                    value={value || ""}
-                    onChange={onChange}
-                    placeholder="Title"
-                    helperText={
-                      <FormHelperText
-                        errorTypes={errorTypes}
-                        value={value}
-                        name={name}
-                        errors={formState.errors}
-                      />
-                    }
+                    errors={formState.errors}
                   />
-                );
-              }}
-            />
-
-            <Controller
-              name="description"
-              control={control}
-              rules={{
-                required: true
-              }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
-                    name={name}
-                    value={value || ""}
-                    onChange={onChange}
-                    variant="outlined"
-                    color="offWhite"
-                    required
-                    multiline
-                    rows={5}
-                    placeholder="Write a description of the task for your community"
-                    helperText={
-                      <FormHelperText
-                        errorTypes={errorTypes}
-                        value={value}
-                        name={name}
-                        errors={formState.errors}
-                      />
-                    }
-                  />
-                );
-              }}
-            />
-
-            <Controller
-              name="network"
-              control={control}
-              rules={{
-                validate: {
-                  selected: (v) => !!v
                 }
-              }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutSelectField
-                    variant="standard"
-                    color="offWhite"
-                    renderValue={(selected) => {
-                      if (!selected) {
-                        return "Network" as any;
-                      }
-                      const network = InteractionNetworks.find(
-                        (t) => t.network === selected
-                      );
-                      return network?.name || selected;
-                    }}
-                    name={name}
-                    value={value || ""}
-                    displayEmpty
-                    required
-                    onChange={onChange}
-                  >
-                    {InteractionNetworks.map((type) => {
-                      return (
-                        <MenuItem
-                          key={`role-${type.network}`}
-                          value={type.network}
-                        >
-                          {type.name}
-                        </MenuItem>
-                      );
-                    })}
-                  </AutSelectField>
-                );
-              }}
-            />
+              />
+            );
+          }}
+        />
 
-            <Controller
-              name="linkToInteractUrl"
-              control={control}
-              rules={{
-                required: true
-              }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
-                    variant="standard"
-                    color="offWhite"
-                    required
+        <Controller
+          name="description"
+          control={control}
+          rules={{
+            required: true,
+            maxLength: 257
+          }}
+          render={({ field: { name, value, onChange } }) => {
+            return (
+              <AutTextField
+                name={name}
+                value={value || ""}
+                onChange={onChange}
+                variant="outlined"
+                color="offWhite"
+                required
+                multiline
+                rows={5}
+                placeholder="Write a description of the task for your community"
+                helperText={
+                  <FormHelperText
+                    errorTypes={errorTypes}
+                    value={value}
                     name={name}
-                    value={value || ""}
-                    onChange={onChange}
-                    placeholder="Link to Interact"
+                    errors={formState.errors}
                   />
-                );
-              }}
-            />
+                }
+              />
+            );
+          }}
+        />
 
-            <Controller
-              name="smartContractAddress"
-              control={control}
-              rules={{
-                required: true
-              }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
-                    variant="standard"
-                    color="offWhite"
-                    required
-                    name={name}
-                    value={value || ""}
-                    onChange={onChange}
-                    placeholder="Smart Contract Address"
-                  />
-                );
-              }}
-            />
+        <Controller
+          name="network"
+          control={control}
+          rules={{
+            validate: {
+              selected: (v) => !!v
+            }
+          }}
+          render={({ field: { name, value, onChange } }) => {
+            return (
+              <AutSelectField
+                variant="standard"
+                color="offWhite"
+                renderValue={(selected) => {
+                  if (!selected) {
+                    return "Network" as any;
+                  }
+                  const network = InteractionNetworks.find(
+                    (t) => t.network === selected
+                  );
+                  return network?.name || selected;
+                }}
+                name={name}
+                value={value || ""}
+                displayEmpty
+                required
+                onChange={onChange}
+              >
+                {InteractionNetworks.map((type) => {
+                  return (
+                    <MenuItem key={`role-${type.network}`} value={type.network}>
+                      {type.name}
+                    </MenuItem>
+                  );
+                })}
+              </AutSelectField>
+            );
+          }}
+        />
 
-            <Controller
-              name="functionName"
-              control={control}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
-                    variant="standard"
-                    color="offWhite"
-                    name={name}
-                    value={value || ""}
-                    onChange={onChange}
-                    placeholder="Function Name"
-                  />
-                );
-              }}
-            />
+        <Controller
+          name="linkToInteractUrl"
+          control={control}
+          rules={{
+            required: true
+          }}
+          render={({ field: { name, value, onChange } }) => {
+            return (
+              <AutTextField
+                variant="standard"
+                color="offWhite"
+                required
+                name={name}
+                value={value || ""}
+                onChange={onChange}
+                placeholder="Link to Interact"
+              />
+            );
+          }}
+        />
 
-            <StepperButton label="Create Task" disabled={!formState.isValid} />
-          </Stack>
-        </Container>
-      )}
-    </>
+        <Controller
+          name="smartContractAddress"
+          control={control}
+          rules={{
+            required: true
+          }}
+          render={({ field: { name, value, onChange } }) => {
+            return (
+              <AutTextField
+                variant="standard"
+                color="offWhite"
+                required
+                name={name}
+                value={value || ""}
+                onChange={onChange}
+                placeholder="Smart Contract Address"
+              />
+            );
+          }}
+        />
+
+        <Controller
+          name="functionName"
+          control={control}
+          render={({ field: { name, value, onChange } }) => {
+            return (
+              <AutTextField
+                variant="standard"
+                color="offWhite"
+                name={name}
+                value={value || ""}
+                onChange={onChange}
+                placeholder="Function Name"
+              />
+            );
+          }}
+        />
+
+        <StepperButton label="Create Task" disabled={!formState.isValid} />
+      </Stack>
+    </Container>
   );
 };
 

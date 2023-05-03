@@ -4,6 +4,7 @@ import { reducers } from "./reducers";
 import { pluginRegistryApi } from "@api/plugin-registry.api";
 import { onboardingApi } from "@api/onboarding.api";
 import { communityApi } from "@api/community.api";
+import { moduleRegistryApi } from "@api/module-registry.api";
 // import storage from "redux-persist/lib/storage";
 // import {
 //   FLUSH,
@@ -29,7 +30,12 @@ type RootState = ReturnType<typeof reducers>;
 
 const rootReducer = (state: RootState, action: Action) => {
   if (action.type === "RESET_ALL") {
-    state = undefined;
+    const keepStateKeys = ["walletProvider"];
+    Object.keys(state).forEach((key) => {
+      if (!keepStateKeys.includes(key)) {
+        delete state[key];
+      }
+    });
   }
   return reducers(state, action);
 };
@@ -47,6 +53,7 @@ export const store = configureStore({
     }).concat(
       logger,
       pluginRegistryApi.middleware,
+      moduleRegistryApi.middleware,
       onboardingApi.middleware,
       communityApi.middleware
     ),

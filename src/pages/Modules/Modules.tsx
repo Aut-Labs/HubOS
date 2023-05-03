@@ -10,12 +10,13 @@ import {
   styled
 } from "@mui/material";
 import { memo, useEffect, useMemo } from "react";
-import { PluginDefinitionCard } from "./Shared/PluginCard";
+import { ModuleDefinitionCard } from "./Shared/PluginCard";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { setTitle } from "@store/ui-reducer";
 import { useAppDispatch } from "@store/store.model";
 import AutLoading from "@components/AutLoading";
+import { useGetAllModuleDefinitionsQuery } from "@api/module-registry.api";
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -34,14 +35,14 @@ const GridBox = styled(Box)(({ theme }) => {
 
 const Modules = () => {
   const dispatch = useAppDispatch();
-  const { plugins, isLoading, isFetching, refetch } =
-    useGetAllPluginDefinitionsByDAOQuery(null, {
+  const { modules, isLoading, isFetching, refetch } =
+    useGetAllModuleDefinitionsQuery(null, {
       // @ts-ignore
       selectFromResult: ({ data, isLoading, isFetching, refetch }) => ({
         refetch,
         isLoading,
         isFetching,
-        plugins: data || []
+        modules: data || []
       })
     });
 
@@ -50,11 +51,10 @@ const Modules = () => {
   }, [dispatch]);
 
   const myModules = useMemo(() => {
-    return plugins.reduce(
+    return modules.reduce(
       (prev, curr) => {
-        const stackType = curr?.metadata?.properties?.module?.type;
-        if (stackType && !prev[stackType] && stackType === "Onboarding") {
-          prev[stackType] = true;
+        if (curr.id === 1) {
+          prev[curr.id] = true;
           prev.types.push(curr);
         }
         return prev;
@@ -63,7 +63,7 @@ const Modules = () => {
         types: []
       }
     ).types;
-  }, [plugins]);
+  }, [modules]);
 
   return (
     <>
@@ -131,10 +131,11 @@ const Modules = () => {
         ) : (
           <>
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>
-              {myModules.map((plugin, index) => (
-                <PluginDefinitionCard
+              {myModules.map((module, index) => (
+                <ModuleDefinitionCard
                   key={`modules-plugin-${index}`}
-                  plugin={plugin}
+                  isFetching={isFetching}
+                  module={module}
                 />
               ))}
             </GridBox>

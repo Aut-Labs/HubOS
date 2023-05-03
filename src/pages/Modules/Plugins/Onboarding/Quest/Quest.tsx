@@ -9,11 +9,9 @@ import {
   Typography,
   Button,
   Stack,
-  CircularProgress,
   IconButton,
   Tooltip,
-  Chip,
-  Badge
+  Chip
 } from "@mui/material";
 import { Link, useLocation, useParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -21,10 +19,7 @@ import { memo, useEffect, useMemo } from "react";
 import { IsAdmin } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
 import LinkWithQuery from "@components/LinkWithQuery";
-import AutTabs from "@components/AutTabs/AutTabs";
-import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
 import { QuestTasks } from "./QuestShared";
-import OverflowTooltip from "@components/OverflowTooltip";
 import Tasks from "../../Task/Shared/Tasks";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import LoadingProgressBar from "@components/LoadingProgressBar";
@@ -32,10 +27,8 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { setTitle } from "@store/ui-reducer";
 import { useAppDispatch } from "@store/store.model";
 import AutLoading from "@components/AutLoading";
-import { addDays, isAfter } from "date-fns";
-import BetaCountdown from "@components/BetaCountdown";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { useEthers } from "@usedapp/core";
+import EditIcon from "@mui/icons-material/Edit";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -66,7 +59,7 @@ const Quest = ({ plugin }: PluginParams) => {
     }
   );
 
-  const { tasks, submissions } = useMemo(
+  const { tasks } = useMemo(
     () => tasksAndSubmissions || ({} as unknown as any),
     [tasksAndSubmissions]
   );
@@ -84,6 +77,10 @@ const Quest = ({ plugin }: PluginParams) => {
   useEffect(() => {
     dispatch(setTitle(`Quest - ${quest?.metadata?.name || ""}`));
   }, [dispatch, quest]);
+
+  const editPath = useMemo(() => {
+    return location.pathname.replaceAll(`/${quest?.questId}`, "/create");
+  }, [location.pathname, quest]);
 
   const isLoading = useMemo(() => {
     return isLoadingPlugins || isLoadingTasks;
@@ -108,13 +105,7 @@ const Quest = ({ plugin }: PluginParams) => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
-            boxShadow: 1,
-            border: "2px solid",
-            borderColor: "divider",
-            borderRadius: "16px",
-            p: 3,
-            backgroundColor: "nightBlack.main"
+            alignItems: "center"
           }}
         >
           <Stack alignItems="center" justifyContent="center">
@@ -129,38 +120,58 @@ const Quest = ({ plugin }: PluginParams) => {
                   sm: "42px"
                 }
               }}
-              to="/aut-dashboard/modules/Onboarding/QuestOnboardingPlugin"
+              to="/aut-dashboard/modules/OnboardingStrategy/QuestOnboardingPlugin"
               component={Link}
             >
-              Back
+              All Quests
             </Button>
-            <Typography textAlign="center" color="white" variant="h3">
-              {quest?.metadata?.name}
-              <Tooltip title="Refresh quests">
-                <IconButton
-                  size="medium"
-                  component="span"
-                  color="offWhite"
-                  sx={{
-                    ml: 1
-                  }}
-                  disabled={isLoading || isFetching}
-                  onClick={refetch}
-                >
-                  <RefreshIcon />
-                </IconButton>
-              </Tooltip>
-              <Chip
+            <Stack position="relative" direction="row" alignItems="center">
+              <Typography textAlign="center" color="white" variant="h3">
+                {quest?.metadata?.name}
+              </Typography>
+              <Box
                 sx={{
-                  ml: 1
+                  display: "flex",
+                  alignItems: "center"
                 }}
-                label={quest?.active ? "Active" : "Inactive"}
-                color={quest?.active ? "success" : "error"}
-                // label={hasQuestStarted ? "Ongoing" : "Active"}
-                // color={hasQuestStarted ? "info" : "success"}
-                size="small"
-              />
-            </Typography>
+              >
+                <Tooltip title="Refresh quests">
+                  <IconButton
+                    size="medium"
+                    component="span"
+                    color="offWhite"
+                    sx={{
+                      ml: 1
+                    }}
+                    disabled={isLoading || isFetching}
+                    onClick={refetch}
+                  >
+                    <RefreshIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Edit quest">
+                  <IconButton
+                    size="medium"
+                    color="offWhite"
+                    sx={{
+                      ml: 1
+                    }}
+                    to={editPath}
+                    disabled={quest?.tasksCount >= 5}
+                    preserveParams
+                    queryParams={{
+                      onboardingQuestAddress: plugin.pluginAddress,
+                      returnUrlLinkName: "Back to quest",
+                      returnUrl: location.pathname,
+                      questId: quest?.questId?.toString()
+                    }}
+                    component={LinkWithQuery}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Stack>
           </Stack>
 
           <Box
@@ -169,15 +180,25 @@ const Quest = ({ plugin }: PluginParams) => {
               justifyContent: "center"
             }}
           >
-            <OverflowTooltip
+            <Chip
+              sx={{
+                mt: 1
+              }}
+              label={quest?.active ? "Active" : "Inactive"}
+              color={quest?.active ? "success" : "error"}
+              // label={hasQuestStarted ? "Ongoing" : "Active"}
+              // color={hasQuestStarted ? "info" : "success"}
+              size="small"
+            />
+            {/* <OverflowTooltip
               typography={{
                 maxWidth: "400px"
               }}
               text={quest?.metadata?.description}
-            />
+            /> */}
           </Box>
 
-          {isAdmin && !quest?.active && quest?.tasksCount > 0 && (
+          {/* {isAdmin && !quest?.active && quest?.tasksCount > 0 && (
             <Box
               sx={{
                 width: "100%",
@@ -215,7 +236,7 @@ const Quest = ({ plugin }: PluginParams) => {
                 </Button>
               </Badge>
             </Box>
-          )}
+          )} */}
         </Box>
       )}
 
@@ -236,7 +257,7 @@ const Quest = ({ plugin }: PluginParams) => {
           <Button
             startIcon={<AddIcon />}
             variant="outlined"
-            size="medium"
+            size="large"
             color="offWhite"
             to="/aut-dashboard/modules/Task"
             preserveParams
@@ -256,52 +277,24 @@ const Quest = ({ plugin }: PluginParams) => {
       {!isLoading && !!tasks.length && (
         <>
           {isAdmin && (
-            <AutTabs
-              tabStyles={{
-                mt: 4,
-                flex: 1,
-                ".tab-content": {
-                  padding: 0,
-                  border: 0,
-                  ".MuiTableContainer-root": {
-                    marginTop: 0,
-                    borderTopLeftRadius: 0,
-                    borderTopRightRadius: {
-                      xs: "0",
-                      sm: "16px"
-                    }
-                  }
-                }
-              }}
-              tabs={[
-                {
-                  label: "Tasks",
-                  props: {
-                    isLoading,
-                    tasks: tasks,
-                    isAdmin,
-                    onboardingQuestAddress: plugin.pluginAddress,
-                    questId: params.questId
-                  },
-                  component: QuestTasks
-                },
-                {
-                  label: "Submissions",
-                  props: {
-                    isLoading,
-                    isAdmin,
-                    tasks: submissions,
-                    onboardingQuestAddress: plugin.pluginAddress,
-                    questId: params.questId
-                  },
-                  component: QuestTasks
-                }
-              ]}
+            <QuestTasks
+              isLoading={isLoading}
+              tasks={tasks}
+              isAdmin={isAdmin}
+              onboardingQuestAddress={plugin.pluginAddress}
+              questId={+params.questId}
+              isSubmission={false}
             />
           )}
 
           {!isAdmin && (
-            <Tasks isAdmin={isAdmin} isLoading={isLoading} tasks={tasks} />
+            <Tasks
+              questId={quest?.questId}
+              onboardingQuestAddress={plugin.pluginAddress}
+              isAdmin={isAdmin}
+              isLoading={isLoading}
+              tasks={tasks}
+            />
           )}
         </>
       )}

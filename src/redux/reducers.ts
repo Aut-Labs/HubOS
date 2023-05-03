@@ -12,6 +12,7 @@ import walletProviderReduce from "./WalletProvider/WalletProvider";
 import { pluginRegistryApi } from "@api/plugin-registry.api";
 import { onboardingApi } from "@api/onboarding.api";
 import { communityApi } from "@api/community.api";
+import { moduleRegistryApi } from "@api/module-registry.api";
 
 export const reducers = combineReducers({
   community: communityReducer,
@@ -26,5 +27,6 @@ export const reducers = combineReducers({
   walletProvider: walletProviderReduce,
   [onboardingApi.reducerPath]: onboardingApi.reducer,
   [communityApi.reducerPath]: communityApi.reducer,
-  [pluginRegistryApi.reducerPath]: pluginRegistryApi.reducer
+  [pluginRegistryApi.reducerPath]: pluginRegistryApi.reducer,
+  [moduleRegistryApi.reducerPath]: moduleRegistryApi.reducer
 });
