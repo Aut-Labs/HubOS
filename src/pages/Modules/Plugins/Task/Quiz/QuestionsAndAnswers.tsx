@@ -186,7 +186,7 @@ const QuestionsAndAnswers = ({ control }) => {
         mx: "auto",
         width: {
           xs: "100%",
-          sm: "600px",
+          sm: "650px",
           xxl: "800px"
         }
       }}
@@ -275,11 +275,10 @@ const QuestionsAndAnswers = ({ control }) => {
               }}
             >
               <Typography
-                className="text-secondary"
                 mt={2}
                 textAlign="end"
                 color="white"
-                variant="body1"
+                variant="caption"
               >
                 Tick the box next to the correct answer(s)
               </Typography>

@@ -188,6 +188,17 @@ function Web3DautConnect({
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
         button-type="simple"
       />
+      {/* <d-aut
+        style={{
+          position: "absolute",
+          zIndex: 99999
+        }}
+        flow-config='{"mode" : "tryAut", "customCongratsMessage": ""}'
+        dao-expander={"0x118d72306238a221f5d6fb30610545fde933651d"}
+        id="d-aut"
+        ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
+        button-type="simple"
+      /> */}
     </>
   );
 }

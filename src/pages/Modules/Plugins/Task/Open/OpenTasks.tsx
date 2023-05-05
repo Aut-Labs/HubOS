@@ -5,7 +5,18 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { FormHelperText } from "@components/Fields";
 import { StepperButton } from "@components/Stepper";
-import { Box, Button, Container, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  Typography
+} from "@mui/material";
+import { AutSelectField } from "@theme/field-select-styles";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
 import { memo, useEffect } from "react";
@@ -15,15 +26,31 @@ import AddIcon from "@mui/icons-material/Add";
 import { dateToUnix } from "@utils/date-format";
 import { addMinutes } from "date-fns";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import LinkWithQuery from "@components/LinkWithQuery";
+import { countWords } from "@utils/helpers";
 
 const errorTypes = {
-  maxWords: `Words cannot be more than 3`,
+  maxWords: `Words cannot be more than 6`,
   maxNameChars: `Characters cannot be more than 24`,
   maxLength: `Characters cannot be more than 257`
 };
 
+const AttachmentTypes = [
+  {
+    value: "url",
+    label: "URL"
+  },
+  {
+    value: "text",
+    label: "Text"
+  },
+  {
+    value: "image",
+    label: "Image"
+  }
+];
 interface PluginParams {
   plugin: PluginDefinition;
 }
@@ -103,7 +130,8 @@ const OpenTasks = ({ plugin }: PluginParams) => {
     mode: "onChange",
     defaultValues: {
       title: "",
-      description: ""
+      description: "",
+      attachmentType: ""
     }
   });
 
@@ -124,7 +152,9 @@ const OpenTasks = ({ plugin }: PluginParams) => {
         metadata: {
           name: values.title,
           description: values.description,
-          properties: {}
+          properties: {
+            attachmentType: values.attachmentType
+          }
         },
         startDate: dateToUnix(new Date()),
         endDate: dateToUnix(endDatetime)
@@ -166,7 +196,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
       >
         <Stack alignItems="center" justifyContent="center">
           <Button
-            startIcon={<ArrowBackIcon />}
+            startIcon={<ArrowBackIosNewIcon />}
             color="offWhite"
             sx={{
               position: {
@@ -179,26 +209,28 @@ const OpenTasks = ({ plugin }: PluginParams) => {
             to={searchParams.get("returnUrl")}
             component={Link}
           >
-            {searchParams.get("returnUrlLinkName") || "Back"}
+            {/* {searchParams.get("returnUrlLinkName") || "Back"} */}
+            <Typography color="white" variant="body">
+              Back
+            </Typography>
           </Button>
           <Typography textAlign="center" color="white" variant="h3">
-            Creating Open task
+            Create an Open Task
           </Typography>
         </Stack>
         <Typography
           sx={{
             width: {
               xs: "100%",
-              sm: "600px",
-              xxl: "800px"
+              sm: "700px",
+              xxl: "1000px"
             }
           }}
-          className="text-secondary"
           mt={2}
           mx="auto"
           textAlign="center"
           color="white"
-          variant="body1"
+          variant="body"
         >
           Create an Open Task which will require you to approve or dismiss
           submissions. This Task type is designed to give you freedom on the
@@ -207,12 +239,12 @@ const OpenTasks = ({ plugin }: PluginParams) => {
       </Box>
       <Stack
         direction="column"
-        gap={4}
+        gap={8}
         sx={{
           margin: "0 auto",
           width: {
             xs: "100%",
-            sm: "400px",
+            sm: "650px",
             xxl: "800px"
           }
         }}
@@ -221,7 +253,10 @@ const OpenTasks = ({ plugin }: PluginParams) => {
           name="title"
           control={control}
           rules={{
-            required: true
+            required: true,
+            validate: {
+              maxWords: (v: string) => countWords(v) <= 6
+            }
           }}
           render={({ field: { name, value, onChange } }) => {
             return (
@@ -240,7 +275,11 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                     value={value}
                     name={name}
                     errors={formState.errors}
-                  />
+                  >
+                    <Typography color="white" variant="caption">
+                      {6 - countWords(value)} Words left
+                    </Typography>
+                  </FormHelperText>
                 }
               />
             );
@@ -273,9 +312,9 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                     name={name}
                     errors={formState.errors}
                   >
-                    <span>
-                      {257 - (value?.length || 0)}/257 characters left
-                    </span>
+                    <Typography color="white" variant="caption">
+                      {257 - (value?.length || 0)} of 257 characters left
+                    </Typography>
                   </FormHelperText>
                 }
               />
@@ -283,7 +322,113 @@ const OpenTasks = ({ plugin }: PluginParams) => {
           }}
         />
 
-        <StepperButton label="Create Task" disabled={!formState.isValid} />
+        <Stack
+          direction="row"
+          gap={4}
+          sx={{
+            margin: "0 auto",
+            display: "flex",
+            alignItems: "center",
+            width: {
+              xs: "100%",
+              sm: "650px",
+              xxl: "800px"
+            }
+          }}
+        >
+          <Typography color="white" variant="body" component="div">
+            Attachment Type
+          </Typography>
+          <Controller
+            name="attachmentType"
+            control={control}
+            rules={{
+              validate: {
+                selected: (v) => !!v
+              }
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <AutSelectField
+                  variant="standard"
+                  color="offWhite"
+                  renderValue={(selected) => {
+                    if (!selected) {
+                      return "Type" as any;
+                    }
+                    const type = AttachmentTypes.find(
+                      (t) => t.value === selected
+                    );
+                    return type?.label || selected;
+                  }}
+                  name={name}
+                  value={value || ""}
+                  displayEmpty
+                  required
+                  onChange={onChange}
+                >
+                  {AttachmentTypes.map((type) => {
+                    return (
+                      <MenuItem key={`role-${type.value}`} value={type.value}>
+                        {type.label}
+                      </MenuItem>
+                    );
+                  })}
+                </AutSelectField>
+              );
+            }}
+          />
+          <Controller
+            name="attachmentType"
+            control={control}
+            rules={{
+              required: true
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <AutTextField
+                  sx={{
+                    width: "150px",
+                    ".MuiSvgIcon-root ": {
+                      fill: "white !important"
+                    }
+                  }}
+                  id="attachmentType"
+                  value={value}
+                  name={name}
+                  color="offWhite"
+                  onChange={onChange}
+                  label="Type"
+                  size="small"
+                  select
+                  InputLabelProps={{
+                    style: { color: "white" }
+                  }}
+                  SelectProps={{
+                    style: { color: "white" }
+                  }}
+                ></AutTextField>
+              );
+            }}
+          />
+        </Stack>
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            mb: 4,
+            justifyContent: {
+              xs: "center",
+              sm: "flex-end"
+            }
+          }}
+        >
+          <StepperButton
+            label="Confirm"
+            disabled={!formState.isValid}
+            sx={{ width: "250px" }}
+          />
+        </Box>
       </Stack>
     </Container>
   );

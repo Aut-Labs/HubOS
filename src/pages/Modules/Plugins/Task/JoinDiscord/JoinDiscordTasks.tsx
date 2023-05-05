@@ -15,6 +15,7 @@ import { dateToUnix } from "@utils/date-format";
 import { addMinutes } from "date-fns";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useSelector } from "react-redux";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DoneIcon from "@mui/icons-material/Done";
 import {
@@ -23,11 +24,12 @@ import {
 } from "@store/Community/community.reducer";
 import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 import LinkWithQuery from "@components/LinkWithQuery";
+import { countWords } from "@utils/helpers";
 
 const errorTypes = {
-  maxWords: `Words cannot be more than 3`,
+  maxWords: `Words cannot be more than 6`,
   maxNameChars: `Characters cannot be more than 24`,
-  maxLength: `Characters cannot be more than 280`
+  maxLength: `Characters cannot be more than 257`
 };
 
 interface PluginParams {
@@ -184,7 +186,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
       >
         <Stack alignItems="center" justifyContent="center">
           <Button
-            startIcon={<ArrowBackIcon />}
+            startIcon={<ArrowBackIosNewIcon />}
             color="offWhite"
             sx={{
               position: {
@@ -197,15 +199,17 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
             to={searchParams.get("returnUrl")}
             component={Link}
           >
-            {searchParams.get("returnUrlLinkName") || "Back"}
+            {/* {searchParams.get("returnUrlLinkName") || "Back"} */}
+            <Typography color="white" variant="body">
+              Back
+            </Typography>
           </Button>
           <Typography textAlign="center" color="white" variant="h3">
-            Creating Join Discord task
+            Join Discord
           </Typography>
         </Stack>
 
         <Typography
-          className="text-secondary"
           mt={2}
           mx="auto"
           textAlign="center"
@@ -213,30 +217,39 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
           sx={{
             width: {
               xs: "100%",
-              sm: "600px",
-              xxl: "800px"
+              sm: "700px",
+              xxl: "1000px"
             }
           }}
-          variant="body1"
+          variant="body"
         >
           Ask your community to Join your Discord Community.
         </Typography>
       </Box>
       <Stack
         direction="column"
-        gap={4}
+        gap={8}
         sx={{
           margin: "0 auto",
           width: {
             xs: "100%",
-            sm: "400px",
+            sm: "650px",
             xxl: "800px"
           }
         }}
       >
         {!isDiscordVerified && (
-          <Stack>
-            <Typography
+          <Stack
+            sx={{
+              margin: "0 auto",
+              width: {
+                xs: "100%",
+                sm: "400px",
+                xxl: "500px"
+              }
+            }}
+          >
+            {/* <Typography
               className="text-secondary"
               mx="auto"
               my={2}
@@ -245,10 +258,10 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
               variant="body1"
             >
               Please verify the discord account for your community.
-            </Typography>
+            </Typography> */}
             <Button
               sx={{
-                mb: pxToRem(50)
+                textTransform: "uppercase"
               }}
               onClick={() => setDiscordDialogOpen(true)}
               type="button"
@@ -256,7 +269,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
               size="medium"
               color="offWhite"
             >
-              Verify Discord
+              Connect your discord
             </Button>
           </Stack>
         )}
@@ -268,7 +281,10 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
           name="title"
           control={control}
           rules={{
-            required: true
+            required: true,
+            validate: {
+              maxWords: (v: string) => countWords(v) <= 6
+            }
           }}
           render={({ field: { name, value, onChange } }) => {
             return (
@@ -287,7 +303,11 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                     value={value}
                     name={name}
                     errors={formState.errors}
-                  />
+                  >
+                    <Typography color="white" variant="caption">
+                      {6 - countWords(value)} Words left
+                    </Typography>
+                  </FormHelperText>
                 }
               />
             );
@@ -319,9 +339,9 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                     name={name}
                     errors={formState.errors}
                   >
-                    <span>
-                      {257 - (value?.length || 0)}/257 characters left
-                    </span>
+                    <Typography color="white" variant="caption">
+                      {257 - (value?.length || 0)} of 257 characters left
+                    </Typography>
                   </FormHelperText>
                 }
               />
@@ -358,11 +378,23 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
           );
         }}
       /> */}
-
-        <StepperButton
-          label="Create Task"
-          disabled={!formState.isValid || !inviteLink}
-        />
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            mb: 4,
+            justifyContent: {
+              xs: "center",
+              sm: "flex-end"
+            }
+          }}
+        >
+          <StepperButton
+            label="Confirm"
+            disabled={!formState.isValid || !inviteLink}
+            sx={{ width: "250px" }}
+          />
+        </Box>
       </Stack>
     </Container>
   );

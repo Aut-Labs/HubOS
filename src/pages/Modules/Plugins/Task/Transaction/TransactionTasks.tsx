@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   Container,
+  InputAdornment,
   MenuItem,
   Stack,
   Typography
@@ -21,16 +22,18 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { dateToUnix } from "@utils/date-format";
 import { addMinutes } from "date-fns";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { AutSelectField } from "@theme/field-select-styles";
 import { InteractionNetworks } from "@utils/transaction-networks";
 import LinkWithQuery from "@components/LinkWithQuery";
+import { countWords } from "@utils/helpers";
 
 const errorTypes = {
-  maxWords: `Words cannot be more than 3`,
+  maxWords: `Words cannot be more than 6`,
   maxNameChars: `Characters cannot be more than 24`,
-  maxLength: `Characters cannot be more than 280`
+  maxLength: `Characters cannot be more than 257`
 };
 
 interface PluginParams {
@@ -177,16 +180,16 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
         sx={{
           display: "flex",
           flexDirection: "column",
+          position: "relative",
           flex: 1,
           mb: 4,
-          position: "relative",
           mx: "auto",
           width: "100%"
         }}
       >
         <Stack alignItems="center" justifyContent="center">
           <Button
-            startIcon={<ArrowBackIcon />}
+            startIcon={<ArrowBackIosNewIcon />}
             color="offWhite"
             sx={{
               position: {
@@ -199,26 +202,28 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
             to={searchParams.get("returnUrl")}
             component={Link}
           >
-            {searchParams.get("returnUrlLinkName") || "Back"}
+            {/* {searchParams.get("returnUrlLinkName") || "Back"} */}
+            <Typography color="white" variant="body">
+              Back
+            </Typography>
           </Button>
           <Typography textAlign="center" color="white" variant="h3">
             Create a Smart Contract Task
           </Typography>
         </Stack>
         <Typography
-          className="text-secondary"
           mt={2}
           sx={{
             width: {
               xs: "100%",
-              sm: "600px",
-              xxl: "800px"
+              sm: "700px",
+              xxl: "1000px"
             }
           }}
           mx="auto"
           textAlign="center"
           color="white"
-          variant="body1"
+          variant="body"
         >
           Create a task based on a Smart Contract Interaction. We will
           automatically validate the interaction on the chosen smart contract(s)
@@ -227,12 +232,12 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
       </Box>
       <Stack
         direction="column"
-        gap={4}
+        gap={8}
         sx={{
           margin: "0 auto",
           width: {
             xs: "100%",
-            sm: "400px",
+            sm: "650px",
             xxl: "800px"
           }
         }}
@@ -241,7 +246,10 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
           name="title"
           control={control}
           rules={{
-            required: true
+            required: true,
+            validate: {
+              maxWords: (v: string) => countWords(v) <= 6
+            }
           }}
           render={({ field: { name, value, onChange } }) => {
             return (
@@ -254,13 +262,30 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                 value={value || ""}
                 onChange={onChange}
                 placeholder="Title"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      {value ? (
+                        <></>
+                      ) : (
+                        <Typography variant="caption" color="offWhite.dark">
+                          e.g. Mint an NFT on Opensea
+                        </Typography>
+                      )}
+                    </InputAdornment>
+                  )
+                }}
                 helperText={
                   <FormHelperText
                     errorTypes={errorTypes}
                     value={value}
                     name={name}
                     errors={formState.errors}
-                  />
+                  >
+                    <Typography color="white" variant="caption">
+                      {6 - countWords(value)} Words left
+                    </Typography>
+                  </FormHelperText>
                 }
               />
             );
@@ -293,9 +318,9 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                     name={name}
                     errors={formState.errors}
                   >
-                    <span>
-                      {257 - (value?.length || 0)}/257 characters left
-                    </span>
+                    <Typography color="white" variant="caption">
+                      {257 - (value?.length || 0)} of 257 characters left
+                    </Typography>
                   </FormHelperText>
                 }
               />
@@ -303,7 +328,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
           }}
         />
 
-        <Controller
+        {/* <Controller
           name="network"
           control={control}
           rules={{
@@ -341,7 +366,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
               </AutSelectField>
             );
           }}
-        />
+        /> */}
 
         <Controller
           name="linkToInteractUrl"
@@ -358,7 +383,20 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                 name={name}
                 value={value || ""}
                 onChange={onChange}
-                placeholder="Link to Interact"
+                placeholder="Your DApp's URL"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      {value ? (
+                        <></>
+                      ) : (
+                        <Typography variant="caption" color="offWhite.dark">
+                          e.g. https://opensea.io/
+                        </Typography>
+                      )}
+                    </InputAdornment>
+                  )
+                }}
               />
             );
           }}
@@ -380,6 +418,19 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                 value={value || ""}
                 onChange={onChange}
                 placeholder="Smart Contract Address"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      {value ? (
+                        <></>
+                      ) : (
+                        <Typography variant="caption" color="offWhite.dark">
+                          0x…
+                        </Typography>
+                      )}
+                    </InputAdornment>
+                  )
+                }}
               />
             );
           }}
@@ -396,13 +447,74 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                 name={name}
                 value={value || ""}
                 onChange={onChange}
-                placeholder="Function Name"
+                placeholder="Copy your Contract function"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      {value ? (
+                        <></>
+                      ) : (
+                        <Typography variant="caption" color="offWhite.dark">
+                          e.g. _Mint
+                        </Typography>
+                      )}
+                    </InputAdornment>
+                  )
+                }}
+                helperText={
+                  <FormHelperText
+                    errorTypes={errorTypes}
+                    value={value}
+                    name={name}
+                    errors={formState.errors}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column"
+                      }}
+                    >
+                      <Typography
+                        color="white"
+                        variant="caption"
+                        textAlign="right"
+                      >
+                        *Only required if you’d like to specify the interaction
+                        function.
+                      </Typography>
+                      <Typography
+                        color="white"
+                        variant="caption"
+                        textAlign="right"
+                      >
+                        Not applicable to multiple contract tasks
+                      </Typography>
+                    </Box>
+                  </FormHelperText>
+                }
               />
             );
           }}
         />
 
-        <StepperButton label="Create Task" disabled={!formState.isValid} />
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            mt: 2,
+            mb: 4,
+            justifyContent: {
+              xs: "center",
+              sm: "flex-end"
+            }
+          }}
+        >
+          <StepperButton
+            label="Confirm"
+            disabled={!formState.isValid}
+            sx={{ width: "250px" }}
+          />
+        </Box>
       </Stack>
     </Container>
   );
