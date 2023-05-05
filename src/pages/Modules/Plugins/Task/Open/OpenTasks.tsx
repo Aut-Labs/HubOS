@@ -378,7 +378,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
               );
             }}
           />
-          <Controller
+          {/* <Controller
             name="attachmentType"
             control={control}
             rules={{
@@ -410,7 +410,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                 ></AutTextField>
               );
             }}
-          />
+          /> */}
         </Stack>
         <Box
           sx={{
