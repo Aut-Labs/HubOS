@@ -123,7 +123,7 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
     <Container
       maxWidth="lg"
       sx={{
-        py: 4,
+        py: "30px",
         height: "100%",
         flex: 1,
         display: "flex",
@@ -137,165 +137,70 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
       {task ? (
         <>
           <TaskDetails task={task} />
-
-          {isAdmin ? (
+          <Stack
+            direction="column"
+            gap={8}
+            sx={{
+              flex: 1,
+              justifyContent: "space-between",
+              margin: "0 auto",
+              width: {
+                xs: "100%",
+                sm: "650px",
+                xxl: "800px"
+              }
+            }}
+          >
             <Stack
-              direction="column"
-              gap={4}
               sx={{
-                flex: 1,
-                justifyContent: "space-between",
                 margin: "0 auto",
                 width: {
                   xs: "100%",
                   sm: "400px",
-                  xxl: "800px"
+                  xxl: "500px"
                 }
               }}
             >
-              <Card
+              <Button
+                startIcon={<OpenInNewIcon></OpenInNewIcon>}
                 sx={{
-                  bgcolor: "nightBlack.main",
-                  borderColor: "divider",
-                  borderRadius: "16px",
-                  boxShadow: 3
+                  textTransform: "uppercase"
                 }}
+                type="button"
+                size="medium"
+                color="offWhite"
+                disabled={
+                  task?.status === TaskStatus.Submitted ||
+                  task?.status === TaskStatus.Finished
+                }
+                variant="outlined"
+                component={Link}
+                target="_blank"
+                to={(task as any)?.metadata?.properties?.inviteUrl}
+                onClick={setButtonClicked}
               >
-                <CardContent
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column"
-                  }}
-                >
-                  <Stack direction="column" alignItems="center" mb="15px">
-                    <Typography
-                      color="white"
-                      variant="body"
-                      textAlign="center"
-                      p="5px"
-                    >
-                      {task?.metadata?.description}
-                    </Typography>
-                    <Typography variant="caption" className="text-secondary">
-                      Task Description
-                    </Typography>
-                  </Stack>
-
-                  <Stack direction="column" alignItems="center">
-                    <Typography
-                      color="white"
-                      variant="body"
-                      textAlign="center"
-                      component={Link}
-                      target="_blank"
-                      to={(task as any)?.metadata?.properties?.inviteUrl}
-                      p="5px"
-                    >
-                      {(task as any)?.metadata?.properties?.inviteUrl}
-                    </Typography>
-                    <Typography variant="caption" className="text-secondary">
-                      Invite URL
-                    </Typography>
-                  </Stack>
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center"
-                    }}
-                  ></Box>
-                </CardContent>
-              </Card>
+                Join Discord
+              </Button>
             </Stack>
-          ) : (
-            <Stack
-              direction="column"
-              gap={4}
+            <Box
               sx={{
-                flex: 1,
-                justifyContent: "space-between",
-                margin: "0 auto",
-                width: {
-                  xs: "100%",
-                  sm: "400px",
-                  xxl: "800px"
+                width: "100%",
+                display: "flex",
+                mb: 4,
+                justifyContent: {
+                  xs: "center",
+                  sm: "flex-end"
                 }
               }}
             >
-              <Card
-                sx={{
-                  bgcolor: "nightBlack.main",
-                  borderColor: "divider",
-                  borderRadius: "16px",
-                  boxShadow: 3
-                }}
-              >
-                <CardContent
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column"
-                  }}
-                >
-                  <Typography
-                    color="white"
-                    variant="body"
-                    textAlign="center"
-                    p="20px"
-                  >
-                    {task?.metadata?.description}
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center"
-                    }}
-                  >
-                    <Button
-                      startIcon={<OpenInNewIcon></OpenInNewIcon>}
-                      sx={{
-                        width: "200px",
-                        height: "50px"
-                      }}
-                      type="button"
-                      color="offWhite"
-                      disabled={
-                        task?.status === TaskStatus.Submitted ||
-                        task?.status === TaskStatus.Finished
-                      }
-                      variant="outlined"
-                      component={Link}
-                      target="_blank"
-                      to={(task as any)?.metadata?.properties?.inviteUrl}
-                      onClick={setButtonClicked}
-                    >
-                      Join Discord
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
-              {task?.status === TaskStatus.Created ||
-              task?.status === TaskStatus.Taken ? (
-                <Stack
-                  sx={{
-                    margin: "0 auto",
-                    width: {
-                      xs: "100%",
-                      sm: "400px",
-                      xxl: "800px"
-                    }
-                  }}
-                >
-                  <StepperButton
-                    label="Submit"
-                    onClick={handleSubmit(onSubmit)}
-                    // disabled={!values}
-                  />
-                </Stack>
-              ) : (
-                <Box sx={{ mb: "20px" }}></Box>
-              )}
-            </Stack>
-          )}
+              <StepperButton
+                label="Confirm"
+                disabled={task?.status !== TaskStatus.Created}
+                onClick={handleSubmit(onSubmit)}
+                sx={{ width: "250px" }}
+              />
+            </Box>
+          </Stack>
         </>
       ) : (
         <AutLoading></AutLoading>
