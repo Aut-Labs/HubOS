@@ -169,10 +169,7 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
                 type="button"
                 size="medium"
                 color="offWhite"
-                disabled={
-                  task?.status === TaskStatus.Submitted ||
-                  task?.status === TaskStatus.Finished
-                }
+                disabled={task?.status !== TaskStatus.Created}
                 variant="outlined"
                 component={Link}
                 target="_blank"
