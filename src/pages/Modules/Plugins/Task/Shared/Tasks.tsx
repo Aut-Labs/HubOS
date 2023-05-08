@@ -24,7 +24,12 @@ import {
   CardActionArea
 } from "@mui/material";
 import { memo, useMemo } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams
+} from "react-router-dom";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 import CopyAddress from "@components/CopyAddress";
@@ -47,6 +52,7 @@ import { useEthers } from "@usedapp/core";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import { differenceInDays } from "date-fns";
+import { RequiredQueryParams } from "@api/RequiredQueryParams";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
@@ -269,6 +275,7 @@ const TaskCard = ({
   const params = useParams<{ questId: string }>();
   const navigate = useNavigate();
   const confirm = useConfirmDialog();
+  const [searchParams] = useSearchParams();
   const [removeTask, { error, isError, isLoading, reset }] =
     useRemoveTaskFromQuestMutation();
 
@@ -341,7 +348,25 @@ const TaskCard = ({
             color: "white"
           }}
           action={
-            <IconButton color="offWhite">
+            <IconButton
+              onClick={() => {
+                navigate({
+                  pathname: `/aut-dashboard/${path}/${row.taskId}`,
+                  search: new URLSearchParams({
+                    questId: params.questId,
+                    onboardingQuestAddress: searchParams.get(
+                      RequiredQueryParams.OnboardingQuestAddress
+                    ),
+                    daoAddress: searchParams.get(
+                      RequiredQueryParams.DaoAddress
+                    ),
+                    returnUrlLinkName: "Back to quest",
+                    returnUrl: `${location?.pathname}${location?.search}`
+                  }).toString()
+                });
+              }}
+              color="offWhite"
+            >
               <EditIcon />
             </IconButton>
           }

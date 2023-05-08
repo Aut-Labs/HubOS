@@ -103,7 +103,11 @@ export const QuestListItem = memo(
                     onClick={() =>
                       navigate({
                         pathname: `${row.questId}`,
-                        search: `onboardingQuestAddress=${pluginAddress}`
+                        search: new URLSearchParams({
+                          questId: `${row.questId}`,
+                          daoAddress: daoAddress,
+                          onboardingQuestAddress: pluginAddress
+                        }).toString()
                       })
                     }
                   >
