@@ -119,7 +119,7 @@ const PluginCard = ({
             pt: 0
           }}
         >
-          <Stack direction="row" alignItems="flex-end" justifyContent="center">
+          {/* <Stack direction="row" alignItems="flex-end" justifyContent="center">
             <Typography
               sx={{
                 letterSpacing: "-.04em",
@@ -142,7 +142,7 @@ const PluginCard = ({
                 </IconButton>
               </Tooltip>
             )}
-          </Stack>
+          </Stack> */}
 
           <Box
             sx={{

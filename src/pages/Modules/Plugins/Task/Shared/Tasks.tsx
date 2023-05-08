@@ -1,21 +1,9 @@
 import { Task } from "@aut-labs-private/sdk";
 import {
-  Badge,
   Box,
-  Paper,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  Link as BtnLink,
-  TableHead,
-  TableRow,
-  Tooltip,
   Typography,
   styled,
-  tableCellClasses,
-  Chip,
   IconButton,
   CardHeader,
   CardContent,
@@ -30,45 +18,18 @@ import {
   useParams,
   useSearchParams
 } from "react-router-dom";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-
-import CopyAddress from "@components/CopyAddress";
 import { TaskStatus } from "@store/model";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
-import LinkWithQuery from "@components/LinkWithQuery";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { TaskType } from "@aut-labs-private/sdk/dist/models/task";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useConfirmDialog } from "react-mui-confirm";
 import OverflowTooltip from "@components/OverflowTooltip";
 import AutLoading from "@components/AutLoading";
-import {
-  useGetAllOnboardingQuestsQuery,
-  useRemoveTaskFromQuestMutation
-} from "@api/onboarding.api";
+import { useRemoveTaskFromQuestMutation } from "@api/onboarding.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
-import LoadingDialog from "@components/Dialog/LoadingPopup";
-import { useEthers } from "@usedapp/core";
-import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import { differenceInDays } from "date-fns";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover
-  },
-  "&:last-child td, &:last-child th": {
-    border: 0
-  }
-}));
-
-const TaskStyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}, &.${tableCellClasses.body}`]: {
-    color: theme.palette.common.white,
-    borderColor: theme.palette.divider
-  }
-}));
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {
@@ -107,156 +68,6 @@ export const taskTypes = {
     label: "Join Discord"
   }
 };
-
-const TaskListItem = memo(
-  ({
-    row,
-    isAdmin,
-    canDelete
-  }: {
-    row: Task;
-    isAdmin: boolean;
-    canDelete: boolean;
-  }) => {
-    const location = useLocation();
-    const params = useParams<{ questId: string }>();
-    const confirm = useConfirmDialog();
-    const [removeTask, { error, isError, isLoading, reset }] =
-      useRemoveTaskFromQuestMutation();
-
-    const { plugin, questOnboarding } = useGetAllPluginDefinitionsByDAOQuery(
-      null,
-      {
-        selectFromResult: ({ data }) => ({
-          questOnboarding: (data || []).find(
-            (p) =>
-              PluginDefinitionType.QuestOnboardingPlugin ===
-              p.pluginDefinitionId
-          ),
-          plugin: (data || []).find(
-            (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
-          )
-        })
-      }
-    );
-
-    const confimDelete = () =>
-      confirm({
-        title: "Are you sure you want to delete this task?",
-        onConfirm: () => {
-          removeTask({
-            task: row,
-            questId: +params.questId,
-            pluginTokenId: plugin.tokenId,
-            pluginAddress: plugin.pluginAddress,
-            onboardingQuestAddress: questOnboarding?.pluginAddress
-          });
-        }
-      });
-
-    const path = useMemo(() => {
-      if (!plugin) return;
-      const stackType = plugin.metadata.properties.module.type;
-      const stack = `modules/${stackType}`;
-      return `${stack}/${PluginDefinitionType[plugin.pluginDefinitionId]}`;
-    }, [plugin]);
-
-    return (
-      <StyledTableRow
-        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-      >
-        <ErrorDialog
-          handleClose={() => reset()}
-          open={isError}
-          message={error}
-        />
-        <LoadingDialog open={isLoading} message="Removing task..." />
-        <TaskStyledTableCell component="th" scope="row">
-          <span
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gridGap: "8px"
-            }}
-          >
-            <Box>
-              <Badge
-                invisible={!!row.metadata?.name}
-                badgeContent={
-                  <Tooltip title="Something went wrong fetching ipfs metadata. This does not affect the contract interactions">
-                    <ErrorOutlineIcon
-                      color="error"
-                      sx={{
-                        width: {
-                          sm: "16px"
-                        }
-                      }}
-                    />
-                  </Tooltip>
-                }
-              >
-                <Tooltip title="View task details">
-                  <BtnLink
-                    variant="subtitle2"
-                    sx={{
-                      color: "primary"
-                    }}
-                    to={`/aut-dashboard/${path}/${row.taskId}`}
-                    preserveParams
-                    queryParams={{
-                      onboardingQuestAddress: plugin?.pluginAddress,
-                      returnUrlLinkName: "Back to quest",
-                      returnUrl: location?.pathname,
-                      questId: params.questId,
-                      submitter: row?.submitter
-                    }}
-                    component={LinkWithQuery}
-                  >
-                    {row.metadata?.name || "n/a"}
-                  </BtnLink>
-                </Tooltip>
-              </Badge>
-            </Box>
-            <OverflowTooltip
-              typography={{
-                maxWidth: "300px"
-              }}
-              text={row.metadata?.description}
-            />
-          </span>
-        </TaskStyledTableCell>
-        {!isAdmin && (
-          <TaskStyledTableCell align="right">
-            <CopyAddress address={row.creator} />
-            <BtnLink
-              color="primary"
-              variant="caption"
-              target="_blank"
-              href={`https://my.aut.id/${row.creator}`}
-            >
-              View profile
-            </BtnLink>
-          </TaskStyledTableCell>
-        )}
-        <TaskStyledTableCell align="right">
-          <Chip {...taskStatuses[row.status]} size="small" />
-        </TaskStyledTableCell>
-        <TaskStyledTableCell align="right">
-          {taskTypes[row.taskType]?.label}
-        </TaskStyledTableCell>
-        {isAdmin && canDelete && (
-          <TaskStyledTableCell align="right">
-            <Tooltip title="Remove task">
-              <IconButton onClick={confimDelete} color="error">
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          </TaskStyledTableCell>
-        )}
-      </StyledTableRow>
-    );
-  }
-);
 
 const TaskCard = ({
   row,
@@ -349,25 +160,27 @@ const TaskCard = ({
           }}
           action={
             <IconButton
+              disabled={isLoading}
+              color="error"
               onClick={() => {
-                navigate({
-                  pathname: `/aut-dashboard/${path}/${row.taskId}`,
-                  search: new URLSearchParams({
-                    questId: params.questId,
-                    onboardingQuestAddress: searchParams.get(
-                      RequiredQueryParams.OnboardingQuestAddress
-                    ),
-                    daoAddress: searchParams.get(
-                      RequiredQueryParams.DaoAddress
-                    ),
-                    returnUrlLinkName: "Back to quest",
-                    returnUrl: `${location?.pathname}${location?.search}`
-                  }).toString()
-                });
+                confimDelete();
+                // navigate({
+                //   pathname: `/aut-dashboard/${path}/${row.taskId}`,
+                //   search: new URLSearchParams({
+                //     questId: params.questId,
+                //     onboardingQuestAddress: searchParams.get(
+                //       RequiredQueryParams.OnboardingQuestAddress
+                //     ),
+                //     daoAddress: searchParams.get(
+                //       RequiredQueryParams.DaoAddress
+                //     ),
+                //     returnUrlLinkName: "Back to quest",
+                //     returnUrl: `${location?.pathname}${location?.search}`
+                //   }).toString()
+                // });
               }}
-              color="offWhite"
             >
-              <EditIcon />
+              <DeleteIcon />
             </IconButton>
           }
           title={plugin?.metadata?.properties?.title}
