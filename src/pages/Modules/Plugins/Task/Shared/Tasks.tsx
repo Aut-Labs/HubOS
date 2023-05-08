@@ -30,6 +30,7 @@ import { useRemoveTaskFromQuestMutation } from "@api/onboarding.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import AddIcon from "@mui/icons-material/Add";
 import { differenceInDays } from "date-fns";
+import { RequiredQueryParams } from "@api/RequiredQueryParams";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {
@@ -163,21 +164,21 @@ const TaskCard = ({
               disabled={isLoading}
               color="error"
               onClick={() => {
-                confimDelete();
-                // navigate({
-                //   pathname: `/aut-dashboard/${path}/${row.taskId}`,
-                //   search: new URLSearchParams({
-                //     questId: params.questId,
-                //     onboardingQuestAddress: searchParams.get(
-                //       RequiredQueryParams.OnboardingQuestAddress
-                //     ),
-                //     daoAddress: searchParams.get(
-                //       RequiredQueryParams.DaoAddress
-                //     ),
-                //     returnUrlLinkName: "Back to quest",
-                //     returnUrl: `${location?.pathname}${location?.search}`
-                //   }).toString()
-                // });
+                // confimDelete();
+                navigate({
+                  pathname: `/aut-dashboard/${path}/${row.taskId}`,
+                  search: new URLSearchParams({
+                    questId: params.questId,
+                    onboardingQuestAddress: searchParams.get(
+                      RequiredQueryParams.OnboardingQuestAddress
+                    ),
+                    daoAddress: searchParams.get(
+                      RequiredQueryParams.DaoAddress
+                    ),
+                    returnUrlLinkName: "Back to quest",
+                    returnUrl: `${location?.pathname}${location?.search}`
+                  }).toString()
+                });
               }}
             >
               <DeleteIcon />

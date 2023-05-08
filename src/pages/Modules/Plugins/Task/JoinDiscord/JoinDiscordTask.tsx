@@ -5,26 +5,11 @@ import {
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
 import { StepperButton } from "@components/Stepper";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Container,
-  Stack,
-  Typography
-} from "@mui/material";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import { Container, Stack } from "@mui/material";
 import { IsAdmin } from "@store/Community/community.reducer";
-import { memo } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { memo, useState } from "react";
 import { useSelector } from "react-redux";
-import {
-  Link,
-  useLocation,
-  useParams,
-  useSearchParams
-} from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { taskTypes } from "../Shared/Tasks";
@@ -32,11 +17,6 @@ import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
 import { useEthers } from "@usedapp/core";
 import { useOAuth } from "@components/Oauth2/oauth2";
-import {
-  getServerDetails,
-  verifyDiscordServerOwnership
-} from "@api/discord.api";
-import { useAppDispatch } from "@store/store.model";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 
@@ -48,10 +28,10 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const params = useParams();
-  const dispatch = useAppDispatch();
   const { account: userAddress } = useEthers();
   const isAdmin = useSelector(IsAdmin);
-  const { getAuth, authenticating } = useOAuth();
+  const { getAuth } = useOAuth();
+  const [joinClicked, setJoinClicked] = useState(false);
 
   const { task } = useGetAllTasksPerQuestQuery(
     {
@@ -77,22 +57,10 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
     }
   );
 
-  const { control, handleSubmit, getValues, setValue, formState } = useForm({
-    mode: "onChange",
-    defaultValues: {
-      inviteClicked: false
-    }
-  });
-  const values = useWatch({
-    name: "inviteClicked",
-    control
-  });
-
-  console.log(task, "task");
   const [submitJoinDiscordTask, { error, isError, isLoading, reset }] =
     useSubmitJoinDiscordTaskMutation();
 
-  const onSubmit = async (values) => {
+  const onSubmit = async () => {
     await getAuth(
       async (data) => {
         const { access_token } = data;
@@ -106,18 +74,10 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
         });
       },
       () => {
-        // setLoading(false);
+        setJoinClicked(false);
       }
     );
   };
-
-  const setButtonClicked = () => {
-    setValue("inviteClicked", true);
-  };
-
-  if (task) {
-    console.log("TASK DISCORD:", task);
-  }
 
   return (
     <Container
@@ -161,8 +121,30 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
                 }
               }}
             >
-              <Button
-                startIcon={<OpenInNewIcon></OpenInNewIcon>}
+              {joinClicked && (
+                <StepperButton
+                  label="Confirm"
+                  disabled={task?.status !== TaskStatus.Created}
+                  onClick={() => onSubmit()}
+                  sx={{ width: "250px", margin: "0 auto" }}
+                />
+              )}
+              {!joinClicked && (
+                <StepperButton
+                  label="Join"
+                  disabled={task?.status !== TaskStatus.Created}
+                  onClick={() => {
+                    setJoinClicked(true);
+                    window.open(
+                      task.metadata.properties["inviteUrl"],
+                      "_blank"
+                    );
+                  }}
+                  sx={{ width: "250px", margin: "0 auto" }}
+                />
+              )}
+              {/* <Button
+                startIcon={<OpenInNewIcon />}
                 sx={{
                   textTransform: "uppercase"
                 }}
@@ -180,9 +162,9 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
                 onClick={setButtonClicked}
               >
                 Join Discord
-              </Button>
+              </Button> */}
             </Stack>
-            <Box
+            {/* <Box
               sx={{
                 width: "100%",
                 display: "flex",
@@ -199,7 +181,7 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
                 onClick={handleSubmit(onSubmit)}
                 sx={{ width: "250px" }}
               />
-            </Box>
+            </Box> */}
           </Stack>
         </>
       ) : (
