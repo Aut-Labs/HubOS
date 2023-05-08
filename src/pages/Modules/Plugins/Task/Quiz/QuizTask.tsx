@@ -306,7 +306,9 @@ const QuizTask = ({ plugin }: PluginParams) => {
             >
               <StepperButton
                 label="Confirm"
-                disabled={task?.status !== TaskStatus.Created}
+                disabled={
+                  !formState.isValid || task?.status !== TaskStatus.Created
+                }
                 onClick={handleSubmit(onSubmit)}
                 sx={{ width: "250px" }}
               />
