@@ -150,7 +150,7 @@ const TaskListItem = memo(
                   <BtnLink
                     variant="subtitle2"
                     sx={{
-                      color: "primary.light",
+                      color: "primary",
                       "&:hover": {
                         textDecoration:
                           !quest?.active ||
@@ -190,7 +190,7 @@ const TaskListItem = memo(
         <TaskStyledTableCell align="right">
           <CopyAddress address={row.creator} />
           <BtnLink
-            color="primary.light"
+            color="primary"
             variant="caption"
             target="_blank"
             href={`https://my.aut.id/${row.creator}`}

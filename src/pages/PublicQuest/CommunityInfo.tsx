@@ -184,7 +184,7 @@ const CommunityInfo = () => {
         </Stack>
 
         <Link
-          color="primary.light"
+          color="primary"
           sx={{
             mt: 1
           }}

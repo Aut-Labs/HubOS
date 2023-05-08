@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import {
-  useActivateOnboardingMutation,
+  useLaunchOnboardingMutation,
   useDeactivateOnboardingMutation,
   useGetAllOnboardingQuestsQuery
 } from "@api/onboarding.api";
@@ -39,6 +39,7 @@ import AutLoading from "@components/AutLoading";
 import { useEthers } from "@usedapp/core";
 import { useConfirmDialog } from "react-mui-confirm";
 import InfoIcon from "@mui/icons-material/Info";
+import SuccessDialog from "@components/Dialog/SuccessPopup";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -52,6 +53,27 @@ const Quests = ({ plugin }: PluginParams) => {
   const communityData = useSelector(CommunityData);
   const confirm = useConfirmDialog();
 
+  const roles = communityData?.properties?.rolesSets[0].roles
+    .map(function (role) {
+      return role.roleName;
+    })
+    .join(", ");
+
+  const twitterProps = {
+    title: `${communityData?.name} has just launched on Āut Labs and joined the Coordination Renaissance🎉
+
+We are now onboarding ${roles} - take a quest, prove yourself, & join us as we bring human Coordination to the next level⚖️`,
+    // hashtags: ["Aut", "DAO", "Blockchain"]
+    url: communityData?.properties?.address
+      ? //TODO: Replace url with valid showcase/#dao-address when available,
+        //also keep this bizarre formatting otherwise the tweet won't have the correct new lines and alignment
+        // ? `http://176.34.149.248:4002/?${communityData?.properties?.address}`
+        `
+https://Aut.id/`
+      : `
+https://Aut.id/`
+  };
+
   const {
     data: quests,
     isLoading,
@@ -63,14 +85,15 @@ const Quests = ({ plugin }: PluginParams) => {
   });
 
   const [
-    activateOnboarding,
+    launchOnboarding,
     {
       error: activateError,
       isError: activateIsError,
       isLoading: isActivating,
+      isSuccess: isSuccessOnboarding,
       reset: activateReset
     }
-  ] = useActivateOnboardingMutation();
+  ] = useLaunchOnboardingMutation();
 
   const [
     deactivateOnboarding,
@@ -137,16 +160,16 @@ const Quests = ({ plugin }: PluginParams) => {
             : "Deactivating onboarding..."
         }
       />
-      <Box
-        sx={{
-          boxShadow: 1,
-          border: "2px solid",
-          borderColor: "divider",
-          borderRadius: "16px",
-          p: 3,
-          backgroundColor: "nightBlack.main"
-        }}
-      >
+      <SuccessDialog
+        open={isSuccessOnboarding}
+        message="Success!"
+        titleVariant="h2"
+        subtitle="Whoop! You launched your Onboarding Quests. Now it's time to share and check the submissions!"
+        subtitleVariant="subtitle1"
+        handleClose={() => activateReset()}
+        twitterProps={twitterProps}
+      ></SuccessDialog>
+      <Box>
         <Typography textAlign="center" color="white" variant="h3">
           Onboarding Quests
           <Tooltip title="Refresh quests">
@@ -214,7 +237,7 @@ const Quests = ({ plugin }: PluginParams) => {
                             disabled={quests?.length >= 3}
                             variant="outlined"
                             size="medium"
-                            color="primary"
+                            color="offWhite"
                             to="create"
                             component={Link}
                           >
@@ -241,9 +264,9 @@ const Quests = ({ plugin }: PluginParams) => {
                             disabled={quests?.length < 3}
                             variant="outlined"
                             size="medium"
-                            color="primary"
+                            color="offWhite"
                             onClick={() =>
-                              activateOnboarding({
+                              launchOnboarding({
                                 quests,
                                 userAddress: account,
                                 pluginAddress: plugin.pluginAddress
@@ -293,7 +316,7 @@ const Quests = ({ plugin }: PluginParams) => {
           <Button
             startIcon={<AddIcon />}
             variant="outlined"
-            size="medium"
+            size="large"
             color="offWhite"
             to={`create`}
             component={Link}

@@ -125,7 +125,7 @@ const hasUserCompletedQuest = async (
   }
 };
 
-const activateOnboarding = async (
+const launchOnboarding = async (
   { quests, pluginAddress, userAddress },
   api: BaseQueryApi
 ) => {
@@ -140,7 +140,7 @@ const activateOnboarding = async (
     sdk.questOnboarding = questOnboarding;
   }
 
-  const response = await questOnboarding.activateOnboarding(quests);
+  const response = await questOnboarding.launchOnboarding(quests);
 
   if (!response.isSuccess) {
     return {
@@ -643,8 +643,8 @@ export const onboardingApi = createApi({
       return getAllTasksPerQuest(body, api);
     }
 
-    if (url === "activateOnboarding") {
-      return activateOnboarding(body, api);
+    if (url === "launchOnboarding") {
+      return launchOnboarding(body, api);
     }
 
     if (url === "deactivateOnboarding") {
@@ -746,7 +746,7 @@ export const onboardingApi = createApi({
       },
       providesTags: []
     }),
-    activateOnboarding: builder.mutation<
+    launchOnboarding: builder.mutation<
       boolean,
       {
         quests: Quest[];
@@ -757,7 +757,7 @@ export const onboardingApi = createApi({
       query: (body) => {
         return {
           body,
-          url: "activateOnboarding"
+          url: "launchOnboarding"
         };
       },
       invalidatesTags: ["Quests", "Tasks"]
@@ -1007,7 +1007,7 @@ export const {
   useGetAllTasksPerQuestQuery,
   useLazyGetAllTasksPerQuestQuery,
   useGetAllOnboardingQuestsQuery,
-  useActivateOnboardingMutation,
+  useLaunchOnboardingMutation,
   useDeactivateOnboardingMutation,
   useSubmitJoinDiscordTaskMutation
 } = onboardingApi;

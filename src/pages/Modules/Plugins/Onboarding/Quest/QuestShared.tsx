@@ -14,7 +14,8 @@ import {
   Stack,
   MenuItem,
   debounce,
-  Badge
+  Badge,
+  IconButton
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { memo, useMemo, useState } from "react";
@@ -94,38 +95,75 @@ export const QuestListItem = memo(
                   </Tooltip>
                 }
               >
-                <Tooltip title="View quest and submissions">
+                <Tooltip title="View quest">
                   <BtnLink
                     component="button"
-                    color="primary.light"
+                    color="primary"
                     variant="subtitle2"
                     onClick={() =>
                       navigate({
                         pathname: `${row.questId}`,
-                        search: `onboardingQuestAddress=${pluginAddress}`
+                        search: new URLSearchParams({
+                          questId: `${row.questId}`,
+                          daoAddress: daoAddress,
+                          onboardingQuestAddress: pluginAddress
+                        }).toString()
                       })
                     }
                   >
                     {row.metadata?.name || "n/a"}
                   </BtnLink>
                 </Tooltip>
-                <CopyLink
+                <IconButton
+                  sx={{
+                    ml: 2
+                  }}
+                  color="offWhite"
+                  size="small"
+                  disabled={row.tasksCount >= 5}
+                  to="create"
+                  preserveParams
+                  queryParams={{
+                    onboardingQuestAddress: pluginAddress,
+                    returnUrlLinkName: "Back to quest",
+                    returnUrl: `${location.pathname}/${row.questId.toString()}`,
+                    questId: row.questId.toString()
+                  }}
+                  component={LinkWithQuery}
+                >
+                  <EditIcon />
+                </IconButton>
+                {/* <CopyLink
                   link={`${window?.location.origin}/quest/?questId=${row.questId}&onboardingQuestAddress=${pluginAddress}&daoAddress=${daoAddress}`}
-                />
+                /> */}
               </Badge>
             </Box>
-            <OverflowTooltip
+            {/* <OverflowTooltip
               typography={{
                 maxWidth: "300px"
               }}
               text={row.metadata?.description}
-            />
+            /> */}
           </span>
         </QuestStyledTableCell>
         {/* <QuestStyledTableCell align="right">{roleName}</QuestStyledTableCell> */}
         {isAdmin && (
           <QuestStyledTableCell align="right">
-            {row.tasksCount}
+            <Tooltip title="View quest">
+              <BtnLink
+                component="button"
+                color="primary"
+                variant="body"
+                onClick={() =>
+                  navigate({
+                    pathname: `${row.questId}`,
+                    search: `onboardingQuestAddress=${pluginAddress}`
+                  })
+                }
+              >
+                {row.tasksCount}
+              </BtnLink>
+            </Tooltip>
           </QuestStyledTableCell>
         )}
         <QuestStyledTableCell align="right">
@@ -141,50 +179,27 @@ export const QuestListItem = memo(
 
         {isAdmin && !row.active && (
           <QuestStyledTableCell align="right">
-            <Stack gap={1}>
-              <Button
-                sx={{
-                  minWidth: "120px"
-                }}
-                color="offWhite"
-                size="small"
-                variant="outlined"
-                startIcon={<AddIcon />}
-                disabled={row.tasksCount >= 5}
-                to="/aut-dashboard/modules/Task"
-                preserveParams
-                queryParams={{
-                  onboardingQuestAddress: pluginAddress,
-                  returnUrlLinkName: "Back to quest",
-                  returnUrl: `${location.pathname}/${row.questId.toString()}`,
-                  questId: row.questId.toString()
-                }}
-                component={LinkWithQuery}
-              >
-                Add task
-              </Button>
-              <Button
-                sx={{
-                  minWidth: "120px"
-                }}
-                color="offWhite"
-                size="small"
-                variant="outlined"
-                startIcon={<EditIcon />}
-                disabled={row.tasksCount >= 5}
-                to="create"
-                preserveParams
-                queryParams={{
-                  onboardingQuestAddress: pluginAddress,
-                  returnUrlLinkName: "Back to quest",
-                  returnUrl: `${location.pathname}/${row.questId.toString()}`,
-                  questId: row.questId.toString()
-                }}
-                component={LinkWithQuery}
-              >
-                Edit quest
-              </Button>
-            </Stack>
+            <Button
+              sx={{
+                minWidth: "130px"
+              }}
+              color="offWhite"
+              size="small"
+              variant="outlined"
+              startIcon={<AddIcon />}
+              disabled={row.tasksCount >= 5}
+              to="/aut-dashboard/modules/Task"
+              preserveParams
+              queryParams={{
+                onboardingQuestAddress: pluginAddress,
+                returnUrlLinkName: "Back to quest",
+                returnUrl: `${location.pathname}/${row.questId.toString()}`,
+                questId: row.questId.toString()
+              }}
+              component={LinkWithQuery}
+            >
+              Add task
+            </Button>
           </QuestStyledTableCell>
         )}
       </StyledTableRow>
@@ -331,7 +346,13 @@ export const QuestTasks = memo(
           </Box>
         )}
 
-        <Tasks isAdmin={isAdmin} isLoading={isLoading} tasks={filteredTasks} />
+        <Tasks
+          onboardingQuestAddress={onboardingQuestAddress}
+          questId={questId}
+          isAdmin={isAdmin}
+          isLoading={isLoading}
+          tasks={filteredTasks}
+        />
       </Box>
     );
   }
