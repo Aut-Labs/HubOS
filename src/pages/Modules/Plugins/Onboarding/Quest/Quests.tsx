@@ -20,7 +20,9 @@ import {
   IconButton,
   Tooltip,
   Badge,
-  Chip
+  Chip,
+  styled,
+  ButtonProps
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -45,6 +47,26 @@ interface PluginParams {
   plugin: PluginDefinition;
 }
 
+const ButtonWithPulse = styled<ButtonProps<any, any>>(Button)`
+  &:not(.Mui-disabled) {
+    box-shadow: 0 0 0 0 rgba(37, 107, 176, 1);
+    animation: pulse 1.5s infinite;
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(37, 107, 176, 0.7);
+      }
+
+      70% {
+        box-shadow: 0 0 0 15px rgba(37, 107, 176, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(37, 107, 176, 0);
+      }
+    }
+  }
+`;
+
 const Quests = ({ plugin }: PluginParams) => {
   const dispatch = useAppDispatch();
   const isAdmin = useSelector(IsAdmin);
@@ -63,7 +85,7 @@ const Quests = ({ plugin }: PluginParams) => {
     title: `${communityData?.name} has just launched on Āut Labs and joined the Coordination Renaissance🎉
 
 We are now onboarding ${roles} - take a quest, prove yourself, & join us as we bring human Coordination to the next level⚖️`,
-    // hashtags: ["Aut", "DAO", "Blockchain"]
+    // hashtags: ["Āut", "DAO", "Blockchain"]
     url: communityData?.properties?.address
       ? //TODO: Replace url with valid showcase/#dao-address when available,
         //also keep this bizarre formatting otherwise the tweet won't have the correct new lines and alignment
@@ -122,6 +144,11 @@ https://Aut.id/`
     if (!quests) return false;
     const atLeastThreeQuests = quests.length >= 3;
     return atLeastThreeQuests && quests?.every((q) => q.active);
+  }, [quests]);
+
+  const doEachQuestHaveAtLeastOneTask = useMemo(() => {
+    if (!quests) return false;
+    return quests?.every((q) => q.tasksCount > 0);
   }, [quests]);
 
   useEffect(() => {
@@ -259,9 +286,12 @@ https://Aut.id/`
                             </Tooltip>
                           }
                         >
-                          <Button
+                          <ButtonWithPulse
                             startIcon={<AddIcon />}
-                            disabled={quests?.length < 3}
+                            disabled={
+                              quests?.length < 3 ||
+                              !doEachQuestHaveAtLeastOneTask
+                            }
                             variant="outlined"
                             size="medium"
                             color="offWhite"
@@ -274,7 +304,7 @@ https://Aut.id/`
                             }
                           >
                             Launch quest onboarding
-                          </Button>
+                          </ButtonWithPulse>
                         </Badge>
                       </Box>
                     </>

@@ -105,7 +105,8 @@ const Quest = ({ plugin }: PluginParams) => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            alignItems: "center"
+            alignItems: "center",
+            position: "relative"
           }}
         >
           <Stack alignItems="center" justifyContent="center">
@@ -117,7 +118,7 @@ const Quest = ({ plugin }: PluginParams) => {
                   sm: "absolute"
                 },
                 left: {
-                  sm: "42px"
+                  sm: "0"
                 }
               }}
               to="/aut-dashboard/modules/OnboardingStrategy/QuestOnboardingPlugin"
@@ -281,6 +282,8 @@ const Quest = ({ plugin }: PluginParams) => {
               isLoading={isLoading}
               tasks={tasks}
               isAdmin={isAdmin}
+              canAdd={!quest?.active}
+              canDelete={!quest?.active}
               onboardingQuestAddress={plugin.pluginAddress}
               questId={+params.questId}
               isSubmission={false}
@@ -289,7 +292,9 @@ const Quest = ({ plugin }: PluginParams) => {
 
           {!isAdmin && (
             <Tasks
+              canAdd={!quest?.active}
               questId={quest?.questId}
+              canDelete={!quest?.active}
               onboardingQuestAddress={plugin.pluginAddress}
               isAdmin={isAdmin}
               isLoading={isLoading}

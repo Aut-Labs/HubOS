@@ -30,7 +30,6 @@ import { useRemoveTaskFromQuestMutation } from "@api/onboarding.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import AddIcon from "@mui/icons-material/Add";
 import { differenceInDays } from "date-fns";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {
@@ -83,11 +82,9 @@ const TaskCard = ({
   onboardingQuestAddress: string;
   questId: number;
 }) => {
-  const location = useLocation();
   const params = useParams<{ questId: string }>();
   const navigate = useNavigate();
   const confirm = useConfirmDialog();
-  const [searchParams] = useSearchParams();
   const [removeTask, { error, isError, isLoading, reset }] =
     useRemoveTaskFromQuestMutation();
 
@@ -119,13 +116,6 @@ const TaskCard = ({
         });
       }
     });
-
-  const path = useMemo(() => {
-    if (!plugin) return;
-    const stackType = plugin.metadata.properties.module.type;
-    const stack = `modules/${stackType}`;
-    return `${stack}/${PluginDefinitionType[plugin.pluginDefinitionId]}`;
-  }, [plugin]);
 
   return (
     <>
@@ -161,7 +151,7 @@ const TaskCard = ({
           }}
           action={
             <IconButton
-              disabled={isLoading}
+              disabled={isLoading || !canDelete}
               color="error"
               onClick={() => {
                 confimDelete();
@@ -184,7 +174,7 @@ const TaskCard = ({
               <DeleteIcon />
             </IconButton>
           }
-          title={plugin?.metadata?.properties?.title}
+          title={row?.metadata?.name}
         />
         <CardContent
           sx={{
@@ -335,6 +325,7 @@ interface TasksParams {
   isLoading: boolean;
   tasks: Task[];
   canDelete?: boolean;
+  canAdd?: boolean;
   isAdmin: boolean;
   onboardingQuestAddress: string;
   questId: number;
@@ -345,6 +336,7 @@ const Tasks = ({
   tasks,
   isAdmin,
   canDelete,
+  canAdd,
   onboardingQuestAddress,
   questId
 }: TasksParams) => {
@@ -366,10 +358,12 @@ const Tasks = ({
                   row={row}
                 />
               ))}
-              <EmptyTaskCard
-                onboardingQuestAddress={onboardingQuestAddress}
-                questId={questId}
-              />
+              {canAdd && (
+                <EmptyTaskCard
+                  onboardingQuestAddress={onboardingQuestAddress}
+                  questId={questId}
+                />
+              )}
             </GridBox>
             // <TableContainer
             //   sx={{

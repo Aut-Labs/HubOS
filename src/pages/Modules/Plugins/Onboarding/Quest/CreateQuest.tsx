@@ -13,18 +13,14 @@ import {
   Box,
   Button,
   Container,
-  InputAdornment,
   MenuItem,
   Stack,
   Link as BtnLink,
-  Tooltip,
   Typography,
   styled
 } from "@mui/material";
 import { allRoles } from "@store/Community/community.reducer";
 import { AutSelectField } from "@theme/field-select-styles";
-import { AutTextField } from "@theme/field-text-styles";
-import { pxToRem } from "@utils/text-size";
 import { memo, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
@@ -34,18 +30,9 @@ import {
   useNavigate,
   useSearchParams
 } from "react-router-dom";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import LinkWithQuery from "@components/LinkWithQuery";
-import AddIcon from "@mui/icons-material/Add";
 import { getMemberPhases, getOwnerPhases } from "@utils/beta-phases";
-
-const errorTypes = {
-  maxWords: `Words cannot be more than 3`,
-  maxNameChars: `Characters cannot be more than 24`,
-  maxLength: `Characters cannot be more than 280`
-};
 
 const Strong = styled("strong")(({ theme }) => ({
   // color: theme.palette.primary.main
@@ -55,88 +42,30 @@ interface PluginParams {
   plugin: PluginDefinition;
 }
 
-const QuestSuccess = ({ newQuestId, existingQuestId, pluginAddress }) => {
-  const location = useLocation();
-  const navigate = useNavigate();
+function getQuestDates() {
+  const { phaseOneStartDate, phaseTwoEndDate } = getMemberPhases();
 
-  const path = useMemo(() => {
-    if (existingQuestId) {
-      return location.pathname.replaceAll("/create", `/${existingQuestId}`);
-    }
-    return location.pathname.replaceAll("/create", `/${newQuestId}`);
-  }, [location.pathname]);
+  const questStartDateOffset = 30 * 60 * 1000; // 2 hours in milliseconds
 
-  return (
-    <Container
-      maxWidth="sm"
-      sx={{ mt: pxToRem(20), flexGrow: 1, display: "flex" }}
-    >
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100%",
-          my: "auto"
-        }}
-      >
-        <Typography align="center" color="white" variant="h2" component="div">
-          Success! Your Onboarding Quest call has been{" "}
-          {existingQuestId ? "edited" : "created"} and deployed on the
-          Blockchain 🎉
-        </Typography>
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            gridGap: "20px"
-          }}
-        >
-          <Button
-            sx={{
-              my: pxToRem(50)
-            }}
-            color="offWhite"
-            size="small"
-            variant="outlined"
-            startIcon={<AddIcon />}
-            to="/aut-dashboard/modules/Task"
-            queryParams={{
-              onboardingQuestAddress: pluginAddress,
-              returnUrlLinkName: "Back to quest",
-              returnUrl: path,
-              questId: (newQuestId || existingQuestId).toString()
-            }}
-            component={LinkWithQuery}
-          >
-            Add task
-          </Button>
-          <Button
-            sx={{
-              my: pxToRem(50)
-            }}
-            onClick={() => navigate(path)}
-            type="submit"
-            variant="outlined"
-            size="medium"
-            color="offWhite"
-          >
-            See Quest
-          </Button>
-        </Box>
-      </Box>
-    </Container>
+  const questStartDate = new Date(
+    phaseOneStartDate.getTime() + questStartDateOffset
   );
-};
+  const questEndDate = phaseTwoEndDate;
+
+  return {
+    questStartDate,
+    questEndDate
+  };
+}
 
 function questDurationInDays() {
-  const { phaseOneDuration, phaseTwoDuration } = getMemberPhases();
-  const totalDuration = phaseOneDuration + phaseTwoDuration;
-  const numberOfDays = totalDuration / (24 * 60 * 60 * 1000); // number of milliseconds in a day
-  return Math.max(1, Math.ceil(numberOfDays));
+  const { questStartDate, questEndDate } = getQuestDates();
+
+  const durationInMilliseconds: number =
+    questEndDate.getTime() - questStartDate.getTime();
+  const durationInDays: number = durationInMilliseconds / (24 * 60 * 60 * 1000);
+
+  return Number(durationInDays.toFixed(2));
 }
 
 const CreateQuest = ({ plugin }: PluginParams) => {
@@ -157,7 +86,8 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       title: "",
       // description: "",
       // durationInDays: questDurationInDays(),
-      startDate: getOwnerPhases().phaseThreeEndDate,
+      // startDate: addMinutes(new Date(), 30), // @TO-USE for testing - 30 minutes
+      startDate: getQuestDates().questStartDate,
       role: null
     }
   });
@@ -272,6 +202,10 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       navigate(path);
     }
   }, [createIsSuccess, updateIsSuccess]);
+
+  const isDisabled = useMemo(() => {
+    return !formState.isValid || Object.keys(formState.dirtyFields).length == 0;
+  }, [formState]);
 
   return (
     <Container
@@ -498,7 +432,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
             component="a"
             type="button"
             color="primary"
-            variant="caption"
+            variant="body"
             href="http://176.34.149.248:4002/"
             target="_blank"
           >
@@ -520,7 +454,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
                 ? "Edit Onboarding Quest"
                 : "Create Onboarding Quest"
             }
-            disabled={!formState.isValid}
+            disabled={isDisabled}
           />
         </Box>
       </Stack>

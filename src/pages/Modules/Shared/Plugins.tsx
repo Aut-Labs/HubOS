@@ -69,6 +69,13 @@ const Plugins = ({ definition }: StackParams) => {
     return plugins.filter((p) => p.pluginAddress);
   }, [showInstalled, plugins]);
 
+  const typeformLink = useMemo(() => {
+    if (definition.properties.module.type === "OnboardingStrategy") {
+      return "https://autlabs.typeform.com/onboarding";
+    }
+    return "https://autlabs.typeform.com/tasktype";
+  }, [definition]);
+
   const { quest, isLoading: isLoadingPlugins } = useGetAllOnboardingQuestsQuery(
     searchParams.get(RequiredQueryParams.OnboardingQuestAddress),
     {
@@ -80,8 +87,6 @@ const Plugins = ({ definition }: StackParams) => {
       })
     }
   );
-
-  console.log("quest: ", quest);
 
   return (
     <>
@@ -175,7 +180,10 @@ const Plugins = ({ definition }: StackParams) => {
                   plugin={plugin}
                 />
               ))}
-              <EmptyPluginCard type={definition.properties.module.title} />
+              <EmptyPluginCard
+                typeformLink={typeformLink}
+                type={definition.properties.module.title}
+              />
             </GridBox>
           </>
         )}

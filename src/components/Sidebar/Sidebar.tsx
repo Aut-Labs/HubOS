@@ -101,7 +101,6 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
   const theme = useTheme();
   const community = useSelector(CommunityData);
   const userInfo = useSelector(UserInfo);
-  const isDiscordVerified = useSelector(IsDiscordVerified);
   const network = useSelector(SelectedNetworkConfig);
   const appTitle = useSelector(AppTitle);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -115,11 +114,6 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
   const toolbarHeight = useMemo(() => {
     return isExtraLarge ? 92 : 72;
   }, [isExtraLarge]);
-
-  const warningToolbarHeight = useMemo(() => {
-    if (isDiscordVerified) return 0;
-    return toolbarHeight / 1.5;
-  }, [toolbarHeight, isDiscordVerified]);
 
   const handleDrawerToggle = () => {
     setOpen(!open);
@@ -154,16 +148,30 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="subtitle2" noWrap color="white">
-            {appTitle}
-          </Typography>
-          <span
-            style={{
-              flex: 1
-            }}
-          ></span>
-
-          <DautPlaceholder />
+          {!isMobile && (
+            <>
+              <Typography variant="subtitle2" noWrap color="white">
+                {appTitle}
+              </Typography>
+              <span
+                style={{
+                  flex: 1
+                }}
+              ></span>
+              <DautPlaceholder />
+            </>
+          )}
+          {isMobile && (
+            <Box
+              sx={{
+                display: "flex",
+                width: "100%",
+                justifyContent: "center"
+              }}
+            >
+              <DautPlaceholder />
+            </Box>
+          )}
         </Toolbar>
       </AppBar>
 
@@ -324,11 +332,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
           />
         </Box>
       </Drawer>
-      <Main
-        toolbarHeight={toolbarHeight + warningToolbarHeight}
-        drawerWidth={drawerWidth}
-        open={open}
-      >
+      <Main toolbarHeight={toolbarHeight} drawerWidth={drawerWidth} open={open}>
         <div
           style={{
             height: "100%",

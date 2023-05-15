@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 export const MarketTemplates = [
   {
-    title: "Infrastructure, & Web3 Tools",
+    title: "Infra, Defi & DAO Tooling",
     description:
       "For researchers & web3, open-source teams, that innovate in a liberal fashion - creating the tools and technology to power a more collaborative world.",
     market: 1

@@ -9,6 +9,16 @@ const AppTitle = (props: TypographyProps) => {
       variant="h1"
       color="white"
       whiteSpace="nowrap"
+      sx={{
+        display: {
+          xs: "flex",
+          sm: "unset"
+        },
+        flexDirection: {
+          xs: "column",
+          sm: "row"
+        }
+      }}
       {...(props as any)}
     >
       <strong

@@ -30,7 +30,7 @@ type RootState = ReturnType<typeof reducers>;
 
 const rootReducer = (state: RootState, action: Action) => {
   if (action.type === "RESET_ALL") {
-    const keepStateKeys = ["walletProvider"];
+    const keepStateKeys = [];
     Object.keys(state).forEach((key) => {
       if (!keepStateKeys.includes(key)) {
         delete state[key];

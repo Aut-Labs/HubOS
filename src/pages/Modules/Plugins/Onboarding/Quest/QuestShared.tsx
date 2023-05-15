@@ -294,6 +294,8 @@ interface QuestTasksParams {
   isSubmission: boolean;
   questId: number;
   tasks: Task[];
+  canDelete: boolean;
+  canAdd: boolean;
 }
 
 export const QuestTasks = memo(
@@ -302,6 +304,8 @@ export const QuestTasks = memo(
     tasks,
     onboardingQuestAddress,
     isSubmission,
+    canAdd,
+    canDelete,
     questId,
     isAdmin
   }: QuestTasksParams) => {
@@ -350,6 +354,8 @@ export const QuestTasks = memo(
           onboardingQuestAddress={onboardingQuestAddress}
           questId={questId}
           isAdmin={isAdmin}
+          canAdd={canAdd}
+          canDelete={canDelete}
           isLoading={isLoading}
           tasks={filteredTasks}
         />

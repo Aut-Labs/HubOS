@@ -22,6 +22,12 @@ const getAllOnboardingQuests = async (
   const sdk = AutSDK.getInstance();
   let questOnboarding: QuestOnboarding = sdk.questOnboarding;
 
+  if (!pluginAddress) {
+    return {
+      data: []
+    };
+  }
+
   if (!questOnboarding) {
     questOnboarding = sdk.initService<QuestOnboarding>(
       QuestOnboarding,

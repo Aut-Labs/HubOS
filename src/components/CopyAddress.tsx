@@ -22,7 +22,7 @@ export const CopyAddress = ({ address, variant = null }) => {
     <CopyToClipboard text={address} onCopy={() => clickCopy(true)}>
       <div
         onClick={(event) => event.stopPropagation()}
-        style={{ color: "white" }}
+        style={{ color: "white", whiteSpace: "nowrap" }}
       >
         <Tooltip title={copied ? "Copied!" : "Copy Address"}>
           <Typography

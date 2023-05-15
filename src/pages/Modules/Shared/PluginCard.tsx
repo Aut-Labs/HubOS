@@ -165,7 +165,7 @@ const PluginCard = ({
               loadingIndicator={
                 <Stack direction="row" gap={1} alignItems="center">
                   <Typography className="text-secondary">
-                    Activating...
+                    Installing...
                   </Typography>
                   <CircularProgress
                     size="20px"
@@ -206,7 +206,7 @@ const PluginCard = ({
   );
 };
 
-export const EmptyPluginCard = ({ type }) => {
+export const EmptyPluginCard = ({ type, typeformLink }) => {
   return (
     <GridCard
       sx={{
@@ -222,6 +222,9 @@ export const EmptyPluginCard = ({ type }) => {
       <CardActionArea
         sx={{
           height: "100%"
+        }}
+        onClick={() => {
+          window.open(typeformLink, "_blank");
         }}
       >
         <CardContent
@@ -335,7 +338,7 @@ export const ModuleDefinitionCard = ({
           })}
           color="offWhite"
         >
-          {module.isActivated ? "Go to plugins" : "Actvate"}
+          {module.isActivated ? "Go to plugins" : "Activate"}
         </LoadingButton>
 
         {/* <Stack direction="row" justifyContent="flex-end">
