@@ -68,6 +68,16 @@ function questDurationInDays() {
   return Number(durationInDays.toFixed(2));
 }
 
+function questDurationInHours() {
+  const { questStartDate, questEndDate } = getQuestDates();
+
+  const durationInMilliseconds: number =
+    questEndDate.getTime() - questStartDate.getTime();
+  const durationInHours: number = durationInMilliseconds / (60 * 60 * 1000);
+
+  return Number(durationInHours.toFixed(2));
+}
+
 const CreateQuest = ({ plugin }: PluginParams) => {
   const [roles] = useState(useSelector(allRoles));
   const [searchParams] = useSearchParams();
@@ -137,7 +147,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         pluginAddress: plugin.pluginAddress,
         role: values.role,
         // durationInDays: values.durationInDays,
-        durationInDays: questDurationInDays(),
+        durationInDays: questDurationInHours(),
         startDate,
         metadata: {
           name:
@@ -151,7 +161,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         pluginAddress: plugin.pluginAddress,
         role: values.role,
         // durationInDays: values.durationInDays,
-        durationInDays: questDurationInDays(),
+        durationInDays: questDurationInHours(),
         startDate,
         metadata: {
           name:
