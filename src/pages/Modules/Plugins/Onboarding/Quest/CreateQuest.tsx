@@ -433,8 +433,8 @@ const CreateQuest = ({ plugin }: PluginParams) => {
 
         <Typography color="white" variant="body">
           *: During the closed beta, the duration of each onboarding quest will
-          be <Strong>{questDurationInDays()} day</Strong> and begin on the{" "}
-          <Strong>{getOwnerPhases().phaseThreeEndDate.toDateString()}</Strong>,
+          be <Strong>{questDurationInDays()} days</Strong> and begin on the{" "}
+          <Strong>{getQuestDates().questStartDate.toDateString()}</Strong>,
           until then you can invite your community to allowlist for quests you
           have activated. During the onboarding period, every community will be
           listed on the{" "}
