@@ -215,7 +215,7 @@ function Members() {
             size="medium"
             color="offWhite"
           >
-            Invite members
+            Invite contributors
           </Button>
         </Box>
       </Box>
@@ -232,7 +232,7 @@ function Members() {
           }}
         >
           <Typography color="rgb(107, 114, 128)" variant="subtitle2">
-            There are no members in this community yet...
+            There are no contributors in this community yet...
           </Typography>
         </Box>
       )}
