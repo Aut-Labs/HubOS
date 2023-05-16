@@ -75,7 +75,7 @@ function questDurationInHours() {
     questEndDate.getTime() - questStartDate.getTime();
   const durationInHours: number = durationInMilliseconds / (60 * 60 * 1000);
 
-  return Number(durationInHours.toFixed(2));
+  return Math.ceil(durationInHours);
 }
 
 const CreateQuest = ({ plugin }: PluginParams) => {
