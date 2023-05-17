@@ -15,6 +15,7 @@ import { memo, useMemo } from "react";
 import {
   Link,
   useLocation,
+  useNavigate,
   useParams,
   useSearchParams
 } from "react-router-dom";
@@ -92,6 +93,8 @@ const TaskCard = ({
   const location = useLocation();
   const params = useParams<{ questId: string }>();
   const confirm = useConfirmDialog();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [removeTask, { error, isError, isLoading, reset }] =
     useRemoveTaskFromQuestMutation();
 
@@ -106,6 +109,13 @@ const TaskCard = ({
       )
     })
   });
+
+  const path = useMemo(() => {
+    if (!plugin) return;
+    const stackType = plugin.metadata.properties.module.type;
+    const stack = `modules/${stackType}`;
+    return `${stack}/${PluginDefinitionType[plugin.pluginDefinitionId]}`;
+  }, [plugin]);
 
   return (
     <>
@@ -174,6 +184,22 @@ const TaskCard = ({
                 mt: 6,
                 mb: 4,
                 mx: "auto"
+              }}
+              onClick={() => {
+                navigate({
+                  pathname: `/aut-dashboard/${path}/${row.taskId}`,
+                  search: new URLSearchParams({
+                    questId: searchParams.get(RequiredQueryParams.QuestId),
+                    onboardingQuestAddress: searchParams.get(
+                      RequiredQueryParams.OnboardingQuestAddress
+                    ),
+                    daoAddress: searchParams.get(
+                      RequiredQueryParams.DaoAddress
+                    ),
+                    returnUrlLinkName: "Back to quest",
+                    returnUrl: `${location?.pathname}${location?.search}`
+                  }).toString()
+                });
               }}
               size="large"
               variant="outlined"
