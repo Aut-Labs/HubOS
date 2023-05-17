@@ -95,41 +95,17 @@ const TaskCard = ({
   const [removeTask, { error, isError, isLoading, reset }] =
     useRemoveTaskFromQuestMutation();
 
-  const { plugin, questOnboarding } = useGetAllPluginDefinitionsByDAOQuery(
-    null,
-    {
-      selectFromResult: ({ data }) => ({
-        questOnboarding: (data || []).find(
-          (p) =>
-            PluginDefinitionType.QuestOnboardingPlugin === p.pluginDefinitionId
-        ),
-        plugin: (data || []).find(
-          (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
-        )
-      })
-    }
-  );
-
-  const confimDelete = () =>
-    confirm({
-      title: "Are you sure you want to delete this task?",
-      onConfirm: () => {
-        removeTask({
-          task: row,
-          questId: +params.questId,
-          pluginTokenId: plugin.tokenId,
-          pluginAddress: plugin.pluginAddress,
-          onboardingQuestAddress: questOnboarding?.pluginAddress
-        });
-      }
-    });
-
-  const path = useMemo(() => {
-    if (!plugin) return;
-    const stackType = plugin.metadata.properties.module.type;
-    const stack = `modules/${stackType}`;
-    return `${stack}/${PluginDefinitionType[plugin.pluginDefinitionId]}`;
-  }, [plugin]);
+  const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
+    selectFromResult: ({ data }) => ({
+      questOnboarding: (data || []).find(
+        (p) =>
+          PluginDefinitionType.QuestOnboardingPlugin === p.pluginDefinitionId
+      ),
+      plugin: (data || []).find(
+        (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
+      )
+    })
+  });
 
   return (
     <>
@@ -163,11 +139,6 @@ const TaskCard = ({
           subheaderTypographyProps={{
             color: "white"
           }}
-          action={
-            <IconButton color="offWhite">
-              <EditIcon />
-            </IconButton>
-          }
           title={plugin?.metadata?.properties?.title}
         />
         <CardContent
@@ -197,22 +168,19 @@ const TaskCard = ({
               display: "flex"
             }}
           >
-            {plugin.pluginDefinitionId ===
-              PluginDefinitionType.OnboardingOpenTaskPlugin && (
-              <Button
-                sx={{
-                  width: "80%",
-                  mt: 6,
-                  mb: 4,
-                  mx: "auto"
-                }}
-                size="large"
-                variant="outlined"
-                color="offWhite"
-              >
-                Submissions
-              </Button>
-            )}
+            <Button
+              sx={{
+                width: "80%",
+                mt: 6,
+                mb: 4,
+                mx: "auto"
+              }}
+              size="large"
+              variant="outlined"
+              color="offWhite"
+            >
+              Go to Submission
+            </Button>
           </Box>
         </CardContent>
       </GridCard>

@@ -151,13 +151,23 @@ interface UpdateDiscordData {
 
 export const updateDiscordSocials = createAsyncThunk(
   "community/update",
-  async (args: UpdateDiscordData, { rejectWithValue }) => {
+  async (args: UpdateDiscordData, { rejectWithValue, getState }) => {
     const sdk = AutSDK.getInstance();
     const updatedCommunity = Community.updateCommunity(args.community);
     const uri = await sdk.client.storeAsBlob(updatedCommunity);
+    const state = getState();
+    const { selectedCommunityAddress } = state["community"];
 
+    if (!sdk.daoExpander) {
+      sdk.daoExpander = sdk.initService<DAOExpander>(
+        DAOExpander,
+        selectedCommunityAddress
+      );
+    }
     console.log("New metadata: ->", ipfsCIDToHttpUrl(uri));
-    const response = await sdk.autID.contract.setMetadataUri(uri);
+    const response = await sdk.daoExpander.contract.metadata.setMetadataUri(
+      uri
+    );
 
     if (response.isSuccess) {
       const autIdData = JSON.parse(window.sessionStorage.getItem("aut-data"));
