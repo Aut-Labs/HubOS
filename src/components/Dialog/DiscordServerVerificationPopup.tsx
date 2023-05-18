@@ -18,7 +18,8 @@ import AutLoading from "../AutLoading";
 import DialogWrapper from "./DialogWrapper";
 
 const errorTypes = {
-  pattern: "Invalid discord invite link"
+  pattern: "Invalid discord invite link",
+  custom: "You are not the owner of this server."
 };
 
 const DiscordServerVerificationPopup = ({
@@ -31,7 +32,7 @@ const DiscordServerVerificationPopup = ({
   const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
 
-  const { control, formState, handleSubmit, getValues } = useForm({
+  const { control, formState, handleSubmit, getValues, setError } = useForm({
     mode: "onChange",
     defaultValues: {
       inviteLink: ""
@@ -54,6 +55,12 @@ const DiscordServerVerificationPopup = ({
         );
         if (result.meta.requestStatus === "rejected") {
           setLoading(false);
+          if (result.payload === "User is not the owner.") {
+            setError("inviteLink", {
+              type: "custom",
+              message: "You are not the owner of this server."
+            });
+          }
         } else {
           const community = { ...communityData };
           for (let i = 0; i < community.properties.socials.length; i++) {
