@@ -12,6 +12,7 @@ import {
   CardContent,
   Chip,
   Container,
+  Link,
   Stack,
   Typography
 } from "@mui/material";
@@ -29,6 +30,7 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { useEthers } from "@usedapp/core";
 import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
+import { ipfsCIDToHttpUrl } from "@api/storage.api";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -258,12 +260,11 @@ const OwnerFinalizeContent = ({
       direction="column"
       gap={4}
       sx={{
-        flex: 1,
         justifyContent: "space-between",
         margin: "0 auto",
         width: {
           xs: "100%",
-          sm: "400px",
+          sm: "600px",
           xxl: "800px"
         }
       }}
@@ -290,37 +291,60 @@ const OwnerFinalizeContent = ({
             </Stack>
           )}
 
-          <Stack direction="column" alignItems="center" mb="15px">
+          {/* <Stack direction="column" alignItems="center" mb="15px">
             <Typography color="white" variant="body" textAlign="center" p="5px">
               {task?.metadata?.description}
             </Typography>
             <Typography variant="caption" className="text-secondary">
               Task Description
             </Typography>
-          </Stack>
+          </Stack> */}
 
           <Stack direction="column" alignItems="center">
             <Typography color="white" variant="body" textAlign="center" p="5px">
-              {submission?.submission?.description}
+              {submission?.submission?.description || "Some description"}
             </Typography>
             <Typography variant="caption" className="text-secondary">
-              User Submission
+              Submission Description
+            </Typography>
+          </Stack>
+          <Stack direction="column" alignItems="center">
+            <Typography color="white" variant="body" textAlign="center" p="5px">
+              <Link
+                color="primary"
+                sx={{
+                  mt: 1,
+                  cursor: "pointer"
+                }}
+                variant="body"
+                target="_blank"
+                href={ipfsCIDToHttpUrl(
+                  submission?.submission?.properties["fileUri"]
+                )}
+              >
+                Open attachment
+              </Link>
+            </Typography>
+            <Typography variant="caption" className="text-secondary">
+              Attachment File
             </Typography>
           </Stack>
         </CardContent>
       </Card>
 
       <Stack
+        flexDirection="row"
+        justifyContent="flex-end"
         sx={{
-          margin: "0 auto",
+          justifyContent: "flex-end",
           width: {
             xs: "100%",
-            sm: "400px",
+            sm: "600px",
             xxl: "800px"
           }
         }}
       >
-        {submission?.status === TaskStatus.Submitted && (
+        {submission?.status !== TaskStatus.Submitted && (
           <StepperButton label="Finalize" onClick={onSubmit} />
         )}
       </Stack>

@@ -189,6 +189,7 @@ const TaskCard = ({
                 navigate({
                   pathname: `/aut-dashboard/${path}/${row.taskId}`,
                   search: new URLSearchParams({
+                    submitter: row.submitter,
                     questId: searchParams.get(RequiredQueryParams.QuestId),
                     onboardingQuestAddress: searchParams.get(
                       RequiredQueryParams.OnboardingQuestAddress
@@ -318,7 +319,6 @@ const Submissions = ({ plugin }: PluginParams) => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          flex: 1,
           mb: 4,
           mx: "auto",
           position: "relative",
@@ -363,7 +363,7 @@ const Submissions = ({ plugin }: PluginParams) => {
               </GridBox>
             )}
 
-            {!isLoadingTasks && !submissions?.length && (
+            {/* {!isLoadingTasks && !submissions?.length && (
               <Box
                 sx={{
                   display: "flex",
@@ -378,7 +378,7 @@ const Submissions = ({ plugin }: PluginParams) => {
                   No submissions yet...
                 </Typography>
               </Box>
-            )}
+            )} */}
           </>
         )}
       </Box>
