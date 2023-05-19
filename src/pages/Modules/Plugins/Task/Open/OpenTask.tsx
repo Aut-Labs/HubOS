@@ -291,15 +291,6 @@ const OwnerFinalizeContent = ({
             </Stack>
           )}
 
-          {/* <Stack direction="column" alignItems="center" mb="15px">
-            <Typography color="white" variant="body" textAlign="center" p="5px">
-              {task?.metadata?.description}
-            </Typography>
-            <Typography variant="caption" className="text-secondary">
-              Task Description
-            </Typography>
-          </Stack> */}
-
           <Stack direction="column" alignItems="center">
             <Typography color="white" variant="body" textAlign="center" p="5px">
               {submission?.submission?.description || "Some description"}
@@ -344,7 +335,7 @@ const OwnerFinalizeContent = ({
           }
         }}
       >
-        {submission?.status !== TaskStatus.Submitted && (
+        {submission?.status === TaskStatus.Submitted && (
           <StepperButton label="Finalize" onClick={onSubmit} />
         )}
       </Stack>
@@ -391,6 +382,8 @@ const OpenTask = ({ plugin }: PluginParams) => {
       })
     }
   );
+
+  console.log(task, submission, isAdmin);
 
   return (
     <Container

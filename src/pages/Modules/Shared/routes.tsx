@@ -76,8 +76,6 @@ export const pluginRoutes = (
         (m) => m.metadata.properties.type === moduleType
       );
 
-      console.log("modulePath: ", modulePath);
-
       if (!moduleDefinition.isActivated) return prev;
 
       if (!prev.taskTypesMainMenu[moduleType]) {

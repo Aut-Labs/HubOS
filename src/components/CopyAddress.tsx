@@ -4,7 +4,7 @@ import { trimAddress } from "@utils/helpers";
 import { Tooltip, Typography, IconButton } from "@mui/material";
 import { useState } from "react";
 
-export const CopyAddress = ({ address, variant = null }) => {
+export const CopyAddress = ({ address, variant = null, color = "white" }) => {
   const [copied, setCopied] = useState(false);
 
   function clickCopy(copied) {
@@ -22,16 +22,16 @@ export const CopyAddress = ({ address, variant = null }) => {
     <CopyToClipboard text={address} onCopy={() => clickCopy(true)}>
       <div
         onClick={(event) => event.stopPropagation()}
-        style={{ color: "white", whiteSpace: "nowrap" }}
+        style={{ color: color, whiteSpace: "nowrap" }}
       >
         <Tooltip title={copied ? "Copied!" : "Copy Address"}>
           <Typography
             variant={variant || "body1"}
-            color="white"
+            color={color}
             fontWeight="normal"
           >
             {trimAddress(address)}
-            <IconButton sx={{ color: "white", p: 0 }}>
+            <IconButton sx={{ color: color, p: 0 }}>
               <ContentCopyIcon
                 sx={{ cursor: "pointer", width: "20px", ml: "5px" }}
               />

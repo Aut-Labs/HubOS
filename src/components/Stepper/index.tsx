@@ -157,7 +157,8 @@ export const StepperButton = ({
   return (
     <Button
       sx={{
-        my: pxToRem(40)
+        my: pxToRem(40),
+        minWidth: "200px"
       }}
       type="submit"
       variant="outlined"

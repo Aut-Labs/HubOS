@@ -9,15 +9,11 @@ import {
   CardContent,
   Card,
   Button,
-  CardActionArea
+  CardActionArea,
+  CardActions
 } from "@mui/material";
 import { memo, useMemo } from "react";
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams
-} from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { TaskStatus } from "@store/model";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
@@ -30,6 +26,7 @@ import { useRemoveTaskFromQuestMutation } from "@api/onboarding.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import AddIcon from "@mui/icons-material/Add";
 import { differenceInDays } from "date-fns";
+import { RequiredQueryParams } from "@api/RequiredQueryParams";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {
@@ -53,19 +50,23 @@ export const taskStatuses: any = {
 export const taskTypes = {
   [TaskType.Open]: {
     pluginType: PluginDefinitionType.OnboardingOpenTaskPlugin,
-    label: "Open Task"
+    label: "Open Task",
+    labelColor: "#FFC1A9"
   },
   [TaskType.ContractInteraction]: {
     pluginType: PluginDefinitionType.OnboardingTransactionTaskPlugin,
-    label: "Contract Interaction"
+    label: "Contract Interaction",
+    labelColor: "#FFECB3"
   },
   [TaskType.Quiz]: {
     pluginType: PluginDefinitionType.OnboardingQuizTaskPlugin,
-    label: "Multiple-Choice Quiz"
+    label: "Multiple-Choice Quiz",
+    labelColor: "#C1FFC1 "
   },
   [TaskType.JoinDiscord]: {
     pluginType: PluginDefinitionType.OnboardingJoinDiscordTaskPlugin,
-    label: "Join Discord"
+    label: "Join Discord",
+    labelColor: "#A5AAFF"
   }
 };
 
@@ -85,6 +86,7 @@ const TaskCard = ({
   const params = useParams<{ questId: string }>();
   const navigate = useNavigate();
   const confirm = useConfirmDialog();
+  const [searchParams] = useSearchParams();
   const [removeTask, { error, isError, isLoading, reset }] =
     useRemoveTaskFromQuestMutation();
 
@@ -116,6 +118,13 @@ const TaskCard = ({
         });
       }
     });
+
+  const path = useMemo(() => {
+    if (!plugin) return;
+    const stackType = plugin.metadata.properties.module.type;
+    const stack = `modules/${stackType}`;
+    return `${stack}/${PluginDefinitionType[plugin.pluginDefinitionId]}`;
+  }, [plugin]);
 
   return (
     <>
@@ -155,20 +164,6 @@ const TaskCard = ({
               color="error"
               onClick={() => {
                 confimDelete();
-                // navigate({
-                //   pathname: `/aut-dashboard/${path}/${row.taskId}`,
-                //   search: new URLSearchParams({
-                //     questId: params.questId,
-                //     onboardingQuestAddress: searchParams.get(
-                //       RequiredQueryParams.OnboardingQuestAddress
-                //     ),
-                //     daoAddress: searchParams.get(
-                //       RequiredQueryParams.DaoAddress
-                //     ),
-                //     returnUrlLinkName: "Back to quest",
-                //     returnUrl: `${location?.pathname}${location?.search}`
-                //   }).toString()
-                // });
               }}
             >
               <DeleteIcon />
@@ -186,7 +181,17 @@ const TaskCard = ({
         >
           <Stack flex={1} direction="column" gap={2}>
             <Typography variant="body" color="white">
-              Task type: {taskTypes[row.taskType]?.label}
+              Task type:{" "}
+              <span
+                style={{
+                  // backgroundColor: taskTypes[row.taskType]?.labelColor,
+                  // color: "#333333",
+                  padding: "2px 6px",
+                  borderRadius: "2px"
+                }}
+              >
+                {taskTypes[row.taskType]?.label}
+              </span>
             </Typography>
             <Typography variant="body" color="white">
               Duration:{" "}
@@ -209,7 +214,6 @@ const TaskCard = ({
                 sx={{
                   width: "80%",
                   mt: 6,
-                  mb: 4,
                   mx: "auto"
                 }}
                 onClick={() => {
@@ -232,6 +236,33 @@ const TaskCard = ({
             )}
           </Box>
         </CardContent>
+        <CardActions
+          sx={{
+            justifyContent: "flex-end"
+          }}
+        >
+          <Button
+            color="offWhite"
+            variant="outlined"
+            size="small"
+            onClick={() => {
+              navigate({
+                pathname: `/aut-dashboard/${path}/${row.taskId}`,
+                search: new URLSearchParams({
+                  questId: params.questId,
+                  onboardingQuestAddress: searchParams.get(
+                    RequiredQueryParams.OnboardingQuestAddress
+                  ),
+                  daoAddress: searchParams.get(RequiredQueryParams.DaoAddress),
+                  returnUrlLinkName: "Back to quest",
+                  returnUrl: `${location?.pathname}${location?.search}`
+                }).toString()
+              });
+            }}
+          >
+            Go to task
+          </Button>
+        </CardActions>
       </GridCard>
     </>
   );

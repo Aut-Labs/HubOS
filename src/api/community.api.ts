@@ -158,12 +158,11 @@ export const updateDiscordSocials = createAsyncThunk(
     const state = getState();
     const { selectedCommunityAddress } = state["community"];
 
-    if (!sdk.daoExpander) {
-      sdk.daoExpander = sdk.initService<DAOExpander>(
-        DAOExpander,
-        selectedCommunityAddress
-      );
-    }
+    sdk.daoExpander = sdk.initService<DAOExpander>(
+      DAOExpander,
+      selectedCommunityAddress
+    );
+
     console.log("New metadata: ->", ipfsCIDToHttpUrl(uri));
     const response = await sdk.daoExpander.contract.metadata.setMetadataUri(
       uri
@@ -365,12 +364,10 @@ const getMembers = async (body, api: BaseQueryApi) => {
 
   const sdk = AutSDK.getInstance();
 
-  if (!sdk.daoExpander) {
-    sdk.daoExpander = sdk.initService<DAOExpander>(
-      DAOExpander,
-      selectedCommunityAddress
-    );
-  }
+  sdk.daoExpander = sdk.initService<DAOExpander>(
+    DAOExpander,
+    selectedCommunityAddress
+  );
 
   const members: DAOMember[] = [];
   const membersResponse =

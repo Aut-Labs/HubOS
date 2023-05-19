@@ -20,23 +20,17 @@ const getAllOnboardingQuests = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
-
   if (!pluginAddress) {
     return {
       data: []
     };
   }
 
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      pluginAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
-
-  const response = await questOnboarding.getAllQuests();
+  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    pluginAddress
+  );
+  const response = await sdk.questOnboarding.getAllQuests();
   if (response?.isSuccess) {
     const questsWithMetadata: Quest[] = [];
     for (let i = 0; i < response.data.length; i++) {
@@ -67,18 +61,14 @@ const fetchQuestById = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
   const { questId, onboardingQuestAddress } = body;
 
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    onboardingQuestAddress
+  );
 
-  const response = await questOnboarding.getQuestById(+questId);
+  const response = await sdk.questOnboarding.getQuestById(+questId);
 
   if (response?.isSuccess) {
     response.data.metadata = await fetchMetadata<typeof response.data.metadata>(
@@ -104,20 +94,16 @@ const hasUserCompletedQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
   const { questId, onboardingQuestAddress, userAddress } = body;
 
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    onboardingQuestAddress
+  );
 
   try {
     const hasCompletedAQuest =
-      await questOnboarding.questPlugin.functions.hasCompletedAQuest(
+      await sdk.questOnboarding.questPlugin.functions.hasCompletedAQuest(
         userAddress,
         +questId
       );
@@ -136,17 +122,12 @@ const launchOnboarding = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    pluginAddress
+  );
 
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      pluginAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
-
-  const response = await questOnboarding.launchOnboarding(quests);
+  const response = await sdk.questOnboarding.launchOnboarding(quests);
 
   if (!response.isSuccess) {
     return {
@@ -171,17 +152,12 @@ const deactivateOnboarding = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    pluginAddress
+  );
 
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      pluginAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
-
-  const response = await questOnboarding.deactivateOnboarding(quests);
+  const response = await sdk.questOnboarding.deactivateOnboarding(quests);
 
   if (!response.isSuccess) {
     return {
@@ -209,17 +185,12 @@ const applyForQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.onboardingQuestAddress
+  );
 
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
-
-  const response = await questOnboarding.applyForAQuest(body.questId);
+  const response = await sdk.questOnboarding.applyForAQuest(body.questId);
 
   if (!response.isSuccess) {
     return {
@@ -239,17 +210,12 @@ const withdrawFromAQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.onboardingQuestAddress
+  );
 
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
-
-  const response = await questOnboarding.withdrawFromAQuest(body.questId);
+  const response = await sdk.questOnboarding.withdrawFromAQuest(body.questId);
 
   if (!response.isSuccess) {
     return {
@@ -266,28 +232,23 @@ const getAllTasksPerQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
-
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      pluginAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    pluginAddress
+  );
 
   let tasks: Task[] = [];
   let submissions: Task[] = [];
 
   if (isAdmin) {
-    const response = await questOnboarding.getAllTasksAndSubmissionsByQuest(
+    const response = await sdk.questOnboarding.getAllTasksAndSubmissionsByQuest(
       questId
     );
 
     tasks = response.data.tasks;
     submissions = response.data.submissions;
   } else {
-    const response = await questOnboarding.getAllTasksByQuest(
+    const response = await sdk.questOnboarding.getAllTasksByQuest(
       questId,
       userAddress
     );
@@ -332,17 +293,12 @@ const createQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.pluginAddress
+  );
 
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.pluginAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
-
-  const response = await questOnboarding.createQuest(body);
+  const response = await sdk.questOnboarding.createQuest(body);
 
   if (!response.isSuccess) {
     return {
@@ -359,17 +315,12 @@ const updateQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.pluginAddress
+  );
 
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.pluginAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
-
-  const response = await questOnboarding.updateQuest(body);
+  const response = await sdk.questOnboarding.updateQuest(body);
 
   if (!response.isSuccess) {
     return {
@@ -392,17 +343,12 @@ const createTaskPerQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.onboardingQuestAddress
+  );
 
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
-
-  const response = await questOnboarding.createTask(
+  const response = await sdk.questOnboarding.createTask(
     body.task,
     body.questId,
     body.pluginTokenId
@@ -429,17 +375,12 @@ const removeTaskFromQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.onboardingQuestAddress
+  );
 
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
-
-  const response = await questOnboarding.removeTasks(
+  const response = await sdk.questOnboarding.removeTasks(
     [body.task],
     body.questId,
     body.pluginTokenId
@@ -465,17 +406,12 @@ const submitOpenTask = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.onboardingQuestAddress
+  );
 
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
-
-  const response = await questOnboarding.submitTask(
+  const response = await sdk.questOnboarding.submitTask(
     body.task,
     body.pluginAddress,
     body.pluginDefinitionId
@@ -579,17 +515,12 @@ const finaliseOpenTask = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.onboardingQuestAddress
+  );
 
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
-
-  const response = await questOnboarding.finalizeFor(
+  const response = await sdk.questOnboarding.finalizeFor(
     body.task,
     body.pluginAddress,
     body.pluginDefinitionId

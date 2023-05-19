@@ -4,12 +4,13 @@ import {
   Stack,
   Typography,
   styled,
-  IconButton,
   CardHeader,
   CardContent,
   Card,
   Button,
-  Container
+  Container,
+  Chip,
+  useTheme
 } from "@mui/material";
 import { memo, useMemo } from "react";
 import {
@@ -42,6 +43,7 @@ import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useSelector } from "react-redux";
 import { IsAdmin } from "@store/Community/community.reducer";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import CopyAddress from "@components/CopyAddress";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {
@@ -53,7 +55,7 @@ export const taskStatuses: any = {
     color: "success"
   },
   [TaskStatus.Submitted]: {
-    label: "Submitted",
+    label: "Pending",
     color: "warning"
   },
   [TaskStatus.Taken]: {
@@ -65,19 +67,23 @@ export const taskStatuses: any = {
 export const taskTypes = {
   [TaskType.Open]: {
     pluginType: PluginDefinitionType.OnboardingOpenTaskPlugin,
-    label: "Open Task"
+    label: "Open Task",
+    labelColor: "#FFC1A9"
   },
   [TaskType.ContractInteraction]: {
     pluginType: PluginDefinitionType.OnboardingTransactionTaskPlugin,
-    label: "Contract Interaction"
+    label: "Contract Interaction",
+    labelColor: "#FFECB3"
   },
   [TaskType.Quiz]: {
     pluginType: PluginDefinitionType.OnboardingQuizTaskPlugin,
-    label: "Multiple-Choice Quiz"
+    label: "Multiple-Choice Quiz",
+    labelColor: "#C1FFC1 "
   },
   [TaskType.JoinDiscord]: {
     pluginType: PluginDefinitionType.OnboardingJoinDiscordTaskPlugin,
-    label: "Join Discord"
+    label: "Join Discord",
+    labelColor: "#A5AAFF"
   }
 };
 
@@ -91,12 +97,10 @@ const TaskCard = ({
   canDelete: boolean;
 }) => {
   const location = useLocation();
-  const params = useParams<{ questId: string }>();
-  const confirm = useConfirmDialog();
+  const params = useParams<{ taskId: string }>();
   const navigate = useNavigate();
+  const theme = useTheme();
   const [searchParams] = useSearchParams();
-  const [removeTask, { error, isError, isLoading, reset }] =
-    useRemoveTaskFromQuestMutation();
 
   const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
     selectFromResult: ({ data }) => ({
@@ -119,7 +123,6 @@ const TaskCard = ({
 
   return (
     <>
-      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
       <GridCard
         sx={{
           bgcolor: "nightBlack.main",
@@ -161,7 +164,42 @@ const TaskCard = ({
         >
           <Stack flex={1} direction="column" gap={2}>
             <Typography variant="body" color="white">
-              Task type: {taskTypes[row.taskType]?.label}
+              Status:{" "}
+              <Chip
+                sx={{
+                  ml: 1
+                }}
+                label={taskStatuses[row.status].label}
+                color={taskStatuses[row.status].color}
+                size="small"
+              />
+            </Typography>
+            <Typography
+              sx={{
+                display: "flex",
+                gridGap: 4
+              }}
+              variant="body"
+              color="white"
+            >
+              Submitter:{" "}
+              <CopyAddress
+                color={theme.palette.primary.main}
+                address={row.submitter}
+              />
+            </Typography>
+            <Typography variant="body" color="white">
+              Task type:{" "}
+              <span
+                style={{
+                  // backgroundColor: taskTypes[row.taskType]?.labelColor,
+                  // color: "#000",
+                  padding: "4px 6px",
+                  borderRadius: "4px"
+                }}
+              >
+                {taskTypes[row.taskType]?.label}
+              </span>
             </Typography>
             <Typography variant="body" color="white">
               Duration:{" "}
@@ -259,28 +297,7 @@ const Submissions = ({ plugin }: PluginParams) => {
   const { account: userAddress } = useEthers();
   const params = useParams<{ taskId: string }>();
   const isAdmin = useSelector(IsAdmin);
-  const { data: tasksAndSubmissions, isLoading: isLoadingTasks } =
-    useGetAllTasksPerQuestQuery(
-      {
-        userAddress,
-        isAdmin,
-        questId: +searchParams.get(RequiredQueryParams.QuestId),
-        pluginAddress: searchParams.get(
-          RequiredQueryParams.OnboardingQuestAddress
-        )
-      },
-      {
-        refetchOnMountOrArgChange: false,
-        skip: false
-      }
-    );
-
-  const { submissions } = useMemo(
-    () => tasksAndSubmissions || ({} as unknown as any),
-    [tasksAndSubmissions]
-  );
-
-  const { task } = useGetAllTasksPerQuestQuery(
+  const { task, submissions, isLoading } = useGetAllTasksPerQuestQuery(
     {
       userAddress,
       isAdmin,
@@ -290,20 +307,33 @@ const Submissions = ({ plugin }: PluginParams) => {
       questId: +searchParams.get(RequiredQueryParams.QuestId)
     },
     {
-      selectFromResult: ({ data, isLoading, isFetching }) => ({
-        isLoading: isLoading || isFetching,
-        task: (data?.tasks || []).find((t) => {
-          return (
-            t.taskId === +params?.taskId &&
-            PluginDefinitionType.OnboardingOpenTaskPlugin ===
-              taskTypes[t.taskType].pluginType
-          );
-        })
-      })
+      selectFromResult: ({ data, isLoading, isFetching }) => {
+        return {
+          isLoading: isLoading || isFetching,
+          ...(data?.tasks || []).reduce(
+            (prev, curr) => {
+              const isCurrentTask =
+                curr.taskId === +params?.taskId &&
+                PluginDefinitionType.OnboardingOpenTaskPlugin ===
+                  taskTypes[curr.taskType].pluginType;
+
+              if (isCurrentTask) {
+                prev.task = curr;
+                prev.submissions = data.submissions.filter(
+                  (r) => r.taskId === curr.taskId
+                );
+              }
+              return prev;
+            },
+            { task: null, submissions: [] }
+          )
+        };
+      }
     }
   );
 
-  console.log(task);
+  console.log("task: ", task);
+  console.log("submissions: ", submissions);
 
   return (
     <Container
@@ -325,7 +355,7 @@ const Submissions = ({ plugin }: PluginParams) => {
           width: "100%"
         }}
       >
-        {isLoadingTasks ? (
+        {isLoading ? (
           <AutLoading width="130px" height="130px" />
         ) : (
           <>
@@ -363,7 +393,7 @@ const Submissions = ({ plugin }: PluginParams) => {
               </GridBox>
             )}
 
-            {/* {!isLoadingTasks && !submissions?.length && (
+            {!isLoading && !submissions?.length && (
               <Box
                 sx={{
                   display: "flex",
@@ -378,7 +408,7 @@ const Submissions = ({ plugin }: PluginParams) => {
                   No submissions yet...
                 </Typography>
               </Box>
-            )} */}
+            )}
           </>
         )}
       </Box>

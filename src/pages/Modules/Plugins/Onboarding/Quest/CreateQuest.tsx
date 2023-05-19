@@ -33,6 +33,7 @@ import {
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { getMemberPhases, getOwnerPhases } from "@utils/beta-phases";
+import { addMinutes } from "date-fns";
 
 const Strong = styled("strong")(({ theme }) => ({
   // color: theme.palette.primary.main
@@ -96,8 +97,8 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       title: "",
       // description: "",
       // durationInDays: questDurationInDays(),
-      // startDate: addMinutes(new Date(), 30), // @TO-USE for testing - 30 minutes
-      startDate: getQuestDates().questStartDate,
+      startDate: addMinutes(new Date(), 30), // @TO-USE for testing - 30 minutes
+      // startDate: getQuestDates().questStartDate,
       role: null
     }
   });
@@ -160,8 +161,8 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       createQuest({
         pluginAddress: plugin.pluginAddress,
         role: values.role,
-        // durationInDays: values.durationInDays,
-        durationInDays: questDurationInHours(),
+        durationInDays: 2,
+        // durationInDays: questDurationInHours(),
         startDate,
         metadata: {
           name:

@@ -9,12 +9,10 @@ const fetch = async (body: any, api: BaseQueryApi) => {
   const state = api.getState() as any;
   const { selectedCommunityAddress } = state.community;
 
-  if (!sdk.daoExpander) {
-    sdk.daoExpander = sdk.initService<DAOExpander>(
-      DAOExpander,
-      selectedCommunityAddress
-    );
-  }
+  sdk.daoExpander = sdk.initService<DAOExpander>(
+    DAOExpander,
+    selectedCommunityAddress
+  );
 
   const response = await sdk.moduleRegistry.getModuleDefinitions();
 
@@ -59,12 +57,10 @@ const activateModule = async ({ moduleId = 1 }, api: BaseQueryApi) => {
   const state = api.getState() as any;
   const { selectedCommunityAddress } = state.community;
 
-  if (!sdk.daoExpander) {
-    sdk.daoExpander = sdk.initService<DAOExpander>(
-      DAOExpander,
-      selectedCommunityAddress
-    );
-  }
+  sdk.daoExpander = sdk.initService<DAOExpander>(
+    DAOExpander,
+    selectedCommunityAddress
+  );
 
   const response = await sdk.daoExpander.activateModule(moduleId);
 
