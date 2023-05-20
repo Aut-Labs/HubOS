@@ -275,7 +275,7 @@ const Quest = ({ plugin }: PluginParams) => {
         </Box>
       )}
 
-      {!isLoading && !!tasks.length && (
+      {!isLoading && !!tasks?.length && (
         <>
           {isAdmin && (
             <QuestTasks

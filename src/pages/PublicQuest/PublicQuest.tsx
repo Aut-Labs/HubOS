@@ -200,13 +200,13 @@ const PublicQuest = () => {
               >
                 Your progress{" "}
                 <Typography className="text-secondary" variant="caption">
-                  (You have completed {completedTasks}/{tasks.length} tasks)
+                  (You have completed {completedTasks}/{tasks?.length} tasks)
                 </Typography>
               </Typography>
               <BorderLinearProgress
                 variant="determinate"
                 color={completedTasks === tasks?.length ? "success" : "primary"}
-                value={(completedTasks / tasks.length) * 100}
+                value={(completedTasks / tasks?.length) * 100}
               />
               <Box
                 sx={{

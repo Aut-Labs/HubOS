@@ -8,18 +8,20 @@ import { PluginDefinition, Task } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
 import { StepperButton } from "@components/Stepper";
 import {
+  Box,
   Card,
   CardContent,
   Chip,
   Container,
   Link,
   Stack,
-  Typography
+  Typography,
+  useTheme
 } from "@mui/material";
 import { IsAdmin } from "@store/Community/community.reducer";
 import { AutTextField } from "@theme/field-text-styles";
-import { memo, useEffect, useMemo, useState } from "react";
-import { Controller, useForm, useWatch } from "react-hook-form";
+import { memo, useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useSearchParams, useParams } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
@@ -31,6 +33,8 @@ import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { useEthers } from "@usedapp/core";
 import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
+import CopyAddress from "@components/CopyAddress";
+import IosShareIcon from "@mui/icons-material/IosShare";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -42,6 +46,25 @@ interface UserSubmitContentProps {
   submission?: Task;
   plugin: PluginDefinition;
 }
+
+export const taskStatuses: any = {
+  [TaskStatus.Created]: {
+    label: "To Do",
+    color: "info"
+  },
+  [TaskStatus.Finished]: {
+    label: "Approved",
+    color: "success"
+  },
+  [TaskStatus.Submitted]: {
+    label: "Pending",
+    color: "warning"
+  },
+  [TaskStatus.Taken]: {
+    label: "Taken",
+    color: "info"
+  }
+};
 
 const UserSubmitContent = ({
   task,
@@ -76,7 +99,7 @@ const UserSubmitContent = ({
           description: values.openTask,
           properties: {
             submitter: userAddress
-          }
+          } as any
         }
       },
       onboardingQuestAddress: searchParams.get(
@@ -240,6 +263,7 @@ const OwnerFinalizeContent = ({
   plugin
 }: UserSubmitContentProps) => {
   const [searchParams] = useSearchParams();
+  const theme = useTheme();
 
   const [finalizeTask, { error, isError, isLoading, reset }] =
     useFinaliseOpenTaskMutation();
@@ -285,41 +309,507 @@ const OwnerFinalizeContent = ({
             flexDirection: "column"
           }}
         >
-          {(task as any)?.status === TaskStatus.Finished && (
-            <Stack direction="column" alignItems="flex-end" mb="15px">
-              <Chip label="Approved" color="success" size="small" />
+          {submission && (
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              mb="4"
+            >
+              <Typography
+                sx={{
+                  display: "flex",
+                  gridGap: 4
+                }}
+                variant="body"
+                color="white"
+              >
+                Submitter:{" "}
+                <CopyAddress
+                  color={theme.palette.primary.main}
+                  address={submission.submitter}
+                />
+              </Typography>
+              <Chip
+                sx={{
+                  ml: 1
+                }}
+                label={taskStatuses[submission?.status].label}
+                color={taskStatuses[submission?.status].color}
+                size="small"
+              />
             </Stack>
           )}
 
-          <Stack direction="column" alignItems="center">
-            <Typography color="white" variant="body" textAlign="center" p="5px">
-              {submission?.submission?.description || "Some description"}
-            </Typography>
-            <Typography variant="caption" className="text-secondary">
-              Submission Description
-            </Typography>
-          </Stack>
-          <Stack direction="column" alignItems="center">
-            <Typography color="white" variant="body" textAlign="center" p="5px">
-              <Link
-                color="primary"
-                sx={{
-                  mt: 1,
-                  cursor: "pointer"
-                }}
-                variant="body"
-                target="_blank"
-                href={ipfsCIDToHttpUrl(
-                  submission?.submission?.properties["fileUri"]
+          {!submission && (
+            <>
+              <Stack direction="column" alignItems="center">
+                {task?.metadata?.properties.attachmentType === "url" && (
+                  <Box
+                    sx={{
+                      display: "grid",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gridTemplateColumns: "1fr",
+                      my: 2
+                    }}
+                  >
+                    <Stack
+                      direction="column"
+                      justifyContent="center"
+                      alignItems="center"
+                      gap={0.5}
+                    >
+                      <Typography
+                        fontFamily="FractulRegular"
+                        color="primary"
+                        variant="subtitle2"
+                        maxWidth="120px"
+                      >
+                        <Box
+                          sx={{
+                            background: "#43A047",
+                            width: "60px",
+                            height: "25px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: "4px",
+                            color: "white",
+                            fontWeight: "bold",
+                            fontSize: "16px"
+                          }}
+                        >
+                          URL
+                        </Box>
+                      </Typography>
+                      <Typography variant="caption" className="text-secondary">
+                        Attachment type
+                      </Typography>
+                    </Stack>
+                  </Box>
                 )}
+                {task?.metadata?.properties.attachmentType === "text" && (
+                  <Box
+                    sx={{
+                      display: "grid",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gridTemplateColumns: "1fr",
+                      my: 2
+                    }}
+                  >
+                    <Stack
+                      direction="column"
+                      justifyContent="center"
+                      alignItems="center"
+                      gap={0.5}
+                    >
+                      <Typography
+                        fontFamily="FractulRegular"
+                        color="primary"
+                        variant="subtitle2"
+                        maxWidth="120px"
+                      >
+                        <Box
+                          sx={{
+                            background: "#1E88E5",
+                            width: "60px",
+                            height: "25px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: "4px",
+                            color: "white",
+                            fontWeight: "bold",
+                            fontSize: "16px"
+                          }}
+                        >
+                          DOC
+                        </Box>
+                      </Typography>
+                      <Typography variant="caption" className="text-secondary">
+                        Attachment type
+                      </Typography>
+                    </Stack>
+                  </Box>
+                )}
+                {task?.metadata?.properties.attachmentType === "image" && (
+                  <Box
+                    sx={{
+                      display: "grid",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gridTemplateColumns: "1fr",
+                      my: 2
+                    }}
+                  >
+                    <Stack
+                      direction="column"
+                      justifyContent="center"
+                      alignItems="center"
+                      gap={0.5}
+                    >
+                      <Typography
+                        fontFamily="FractulRegular"
+                        color="primary"
+                        variant="subtitle2"
+                        maxWidth="120px"
+                      >
+                        <Box
+                          sx={{
+                            background: "#E53834",
+                            width: "60px",
+                            height: "25px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: "4px",
+                            color: "white",
+                            fontWeight: "bold",
+                            fontSize: "16px"
+                          }}
+                        >
+                          IMG
+                        </Box>
+                      </Typography>
+                      <Typography variant="caption" className="text-secondary">
+                        Attachment type
+                      </Typography>
+                    </Stack>
+                  </Box>
+                )}
+              </Stack>
+              {/* <Stack direction="column" alignItems="center">
+                <Box
+                  sx={{
+                    display: "grid",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gridTemplateColumns: "1fr",
+                    my: 2
+                  }}
+                >
+                  <Stack
+                    direction="column"
+                    justifyContent="center"
+                    alignItems="center"
+                    gap={0.5}
+                  >
+                    <Typography variant="caption" className="text-secondary">
+                      Attachment type
+                    </Typography>
+                  </Stack>
+                </Box>
+              </Stack> */}
+            </>
+          )}
+
+          {submission && (
+            <Stack direction="column" alignItems="center">
+              {submission?.metadata?.properties.attachmentType === "url" && (
+                <Box
+                  sx={{
+                    display: "grid",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gridTemplateColumns: "1fr 1fr",
+                    my: 2
+                  }}
+                >
+                  <Stack
+                    direction="column"
+                    justifyContent="center"
+                    alignItems="center"
+                    gap={0.5}
+                  >
+                    <Typography
+                      fontFamily="FractulRegular"
+                      color="primary"
+                      variant="subtitle2"
+                      maxWidth="120px"
+                    >
+                      <Box
+                        sx={{
+                          background: "#43A047",
+                          width: "60px",
+                          height: "25px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: "4px",
+                          color: "white",
+                          fontWeight: "bold",
+                          fontSize: "16px"
+                        }}
+                      >
+                        URL
+                      </Box>
+                    </Typography>
+                    <Typography variant="caption" className="text-secondary">
+                      Attachment type
+                    </Typography>
+                  </Stack>
+                  <Stack
+                    direction="column"
+                    justifyContent="center"
+                    alignItems="center"
+                    gap={0.5}
+                  >
+                    <Typography
+                      fontFamily="FractulRegular"
+                      color="primary"
+                      variant="subtitle2"
+                    >
+                      <Link
+                        color="primary"
+                        sx={{
+                          mt: 1,
+                          cursor: "pointer"
+                        }}
+                        variant="body"
+                        target="_blank"
+                        href={ipfsCIDToHttpUrl(
+                          submission?.submission?.properties["fileUri"]
+                        )}
+                      >
+                        Open link
+                      </Link>
+                    </Typography>
+                    <Typography variant="caption" className="text-secondary">
+                      Source
+                    </Typography>
+                  </Stack>
+                </Box>
+              )}
+              {submission?.metadata?.properties.attachmentType === "text" && (
+                <Box
+                  sx={{
+                    display: "grid",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gridTemplateColumns: "1fr 1fr 1fr",
+                    my: 2
+                  }}
+                >
+                  <Stack
+                    direction="column"
+                    justifyContent="center"
+                    alignItems="center"
+                    gap={0.5}
+                  >
+                    <Typography
+                      fontFamily="FractulRegular"
+                      color="primary"
+                      variant="subtitle2"
+                      maxWidth="120px"
+                    >
+                      <Box
+                        sx={{
+                          background: "#1E88E5",
+                          width: "60px",
+                          height: "25px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: "4px",
+                          color: "white",
+                          fontWeight: "bold",
+                          fontSize: "16px"
+                        }}
+                      >
+                        DOC
+                      </Box>
+                    </Typography>
+                    <Typography variant="caption" className="text-secondary">
+                      Attachment type
+                    </Typography>
+                  </Stack>
+                  <Stack
+                    direction="column"
+                    justifyContent="center"
+                    alignItems="center"
+                    gap={0.5}
+                  >
+                    <Typography
+                      fontFamily="FractulRegular"
+                      color="primary"
+                      variant="subtitle2"
+                    >
+                      <Link
+                        color="primary"
+                        sx={{
+                          mt: 1,
+                          cursor: "pointer"
+                        }}
+                        variant="body"
+                        target="_blank"
+                        href={ipfsCIDToHttpUrl(
+                          submission?.submission?.properties["fileUri"]
+                        )}
+                      >
+                        Download
+                      </Link>
+                    </Typography>
+                    <Typography variant="caption" className="text-secondary">
+                      Action
+                    </Typography>
+                  </Stack>
+                  <Stack
+                    direction="column"
+                    justifyContent="center"
+                    alignItems="center"
+                    gap={0.5}
+                  >
+                    <Typography
+                      fontFamily="FractulRegular"
+                      color="primary"
+                      variant="subtitle2"
+                    >
+                      <Link
+                        color="primary"
+                        sx={{
+                          mt: 1,
+                          cursor: "pointer"
+                        }}
+                        variant="body"
+                        target="_blank"
+                        href={ipfsCIDToHttpUrl(
+                          submission?.submission?.properties["fileUri"]
+                        )}
+                      >
+                        View in IPFS
+                      </Link>
+                    </Typography>
+                    <Typography variant="caption" className="text-secondary">
+                      Source
+                    </Typography>
+                  </Stack>
+                </Box>
+              )}
+              {submission?.metadata?.properties.attachmentType === "image" && (
+                <Box
+                  sx={{
+                    display: "grid",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gridTemplateColumns: "1fr 1fr 1fr",
+                    my: 2
+                  }}
+                >
+                  <Stack
+                    direction="column"
+                    justifyContent="center"
+                    alignItems="center"
+                    gap={0.5}
+                  >
+                    <Typography
+                      fontFamily="FractulRegular"
+                      color="primary"
+                      variant="subtitle2"
+                      maxWidth="120px"
+                    >
+                      <Box
+                        sx={{
+                          background: "#E53834",
+                          width: "60px",
+                          height: "25px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: "4px",
+                          color: "white",
+                          fontWeight: "bold",
+                          fontSize: "16px"
+                        }}
+                      >
+                        IMG
+                      </Box>
+                    </Typography>
+                    <Typography variant="caption" className="text-secondary">
+                      Attachment type
+                    </Typography>
+                  </Stack>
+                  <Stack
+                    direction="column"
+                    justifyContent="center"
+                    alignItems="center"
+                    gap={0.5}
+                  >
+                    <Typography
+                      fontFamily="FractulRegular"
+                      color="primary"
+                      variant="subtitle2"
+                    >
+                      <Link
+                        color="primary"
+                        sx={{
+                          mt: 1,
+                          cursor: "pointer"
+                        }}
+                        variant="body"
+                        target="_blank"
+                        href={ipfsCIDToHttpUrl(
+                          submission?.submission?.properties["fileUri"]
+                        )}
+                      >
+                        Download
+                      </Link>
+                    </Typography>
+                    <Typography variant="caption" className="text-secondary">
+                      Action
+                    </Typography>
+                  </Stack>
+                  <Stack
+                    direction="column"
+                    justifyContent="center"
+                    alignItems="center"
+                    gap={0.5}
+                  >
+                    <Typography
+                      fontFamily="FractulRegular"
+                      color="primary"
+                      variant="subtitle2"
+                    >
+                      <Link
+                        color="primary"
+                        sx={{
+                          mt: 1,
+                          cursor: "pointer"
+                        }}
+                        variant="body"
+                        target="_blank"
+                        href={ipfsCIDToHttpUrl(
+                          submission?.submission?.properties["fileUri"]
+                        )}
+                      >
+                        View in IPFS
+                      </Link>
+                    </Typography>
+                    <Typography variant="caption" className="text-secondary">
+                      Source
+                    </Typography>
+                  </Stack>
+                </Box>
+              )}
+            </Stack>
+          )}
+
+          {submission && (
+            <Stack direction="column" alignItems="center">
+              <Typography
+                color="white"
+                variant="body"
+                textAlign="center"
+                p="5px"
               >
-                Open attachment
-              </Link>
-            </Typography>
-            <Typography variant="caption" className="text-secondary">
-              Attachment File
-            </Typography>
-          </Stack>
+                {submission?.submission?.description || "Some description"}
+              </Typography>
+              <Typography variant="caption" className="text-secondary">
+                Submission description
+              </Typography>
+            </Stack>
+          )}
         </CardContent>
       </Card>
 

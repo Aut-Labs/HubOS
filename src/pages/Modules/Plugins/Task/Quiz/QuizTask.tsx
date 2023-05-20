@@ -293,26 +293,26 @@ const QuizTask = ({ plugin }: PluginParams) => {
               )
             )}
 
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                mb: 4,
-                justifyContent: {
-                  xs: "center",
-                  sm: "flex-end"
-                }
-              }}
-            >
-              <StepperButton
-                label="Confirm"
-                disabled={
-                  !formState.isValid || task?.status !== TaskStatus.Created
-                }
-                onClick={handleSubmit(onSubmit)}
-                sx={{ width: "250px" }}
-              />
-            </Box>
+            {/* {task?.status !== TaskStatus.Created && (
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  mb: 4,
+                  justifyContent: {
+                    xs: "center",
+                    sm: "flex-end"
+                  }
+                }}
+              >
+                <StepperButton
+                  label="Confirm"
+                  disabled={!formState.isValid}
+                  onClick={handleSubmit(onSubmit)}
+                  sx={{ width: "250px" }}
+                />
+              </Box>
+            )} */}
           </Stack>
         </>
       ) : (

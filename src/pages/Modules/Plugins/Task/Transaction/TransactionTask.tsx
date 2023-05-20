@@ -5,15 +5,7 @@ import {
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
 import { StepperButton } from "@components/Stepper";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Container,
-  Stack,
-  Typography
-} from "@mui/material";
+import { Box, Button, Container, Stack } from "@mui/material";
 import { IsAdmin } from "@store/Community/community.reducer";
 import { memo, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -185,7 +177,7 @@ const TransactionTask = ({ plugin }: PluginParams) => {
               </Button>
             </Stack>
 
-            <Box
+            {/* <Box
               sx={{
                 width: "100%",
                 display: "flex",
@@ -202,7 +194,7 @@ const TransactionTask = ({ plugin }: PluginParams) => {
                 onClick={handleSubmit(onSubmit)}
                 sx={{ width: "250px" }}
               />
-            </Box>
+            </Box> */}
           </Stack>
         </>
       ) : (

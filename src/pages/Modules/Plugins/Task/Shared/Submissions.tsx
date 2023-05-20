@@ -51,7 +51,7 @@ export const taskStatuses: any = {
     color: "info"
   },
   [TaskStatus.Finished]: {
-    label: "Complete",
+    label: "Completed",
     color: "success"
   },
   [TaskStatus.Submitted]: {
@@ -297,6 +297,8 @@ const Submissions = ({ plugin }: PluginParams) => {
   const { account: userAddress } = useEthers();
   const params = useParams<{ taskId: string }>();
   const isAdmin = useSelector(IsAdmin);
+
+  console.log("searchParams", searchParams.toString());
   const { task, submissions, isLoading } = useGetAllTasksPerQuestQuery(
     {
       userAddress,
@@ -371,7 +373,10 @@ const Submissions = ({ plugin }: PluginParams) => {
                     sm: "0"
                   }
                 }}
-                to={searchParams.get("returnUrl")}
+                to={{
+                  pathname: searchParams.get("returnUrl"),
+                  search: searchParams.toString()
+                }}
                 component={Link}
               >
                 {searchParams.get("returnUrlLinkName") || "Back"}

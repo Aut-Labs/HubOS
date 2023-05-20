@@ -97,8 +97,8 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       title: "",
       // description: "",
       // durationInDays: questDurationInDays(),
-      startDate: addMinutes(new Date(), 30), // @TO-USE for testing - 30 minutes
-      // startDate: getQuestDates().questStartDate,
+      // startDate: addMinutes(new Date(), 40), // @TO-USE for testing - 30 minutes
+      startDate: getQuestDates().questStartDate,
       role: null
     }
   });
@@ -147,7 +147,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         ...quest,
         pluginAddress: plugin.pluginAddress,
         role: values.role,
-        // durationInDays: values.durationInDays,
+        // durationInDays: 2,
         durationInDays: questDurationInHours(),
         startDate,
         metadata: {

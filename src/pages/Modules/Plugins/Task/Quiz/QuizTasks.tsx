@@ -189,7 +189,8 @@ const QuizTasks = ({ plugin }: PluginParams) => {
       navigate({
         pathname: `/aut-dashboard/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
           RequiredQueryParams.QuestId
-        )}`
+        )}`,
+        search: searchParams.toString()
       });
     }
   }, [isSuccess]);

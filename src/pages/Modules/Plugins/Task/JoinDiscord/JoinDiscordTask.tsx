@@ -19,6 +19,7 @@ import { useEthers } from "@usedapp/core";
 import { useOAuth } from "@components/Oauth2/oauth2";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
+import IosShareIcon from "@mui/icons-material/IosShare";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -121,28 +122,49 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
                 }
               }}
             >
-              {joinClicked && (
-                <StepperButton
-                  label="Confirm"
-                  disabled={task?.status !== TaskStatus.Created}
-                  onClick={() => onSubmit()}
-                  sx={{ width: "250px", margin: "0 auto" }}
-                />
+              {isAdmin && (
+                <>
+                  <StepperButton
+                    label="View Invite link"
+                    startIcon={<IosShareIcon />}
+                    onClick={() => {
+                      window.open(
+                        task.metadata.properties["inviteUrl"],
+                        "_blank"
+                      );
+                    }}
+                    sx={{ width: "250px", margin: "0 auto" }}
+                  />
+                </>
               )}
-              {!joinClicked && (
-                <StepperButton
-                  label="Join"
-                  disabled={task?.status !== TaskStatus.Created}
-                  onClick={() => {
-                    setJoinClicked(true);
-                    window.open(
-                      task.metadata.properties["inviteUrl"],
-                      "_blank"
-                    );
-                  }}
-                  sx={{ width: "250px", margin: "0 auto" }}
-                />
+              {!isAdmin && (
+                <>
+                  {joinClicked && (
+                    <StepperButton
+                      label="Confirm"
+                      disabled={task?.status !== TaskStatus.Created}
+                      onClick={() => onSubmit()}
+                      sx={{ width: "250px", margin: "0 auto" }}
+                    />
+                  )}
+                  {!joinClicked && (
+                    <StepperButton
+                      label="Join"
+                      disabled={task?.status !== TaskStatus.Created}
+                      startIcon={<IosShareIcon />}
+                      onClick={() => {
+                        setJoinClicked(true);
+                        window.open(
+                          task.metadata.properties["inviteUrl"],
+                          "_blank"
+                        );
+                      }}
+                      sx={{ width: "250px", margin: "0 auto" }}
+                    />
+                  )}
+                </>
               )}
+
               {/* <Button
                 startIcon={<OpenInNewIcon />}
                 sx={{
