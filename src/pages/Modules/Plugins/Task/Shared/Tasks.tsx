@@ -255,7 +255,7 @@ const TaskCard = ({
                   ),
                   daoAddress: searchParams.get(RequiredQueryParams.DaoAddress),
                   returnUrlLinkName: "Back to quest",
-                  returnUrl: `${location?.pathname}${location?.search}`
+                  returnUrl: `${location?.pathname}`
                 }).toString()
               });
             }}

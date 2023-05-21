@@ -236,7 +236,7 @@ const TaskCard = ({
                       RequiredQueryParams.DaoAddress
                     ),
                     returnUrlLinkName: "Back to quest",
-                    returnUrl: `${location?.pathname}${location?.search}`
+                    returnUrl: `${location?.pathname}`
                   }).toString()
                 });
               }}
@@ -374,7 +374,9 @@ const Submissions = ({ plugin }: PluginParams) => {
                   }
                 }}
                 to={{
-                  pathname: searchParams.get("returnUrl"),
+                  pathname: `/aut-dashboard/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
+                    RequiredQueryParams.QuestId
+                  )}`,
                   search: searchParams.toString()
                 }}
                 component={Link}
