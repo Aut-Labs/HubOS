@@ -586,9 +586,7 @@ const OwnerFinalizeContent = ({
                         }}
                         variant="body"
                         target="_blank"
-                        href={ipfsCIDToHttpUrl(
-                          submission?.submission?.properties["fileUri"]
-                        )}
+                        href={submission?.submission?.properties["externalUrl"]}
                       >
                         Open link
                       </Link>
@@ -820,7 +818,7 @@ const OwnerFinalizeContent = ({
                 textAlign="center"
                 p="5px"
               >
-                {submission?.submission?.description || "Some description"}
+                {submission?.submission?.description || "No description"}
               </Typography>
               <Typography variant="caption" className="text-secondary">
                 Submission description
