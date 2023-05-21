@@ -24,10 +24,10 @@ export const saveQestions = async (
   return res?.data || null;
 };
 
-export const getQestions = async (taskAddress: string): Promise<void> => {
+export const getQestions = async (taskAddress: string): Promise<any[]> => {
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
   const res = await axios.get(
-    `${environment.apiUrl}/autID/quizAnswers/${taskAddress}`,
+    `${environment.apiUrl}/autID/quiz/all`,
 
     {
       headers: {
@@ -35,7 +35,7 @@ export const getQestions = async (taskAddress: string): Promise<void> => {
       }
     }
   );
-  return res?.data || null;
+  return res?.data || [];
 };
 
 export const finaliseQuizTask = async (

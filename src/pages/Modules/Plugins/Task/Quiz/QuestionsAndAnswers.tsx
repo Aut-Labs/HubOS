@@ -102,11 +102,15 @@ const Answers = ({ control, questionIndex }: AnswersParams) => {
                 return (
                   <Checkbox
                     name={name}
-                    color="primary"
                     required={!values?.some((v) => v.correct)}
                     value={value}
                     tabIndex={-1}
                     onChange={onChange}
+                    sx={{
+                      ".MuiSvgIcon-root": {
+                        color: !value ? "offWhite.main" : "primary.main"
+                      }
+                    }}
                   />
                 );
               }}

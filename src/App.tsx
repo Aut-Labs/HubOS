@@ -117,7 +117,7 @@ function App() {
               className={isLoading ? "sw-loading" : ""}
             >
               {isLoading ? (
-                <AutLoading />
+                <AutLoading width="130px" height="130px" />
               ) : (
                 <Routes>
                   <Route path="callback" element={<Callback />} />

@@ -102,7 +102,7 @@ https://Aut.id/`
     isFetching,
     refetch
   } = useGetAllOnboardingQuestsQuery(plugin.pluginAddress, {
-    refetchOnMountOrArgChange: false,
+    refetchOnMountOrArgChange: true,
     skip: false
   });
 

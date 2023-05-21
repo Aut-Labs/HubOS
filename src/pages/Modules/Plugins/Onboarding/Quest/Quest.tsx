@@ -54,7 +54,7 @@ const Quest = ({ plugin }: PluginParams) => {
       pluginAddress: plugin.pluginAddress
     },
     {
-      refetchOnMountOrArgChange: false,
+      refetchOnMountOrArgChange: true,
       skip: false
     }
   );

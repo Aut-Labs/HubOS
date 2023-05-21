@@ -49,10 +49,10 @@ const AutDashboardMain = () => {
   return (
     <>
       {isLoading || isLoadingModules ? (
-        <AutLoading />
+        <AutLoading width="130px" height="130px" />
       ) : (
         <SidebarDrawer addonMenuItems={[modulesRoutes.menuItem]}>
-          <Suspense fallback={<AutLoading />}>
+          <Suspense fallback={<AutLoading width="130px" height="130px" />}>
             <Routes>
               <Route index element={<Dashboard />} />
               <Route path="members" element={<Members />} />

@@ -196,7 +196,10 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                 sm: "0"
               }
             }}
-            to={searchParams.get("returnUrl")}
+            to={{
+              pathname: searchParams.get("returnUrl"),
+              search: searchParams.toString()
+            }}
             component={Link}
           >
             {/* {searchParams.get("returnUrlLinkName") || "Back"} */}

@@ -1,13 +1,6 @@
-import {
-  useGetAllTasksPerQuestQuery,
-  useSubmitQuizTaskMutation
-} from "@api/onboarding.api";
+import { useGetAllTasksPerQuestQuery } from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
-import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
 import AutLoading from "@components/AutLoading";
-import ErrorDialog from "@components/Dialog/ErrorPopup";
-import LoadingDialog from "@components/Dialog/LoadingPopup";
-import { StepperButton } from "@components/Stepper";
 import {
   Box,
   Card,
@@ -30,6 +23,7 @@ import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import { useEthers } from "@usedapp/core";
+import { getQestions } from "@api/tasks.api";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -42,13 +36,7 @@ const GridRow = styled(Box)({
   gridGap: "8px"
 });
 
-const Row = styled(Box)({
-  display: "flex",
-  justifyContent: "flex-end",
-  width: "100%"
-});
-
-const Answers = memo(({ control, questionIndex, answers, taskStatus }: any) => {
+const Answers = memo(({ control, questionIndex, answers, isDisabled }: any) => {
   const values = useWatch({
     name: `questions[${questionIndex}].answers`,
     control
@@ -83,31 +71,26 @@ const Answers = memo(({ control, questionIndex, answers, taskStatus }: any) => {
                   </Typography>
                 </Stack>
                 <Controller
-                  name={`questions[${questionIndex}].answers[${index}].checked`}
+                  name={`questions[${questionIndex}].answers[${index}].correct`}
                   control={control}
                   rules={{
-                    required: !values?.some((v) => v.checked)
+                    required: !values?.some((v) => v.correct)
                   }}
                   render={({ field: { name, value, onChange } }) => {
+                    console.log(value, "value");
                     return (
                       <Checkbox
                         name={name}
-                        sx={{
-                          color: "white",
-                          "&.Mui-checked": {
-                            color: "primary"
-                          },
-                          "&.Mui-disabled": {
-                            color: "nightBlack.light"
-                          }
-                        }}
                         value={value}
+                        checked={!!value}
                         tabIndex={-1}
                         onChange={onChange}
-                        disabled={
-                          taskStatus === TaskStatus.Submitted ||
-                          taskStatus === TaskStatus.Finished
-                        }
+                        disabled={isDisabled}
+                        sx={{
+                          ".MuiSvgIcon-root": {
+                            color: !value ? "offWhite.main" : "primary.main"
+                          }
+                        }}
                       />
                     );
                   }}
@@ -121,42 +104,6 @@ const Answers = memo(({ control, questionIndex, answers, taskStatus }: any) => {
   );
 });
 
-const AnswersAdminView = memo(({ questionIndex, answers }: any) => {
-  return (
-    <GridBox>
-      {answers.map((answer, index) => {
-        return (
-          <GridRow
-            key={`questions[${questionIndex}].answers[${index}]`}
-            style={{ gridTemplateColumns: "40px 1fr" }}
-          >
-            <Checkbox
-              sx={{
-                color: "white",
-                "&.Mui-checked": {
-                  color: "primary"
-                },
-                "&.Mui-disabled": {
-                  color: "nightBlack.light"
-                }
-              }}
-              checked={!!answer?.correct}
-              disabled={true}
-            />
-            <Typography
-              color={answer?.correct ? "success.main" : "error.main"}
-              variant="body"
-              lineHeight="40px"
-            >
-              {answer?.value}
-            </Typography>
-          </GridRow>
-        );
-      })}
-    </GridBox>
-  );
-});
-
 const QuizTask = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const isAdmin = useSelector(IsAdmin);
@@ -164,7 +111,7 @@ const QuizTask = ({ plugin }: PluginParams) => {
   const params = useParams();
   const [initialized, setInitialized] = useState(false);
 
-  const { task, isLoading: isLoadingPlugins } = useGetAllTasksPerQuestQuery(
+  const { task } = useGetAllTasksPerQuestQuery(
     {
       userAddress,
       isAdmin,
@@ -188,46 +135,39 @@ const QuizTask = ({ plugin }: PluginParams) => {
     }
   );
 
-  const { control, handleSubmit, getValues, setValue, formState } = useForm({
+  const { control, setValue, watch } = useForm({
     mode: "onChange",
     defaultValues: {
       questions: []
     }
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const values = watch();
+
+  const { fields } = useFieldArray({
     control,
     name: "questions"
   });
 
   useEffect(() => {
     if (!initialized && task) {
-      setValue("questions", (task as any)?.metadata?.properties?.questions);
-      setInitialized(true);
+      const start = async () => {
+        const questionsAndAnswer: any[] = await getQestions(task.pluginAddress);
+        const foundQuestion = questionsAndAnswer.find(
+          ({ taskAddress, taskId }) =>
+            taskAddress === task.pluginAddress && taskId === task.taskId
+        );
+
+        if (foundQuestion) {
+          setValue("questions", foundQuestion.questions);
+        } else {
+          setValue("questions", (task as any)?.metadata?.properties?.questions);
+        }
+        setInitialized(true);
+      };
+      start();
     }
   }, [initialized, task]);
-
-  const [submitTask, { error, isError, isLoading, reset }] =
-    useSubmitQuizTaskMutation();
-
-  const onSubmit = async () => {
-    const values = getValues();
-    submitTask({
-      task,
-      questionsAndAnswers: values.questions.map((q) => ({
-        ...q,
-        answers: q.answers.map((a) => ({
-          ...a,
-          correct: a.checked || false
-        }))
-      })),
-      onboardingQuestAddress: searchParams.get(
-        RequiredQueryParams.OnboardingQuestAddress
-      ),
-      pluginAddress: plugin.pluginAddress,
-      pluginDefinitionId: plugin.pluginDefinitionId
-    });
-  };
 
   return (
     <Container
@@ -241,12 +181,9 @@ const QuizTask = ({ plugin }: PluginParams) => {
         position: "relative"
       }}
     >
-      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
-      <LoadingDialog open={isLoading} message="Submitting task..." />
       {task ? (
         <>
           <TaskDetails task={task} />
-
           <Stack
             direction="column"
             gap={4}
@@ -261,62 +198,39 @@ const QuizTask = ({ plugin }: PluginParams) => {
               }
             }}
           >
-            {((task as any)?.metadata?.properties?.questions as any[])?.map(
-              (question, questionIndex) => (
-                <Card
-                  key={`questions.${questionIndex}.question`}
-                  sx={{
-                    bgcolor: "nightBlack.main",
-                    borderColor: "divider",
-                    borderRadius: "16px",
-                    boxShadow: 3
-                  }}
-                >
-                  <CardHeader
-                    titleTypographyProps={{
-                      fontFamily: "FractulAltBold",
-                      fontWeight: 900,
-                      color: "white",
-                      variant: "subtitle1"
-                    }}
-                    title={question?.question}
-                  />
-                  <CardContent>
-                    <Answers
-                      control={control}
-                      answers={question?.answers}
-                      questionIndex={questionIndex}
-                      taskStatus={task?.status}
-                    ></Answers>
-                  </CardContent>
-                </Card>
-              )
-            )}
-
-            {/* {task?.status !== TaskStatus.Created && (
-              <Box
+            {values.questions?.map((question, questionIndex) => (
+              <Card
+                key={`questions.${questionIndex}.question`}
                 sx={{
-                  width: "100%",
-                  display: "flex",
-                  mb: 4,
-                  justifyContent: {
-                    xs: "center",
-                    sm: "flex-end"
-                  }
+                  bgcolor: "nightBlack.main",
+                  borderColor: "divider",
+                  borderRadius: "16px",
+                  boxShadow: 3
                 }}
               >
-                <StepperButton
-                  label="Confirm"
-                  disabled={!formState.isValid}
-                  onClick={handleSubmit(onSubmit)}
-                  sx={{ width: "250px" }}
+                <CardHeader
+                  titleTypographyProps={{
+                    fontFamily: "FractulAltBold",
+                    fontWeight: 900,
+                    color: "white",
+                    variant: "subtitle1"
+                  }}
+                  title={question?.question}
                 />
-              </Box>
-            )} */}
+                <CardContent>
+                  <Answers
+                    control={control}
+                    answers={question?.answers}
+                    questionIndex={questionIndex}
+                    isDisabled={!!task?.taskId}
+                  ></Answers>
+                </CardContent>
+              </Card>
+            ))}
           </Stack>
         </>
       ) : (
-        <AutLoading></AutLoading>
+        <AutLoading width="130px" height="130px"></AutLoading>
       )}
     </Container>
   );

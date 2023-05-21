@@ -264,9 +264,26 @@ const OwnerFinalizeContent = ({
 }: UserSubmitContentProps) => {
   const [searchParams] = useSearchParams();
   const theme = useTheme();
+  const isAdmin = useSelector(IsAdmin);
 
   const [finalizeTask, { error, isError, isLoading, reset }] =
     useFinaliseOpenTaskMutation();
+
+  const { isLoading: isLoadingTasks } = useGetAllTasksPerQuestQuery(
+    {
+      userAddress,
+      isAdmin,
+      pluginAddress: searchParams.get(
+        RequiredQueryParams.OnboardingQuestAddress
+      ),
+      questId: +searchParams.get(RequiredQueryParams.QuestId)
+    },
+    {
+      selectFromResult: ({ isLoading, isFetching }) => ({
+        isLoading: isLoading || isFetching
+      })
+    }
+  );
 
   const onSubmit = async () => {
     finalizeTask({
@@ -588,7 +605,7 @@ const OwnerFinalizeContent = ({
                     display: "grid",
                     alignItems: "center",
                     justifyContent: "center",
-                    gridTemplateColumns: "1fr 1fr 1fr",
+                    gridTemplateColumns: "1fr 1fr",
                     my: 2
                   }}
                 >
@@ -625,7 +642,7 @@ const OwnerFinalizeContent = ({
                       Attachment type
                     </Typography>
                   </Stack>
-                  <Stack
+                  {/* <Stack
                     direction="column"
                     justifyContent="center"
                     alignItems="center"
@@ -654,7 +671,7 @@ const OwnerFinalizeContent = ({
                     <Typography variant="caption" className="text-secondary">
                       Action
                     </Typography>
-                  </Stack>
+                  </Stack> */}
                   <Stack
                     direction="column"
                     justifyContent="center"
@@ -693,7 +710,7 @@ const OwnerFinalizeContent = ({
                     display: "grid",
                     alignItems: "center",
                     justifyContent: "center",
-                    gridTemplateColumns: "1fr 1fr 1fr",
+                    gridTemplateColumns: "1fr 1fr",
                     my: 2
                   }}
                 >
@@ -730,7 +747,7 @@ const OwnerFinalizeContent = ({
                       Attachment type
                     </Typography>
                   </Stack>
-                  <Stack
+                  {/* <Stack
                     direction="column"
                     justifyContent="center"
                     alignItems="center"
@@ -759,7 +776,7 @@ const OwnerFinalizeContent = ({
                     <Typography variant="caption" className="text-secondary">
                       Action
                     </Typography>
-                  </Stack>
+                  </Stack> */}
                   <Stack
                     direction="column"
                     justifyContent="center"
@@ -826,7 +843,11 @@ const OwnerFinalizeContent = ({
         }}
       >
         {submission?.status === TaskStatus.Submitted && (
-          <StepperButton label="Finalize" onClick={onSubmit} />
+          <StepperButton
+            disabled={isLoadingTasks}
+            label="Finalize"
+            onClick={onSubmit}
+          />
         )}
       </Stack>
     </Stack>
@@ -909,7 +930,7 @@ const OpenTask = ({ plugin }: PluginParams) => {
           )}
         </>
       ) : (
-        <AutLoading></AutLoading>
+        <AutLoading width="130px" height="130px"></AutLoading>
       )}
     </Container>
   );

@@ -32,7 +32,7 @@ import {
 } from "react-router-dom";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { getMemberPhases, getOwnerPhases } from "@utils/beta-phases";
+import { getMemberPhases } from "@utils/beta-phases";
 import { addMinutes } from "date-fns";
 
 const Strong = styled("strong")(({ theme }) => ({
@@ -97,7 +97,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       title: "",
       // description: "",
       // durationInDays: questDurationInDays(),
-      // startDate: addMinutes(new Date(), 40), // @TO-USE for testing - 30 minutes
+      // startDate: addMinutes(new Date(), 20), // @TO-USE for testing - 30 minutes
       startDate: getQuestDates().questStartDate,
       role: null
     }
@@ -161,8 +161,8 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       createQuest({
         pluginAddress: plugin.pluginAddress,
         role: values.role,
-        durationInDays: 2,
-        // durationInDays: questDurationInHours(),
+        // durationInDays: 2,
+        durationInDays: questDurationInHours(),
         startDate,
         metadata: {
           name:
@@ -263,7 +263,10 @@ const CreateQuest = ({ plugin }: PluginParams) => {
                   sm: "0"
                 }
               }}
-              to={searchParams.get("returnUrl")}
+              to={{
+                pathname: searchParams.get("returnUrl"),
+                search: searchParams.toString()
+              }}
               component={Link}
             >
               {searchParams.get("returnUrlLinkName") || "Back"}

@@ -26,7 +26,7 @@ const UserProfile = () => {
     <>
       {/* {status === ResultState.Loading ? (
         <div className="sw-loading-spinner">
-          <AutLoading />
+          <AutLoading width="130px" height="130px" />
         </div>
       ) : (
         <SwGrid

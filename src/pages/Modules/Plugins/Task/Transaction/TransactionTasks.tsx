@@ -92,7 +92,12 @@ const TaskSuccess = ({ pluginId, reset }) => {
               sx={{
                 my: pxToRem(50)
               }}
-              onClick={() => navigate(searchParams.get("returnUrl"))}
+              onClick={() =>
+                navigate({
+                  pathname: searchParams.get("returnUrl"),
+                  search: searchParams.toString()
+                })
+              }
               type="submit"
               variant="outlined"
               size="medium"
@@ -200,7 +205,10 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                 sm: "0"
               }
             }}
-            to={searchParams.get("returnUrl")}
+            to={{
+              pathname: searchParams.get("returnUrl"),
+              search: searchParams.toString()
+            }}
             component={Link}
           >
             {/* {searchParams.get("returnUrlLinkName") || "Back"} */}
@@ -329,7 +337,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
           }}
         />
 
-        {/* <Controller
+        <Controller
           name="network"
           control={control}
           rules={{
@@ -367,7 +375,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
               </AutSelectField>
             );
           }}
-        /> */}
+        />
 
         <Controller
           name="linkToInteractUrl"
