@@ -12,7 +12,8 @@ import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import {
   finaliseJoinDiscordTask,
   finaliseQuizTask,
-  finaliseTransactionTask
+  finaliseTransactionTask,
+  saveQestions
 } from "./tasks.api";
 
 const getAllOnboardingQuests = async (
@@ -364,6 +365,51 @@ const createTaskPerQuest = async (
   };
 };
 
+const createQuizTaskPerQuest = async (
+  body: {
+    task: Task;
+    questId: number;
+    allQuestions: any[];
+    pluginAddress: string;
+    onboardingQuestAddress: string;
+    pluginTokenId: number;
+  },
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  const questOnboarding: QuestOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.onboardingQuestAddress
+  );
+
+  const response = await questOnboarding.createTask(
+    body.task,
+    body.questId,
+    body.pluginTokenId
+  );
+
+  if (!response.isSuccess) {
+    return {
+      error: response.errorMessage
+    };
+  }
+  try {
+    await saveQestions(
+      body.pluginAddress,
+      response.data.taskId,
+      body.allQuestions
+    );
+  } catch (error) {
+    return {
+      error:
+        "An error occured which caused questions and answered not to be stored. Please delete this task and try to create it again!"
+    };
+  }
+  return {
+    data: response.data
+  };
+};
+
 const removeTaskFromQuest = async (
   body: {
     task: Task;
@@ -590,6 +636,10 @@ export const onboardingApi = createApi({
 
     if (url === "createTaskPerQuest") {
       return createTaskPerQuest(body, api);
+    }
+
+    if (url === "createQuizTaskPerQuest") {
+      return createQuizTaskPerQuest(body, api);
     }
 
     if (url === "removeTaskFromQuest") {
@@ -822,6 +872,25 @@ export const onboardingApi = createApi({
       },
       invalidatesTags: ["Tasks", "Quests"]
     }),
+    createQuizTaskPerQuest: builder.mutation<
+      Task,
+      {
+        task: Task;
+        questId: number;
+        pluginAddress: string;
+        allQuestions: any[];
+        onboardingQuestAddress: string;
+        pluginTokenId: number;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "createQuizTaskPerQuest"
+        };
+      },
+      invalidatesTags: ["Tasks", "Quests"]
+    }),
     removeTaskFromQuest: builder.mutation<
       Task,
       {
@@ -938,6 +1007,7 @@ export const {
   useSubmitOpenTaskMutation,
   useWithdrawFromAQuestMutation,
   useRemoveTaskFromQuestMutation,
+  useCreateQuizTaskPerQuestMutation,
   useLazyHasUserCompletedQuestQuery,
   useGetOnboardingQuestByIdQuery,
   useCreateTaskPerQuestMutation,

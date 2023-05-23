@@ -114,13 +114,28 @@ export const CommunityData = createSelector(
   }
 );
 
-export const DiscordLink = createSelector(CommunityData, (c) => {
-  return c.properties.socials.find((s) => s.type === "discord")?.link;
+export const IsDiscordVerified = createSelector(CommunityData, (c) => {
+  try {
+    const social = c.properties.socials.find((s) => s.type === "discord");
+    if (
+      typeof social?.link === "string" &&
+      social?.link?.replace("https://discord.gg/", "")?.length > 0
+    ) {
+      return true;
+    }
+  } catch (error) {
+    return false;
+  }
+  return false;
 });
 
-export const IsDiscordVerified = createSelector(CommunityData, (c) => {
-  return !!c.properties.socials.find((s) => s.type === "discord")?.link;
-});
+export const DiscordLink = createSelector(
+  [CommunityData, IsDiscordVerified],
+  (c, isVerified) => {
+    if (!isVerified) return "";
+    return c.properties.socials.find((s) => s.type === "discord")?.link;
+  }
+);
 
 export const allRoles = createSelector(CommunityData, (c) => {
   return c.properties?.rolesSets[0]?.roles || [];
