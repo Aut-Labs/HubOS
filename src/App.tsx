@@ -20,7 +20,6 @@ import GetStarted from "./pages/GetStarted/GetStarted";
 import AutLoading from "@components/AutLoading";
 import ErrorPage from "@components/ErrorPage";
 import Callback from "./pages/Oauth2Callback/Callback";
-import NetworkResolver from "./pages/PublicQuest/NetworkResolver";
 
 const generateConfig = (networks: NetworkConfig[]): Config => {
   const enabled_networks = networks.filter((n) => !n.disabled);
@@ -125,7 +124,6 @@ function App() {
                   {!isAutheticated && (
                     <>
                       <Route path="/" element={<GetStarted />} />
-                      <Route path="/quest/*" element={<NetworkResolver />} />
                       <Route
                         path="*"
                         element={<Navigate to="/" state={{ from: location }} />}

@@ -4,7 +4,7 @@ import { AUTH_TOKEN_KEY } from "./auth.api";
 
 export const saveQestions = async (
   taskAddress: string,
-  taskId: number,
+  uuid: string,
   questions: any[]
 ): Promise<void> => {
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
@@ -12,7 +12,29 @@ export const saveQestions = async (
     `${environment.apiUrl}/autID/quiz`,
     {
       taskAddress,
-      taskId,
+      uuid,
+      questions
+    },
+    {
+      headers: {
+        Authorization: token
+      }
+    }
+  );
+  return res?.data || null;
+};
+
+export const deleteQestions = async (
+  taskAddress: string,
+  uuid: string,
+  questions: any[]
+): Promise<void> => {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  const res = await axios.post(
+    `${environment.apiUrl}/autID/removeQuiz`,
+    {
+      taskAddress,
+      uuid,
       questions
     },
     {

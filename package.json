@@ -34,7 +34,7 @@
     "@aut-labs-private/abi-types": "^0.0.34",
     "@aut-labs-private/sdk": "^0.0.54",
     "@aut-labs-private/sdk-biconomy": "latest",
-    "@aut-labs/d-aut": "^1.0.23",
+    "@aut-labs/d-aut": "^1.0.25",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@leenguyen/react-flip-clock-countdown": "^1.4.0",
@@ -87,6 +87,7 @@
     "stream-browserify": "^3.0.0",
     "use-react-router-breadcrumbs": "^4.0.1",
     "util": "^0.10.3",
+    "uuid": "^9.0.0",
     "web-vitals": "^2.1.2",
     "webpack": "^5.75.0"
   },

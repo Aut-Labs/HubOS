@@ -153,9 +153,10 @@ const QuizTask = ({ plugin }: PluginParams) => {
     if (!initialized && task) {
       const start = async () => {
         const questionsAndAnswer: any[] = await getQestions(task.pluginAddress);
+        const taskUuid = task.metadata.properties["uuid"];
         const foundQuestion = questionsAndAnswer.find(
-          ({ taskAddress, taskId }) =>
-            taskAddress === task.pluginAddress && taskId === task.taskId
+          ({ taskAddress, uuid }) =>
+            taskAddress === task.pluginAddress && uuid === taskUuid
         );
 
         if (foundQuestion) {

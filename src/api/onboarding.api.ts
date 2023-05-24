@@ -10,11 +10,13 @@ import { environment } from "./environment";
 import { CacheTypes, getCache, updateCache } from "./cache.api";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import {
+  deleteQestions,
   finaliseJoinDiscordTask,
   finaliseQuizTask,
   finaliseTransactionTask,
   saveQestions
 } from "./tasks.api";
+import { v4 as uuidv4 } from "uuid";
 
 const getAllOnboardingQuests = async (
   pluginAddress: any,
@@ -382,6 +384,16 @@ const createQuizTaskPerQuest = async (
     body.onboardingQuestAddress
   );
 
+  const uuid = uuidv4();
+  try {
+    await saveQestions(body.pluginAddress, uuid, body.allQuestions);
+  } catch (error) {
+    return {
+      error: "An error occurred storing the quiz answers. Please try again."
+    };
+  }
+
+  body.task.metadata.properties["uuid"] = uuid;
   const response = await questOnboarding.createTask(
     body.task,
     body.questId,
@@ -389,22 +401,18 @@ const createQuizTaskPerQuest = async (
   );
 
   if (!response.isSuccess) {
+    try {
+      await deleteQestions(body.pluginAddress, uuid, body.allQuestions);
+    } catch (error) {
+      return {
+        error: "An error occurred deleting the quiz answers. Please try again."
+      };
+    }
     return {
       error: response.errorMessage
     };
   }
-  try {
-    await saveQestions(
-      body.pluginAddress,
-      response.data.taskId,
-      body.allQuestions
-    );
-  } catch (error) {
-    return {
-      error:
-        "An error occured which caused questions and answered not to be stored. Please delete this task and try to create it again!"
-    };
-  }
+
   return {
     data: response.data
   };
