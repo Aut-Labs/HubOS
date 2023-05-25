@@ -447,7 +447,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
             type="button"
             color="primary"
             variant="body"
-            href="http://176.34.149.248:4002/"
+            href="https://nova-internal-test.aut.id/"
             target="_blank"
           >
             Nova Leaderboard
