@@ -10,10 +10,13 @@ import { environment } from "./environment";
 import { CacheTypes, getCache, updateCache } from "./cache.api";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import {
+  deleteQestions,
   finaliseJoinDiscordTask,
   finaliseQuizTask,
-  finaliseTransactionTask
+  finaliseTransactionTask,
+  saveQestions
 } from "./tasks.api";
+import { v4 as uuidv4 } from "uuid";
 
 const getAllOnboardingQuests = async (
   pluginAddress: any,
@@ -364,6 +367,57 @@ const createTaskPerQuest = async (
   };
 };
 
+const createQuizTaskPerQuest = async (
+  body: {
+    task: Task;
+    questId: number;
+    allQuestions: any[];
+    pluginAddress: string;
+    onboardingQuestAddress: string;
+    pluginTokenId: number;
+  },
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  const questOnboarding: QuestOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.onboardingQuestAddress
+  );
+
+  const uuid = uuidv4();
+  try {
+    await saveQestions(body.pluginAddress, uuid, body.allQuestions);
+  } catch (error) {
+    return {
+      error: "An error occurred storing the quiz answers. Please try again."
+    };
+  }
+
+  body.task.metadata.properties["uuid"] = uuid;
+  const response = await questOnboarding.createTask(
+    body.task,
+    body.questId,
+    body.pluginTokenId
+  );
+
+  if (!response.isSuccess) {
+    try {
+      await deleteQestions(body.pluginAddress, uuid, body.allQuestions);
+    } catch (error) {
+      return {
+        error: "An error occurred deleting the quiz answers. Please try again."
+      };
+    }
+    return {
+      error: response.errorMessage
+    };
+  }
+
+  return {
+    data: response.data
+  };
+};
+
 const removeTaskFromQuest = async (
   body: {
     task: Task;
@@ -590,6 +644,10 @@ export const onboardingApi = createApi({
 
     if (url === "createTaskPerQuest") {
       return createTaskPerQuest(body, api);
+    }
+
+    if (url === "createQuizTaskPerQuest") {
+      return createQuizTaskPerQuest(body, api);
     }
 
     if (url === "removeTaskFromQuest") {
@@ -822,6 +880,25 @@ export const onboardingApi = createApi({
       },
       invalidatesTags: ["Tasks", "Quests"]
     }),
+    createQuizTaskPerQuest: builder.mutation<
+      Task,
+      {
+        task: Task;
+        questId: number;
+        pluginAddress: string;
+        allQuestions: any[];
+        onboardingQuestAddress: string;
+        pluginTokenId: number;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "createQuizTaskPerQuest"
+        };
+      },
+      invalidatesTags: ["Tasks", "Quests"]
+    }),
     removeTaskFromQuest: builder.mutation<
       Task,
       {
@@ -938,6 +1015,7 @@ export const {
   useSubmitOpenTaskMutation,
   useWithdrawFromAQuestMutation,
   useRemoveTaskFromQuestMutation,
+  useCreateQuizTaskPerQuestMutation,
   useLazyHasUserCompletedQuestQuery,
   useGetOnboardingQuestByIdQuery,
   useCreateTaskPerQuestMutation,

@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { useCreateTaskPerQuestMutation } from "@api/onboarding.api";
+import { useCreateQuizTaskPerQuestMutation } from "@api/onboarding.api";
 import { PluginDefinition, Task } from "@aut-labs-private/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
@@ -17,9 +17,7 @@ import AddIcon from "@mui/icons-material/Add";
 import QuestionsAndAnswers, { emptyQuestion } from "./QuestionsAndAnswers";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { saveQestions } from "@api/tasks.api";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
 
@@ -128,27 +126,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
   });
 
   const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
-    useCreateTaskPerQuestMutation();
-
-  useEffect(() => {
-    const start = async () => {
-      if (isSuccess && data && !answersSaved) {
-        setAnswersSaved(true);
-        const values = getValues();
-        // store answers in the db
-        try {
-          await saveQestions(
-            plugin.pluginAddress,
-            data.taskId,
-            values.questions
-          );
-        } catch (error) {
-          // reset
-        }
-      }
-    };
-    start();
-  }, [isSuccess, data, answersSaved]);
+    useCreateQuizTaskPerQuestMutation();
 
   const onSubmit = async () => {
     const values = getValues();
@@ -174,8 +152,9 @@ const QuizTasks = ({ plugin }: PluginParams) => {
       pluginTokenId: plugin.tokenId,
       questId: +searchParams.get(RequiredQueryParams.QuestId),
       pluginAddress: plugin.pluginAddress,
+      allQuestions: values.questions,
       task: {
-        role: 1,
+        role: +searchParams.get(RequiredQueryParams.QuestId),
         metadata: {
           name: values.title,
           description: values.description,
