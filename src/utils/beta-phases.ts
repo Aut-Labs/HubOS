@@ -1,10 +1,10 @@
-export function getOwnerPhases() {
-  const phaseOneStartDate = new Date("2023-05-26T07:00:00.000Z");
+export function getOwnerPhases(startDate: Date) {
+  const phaseOneStartDate = new Date(startDate);
   // set the time zone to CET
-  phaseOneStartDate.setUTCHours(7);
-  phaseOneStartDate.setMinutes(0);
-  phaseOneStartDate.setSeconds(0);
-  phaseOneStartDate.setMilliseconds(0);
+  // phaseOneStartDate.setUTCHours(7);
+  // phaseOneStartDate.setMinutes(0);
+  // phaseOneStartDate.setSeconds(0);
+  // phaseOneStartDate.setMilliseconds(0);
 
   const phaseOneDuration = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
   const phaseTwoDuration = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
@@ -35,8 +35,9 @@ export function getOwnerPhases() {
   };
 }
 
-export function getMemberPhases() {
-  const { phaseThreeEndDate: ownerPhaseThreeEndDate } = getOwnerPhases();
+export function getMemberPhases(startDate: Date) {
+  const { phaseThreeEndDate: ownerPhaseThreeEndDate } =
+    getOwnerPhases(startDate);
 
   const phaseOneDuration = 7 * 60 * 60 * 1000; // 7 hours in milliseconds
   const phaseTwoDuration = 9 * 60 * 60 * 1000; // 9 hours in milliseconds
