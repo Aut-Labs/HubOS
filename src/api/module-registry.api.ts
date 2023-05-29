@@ -100,7 +100,7 @@ export const moduleRegistryApi = createApi({
   },
   tagTypes: ["Modules"],
   endpoints: (builder) => ({
-    getAllModuleDefinitions: builder.query<ModuleDefinition[], void>({
+    getAllModuleDefinitions: builder.query<ModuleDefinition[], any>({
       query: (body) => {
         return {
           body,
@@ -121,7 +121,28 @@ export const moduleRegistryApi = createApi({
           url: "activateModule"
         };
       },
-      invalidatesTags: ["Modules"]
+      invalidatesTags: ["Modules"],
+      async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(
+            moduleRegistryApi.util.updateQueryData(
+              "getAllModuleDefinitions",
+              null,
+              (draft) => {
+                const index = draft.findIndex((q) => q.id === args.moduleId);
+                const updatedModule: ModuleDefinition = JSON.parse(
+                  JSON.stringify(draft[index])
+                );
+                draft.splice(index, 1, updatedModule);
+                return draft;
+              }
+            )
+          );
+        } catch (err) {
+          console.error(err);
+        }
+      }
     })
   })
 });

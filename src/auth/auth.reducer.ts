@@ -47,7 +47,7 @@ export const UserPhasesCache = createSelector([userPhasesCache], (a) => a);
 function getQuestDates(startDate: Date) {
   const { phaseOneStartDate, phaseTwoEndDate } = getMemberPhases(startDate);
 
-  const questStartDateOffset = 30 * 60 * 1000; // 2 hours in milliseconds
+  const questStartDateOffset = 10 * 60 * 1000; // 10 hours in milliseconds
 
   const questStartDate = new Date(
     phaseOneStartDate.getTime() + questStartDateOffset
@@ -60,34 +60,30 @@ function getQuestDates(startDate: Date) {
   };
 }
 
-function questDurationInDays(startDate: Date) {
-  const { questStartDate, questEndDate } = getQuestDates(startDate);
-
+function questDurationInDays(startDate: Date, endDate: Date) {
   const durationInMilliseconds: number =
-    questEndDate.getTime() - questStartDate.getTime();
+    endDate.getTime() - startDate.getTime();
   const durationInDays: number = durationInMilliseconds / (24 * 60 * 60 * 1000);
 
   return Number(durationInDays.toFixed(2));
 }
 
-function questDurationInHours(startDate: Date) {
-  const { questStartDate, questEndDate } = getQuestDates(startDate);
-
+function questDurationInHours(startDate: Date, endDate: Date) {
   const durationInMilliseconds: number =
-    questEndDate.getTime() - questStartDate.getTime();
+    endDate.getTime() - startDate.getTime();
   const durationInHours: number = durationInMilliseconds / (60 * 60 * 1000);
 
-  return Math.ceil(durationInHours);
+  return Math.floor(durationInHours);
 }
 
 export const QuestDates = createSelector([userPhasesCache], (cache) => {
   const startDate = cache?.createdAt || new Date();
   const { questEndDate, questStartDate } = getQuestDates(startDate);
   return {
-    startDate: questEndDate,
-    endDate: questStartDate,
-    durationInHours: questDurationInHours(startDate),
-    durationInDays: questDurationInDays(startDate)
+    startDate: questStartDate,
+    endDate: questEndDate,
+    durationInHours: questDurationInHours(questStartDate, questEndDate),
+    durationInDays: questDurationInDays(questStartDate, questEndDate)
   };
 });
 

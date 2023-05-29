@@ -287,6 +287,9 @@ const OwnerFinalizeContent = ({
 
   const onSubmit = async () => {
     finalizeTask({
+      userAddress,
+      isAdmin: true,
+      questId: +searchParams.get(RequiredQueryParams.QuestId),
       task: submission,
       onboardingQuestAddress: searchParams.get(
         RequiredQueryParams.OnboardingQuestAddress

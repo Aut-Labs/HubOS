@@ -12,8 +12,6 @@ import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import {
   deleteQestions,
   finaliseJoinDiscordTask,
-  finaliseQuizTask,
-  finaliseTransactionTask,
   saveQestions
 } from "./tasks.api";
 import { v4 as uuidv4 } from "uuid";
@@ -87,39 +85,6 @@ const fetchQuestById = async (
   };
 };
 
-const hasUserCompletedQuest = async (
-  body: {
-    userAddress: string;
-    questId: number;
-    onboardingQuestAddress: string;
-    daoAddress: string;
-  },
-  api: BaseQueryApi
-) => {
-  const sdk = AutSDK.getInstance();
-  const { questId, onboardingQuestAddress, userAddress } = body;
-
-  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
-    QuestOnboarding,
-    onboardingQuestAddress
-  );
-
-  try {
-    const hasCompletedAQuest =
-      await sdk.questOnboarding.questPlugin.functions.hasCompletedAQuest(
-        userAddress,
-        +questId
-      );
-    return {
-      data: hasCompletedAQuest
-    };
-  } catch (error) {
-    return {
-      data: false
-    };
-  }
-};
-
 const launchOnboarding = async (
   { quests, pluginAddress, userAddress },
   api: BaseQueryApi
@@ -174,56 +139,6 @@ const deactivateOnboarding = async (
     await updateCache(cache);
   } catch (error) {
     console.log(error);
-  }
-  return {
-    data: response.data
-  };
-};
-
-const applyForQuest = async (
-  body: {
-    questId: number;
-    onboardingQuestAddress: string;
-  },
-  api: BaseQueryApi
-) => {
-  const sdk = AutSDK.getInstance();
-  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
-    QuestOnboarding,
-    body.onboardingQuestAddress
-  );
-
-  const response = await sdk.questOnboarding.applyForAQuest(body.questId);
-
-  if (!response.isSuccess) {
-    return {
-      error: response.errorMessage
-    };
-  }
-  return {
-    data: response.data
-  };
-};
-
-const withdrawFromAQuest = async (
-  body: {
-    questId: number;
-    onboardingQuestAddress: string;
-  },
-  api: BaseQueryApi
-) => {
-  const sdk = AutSDK.getInstance();
-  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
-    QuestOnboarding,
-    body.onboardingQuestAddress
-  );
-
-  const response = await sdk.questOnboarding.withdrawFromAQuest(body.questId);
-
-  if (!response.isSuccess) {
-    return {
-      error: response.errorMessage
-    };
   }
   return {
     data: response.data
@@ -481,59 +396,6 @@ const submitOpenTask = async (
   };
 };
 
-const submitQuizTask = async (
-  body: {
-    task: Task;
-    questionsAndAnswers: any[];
-    pluginAddress: string;
-    onboardingQuestAddress: string;
-    pluginDefinitionId: PluginDefinitionType;
-  },
-  api: BaseQueryApi
-) => {
-  try {
-    await finaliseQuizTask(
-      body.pluginAddress,
-      body.onboardingQuestAddress,
-      body.task.taskId,
-      body.questionsAndAnswers
-    );
-
-    return {
-      data: true
-    };
-  } catch (error) {
-    return {
-      error: error?.response?.data?.error || "Task could not be finalised!"
-    };
-  }
-};
-
-const submitTransactionTask = async (
-  body: {
-    task: Task;
-    pluginAddress: string;
-    onboardingQuestAddress: string;
-    pluginDefinitionId: PluginDefinitionType;
-  },
-  api: BaseQueryApi
-) => {
-  try {
-    await finaliseTransactionTask(
-      body.pluginAddress,
-      body.onboardingQuestAddress,
-      body.task.taskId
-    );
-    return {
-      data: true
-    };
-  } catch (error) {
-    return {
-      error: error?.response?.data?.error || "Task could not be finalised!"
-    };
-  }
-};
-
 const submitJoinDiscordTask = async (
   body: {
     task: Task;
@@ -606,20 +468,8 @@ export const onboardingApi = createApi({
       return getAllOnboardingQuests(body, api);
     }
 
-    if (url === "applyForQuest") {
-      return applyForQuest(body, api);
-    }
-
-    if (url === "withdrawFromAQuest") {
-      return withdrawFromAQuest(body, api);
-    }
-
     if (url === "getOnboardingQuestById") {
       return fetchQuestById(body, api);
-    }
-
-    if (url === "hasUserCompletedQuest") {
-      return hasUserCompletedQuest(body, api);
     }
 
     if (url === "createQuest") {
@@ -666,13 +516,6 @@ export const onboardingApi = createApi({
       return finaliseOpenTask(body, api);
     }
 
-    if (url === "submitQuizTask") {
-      return submitQuizTask(body, api);
-    }
-
-    if (url === "submitTransactionTask") {
-      return submitTransactionTask(body, api);
-    }
     return {
       data: "Test"
     };
@@ -683,7 +526,8 @@ export const onboardingApi = createApi({
       query: (body) => {
         return {
           body,
-          url: "getAllOnboardingQuests"
+          url: "getAllOnboardingQuests",
+          timestamp: Date.now()
         };
       },
       providesTags: ["Quests"]
@@ -724,23 +568,6 @@ export const onboardingApi = createApi({
       },
       providesTags: ["Tasks"]
     }),
-    hasUserCompletedQuest: builder.query<
-      Quest,
-      {
-        userAddress: string;
-        questId: number;
-        onboardingQuestAddress: string;
-        daoAddress: string;
-      }
-    >({
-      query: (body) => {
-        return {
-          body,
-          url: "hasUserCompletedQuest"
-        };
-      },
-      providesTags: []
-    }),
     launchOnboarding: builder.mutation<
       boolean,
       {
@@ -773,36 +600,6 @@ export const onboardingApi = createApi({
       },
       invalidatesTags: ["Quests", "Tasks"]
     }),
-    applyForQuest: builder.mutation<
-      boolean,
-      {
-        questId: number;
-        onboardingQuestAddress: string;
-      }
-    >({
-      query: (body) => {
-        return {
-          body,
-          url: "applyForQuest"
-        };
-      },
-      invalidatesTags: ["Quest"]
-    }),
-    withdrawFromAQuest: builder.mutation<
-      boolean,
-      {
-        questId: number;
-        onboardingQuestAddress: string;
-      }
-    >({
-      query: (body) => {
-        return {
-          body,
-          url: "withdrawFromAQuest"
-        };
-      },
-      invalidatesTags: ["Quest"]
-    }),
     createQuest: builder.mutation<
       Quest,
       Partial<Quest & { pluginAddress: string }>
@@ -813,6 +610,7 @@ export const onboardingApi = createApi({
           url: "createQuest"
         };
       },
+      invalidatesTags: ["Quests"],
       async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -841,6 +639,7 @@ export const onboardingApi = createApi({
           url: "updateQuest"
         };
       },
+      invalidatesTags: ["Quests"],
       async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -866,6 +665,8 @@ export const onboardingApi = createApi({
       Task,
       {
         task: Task;
+        userAddress: string;
+        isAdmin: boolean;
         questId: number;
         pluginAddress: string;
         onboardingQuestAddress: string;
@@ -878,12 +679,39 @@ export const onboardingApi = createApi({
           url: "createTaskPerQuest"
         };
       },
-      invalidatesTags: ["Tasks", "Quests"]
+      invalidatesTags: ["Tasks", "Quests"],
+      async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(
+            onboardingApi.util.updateQueryData(
+              "getAllTasksPerQuest",
+              {
+                userAddress: args.onboardingQuestAddress,
+                isAdmin: args.isAdmin,
+                pluginAddress: args.onboardingQuestAddress,
+                questId: args.questId
+              },
+              (draft) => {
+                const index = draft.tasks.findIndex(
+                  (q) => q.taskId === data.taskId
+                );
+                draft.tasks.splice(index, 1, data);
+                return draft;
+              }
+            )
+          );
+        } catch (err) {
+          console.error(err);
+        }
+      }
     }),
     createQuizTaskPerQuest: builder.mutation<
       Task,
       {
         task: Task;
+        userAddress: string;
+        isAdmin: boolean;
         questId: number;
         pluginAddress: string;
         allQuestions: any[];
@@ -897,7 +725,32 @@ export const onboardingApi = createApi({
           url: "createQuizTaskPerQuest"
         };
       },
-      invalidatesTags: ["Tasks", "Quests"]
+      invalidatesTags: ["Tasks", "Quests"],
+      async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(
+            onboardingApi.util.updateQueryData(
+              "getAllTasksPerQuest",
+              {
+                userAddress: args.onboardingQuestAddress,
+                isAdmin: args.isAdmin,
+                pluginAddress: args.onboardingQuestAddress,
+                questId: args.questId
+              },
+              (draft) => {
+                const index = draft.tasks.findIndex(
+                  (q) => q.taskId === data.taskId
+                );
+                draft.tasks.splice(index, 1, data);
+                return draft;
+              }
+            )
+          );
+        } catch (err) {
+          console.error(err);
+        }
+      }
     }),
     removeTaskFromQuest: builder.mutation<
       Task,
@@ -950,45 +803,13 @@ export const onboardingApi = createApi({
       },
       invalidatesTags: ["Tasks", "Quest"]
     }),
-    submitQuizTask: builder.mutation<
-      Task,
-      {
-        task: Task;
-        questionsAndAnswers: any[];
-        pluginAddress: string;
-        onboardingQuestAddress: string;
-        pluginDefinitionId: PluginDefinitionType;
-      }
-    >({
-      query: (body) => {
-        return {
-          body,
-          url: "submitQuizTask"
-        };
-      },
-      invalidatesTags: ["Tasks", "Quest"]
-    }),
-    submitTransactionTask: builder.mutation<
-      Task,
-      {
-        task: Task;
-        pluginAddress: string;
-        onboardingQuestAddress: string;
-        pluginDefinitionId: PluginDefinitionType;
-      }
-    >({
-      query: (body) => {
-        return {
-          body,
-          url: "submitTransactionTask"
-        };
-      },
-      invalidatesTags: ["Tasks", "Quest"]
-    }),
     finaliseOpenTask: builder.mutation<
       Task,
       {
         task: Task;
+        isAdmin: boolean;
+        questId: number;
+        userAddress: string;
         pluginAddress: string;
         onboardingQuestAddress: string;
         pluginDefinitionId: PluginDefinitionType;
@@ -1000,7 +821,32 @@ export const onboardingApi = createApi({
           url: "finaliseOpenTask"
         };
       },
-      invalidatesTags: ["Tasks"]
+      invalidatesTags: ["Tasks", "Quests"],
+      async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(
+            onboardingApi.util.updateQueryData(
+              "getAllTasksPerQuest",
+              {
+                userAddress: args.onboardingQuestAddress,
+                isAdmin: args.isAdmin,
+                pluginAddress: args.onboardingQuestAddress,
+                questId: args.questId
+              },
+              (draft) => {
+                const index = draft.submissions.findIndex(
+                  (q) => q.taskId === data.taskId
+                );
+                draft.submissions.splice(index, 1, data);
+                return draft;
+              }
+            )
+          );
+        } catch (err) {
+          console.error(err);
+        }
+      }
     })
   })
 });
@@ -1008,16 +854,10 @@ export const onboardingApi = createApi({
 export const {
   useUpdateQuestMutation,
   useCreateQuestMutation,
-  useApplyForQuestMutation,
-  useSubmitQuizTaskMutation,
-  useSubmitTransactionTaskMutation,
   useFinaliseOpenTaskMutation,
   useSubmitOpenTaskMutation,
-  useWithdrawFromAQuestMutation,
   useRemoveTaskFromQuestMutation,
   useCreateQuizTaskPerQuestMutation,
-  useLazyHasUserCompletedQuestQuery,
-  useGetOnboardingQuestByIdQuery,
   useCreateTaskPerQuestMutation,
   useGetAllTasksPerQuestQuery,
   useLazyGetAllTasksPerQuestQuery,
