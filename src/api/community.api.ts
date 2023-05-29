@@ -372,6 +372,11 @@ const getMembers = async (body, api: BaseQueryApi) => {
   const members: DAOMember[] = [];
   const membersResponse =
     await sdk.daoExpander.contract.members.getAllMembers();
+  if (!membersResponse) {
+    return {
+      data: members
+    };
+  }
 
   for (let i = 0; i < membersResponse.data.length; i += 1) {
     try {

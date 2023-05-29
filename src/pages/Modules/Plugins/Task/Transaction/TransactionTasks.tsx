@@ -23,12 +23,12 @@ import AddIcon from "@mui/icons-material/Add";
 import { dateToUnix } from "@utils/date-format";
 import { addMinutes } from "date-fns";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { AutSelectField } from "@theme/field-select-styles";
 import { InteractionNetworks } from "@utils/transaction-networks";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
+import { useEthers } from "@usedapp/core";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -118,6 +118,7 @@ addMinutes(endDatetime, 45);
 const TransactionTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { account } = useEthers();
   const { control, handleSubmit, getValues, formState } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -136,6 +137,8 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
   const onSubmit = async () => {
     const values = getValues();
     createTask({
+      isAdmin: true,
+      userAddress: account,
       onboardingQuestAddress: searchParams.get(
         RequiredQueryParams.OnboardingQuestAddress
       ),

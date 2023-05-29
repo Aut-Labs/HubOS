@@ -16,7 +16,6 @@ import { addMinutes } from "date-fns";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useSelector } from "react-redux";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DoneIcon from "@mui/icons-material/Done";
 import {
   DiscordLink,
@@ -25,6 +24,7 @@ import {
 import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
+import { useEthers } from "@usedapp/core";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -109,6 +109,7 @@ addMinutes(endDatetime, 45);
 const JoinDiscordTasks = ({ plugin }: PluginParams) => {
   const isDiscordVerified = useSelector(IsDiscordVerified);
   const inviteLink = useSelector(DiscordLink);
+  const { account } = useEthers();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [discordDialogOpen, setDiscordDialogOpen] = useState(false);
@@ -127,6 +128,8 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
   const onSubmit = async () => {
     const values = getValues();
     createTask({
+      isAdmin: true,
+      userAddress: account,
       onboardingQuestAddress: searchParams.get(
         RequiredQueryParams.OnboardingQuestAddress
       ),

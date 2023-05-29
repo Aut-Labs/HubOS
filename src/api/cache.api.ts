@@ -14,6 +14,7 @@ export interface CacheModel {
   onboardingQuestAddress: string;
   questId: number;
   list: any[];
+  createdAt?: Date;
 }
 
 export const getCache = async (cacheKey: string): Promise<CacheModel> => {
