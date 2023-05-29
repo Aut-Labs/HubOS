@@ -8,6 +8,7 @@ import { StepperButton } from "@components/Stepper";
 import {
   Box,
   Button,
+  Checkbox,
   Container,
   FormControl,
   InputLabel,
@@ -20,7 +21,7 @@ import { AutSelectField } from "@theme/field-select-styles";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
 import { memo, useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { dateToUnix } from "@utils/date-format";
@@ -131,9 +132,14 @@ const OpenTasks = ({ plugin }: PluginParams) => {
     defaultValues: {
       title: "",
       description: "",
-      attachmentType: ""
+      attachmentType: "",
+      attachmentRequired: false,
+      textRequired: false
     }
   });
+
+  const values = useWatch({ control });
+  console.log(values);
 
   const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
     useCreateTaskPerQuestMutation();
@@ -325,10 +331,9 @@ const OpenTasks = ({ plugin }: PluginParams) => {
             );
           }}
         />
-
         <Stack
-          direction="row"
-          gap={4}
+          direction="column"
+          gap={2}
           sx={{
             margin: "0 auto",
             display: "flex",
@@ -337,52 +342,176 @@ const OpenTasks = ({ plugin }: PluginParams) => {
               xs: "100%",
               sm: "650px",
               xxl: "800px"
-            }
+            },
+            minHeight: "45px"
           }}
         >
-          <Typography color="white" variant="body" component="div">
-            Attachment Type
-          </Typography>
-          <Controller
-            name="attachmentType"
-            control={control}
-            rules={{
-              validate: {
-                selected: (v) => !!v
+          <Stack direction="column">
+            <Typography
+              color="white"
+              variant="body"
+              component="div"
+              sx={{ mb: "5px" }}
+            >
+              Choose whether contributors need to complete a text input, attach
+              a file, or both. At least one of the options must be selected.
+            </Typography>
+            {/* <Typography color="white" variant="caption">
+              Choose whether contributors need to complete a text input, attach
+              a file, or both. At least one of the options must be selected.
+            </Typography> */}
+          </Stack>
+          <Stack
+            direction={{
+              xs: "column",
+              md: "row"
+            }}
+            gap={2}
+            sx={{
+              margin: "0 auto",
+              display: "flex",
+              alignItems: {
+                xs: "flex-start",
+                md: "center"
+              },
+
+              width: {
+                xs: "100%",
+                sm: "650px",
+                xxl: "800px"
               }
             }}
-            render={({ field: { name, value, onChange } }) => {
-              return (
-                <AutSelectField
-                  variant="standard"
-                  color="offWhite"
-                  renderValue={(selected) => {
-                    if (!selected) {
-                      return "Type" as any;
-                    }
-                    const type = AttachmentTypes.find(
-                      (t) => t.value === selected
-                    );
-                    return type?.label || selected;
+          >
+            <Stack
+              direction="row"
+              gap={1}
+              sx={{
+                display: "flex",
+                alignItems: "center"
+              }}
+            >
+              <Typography color="white" variant="body" component="div">
+                Text
+              </Typography>
+              <Controller
+                name="textRequired"
+                control={control}
+                rules={{
+                  required: !values?.attachmentRequired
+                }}
+                render={({ field: { name, value, onChange } }) => {
+                  return (
+                    <Checkbox
+                      name={name}
+                      value={value}
+                      checked={!!value}
+                      onChange={onChange}
+                      sx={{
+                        ".MuiSvgIcon-root": {
+                          color: !value ? "offWhite.main" : "primary.main"
+                        }
+                      }}
+                    />
+                  );
+                }}
+              />
+            </Stack>
+            <Stack
+              direction={{
+                xs: "column",
+                md: "row"
+              }}
+              gap={2}
+              sx={{
+                display: "flex",
+                alignItems: {
+                  xs: "flex-start",
+                  md: "center"
+                }
+              }}
+            >
+              <Stack
+                direction="row"
+                gap={1}
+                sx={{
+                  display: "flex",
+                  alignItems: "center"
+                }}
+              >
+                <Typography color="white" variant="body" component="div">
+                  File Attachment
+                </Typography>
+
+                <Controller
+                  name="attachmentRequired"
+                  control={control}
+                  rules={{
+                    required: !values?.textRequired
                   }}
-                  name={name}
-                  value={value || ""}
-                  displayEmpty
-                  required
-                  onChange={onChange}
-                >
-                  {AttachmentTypes.map((type) => {
+                  render={({ field: { name, value, onChange } }) => {
                     return (
-                      <MenuItem key={`role-${type.value}`} value={type.value}>
-                        {type.label}
-                      </MenuItem>
+                      <Checkbox
+                        name={name}
+                        value={value}
+                        checked={!!value}
+                        onChange={onChange}
+                        sx={{
+                          ".MuiSvgIcon-root": {
+                            color: !value ? "offWhite.main" : "primary.main"
+                          }
+                        }}
+                      />
                     );
-                  })}
-                </AutSelectField>
-              );
-            }}
-          />
-          {/* <Controller
+                  }}
+                />
+              </Stack>
+              {values?.attachmentRequired === true && (
+                <Controller
+                  name="attachmentType"
+                  control={control}
+                  rules={{
+                    validate: {
+                      selected: (v) => !!v
+                    },
+                    required: values.attachmentRequired
+                  }}
+                  render={({ field: { name, value, onChange } }) => {
+                    return (
+                      <AutSelectField
+                        variant="standard"
+                        color="offWhite"
+                        renderValue={(selected) => {
+                          if (!selected) {
+                            return "Attachment Type" as any;
+                          }
+                          const type = AttachmentTypes.find(
+                            (t) => t.value === selected
+                          );
+                          return type?.label || selected;
+                        }}
+                        name={name}
+                        value={value || ""}
+                        displayEmpty
+                        required
+                        onChange={onChange}
+                      >
+                        {AttachmentTypes.map((type) => {
+                          return (
+                            <MenuItem
+                              key={`role-${type.value}`}
+                              value={type.value}
+                            >
+                              {type.label}
+                            </MenuItem>
+                          );
+                        })}
+                      </AutSelectField>
+                    );
+                  }}
+                />
+              )}
+            </Stack>
+            {/* <Controller
             name="attachmentType"
             control={control}
             rules={{
@@ -415,7 +544,9 @@ const OpenTasks = ({ plugin }: PluginParams) => {
               );
             }}
           /> */}
+          </Stack>
         </Stack>
+
         <Box
           sx={{
             width: "100%",
