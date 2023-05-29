@@ -1,11 +1,7 @@
-import {
-  useGetAllTasksPerQuestQuery,
-  useSubmitTransactionTaskMutation
-} from "@api/onboarding.api";
+import { useGetAllTasksPerQuestQuery } from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
-import { StepperButton } from "@components/Stepper";
-import { Box, Button, Container, Stack } from "@mui/material";
+import { Button, Container, Stack } from "@mui/material";
 import { IsAdmin } from "@store/Community/community.reducer";
 import { memo, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -17,8 +13,6 @@ import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import { useEthers } from "@usedapp/core";
 import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
-import ErrorDialog from "@components/Dialog/ErrorPopup";
-import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { InteractionNetworks } from "@utils/transaction-networks";
 
 interface PluginParams {
@@ -66,19 +60,16 @@ const TransactionTask = ({ plugin }: PluginParams) => {
     control
   });
 
-  const [submitTask, { error, isError, isLoading, reset }] =
-    useSubmitTransactionTaskMutation();
-
-  const onSubmit = async () => {
-    submitTask({
-      task,
-      onboardingQuestAddress: searchParams.get(
-        RequiredQueryParams.OnboardingQuestAddress
-      ),
-      pluginAddress: plugin.pluginAddress,
-      pluginDefinitionId: plugin.pluginDefinitionId
-    });
-  };
+  // const onSubmit = async () => {
+  //   submitTask({
+  //     task,
+  //     onboardingQuestAddress: searchParams.get(
+  //       RequiredQueryParams.OnboardingQuestAddress
+  //     ),
+  //     pluginAddress: plugin.pluginAddress,
+  //     pluginDefinitionId: plugin.pluginDefinitionId
+  //   });
+  // };
 
   const transactionNetwork = useMemo(() => {
     if (!task) return;
@@ -101,8 +92,8 @@ const TransactionTask = ({ plugin }: PluginParams) => {
         position: "relative"
       }}
     >
-      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
-      <LoadingDialog open={isLoading} message="Submitting task..." />
+      {/* <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <LoadingDialog open={isLoading} message="Submitting task..." /> */}
       {task ? (
         <>
           <TaskDetails task={task} />

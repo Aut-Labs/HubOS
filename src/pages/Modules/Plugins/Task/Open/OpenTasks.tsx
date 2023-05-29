@@ -10,10 +10,7 @@ import {
   Button,
   Checkbox,
   Container,
-  FormControl,
-  InputLabel,
   MenuItem,
-  Select,
   Stack,
   Typography
 } from "@mui/material";
@@ -26,11 +23,11 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { dateToUnix } from "@utils/date-format";
 import { addMinutes } from "date-fns";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
+import { useEthers } from "@usedapp/core";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -125,6 +122,7 @@ const endDatetime = new Date();
 addMinutes(endDatetime, 45);
 
 const OpenTasks = ({ plugin }: PluginParams) => {
+  const { account } = useEthers();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { control, handleSubmit, getValues, formState } = useForm({
@@ -139,7 +137,6 @@ const OpenTasks = ({ plugin }: PluginParams) => {
   });
 
   const values = useWatch({ control });
-  console.log(values);
 
   const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
     useCreateTaskPerQuestMutation();
@@ -147,6 +144,8 @@ const OpenTasks = ({ plugin }: PluginParams) => {
   const onSubmit = async () => {
     const values = getValues();
     createTask({
+      isAdmin: true,
+      userAddress: account,
       onboardingQuestAddress: searchParams.get(
         RequiredQueryParams.OnboardingQuestAddress
       ),
@@ -159,6 +158,8 @@ const OpenTasks = ({ plugin }: PluginParams) => {
           name: values.title,
           description: values.description,
           properties: {
+            attachmentRequired: values.attachmentRequired,
+            textRequired: values.textRequired,
             attachmentType: values.attachmentType
           }
         },

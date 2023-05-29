@@ -19,6 +19,7 @@ import { AUTH_TOKEN_KEY } from "@api/auth.api";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { IAutButtonConfig } from "@aut-labs/d-aut/build/components/AutButtonMenu/AutMenuUtils";
 import { resetState } from "@store/store";
+import { CacheTypes, getCache } from "@api/cache.api";
 
 function Web3DautConnect({
   setLoading,
@@ -114,8 +115,10 @@ function Web3DautConnect({
       })
     );
 
+    const cache = await getCache(CacheTypes.UserPhases);
     await dispatch(
       setAuthenticated({
+        cache,
         isAuthenticated: true,
         userInfo: autID
       })
@@ -194,7 +197,7 @@ function Web3DautConnect({
           zIndex: 99999
         }}
         flow-config='{"mode" : "tryAut", "customCongratsMessage": ""}'
-        dao-expander={"0x6A898113C6055b65150a39F8608232FbD001e475"}
+        dao-expander={"0x6Df5596CdB88bf80B3b0C27F9ca0391b4194236E"}
         id="d-aut"
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
         button-type="simple"

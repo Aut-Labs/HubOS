@@ -32,8 +32,7 @@ import {
 } from "react-router-dom";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { getMemberPhases } from "@utils/beta-phases";
-import { addMinutes } from "date-fns";
+import { QuestDates } from "@auth/auth.reducer";
 
 const Strong = styled("strong")(({ theme }) => ({
   // color: theme.palette.primary.main
@@ -43,48 +42,15 @@ interface PluginParams {
   plugin: PluginDefinition;
 }
 
-function getQuestDates() {
-  const { phaseOneStartDate, phaseTwoEndDate } = getMemberPhases();
-
-  const questStartDateOffset = 30 * 60 * 1000; // 2 hours in milliseconds
-
-  const questStartDate = new Date(
-    phaseOneStartDate.getTime() + questStartDateOffset
-  );
-  const questEndDate = phaseTwoEndDate;
-
-  return {
-    questStartDate,
-    questEndDate
-  };
-}
-
-function questDurationInDays() {
-  const { questStartDate, questEndDate } = getQuestDates();
-
-  const durationInMilliseconds: number =
-    questEndDate.getTime() - questStartDate.getTime();
-  const durationInDays: number = durationInMilliseconds / (24 * 60 * 60 * 1000);
-
-  return Number(durationInDays.toFixed(2));
-}
-
-function questDurationInHours() {
-  const { questStartDate, questEndDate } = getQuestDates();
-
-  const durationInMilliseconds: number =
-    questEndDate.getTime() - questStartDate.getTime();
-  const durationInHours: number = durationInMilliseconds / (60 * 60 * 1000);
-
-  return Math.ceil(durationInHours);
-}
-
 const CreateQuest = ({ plugin }: PluginParams) => {
   const [roles] = useState(useSelector(allRoles));
   const [searchParams] = useSearchParams();
+  const questDates = useSelector(QuestDates);
   const [initialized, setInitialized] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  console.log("questDates: ", questDates);
   const {
     control,
     handleSubmit,
@@ -98,7 +64,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       // description: "",
       // durationInDays: questDurationInDays(),
       // startDate: addMinutes(new Date(), 40), // @TO-USE for testing - 30 minutes
-      startDate: getQuestDates().questStartDate,
+      startDate: null,
       role: null
     }
   });
@@ -148,7 +114,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         pluginAddress: plugin.pluginAddress,
         role: values.role,
         // durationInDays: 2,
-        durationInDays: questDurationInHours(),
+        durationInDays: questDates.durationInHours,
         startDate,
         metadata: {
           name:
@@ -162,7 +128,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         pluginAddress: plugin.pluginAddress,
         role: values.role,
         // durationInDays: 2,
-        durationInDays: questDurationInHours(),
+        durationInDays: questDates.durationInHours,
         startDate,
         metadata: {
           name:
@@ -175,17 +141,21 @@ const CreateQuest = ({ plugin }: PluginParams) => {
   };
 
   useEffect(() => {
-    if (!initialized && quest) {
-      resetForm({
-        title: quest.metadata.name,
-        // description: quest.metadata.description,
-        // durationInDays: quest.durationInDays,
-        startDate: new Date(quest.startDate),
-        role: quest.role
-      });
-      setInitialized(true);
+    if (!initialized) {
+      if (!quest && questDates?.startDate) {
+        resetForm({
+          startDate: questDates.startDate
+        });
+      } else {
+        resetForm({
+          title: quest.metadata.name,
+          startDate: new Date(quest.startDate),
+          role: quest.role
+        });
+        setInitialized(true);
+      }
     }
-  }, [initialized, quest]);
+  }, [initialized, quest, questDates]);
 
   const path = useMemo(() => {
     if (updateIsSuccess) {
@@ -437,11 +407,10 @@ const CreateQuest = ({ plugin }: PluginParams) => {
 
         <Typography color="white" variant="body">
           *: During the closed beta, the duration of each onboarding quest will
-          be <Strong>{questDurationInDays()} days</Strong> and begin on the{" "}
-          <Strong>{getQuestDates().questStartDate.toDateString()}</Strong>,
-          until then you can invite your community to allowlist for quests you
-          have activated. During the onboarding period, every community will be
-          listed on the{" "}
+          be <Strong>{questDates.durationInDays} days</Strong> and begin on the{" "}
+          <Strong>{questDates.startDate.toDateString()}</Strong>, until then you
+          can invite your community to allowlist for quests you have activated.
+          During the onboarding period, every community will be listed on the{" "}
           <BtnLink
             component="a"
             type="button"
