@@ -89,7 +89,7 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
     url: communityData?.properties?.address
       ? //TODO: Replace url with valid showcase/#dao-address when available,
         //also keep this bizarre formatting otherwise the tweet won't have the correct new lines and alignment
-        // ? `http://176.34.149.248:4002/?${communityData?.properties?.address}`
+        // ? `https://nova-internal-test.aut.id/?${communityData?.properties?.address}`
         `
 https://Aut.id/`
       : `
