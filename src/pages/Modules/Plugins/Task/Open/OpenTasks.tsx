@@ -45,7 +45,7 @@ const AttachmentTypes = [
   },
   {
     value: "text",
-    label: "Text"
+    label: "Document"
   },
   {
     value: "image",
@@ -439,7 +439,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                 }}
               >
                 <Typography color="white" variant="body" component="div">
-                  File Attachment
+                  Attachment
                 </Typography>
 
                 <Controller
@@ -482,7 +482,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                         color="offWhite"
                         renderValue={(selected) => {
                           if (!selected) {
-                            return "Attachment Type" as any;
+                            return "Type" as any;
                           }
                           const type = AttachmentTypes.find(
                             (t) => t.value === selected
