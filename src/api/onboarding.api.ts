@@ -610,24 +610,24 @@ export const onboardingApi = createApi({
           url: "createQuest"
         };
       },
-      invalidatesTags: ["Quests"],
-      async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(
-            onboardingApi.util.updateQueryData(
-              "getAllOnboardingQuests",
-              args.pluginAddress,
-              (draft) => {
-                draft.push(data);
-                return draft;
-              }
-            )
-          );
-        } catch (err) {
-          console.error(err);
-        }
-      }
+      invalidatesTags: ["Quests"]
+      // async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
+      //   try {
+      //     const { data } = await queryFulfilled;
+      //     dispatch(
+      //       onboardingApi.util.updateQueryData(
+      //         "getAllOnboardingQuests",
+      //         args.pluginAddress,
+      //         (draft) => {
+      //           draft.push(data);
+      //           return draft;
+      //         }
+      //       )
+      //     );
+      //   } catch (err) {
+      //     console.error(err);
+      //   }
+      // }
     }),
     updateQuest: builder.mutation<
       Quest,
@@ -639,27 +639,27 @@ export const onboardingApi = createApi({
           url: "updateQuest"
         };
       },
-      invalidatesTags: ["Quests"],
-      async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(
-            onboardingApi.util.updateQueryData(
-              "getAllOnboardingQuests",
-              args.pluginAddress,
-              (draft) => {
-                const index = draft.findIndex(
-                  (q) => q.questId === data.questId
-                );
-                draft.splice(index, 1, data);
-                return draft;
-              }
-            )
-          );
-        } catch (err) {
-          console.error(err);
-        }
-      }
+      invalidatesTags: ["Quests"]
+      // async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
+      //   try {
+      //     const { data } = await queryFulfilled;
+      //     dispatch(
+      //       onboardingApi.util.updateQueryData(
+      //         "getAllOnboardingQuests",
+      //         args.pluginAddress,
+      //         (draft) => {
+      //           const index = draft.findIndex(
+      //             (q) => q.questId === data.questId
+      //           );
+      //           draft.splice(index, 1, data);
+      //           return draft;
+      //         }
+      //       )
+      //     );
+      //   } catch (err) {
+      //     console.error(err);
+      //   }
+      // }
     }),
     createTaskPerQuest: builder.mutation<
       Task,
@@ -679,32 +679,32 @@ export const onboardingApi = createApi({
           url: "createTaskPerQuest"
         };
       },
-      invalidatesTags: ["Tasks", "Quests"],
-      async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(
-            onboardingApi.util.updateQueryData(
-              "getAllTasksPerQuest",
-              {
-                userAddress: args.onboardingQuestAddress,
-                isAdmin: args.isAdmin,
-                pluginAddress: args.onboardingQuestAddress,
-                questId: args.questId
-              },
-              (draft) => {
-                const index = draft.tasks.findIndex(
-                  (q) => q.taskId === data.taskId
-                );
-                draft.tasks.splice(index, 1, data);
-                return draft;
-              }
-            )
-          );
-        } catch (err) {
-          console.error(err);
-        }
-      }
+      invalidatesTags: ["Tasks", "Quests"]
+      // async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
+      //   try {
+      //     const { data } = await queryFulfilled;
+      //     dispatch(
+      //       onboardingApi.util.updateQueryData(
+      //         "getAllTasksPerQuest",
+      //         {
+      //           userAddress: args.onboardingQuestAddress,
+      //           isAdmin: args.isAdmin,
+      //           pluginAddress: args.onboardingQuestAddress,
+      //           questId: args.questId
+      //         },
+      //         (draft) => {
+      //           const index = draft.tasks.findIndex(
+      //             (q) => q.taskId === data.taskId
+      //           );
+      //           draft.tasks.splice(index, 1, data);
+      //           return draft;
+      //         }
+      //       )
+      //     );
+      //   } catch (err) {
+      //     console.error(err);
+      //   }
+      // }
     }),
     createQuizTaskPerQuest: builder.mutation<
       Task,
@@ -725,32 +725,32 @@ export const onboardingApi = createApi({
           url: "createQuizTaskPerQuest"
         };
       },
-      invalidatesTags: ["Tasks", "Quests"],
-      async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(
-            onboardingApi.util.updateQueryData(
-              "getAllTasksPerQuest",
-              {
-                userAddress: args.onboardingQuestAddress,
-                isAdmin: args.isAdmin,
-                pluginAddress: args.onboardingQuestAddress,
-                questId: args.questId
-              },
-              (draft) => {
-                const index = draft.tasks.findIndex(
-                  (q) => q.taskId === data.taskId
-                );
-                draft.tasks.splice(index, 1, data);
-                return draft;
-              }
-            )
-          );
-        } catch (err) {
-          console.error(err);
-        }
-      }
+      invalidatesTags: ["Tasks", "Quests"]
+      // async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
+      //   try {
+      //     const { data } = await queryFulfilled;
+      //     dispatch(
+      //       onboardingApi.util.updateQueryData(
+      //         "getAllTasksPerQuest",
+      //         {
+      //           userAddress: args.onboardingQuestAddress,
+      //           isAdmin: args.isAdmin,
+      //           pluginAddress: args.onboardingQuestAddress,
+      //           questId: args.questId
+      //         },
+      //         (draft) => {
+      //           const index = draft.tasks.findIndex(
+      //             (q) => q.taskId === data.taskId
+      //           );
+      //           draft.tasks.splice(index, 1, data);
+      //           return draft;
+      //         }
+      //       )
+      //     );
+      //   } catch (err) {
+      //     console.error(err);
+      //   }
+      // }
     }),
     removeTaskFromQuest: builder.mutation<
       Task,
@@ -821,32 +821,32 @@ export const onboardingApi = createApi({
           url: "finaliseOpenTask"
         };
       },
-      invalidatesTags: ["Tasks", "Quests"],
-      async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(
-            onboardingApi.util.updateQueryData(
-              "getAllTasksPerQuest",
-              {
-                userAddress: args.onboardingQuestAddress,
-                isAdmin: args.isAdmin,
-                pluginAddress: args.onboardingQuestAddress,
-                questId: args.questId
-              },
-              (draft) => {
-                const index = draft.submissions.findIndex(
-                  (q) => q.taskId === data.taskId
-                );
-                draft.submissions.splice(index, 1, data);
-                return draft;
-              }
-            )
-          );
-        } catch (err) {
-          console.error(err);
-        }
-      }
+      invalidatesTags: ["Tasks", "Quests"]
+      // async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
+      //   try {
+      //     const { data } = await queryFulfilled;
+      //     dispatch(
+      //       onboardingApi.util.updateQueryData(
+      //         "getAllTasksPerQuest",
+      //         {
+      //           userAddress: args.onboardingQuestAddress,
+      //           isAdmin: args.isAdmin,
+      //           pluginAddress: args.onboardingQuestAddress,
+      //           questId: args.questId
+      //         },
+      //         (draft) => {
+      //           const index = draft.submissions.findIndex(
+      //             (q) => q.taskId === data.taskId
+      //           );
+      //           draft.submissions.splice(index, 1, data);
+      //           return draft;
+      //         }
+      //       )
+      //     );
+      //   } catch (err) {
+      //     console.error(err);
+      //   }
+      // }
     })
   })
 });
