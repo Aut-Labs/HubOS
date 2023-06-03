@@ -197,7 +197,7 @@ function Web3DautConnect({
           zIndex: 99999
         }}
         flow-config='{"mode" : "tryAut", "customCongratsMessage": ""}'
-        dao-expander={"0x3a6a0beb5e7BCF94e58732D8B4c5Fe5beB9a7f6B"}
+        dao-expander={"0xCBa9a81692ccC4ddcf46346dbC4D7f6fBb15f7D0"}
         id="d-aut"
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
         button-type="simple"

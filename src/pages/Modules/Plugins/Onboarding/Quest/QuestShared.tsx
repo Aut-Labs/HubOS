@@ -121,15 +121,25 @@ export const QuestListItem = memo(
                   color="offWhite"
                   size="small"
                   disabled={row.tasksCount >= 5}
-                  to="create"
-                  preserveParams
-                  queryParams={{
-                    onboardingQuestAddress: pluginAddress,
-                    returnUrlLinkName: "Back to quest",
-                    returnUrl: `${location.pathname}/${row.questId.toString()}`,
-                    questId: row.questId.toString()
-                  }}
-                  component={LinkWithQuery}
+                  onClick={() =>
+                    navigate({
+                      pathname: `${row.questId}`,
+                      search: new URLSearchParams({
+                        questId: `${row.questId}`,
+                        daoAddress: daoAddress,
+                        onboardingQuestAddress: pluginAddress
+                      }).toString()
+                    })
+                  }
+                  // to="create"
+                  // preserveParams
+                  // queryParams={{
+                  //   onboardingQuestAddress: pluginAddress,
+                  //   returnUrlLinkName: "Back to quest",
+                  //   returnUrl: `${location.pathname}/${row.questId.toString()}`,
+                  //   questId: row.questId.toString()
+                  // }}
+                  // component={LinkWithQuery}
                 >
                   <EditIcon />
                 </IconButton>

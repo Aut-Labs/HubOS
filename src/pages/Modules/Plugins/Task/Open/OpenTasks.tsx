@@ -17,7 +17,7 @@ import {
 import { AutSelectField } from "@theme/field-select-styles";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
-import { memo, useEffect } from "react";
+import { memo, useEffect, useMemo } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -28,6 +28,8 @@ import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
 import { useEthers } from "@usedapp/core";
+import { allRoles } from "@store/Community/community.reducer";
+import { useSelector } from "react-redux";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -125,6 +127,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
   const { account } = useEthers();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const roles = useSelector(allRoles);
   const { control, handleSubmit, getValues, formState } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -180,6 +183,12 @@ const OpenTasks = ({ plugin }: PluginParams) => {
     }
   }, [isSuccess]);
 
+  const selectedRole = useMemo(() => {
+    return roles.find(
+      (r) => r.id === +searchParams.get(RequiredQueryParams.QuestId)
+    );
+  }, [roles, searchParams]);
+
   return (
     <Container
       sx={{ py: "20px", display: "flex", flexDirection: "column" }}
@@ -226,7 +235,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
             </Typography>
           </Button>
           <Typography textAlign="center" color="white" variant="h3">
-            Create an Open Task
+            Open Task for {selectedRole?.roleName}
           </Typography>
         </Stack>
         <Typography

@@ -150,7 +150,7 @@ const Quest = ({ plugin }: PluginParams) => {
                     <RefreshIcon />
                   </IconButton>
                 </Tooltip>
-                <Tooltip title="Edit quest">
+                {/* <Tooltip title="Edit quest">
                   <IconButton
                     size="medium"
                     color="offWhite"
@@ -170,7 +170,7 @@ const Quest = ({ plugin }: PluginParams) => {
                   >
                     <EditIcon />
                   </IconButton>
-                </Tooltip>
+                </Tooltip> */}
               </Box>
             </Stack>
           </Stack>

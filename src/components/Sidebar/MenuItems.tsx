@@ -3,7 +3,7 @@ import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import { alpha, styled, SvgIcon } from "@mui/material";
+import { alpha, Badge, styled, SvgIcon } from "@mui/material";
 import { ReactComponent as ManageIcon } from "@assets/manage.svg";
 import { ReactComponent as DashboardIcon } from "@assets/dashboard.svg";
 import { NavLink as RouteNavLink } from "react-router-dom";
@@ -15,6 +15,7 @@ export interface SidebarMenuItem {
   route?: string;
   exact?: boolean;
   disabled?: boolean;
+  badgeCounter?: number;
   icon?: any;
   children?: SidebarMenuItem[];
 }
@@ -105,7 +106,30 @@ const autMenuItem = (menu: SidebarMenuItem, level = 0) => {
           inheritViewBox
         />
       </ListItemIcon>
-      <Typography variant="body">{menu.title}</Typography>
+      {"badgeCounter" in menu ? (
+        <>
+          <Badge
+            sx={{
+              flex: 1,
+              ".MuiBadge-badge": {
+                fontSize: "14px",
+                top: "10px",
+                right: "22px",
+                width: "25px",
+                height: "25px",
+                borderRadius: "50%"
+              }
+            }}
+            color="primary"
+            badgeContent={menu.badgeCounter}
+            showZero
+          >
+            <Typography variant="body">{menu.title}</Typography>
+          </Badge>
+        </>
+      ) : (
+        <Typography variant="body">{menu.title}</Typography>
+      )}
     </AutMenuItem>
   );
 };

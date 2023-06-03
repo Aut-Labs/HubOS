@@ -87,20 +87,20 @@ export const taskTypes = {
   }
 };
 
-const TaskCard = ({
+export const SubmissionCard = ({
   row,
-  isAdmin,
-  canDelete
+  questId,
+  daoAddress,
+  onboardingQuestAddress
 }: {
   row: Task;
-  isAdmin: boolean;
-  canDelete: boolean;
+  questId: string;
+  daoAddress: string;
+  onboardingQuestAddress: string;
 }) => {
   const location = useLocation();
-  const params = useParams<{ taskId: string }>();
   const navigate = useNavigate();
   const theme = useTheme();
-  const [searchParams] = useSearchParams();
 
   const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
     selectFromResult: ({ data }) => ({
@@ -152,7 +152,7 @@ const TaskCard = ({
           subheaderTypographyProps={{
             color: "white"
           }}
-          title={plugin?.metadata?.properties?.title}
+          title={row?.metadata?.name}
         />
         <CardContent
           sx={{
@@ -228,13 +228,9 @@ const TaskCard = ({
                   pathname: `/aut-dashboard/${path}/${row.taskId}`,
                   search: new URLSearchParams({
                     submitter: row.submitter,
-                    questId: searchParams.get(RequiredQueryParams.QuestId),
-                    onboardingQuestAddress: searchParams.get(
-                      RequiredQueryParams.OnboardingQuestAddress
-                    ),
-                    daoAddress: searchParams.get(
-                      RequiredQueryParams.DaoAddress
-                    ),
+                    questId: questId.toString(),
+                    onboardingQuestAddress: onboardingQuestAddress,
+                    daoAddress: daoAddress,
                     returnUrlLinkName: "Back to quest",
                     returnUrl: `${location?.pathname}`
                   }).toString()
@@ -264,7 +260,7 @@ const GridCard = styled(Card)(({ theme }) => {
   };
 });
 
-const GridBox = styled(Box)(({ theme }) => {
+export const SubmissionsGridBox = styled(Box)(({ theme }) => {
   return {
     boxSizing: "border-box",
     display: "grid",
@@ -298,7 +294,6 @@ const Submissions = ({ plugin }: PluginParams) => {
   const params = useParams<{ taskId: string }>();
   const isAdmin = useSelector(IsAdmin);
 
-  console.log("searchParams", searchParams.toString());
   const { task, submissions, isLoading } = useGetAllTasksPerQuestQuery(
     {
       userAddress,
@@ -334,8 +329,15 @@ const Submissions = ({ plugin }: PluginParams) => {
     }
   );
 
-  console.log("task: ", task);
-  console.log("submissions: ", submissions);
+  const taskParams = useMemo(() => {
+    return {
+      questId: searchParams.get(RequiredQueryParams.QuestId),
+      onboardingQuestAddress: searchParams.get(
+        RequiredQueryParams.OnboardingQuestAddress
+      ),
+      daoAddress: searchParams.get(RequiredQueryParams.DaoAddress)
+    };
+  }, [searchParams]);
 
   return (
     <Container
@@ -388,16 +390,18 @@ const Submissions = ({ plugin }: PluginParams) => {
               </Typography>
             </Stack>
             {!!submissions?.length && (
-              <GridBox sx={{ flexGrow: 1, mt: 4 }}>
+              <SubmissionsGridBox sx={{ flexGrow: 1, mt: 4 }}>
                 {submissions.map((row, index) => (
-                  <TaskCard
-                    isAdmin={isAdmin}
-                    canDelete={false}
+                  <SubmissionCard
                     key={`table-row-${index}`}
                     row={row}
+                    questId={taskParams.questId}
+                    onboardingQuestAddress={taskParams.onboardingQuestAddress}
+                    daoAddress={taskParams.daoAddress}
+                    {...taskParams}
                   />
                 ))}
-              </GridBox>
+              </SubmissionsGridBox>
             )}
 
             {!isLoading && !submissions?.length && (

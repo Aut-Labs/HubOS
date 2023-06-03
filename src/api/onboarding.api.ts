@@ -7,7 +7,7 @@ import AutSDK, {
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
-import { CacheTypes, getCache, updateCache } from "./cache.api";
+import { CacheModel, CacheTypes, getCache, updateCache } from "./cache.api";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import {
   deleteQestions,
@@ -15,6 +15,91 @@ import {
   saveQestions
 } from "./tasks.api";
 import { v4 as uuidv4 } from "uuid";
+import { getDAOProgress } from "./aut.api";
+
+const getOnboardingProgress = async (
+  pluginAddress: string,
+  api: BaseQueryApi
+) => {
+  if (!pluginAddress)
+    return {
+      data: {
+        daoProgress: [],
+        quests: []
+      }
+    };
+  const state = api.getState() as any;
+  const { selectedCommunityAddress } = state.community;
+  const { cache } = state.auth;
+  const sdk = AutSDK.getInstance();
+  const cacheData: CacheModel = cache;
+
+  const questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    pluginAddress
+  );
+
+  const tasksAndSubmissionsResponse = await Promise.all([
+    questOnboarding.getAllTasksAndSubmissionsByQuest(1),
+    questOnboarding.getAllTasksAndSubmissionsByQuest(2),
+    questOnboarding.getAllTasksAndSubmissionsByQuest(3)
+  ]);
+
+  const daoProgress = await getDAOProgress(selectedCommunityAddress);
+
+  const tasksAndSubmissions = [];
+
+  for (let i = 0; i < tasksAndSubmissionsResponse.length; i++) {
+    const submissions = tasksAndSubmissionsResponse[i].data.submissions;
+    const tasks = tasksAndSubmissionsResponse[i].data.tasks;
+    for (let j = 0; j < submissions.length; j++) {
+      const submission = submissions[j];
+      submission.submission = await fetchMetadata(
+        submission.submitionUrl,
+        environment.nftStorageUrl
+      );
+      submission.metadata = await fetchMetadata(
+        submission.metadataUri,
+        environment.nftStorageUrl
+      );
+    }
+    for (let j = 0; j < tasks.length; j++) {
+      const task = tasks[j];
+      task.metadata = await fetchMetadata(
+        task.metadataUri,
+        environment.nftStorageUrl
+      );
+    }
+    tasksAndSubmissions.push(tasksAndSubmissionsResponse[i].data);
+  }
+  return {
+    data: {
+      daoAddress: cacheData.daoAddress,
+      onboardingQuestAddress: cacheData.onboardingQuestAddress,
+      daoProgress: daoProgress.filter((c) => c.address !== cache.address),
+      quests: [
+        {
+          questId: 1,
+          daoAddress: cacheData.daoAddress,
+          onboardingQuestAddress: cacheData.onboardingQuestAddress,
+          tasksAndSubmissions: tasksAndSubmissions[0]
+        },
+        {
+          questId: 2,
+          daoAddress: cacheData.daoAddress,
+          onboardingQuestAddress: cacheData.onboardingQuestAddress,
+          tasksAndSubmissions: tasksAndSubmissions[1]
+        },
+        {
+          questId: 3,
+          daoAddress: cacheData.daoAddress,
+          onboardingQuestAddress: cacheData.onboardingQuestAddress,
+          tasksAndSubmissions: tasksAndSubmissions[2]
+        }
+      ]
+    }
+  };
+};
 
 const getAllOnboardingQuests = async (
   pluginAddress: any,
@@ -516,12 +601,42 @@ export const onboardingApi = createApi({
       return finaliseOpenTask(body, api);
     }
 
+    if (url === "getOnboardingProgress") {
+      return getOnboardingProgress(body, api);
+    }
+
     return {
       data: "Test"
     };
   },
   tagTypes: ["Quests", "Tasks", "Quest"],
   endpoints: (builder) => ({
+    getOnboardingProgress: builder.query<
+      {
+        daoAddress: string;
+        onboardingQuestAddress: string;
+        daoProgress: CacheModel[];
+        quests: {
+          questId: number;
+          daoAddress: string;
+          onboardingQuestAddress: string;
+          tasksAndSubmissions: {
+            tasks: Task[];
+            submissions: Task[];
+          };
+        }[];
+      },
+      string
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "getOnboardingProgress",
+          timestamp: Date.now()
+        };
+      },
+      providesTags: ["Quests"]
+    }),
     getAllOnboardingQuests: builder.query<Quest[], string>({
       query: (body) => {
         return {
@@ -611,23 +726,6 @@ export const onboardingApi = createApi({
         };
       },
       invalidatesTags: ["Quests"]
-      // async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
-      //   try {
-      //     const { data } = await queryFulfilled;
-      //     dispatch(
-      //       onboardingApi.util.updateQueryData(
-      //         "getAllOnboardingQuests",
-      //         args.pluginAddress,
-      //         (draft) => {
-      //           draft.push(data);
-      //           return draft;
-      //         }
-      //       )
-      //     );
-      //   } catch (err) {
-      //     console.error(err);
-      //   }
-      // }
     }),
     updateQuest: builder.mutation<
       Quest,
@@ -640,26 +738,6 @@ export const onboardingApi = createApi({
         };
       },
       invalidatesTags: ["Quests"]
-      // async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
-      //   try {
-      //     const { data } = await queryFulfilled;
-      //     dispatch(
-      //       onboardingApi.util.updateQueryData(
-      //         "getAllOnboardingQuests",
-      //         args.pluginAddress,
-      //         (draft) => {
-      //           const index = draft.findIndex(
-      //             (q) => q.questId === data.questId
-      //           );
-      //           draft.splice(index, 1, data);
-      //           return draft;
-      //         }
-      //       )
-      //     );
-      //   } catch (err) {
-      //     console.error(err);
-      //   }
-      // }
     }),
     createTaskPerQuest: builder.mutation<
       Task,
@@ -680,31 +758,6 @@ export const onboardingApi = createApi({
         };
       },
       invalidatesTags: ["Tasks", "Quests"]
-      // async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
-      //   try {
-      //     const { data } = await queryFulfilled;
-      //     dispatch(
-      //       onboardingApi.util.updateQueryData(
-      //         "getAllTasksPerQuest",
-      //         {
-      //           userAddress: args.onboardingQuestAddress,
-      //           isAdmin: args.isAdmin,
-      //           pluginAddress: args.onboardingQuestAddress,
-      //           questId: args.questId
-      //         },
-      //         (draft) => {
-      //           const index = draft.tasks.findIndex(
-      //             (q) => q.taskId === data.taskId
-      //           );
-      //           draft.tasks.splice(index, 1, data);
-      //           return draft;
-      //         }
-      //       )
-      //     );
-      //   } catch (err) {
-      //     console.error(err);
-      //   }
-      // }
     }),
     createQuizTaskPerQuest: builder.mutation<
       Task,
@@ -726,31 +779,6 @@ export const onboardingApi = createApi({
         };
       },
       invalidatesTags: ["Tasks", "Quests"]
-      // async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
-      //   try {
-      //     const { data } = await queryFulfilled;
-      //     dispatch(
-      //       onboardingApi.util.updateQueryData(
-      //         "getAllTasksPerQuest",
-      //         {
-      //           userAddress: args.onboardingQuestAddress,
-      //           isAdmin: args.isAdmin,
-      //           pluginAddress: args.onboardingQuestAddress,
-      //           questId: args.questId
-      //         },
-      //         (draft) => {
-      //           const index = draft.tasks.findIndex(
-      //             (q) => q.taskId === data.taskId
-      //           );
-      //           draft.tasks.splice(index, 1, data);
-      //           return draft;
-      //         }
-      //       )
-      //     );
-      //   } catch (err) {
-      //     console.error(err);
-      //   }
-      // }
     }),
     removeTaskFromQuest: builder.mutation<
       Task,
@@ -822,31 +850,6 @@ export const onboardingApi = createApi({
         };
       },
       invalidatesTags: ["Tasks", "Quests"]
-      // async onQueryStarted({ ...args }, { dispatch, queryFulfilled }) {
-      //   try {
-      //     const { data } = await queryFulfilled;
-      //     dispatch(
-      //       onboardingApi.util.updateQueryData(
-      //         "getAllTasksPerQuest",
-      //         {
-      //           userAddress: args.onboardingQuestAddress,
-      //           isAdmin: args.isAdmin,
-      //           pluginAddress: args.onboardingQuestAddress,
-      //           questId: args.questId
-      //         },
-      //         (draft) => {
-      //           const index = draft.submissions.findIndex(
-      //             (q) => q.taskId === data.taskId
-      //           );
-      //           draft.submissions.splice(index, 1, data);
-      //           return draft;
-      //         }
-      //       )
-      //     );
-      //   } catch (err) {
-      //     console.error(err);
-      //   }
-      // }
     })
   })
 });
@@ -855,6 +858,8 @@ export const {
   useUpdateQuestMutation,
   useCreateQuestMutation,
   useFinaliseOpenTaskMutation,
+  useGetOnboardingProgressQuery,
+  useLazyGetOnboardingProgressQuery,
   useSubmitOpenTaskMutation,
   useRemoveTaskFromQuestMutation,
   useCreateQuizTaskPerQuestMutation,

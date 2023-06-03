@@ -8,7 +8,7 @@ import { StepperButton } from "@components/Stepper";
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { dateToUnix } from "@utils/date-format";
@@ -21,6 +21,8 @@ import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
 import { useEthers } from "@usedapp/core";
+import { allRoles } from "@store/Community/community.reducer";
+import { useSelector } from "react-redux";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -110,6 +112,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { account } = useEthers();
+  const roles = useSelector(allRoles);
   const [answersSaved, setAnswersSaved] = useState(false);
   const {
     control,
@@ -172,6 +175,12 @@ const QuizTasks = ({ plugin }: PluginParams) => {
     });
   };
 
+  const selectedRole = useMemo(() => {
+    return roles.find(
+      (r) => r.id === +searchParams.get(RequiredQueryParams.QuestId)
+    );
+  }, [roles, searchParams]);
+
   useEffect(() => {
     if (isSuccess) {
       navigate({
@@ -229,7 +238,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
             </Typography>
           </Button>
           <Typography textAlign="center" color="white" variant="h3">
-            Create a Quiz
+            Quiz for {selectedRole?.roleName}
           </Typography>
         </Stack>
         <Typography

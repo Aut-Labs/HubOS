@@ -3,6 +3,7 @@ import { environment } from "./environment";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
 import { NetworkConfig } from "./ProviderFactory/network.config";
 import { Web3AutIDProvider } from "@aut-labs-private/abi-types";
+import { CacheModel } from "./cache.api";
 
 export const getUsersData = () => {
   const params = {
@@ -38,6 +39,12 @@ export const getAutAddress = (): Promise<string> => {
   return axios
     .get(`${environment.apiUrl}/Aut/config`, {})
     .then((res) => res.data.AutAddress);
+};
+
+export const getDAOProgress = (daoAddress: string): Promise<CacheModel[]> => {
+  return axios
+    .get(`${environment.apiUrl}/autID/cache/getDAOData/${daoAddress}`, {})
+    .then((res) => res.data);
 };
 
 // @OTOD: Milena to implement method for fetching logs

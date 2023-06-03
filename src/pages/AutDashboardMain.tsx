@@ -11,6 +11,10 @@ import Modules from "./Modules/Modules";
 import { useSelector } from "react-redux";
 import { IsAdmin } from "@store/Community/community.reducer";
 import { useGetAllModuleDefinitionsQuery } from "@api/module-registry.api";
+import QuestSubmissions from "./QuestSubmissions/QuestSubmissions";
+import PeopleIcon from "@mui/icons-material/People";
+import { useGetOnboardingProgressQuery } from "@api/onboarding.api";
+import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 
 const AutDashboardMain = () => {
   const isAdmin = useSelector(IsAdmin);
@@ -21,6 +25,34 @@ const AutDashboardMain = () => {
       skip: false
     }
   );
+
+  const { questOnboarding } = useGetAllPluginDefinitionsByDAOQuery(null, {
+    selectFromResult: ({ data }) => ({
+      questOnboarding: (data || []).find(
+        (p) =>
+          PluginDefinitionType.QuestOnboardingPlugin === p.pluginDefinitionId
+      )
+    })
+  });
+
+  const { data: onboardingProgress } = useGetOnboardingProgressQuery(
+    questOnboarding?.pluginAddress,
+    {
+      pollingInterval: 15000,
+      refetchOnMountOrArgChange: true
+    }
+  );
+
+  const totalSubmissions = useMemo(() => {
+    if (onboardingProgress?.quests) {
+      return onboardingProgress?.quests.reduce((prev, curr) => {
+        prev += curr.tasksAndSubmissions.submissions.length;
+        return prev;
+      }, 0);
+    }
+
+    return 0;
+  }, [onboardingProgress]);
 
   const { data: modules, isLoading: isLoadingModules } =
     useGetAllModuleDefinitionsQuery(null, {
@@ -34,7 +66,16 @@ const AutDashboardMain = () => {
       modules || [],
       isAdmin
     );
+
     return {
+      submissionsItem: {
+        title: "Quest Submissions",
+        route: "/aut-dashboard/quest-submissions",
+        exact: true,
+        icon: PeopleIcon,
+        badgeCounter: totalSubmissions,
+        children: []
+      },
       menuItem: {
         title: "Modules",
         route: "modules",
@@ -44,18 +85,30 @@ const AutDashboardMain = () => {
       },
       routes: allRoutes
     };
-  }, [plugins, modules, isAdmin]);
+  }, [plugins, modules, isAdmin, totalSubmissions]);
 
   return (
     <>
       {isLoading || isLoadingModules ? (
         <AutLoading width="130px" height="130px" />
       ) : (
-        <SidebarDrawer addonMenuItems={[modulesRoutes.menuItem]}>
+        <SidebarDrawer
+          addonMenuItems={
+            modulesRoutes?.routes?.length
+              ? [modulesRoutes.submissionsItem, modulesRoutes.menuItem]
+              : [modulesRoutes.menuItem]
+          }
+        >
           <Suspense fallback={<AutLoading width="130px" height="130px" />}>
             <Routes>
               <Route index element={<Dashboard />} />
               <Route path="members" element={<Members />} />
+              {modulesRoutes?.routes?.length && (
+                <Route
+                  path="quest-submissions"
+                  element={<QuestSubmissions />}
+                />
+              )}
               <Route path="modules" element={<Modules />} />
               {modulesRoutes.routes.map((r) => r)}
               <Route path="*" element={<Navigate to="/aut-dashboard" />} />

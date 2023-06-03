@@ -311,6 +311,15 @@ https://Aut.id/`
                   ) : (
                     <>
                       <Button
+                        variant="outlined"
+                        size="medium"
+                        color="offWhite"
+                        to="/quest-submissions"
+                        component={Link}
+                      >
+                        View all submissions
+                      </Button>
+                      <Button
                         startIcon={<AddIcon />}
                         disabled={quests?.length < 3}
                         variant="outlined"

@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
-import { memo, useEffect } from "react";
+import { memo, useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -29,6 +29,8 @@ import { InteractionNetworks } from "@utils/transaction-networks";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
 import { useEthers } from "@usedapp/core";
+import { allRoles } from "@store/Community/community.reducer";
+import { useSelector } from "react-redux";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -118,6 +120,7 @@ addMinutes(endDatetime, 45);
 const TransactionTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const roles = useSelector(allRoles);
   const { account } = useEthers();
   const { control, handleSubmit, getValues, formState } = useForm({
     mode: "onChange",
@@ -174,6 +177,12 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
     }
   }, [isSuccess]);
 
+  const selectedRole = useMemo(() => {
+    return roles.find(
+      (r) => r.id === +searchParams.get(RequiredQueryParams.QuestId)
+    );
+  }, [roles, searchParams]);
+
   return (
     <Container
       sx={{ py: "20px", display: "flex", flexDirection: "column" }}
@@ -220,7 +229,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
             </Typography>
           </Button>
           <Typography textAlign="center" color="white" variant="h3">
-            Create a Smart Contract Task
+            Smart Contract Task for {selectedRole?.roleName}
           </Typography>
         </Stack>
         <Typography

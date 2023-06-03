@@ -7,7 +7,7 @@ import { StepperButton } from "@components/Stepper";
 import { Box, Button, Chip, Container, Stack, Typography } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -19,7 +19,8 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import DoneIcon from "@mui/icons-material/Done";
 import {
   DiscordLink,
-  IsDiscordVerified
+  IsDiscordVerified,
+  allRoles
 } from "@store/Community/community.reducer";
 import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 import LinkWithQuery from "@components/LinkWithQuery";
@@ -109,6 +110,7 @@ addMinutes(endDatetime, 45);
 const JoinDiscordTasks = ({ plugin }: PluginParams) => {
   const isDiscordVerified = useSelector(IsDiscordVerified);
   const inviteLink = useSelector(DiscordLink);
+  const roles = useSelector(allRoles);
   const { account } = useEthers();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -150,6 +152,12 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
       } as unknown as Task
     });
   };
+
+  const selectedRole = useMemo(() => {
+    return roles.find(
+      (r) => r.id === +searchParams.get(RequiredQueryParams.QuestId)
+    );
+  }, [roles, searchParams]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -211,7 +219,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
             </Typography>
           </Button>
           <Typography textAlign="center" color="white" variant="h3">
-            Join Discord
+            Join Discord for {selectedRole?.roleName}
           </Typography>
         </Stack>
 
