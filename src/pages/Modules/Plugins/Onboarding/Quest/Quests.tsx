@@ -42,6 +42,7 @@ import { useEthers } from "@usedapp/core";
 import { useConfirmDialog } from "react-mui-confirm";
 import InfoIcon from "@mui/icons-material/Info";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
+import { autUrls } from "@api/environment";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -74,6 +75,7 @@ const Quests = ({ plugin }: PluginParams) => {
   const { account } = useEthers();
   const communityData = useSelector(CommunityData);
   const confirm = useConfirmDialog();
+  const urls = autUrls();
 
   const roles = communityData?.properties?.rolesSets[0].roles
     .map(function (role) {
@@ -89,11 +91,8 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
     url: communityData?.properties?.address
       ? //TODO: Replace url with valid showcase/#dao-address when available,
         //also keep this bizarre formatting otherwise the tweet won't have the correct new lines and alignment
-        // ? `https://nova-internal-test.aut.id/?${communityData?.properties?.address}`
-        `
-https://Aut.id/`
-      : `
-https://Aut.id/`
+        `${urls.showcase}?daoAddress=${communityData?.properties?.address}`
+      : "https://Aut.id/"
   };
 
   const {

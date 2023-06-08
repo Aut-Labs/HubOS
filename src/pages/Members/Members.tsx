@@ -21,6 +21,7 @@ import IosShareIcon from "@mui/icons-material/IosShare";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import AutLoading from "@components/AutLoading";
+import { autUrls } from "@api/environment";
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -71,6 +72,7 @@ const MemberType = styled(Chip)(({ theme }) => {
 
 const MemberCard = memo(
   ({ member, isFetching }: { member: DAOMember; isFetching: boolean }) => {
+    const urls = autUrls();
     return (
       <>
         <GridCardWrapper>
@@ -162,7 +164,7 @@ const MemberCard = memo(
             >
               <Button
                 target="_blank"
-                href={`https://my.aut.id/${member.properties.address}`}
+                href={`${urls.myAut}${member.properties.address}`}
                 color="offWhite"
               >
                 View profile

@@ -33,6 +33,7 @@ import {
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { QuestDates } from "@auth/auth.reducer";
+import { autUrls } from "@api/environment";
 
 const Strong = styled("strong")(({ theme }) => ({
   // color: theme.palette.primary.main
@@ -49,6 +50,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
   const [initialized, setInitialized] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const urls = autUrls();
 
   console.log("questDates: ", questDates);
   const {
@@ -416,7 +418,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
             type="button"
             color="primary"
             variant="body"
-            href="https://nova-internal-test.aut.id/"
+            href={urls.leaderboard}
             target="_blank"
           >
             Nova Leaderboard

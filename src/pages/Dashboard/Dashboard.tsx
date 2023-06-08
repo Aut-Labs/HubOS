@@ -27,6 +27,7 @@ import { Link } from "react-router-dom";
 import { useGetAllMembersQuery } from "@api/community.api";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import { CommitmentMessages } from "@utils/misc";
+import { autUrls } from "@api/environment";
 
 const StyledTableTitle = styled("div")(({ theme }) => ({
   alignItems: "flex-start",
@@ -92,6 +93,7 @@ const Dashboard = () => {
   const userInfo = useSelector(UserInfo);
   const community = useSelector(CommunityData);
   const roles = useSelector(allRoles);
+  const urls = autUrls();
 
   const { data, isLoading, isFetching } = useGetAllMembersQuery(null, {
     refetchOnMountOrArgChange: true,
@@ -345,8 +347,7 @@ const Dashboard = () => {
                   variant="outlined"
                   size="medium"
                   component={Link}
-                  // to="https://leaderboard.aut.id"
-                  to="http://176.34.149.248:4001/"
+                  to={urls.leaderboard}
                   target="_blank"
                 >
                   See your Nova Ranking
