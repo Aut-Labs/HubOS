@@ -65,8 +65,9 @@ export const verifyDiscordServerOwnership = createAsyncThunk(
   ) => {
     const guilds = await getUserGuilds(guildVerificationData.accessToken);
     const guild = guilds.find((g) => g.id === guildVerificationData.guildId);
-    if (!guild || !guild.owner) {
-      return rejectWithValue("User is not the owner.");
+    const isAdmin = guild && (guild.permissions & 0x8) === 0x8;
+    if (!isAdmin) {
+      return rejectWithValue("User is not an admin.");
     }
     return true;
   }

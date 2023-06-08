@@ -31,10 +31,10 @@
     ]
   },
   "dependencies": {
-    "@aut-labs-private/abi-types": "^0.0.34",
-    "@aut-labs-private/sdk": "^0.0.57",
+    "@aut-labs-private/abi-types": "^0.0.36",
+    "@aut-labs-private/sdk": "^0.0.60",
     "@aut-labs-private/sdk-biconomy": "latest",
-    "@aut-labs/d-aut": "^1.0.27",
+    "@aut-labs/d-aut": "^1.0.30",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@leenguyen/react-flip-clock-countdown": "^1.4.0",

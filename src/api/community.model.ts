@@ -97,6 +97,7 @@ export class Community extends BaseNFTModel<CommunityProperties> {
         market: market?.title || 0,
         commitment: community.properties.commitment,
         rolesSets: community.properties.rolesSets,
+        timestamp: community.properties.timestamp,
         socials: community.properties.socials.map((social) => {
           social.link = `${socialUrls[social.type].prefix}${social.link}`;
           return social;

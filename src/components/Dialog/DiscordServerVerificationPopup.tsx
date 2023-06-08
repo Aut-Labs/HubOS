@@ -55,10 +55,10 @@ const DiscordServerVerificationPopup = ({
         );
         if (result.meta.requestStatus === "rejected") {
           setLoading(false);
-          if (result.payload === "User is not the owner.") {
+          if (result.payload === "User is not an admin.") {
             setError("inviteLink", {
               type: "custom",
-              message: "You are not the owner of this server."
+              message: "You are not an admin in this server."
             });
           }
         } else {

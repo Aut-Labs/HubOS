@@ -6,11 +6,13 @@ import {
 } from "@api/onboarding.api";
 import { PluginDefinition, Task } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
+import { base64toFile } from "@utils/to-base-64";
 import { StepperButton } from "@components/Stepper";
 import {
   Box,
   Card,
   CardContent,
+  CardMedia,
   Chip,
   Container,
   Link,
@@ -35,6 +37,7 @@ import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import CopyAddress from "@components/CopyAddress";
 import IosShareIcon from "@mui/icons-material/IosShare";
+import axios from "axios";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -692,11 +695,19 @@ const OwnerFinalizeContent = ({
                         }}
                         variant="body"
                         target="_blank"
-                        href={ipfsCIDToHttpUrl(
-                          submission?.submission?.properties["fileUri"]
-                        )}
+                        onClick={async () => {
+                          const result = await axios.get(
+                            ipfsCIDToHttpUrl(
+                              submission?.submission?.properties["fileUri"]
+                            )
+                          );
+                          const link = document.createElement("a");
+                          link.download = "attachment";
+                          link.href = result.data;
+                          link.click();
+                        }}
                       >
-                        View in IPFS
+                        Download Document
                       </Link>
                     </Typography>
                     <Typography variant="caption" className="text-secondary">
@@ -784,7 +795,25 @@ const OwnerFinalizeContent = ({
                     alignItems="center"
                     gap={0.5}
                   >
-                    <Typography
+                    <Card sx={{ maxWidth: 345, maxHeight: 280 }}>
+                      <CardMedia
+                        sx={{ cursor: "pointer" }}
+                        component="img"
+                        src={ipfsCIDToHttpUrl(
+                          submission?.submission?.properties["fileUri"]
+                        )}
+                        onClick={() => {
+                          window.open(
+                            ipfsCIDToHttpUrl(
+                              submission?.submission?.properties["fileUri"]
+                            ),
+                            "_blank"
+                          );
+                        }}
+                        alt="Submission Image"
+                      />
+                    </Card>
+                    {/* <Typography
                       fontFamily="FractulRegular"
                       color="primary"
                       variant="subtitle2"
@@ -806,7 +835,7 @@ const OwnerFinalizeContent = ({
                     </Typography>
                     <Typography variant="caption" className="text-secondary">
                       Source
-                    </Typography>
+                    </Typography> */}
                   </Stack>
                 </Box>
               )}
