@@ -3,6 +3,7 @@ import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import { NetworkConfig } from "./ProviderFactory/network.config";
 
 const fetch = async (body: any, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
@@ -52,6 +53,12 @@ const add = async (body: PluginDefinition, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
   const state = api.getState() as any;
   const { selectedCommunityAddress } = state.community;
+  const { networksConfig, selectedNetwork } = state.walletProvider;
+  const network: NetworkConfig = networksConfig.find(
+    (n) => n.network === selectedNetwork
+  );
+
+  debugger;
 
   // temporary
   const { data } =
@@ -66,7 +73,8 @@ const add = async (body: PluginDefinition, api: BaseQueryApi) => {
   const response = await sdk.pluginRegistry.addPluginToDAO(
     pluginDefinitionId,
     selectedCommunityAddress,
-    questPlugin.pluginAddress
+    questPlugin.pluginAddress,
+    network.contracts.offchainVerifierAddress
   );
 
   if (!response.isSuccess) {

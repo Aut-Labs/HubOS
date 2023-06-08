@@ -8,6 +8,7 @@ export interface NetworkContracts {
   daoExpanderRegistryAddress: string;
   daoExpanderFactoryAddress: string;
   novaRegistryAddress: string;
+  offchainVerifierAddress: string;
   novaFactoryAddress: string;
   hackerDaoAddress: string;
   daoTypesAddress: string;

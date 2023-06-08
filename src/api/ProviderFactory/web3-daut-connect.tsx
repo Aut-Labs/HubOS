@@ -20,7 +20,11 @@ import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { IAutButtonConfig } from "@aut-labs/d-aut/build/components/AutButtonMenu/AutMenuUtils";
 import { resetState } from "@store/store";
 import { CacheTypes, getCache } from "@api/cache.api";
+<<<<<<< Updated upstream
 import { autUrls } from "@api/environment";
+=======
+import { EnvMode, environment } from "@api/environment";
+>>>>>>> Stashed changes
 
 function Web3DautConnect({
   setLoading,
@@ -188,6 +192,7 @@ function Web3DautConnect({
           zIndex: 99999
         }}
         id="d-aut"
+        use-dev={environment.env == EnvMode.Development}
         menu-items='[{"name":"Profile","actionType":"event_emit","eventName":"aut_profile"}]'
         flow-config='{"mode" : "dashboard", "customCongratsMessage": ""}'
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
@@ -198,6 +203,7 @@ function Web3DautConnect({
           position: "absolute",
           zIndex: 99999
         }}
+        use-dev={environment.env == EnvMode.Development}
         flow-config='{"mode" : "tryAut", "customCongratsMessage": ""}'
         dao-expander={"0xCBa9a81692ccC4ddcf46346dbC4D7f6fBb15f7D0"}
         id="d-aut"
