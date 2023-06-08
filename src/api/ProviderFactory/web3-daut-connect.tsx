@@ -20,11 +20,8 @@ import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { IAutButtonConfig } from "@aut-labs/d-aut/build/components/AutButtonMenu/AutMenuUtils";
 import { resetState } from "@store/store";
 import { CacheTypes, getCache } from "@api/cache.api";
-<<<<<<< Updated upstream
 import { autUrls } from "@api/environment";
-=======
 import { EnvMode, environment } from "@api/environment";
->>>>>>> Stashed changes
 
 function Web3DautConnect({
   setLoading,
