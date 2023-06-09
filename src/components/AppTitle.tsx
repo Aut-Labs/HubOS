@@ -28,7 +28,7 @@ const AppTitle = (props: TypographyProps) => {
       >
         Āut
       </strong>{" "}
-      Dashboard <Typography variant="body">(beta)</Typography>
+      Dashboard <Typography variant="body"></Typography>
     </Typography>
   );
 };

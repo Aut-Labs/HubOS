@@ -44,11 +44,13 @@ const GridCard = styled(Card)(({ theme }) => {
 const PluginCard = ({
   plugin,
   isFetching,
-  isAdmin
+  isAdmin,
+  hasCopyright
 }: {
   isAdmin: boolean;
   plugin: PluginDefinition;
   isFetching: boolean;
+  hasCopyright: boolean;
 }) => {
   const selectedNetworkConfig = useSelector(SelectedNetworkConfig);
   const [addPlugin, { error, isLoading, isError, reset }] =
@@ -70,7 +72,7 @@ const PluginCard = ({
     if (
       plugin.pluginDefinitionId === PluginDefinitionType.QuestOnboardingPlugin
     ) {
-      return "View Quests";
+      return "Go to Quests";
     }
     return "Add Task";
   }, [plugin]);
@@ -84,7 +86,8 @@ const PluginCard = ({
           borderColor: "divider",
           borderRadius: "16px",
           minHeight: "300px",
-          boxShadow: 7
+          boxShadow: 7,
+          position: hasCopyright ? "relative" : "inherit"
         }}
         variant="outlined"
       >
@@ -186,6 +189,20 @@ const PluginCard = ({
               {actionName}
             </LoadingButton>
           </Box>
+          {hasCopyright && (
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: "15px",
+                right: "15px"
+              }}
+            >
+              {" "}
+              <Typography color="white" variant="caption">
+                © Āut Labs
+              </Typography>
+            </Box>
+          )}
 
           {/* <Stack direction="row" justifyContent="flex-end">
             <Typography
@@ -238,8 +255,11 @@ export const EmptyPluginCard = ({ type, typeformLink }) => {
             cursor: "pointer"
           }}
         >
-          <Typography textAlign="center" color="white" variant="body">
+          {/* <Typography textAlign="center" color="white" variant="body">
             Request new <br /> {type} plugin
+          </Typography> */}
+          <Typography textAlign="center" color="white" variant="body">
+            Request a plugin type
           </Typography>
           <AddIcon
             sx={{

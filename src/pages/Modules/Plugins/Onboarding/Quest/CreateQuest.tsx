@@ -34,6 +34,7 @@ import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { QuestDates } from "@auth/auth.reducer";
 import { autUrls } from "@api/environment";
+import { addMinutes } from "date-fns";
 
 const Strong = styled("strong")(({ theme }) => ({
   // color: theme.palette.primary.main
@@ -131,7 +132,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         role: values.role,
         // durationInDays: 2,
         durationInDays: questDates.durationInHours,
-        startDate,
+        startDate: addMinutes(new Date(), 40).getTime(),
         metadata: {
           name:
             values.title || roles.find((r) => r.id === values.role)?.roleName,
@@ -248,7 +249,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
           <Typography textAlign="center" color="white" variant="h3">
             {quest?.questId
               ? "Editing onboarding quest"
-              : "Creating onboarding quest"}
+              : "Create a new Onboarding Quest"}
           </Typography>
         </Stack>
       </Box>
@@ -296,7 +297,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
                     name={name}
                     errors={formState.errors}
                   >
-                    Select a role with which members can join
+                    Select the Role you want to onboard with this Quest
                   </FormHelperText>
                 }
               >
@@ -408,10 +409,11 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         /> */}
 
         <Typography color="white" variant="body">
-          *: During the closed beta, the duration of each onboarding quest will
-          be <Strong>{questDates.durationInDays} days</Strong> and begin on the{" "}
+          During the closed beta, the duration of each onboarding quest will be
+          <Strong> {questDates.durationInDays} days</Strong>, starting on{" "}
           <Strong>{questDates.startDate.toDateString()}</Strong>, until then you
-          can invite your community to allowlist for quests you have activated.
+          can invite new community members to take the quests you launched.
+          <br />
           During the onboarding period, every community will be listed on the{" "}
           <BtnLink
             component="a"
@@ -423,8 +425,8 @@ const CreateQuest = ({ plugin }: PluginParams) => {
           >
             Nova Leaderboard
           </BtnLink>{" "}
-          where the number of successful onboardings will correspond to their
-          ranking. Happy Onboarding!
+          - their ranking will be determined by the amount of members onboarded.
+          Have fun, and Onboard (ir)responsibly 😎
         </Typography>
 
         <Box

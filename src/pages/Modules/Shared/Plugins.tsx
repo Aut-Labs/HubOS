@@ -48,7 +48,6 @@ const Plugins = ({ definition }: StackParams) => {
   const isAdmin = useSelector(IsAdmin);
   const [searchParams] = useSearchParams();
   const [showInstalled, setToggleInstalled] = useState(false);
-
   const { plugins, isLoading, isFetching, refetch } =
     useGetAllPluginDefinitionsByDAOQuery(null, {
       // @ts-ignore
@@ -119,7 +118,7 @@ const Plugins = ({ definition }: StackParams) => {
               </Button>
             )}
             <Typography textAlign="center" color="white" variant="h3">
-              {definition.properties.module.title} Plugins
+              {definition.properties.module.title}
               <Tooltip title="Refresh plugins">
                 <IconButton
                   size="medium"
@@ -136,7 +135,7 @@ const Plugins = ({ definition }: StackParams) => {
               </Tooltip>
             </Typography>
 
-            {quest?.tasksCount === 0 && (
+            {/* {quest?.tasksCount === 0 && (
               <Typography
                 mt={2}
                 textAlign="center"
@@ -146,7 +145,7 @@ const Plugins = ({ definition }: StackParams) => {
                 Your Quest is ready to go - add 1 or more tasks to start
                 onboarding {quest?.metadata?.name}
               </Typography>
-            )}
+            )} */}
           </Stack>
 
           {!!plugins?.length && (
@@ -181,6 +180,7 @@ const Plugins = ({ definition }: StackParams) => {
                   isAdmin={isAdmin}
                   key={`modules-plugin-${index}`}
                   plugin={plugin}
+                  hasCopyright={definition?.properties?.type === "Task"}
                 />
               ))}
               <EmptyPluginCard

@@ -128,7 +128,7 @@ const Quest = ({ plugin }: PluginParams) => {
             </Button>
             <Stack position="relative" direction="row" alignItems="center">
               <Typography textAlign="center" color="white" variant="h3">
-                {quest?.metadata?.name}
+                {quest?.metadata?.name} Quest
               </Typography>
               <Box
                 sx={{
@@ -253,7 +253,7 @@ const Quest = ({ plugin }: PluginParams) => {
           }}
         >
           <Typography className="text-secondary" variant="subtitle2">
-            No tasks have been added to this quest yet...
+            No tasks yet...
           </Typography>
           <Button
             startIcon={<AddIcon />}

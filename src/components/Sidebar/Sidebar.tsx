@@ -262,7 +262,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             >
               {network?.name}
             </Typography>
-            <Typography variant="caption" className="text-secondary">
+            <Typography variant="caption" color="offWhite.main">
               Network
             </Typography>
           </Stack>
@@ -274,8 +274,8 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             >
               {community?.name}
             </Typography>
-            <Typography variant="caption" className="text-secondary">
-              DAO
+            <Typography variant="caption" color="offWhite.main">
+              Nova
             </Typography>
           </Stack>
           <Box
@@ -293,8 +293,8 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
               >
                 {userInfo?.name}
               </Typography>
-              <Typography variant="caption" className="text-secondary">
-                Āut name
+              <Typography variant="caption" color="offWhite.main">
+                Your ĀutID
               </Typography>
             </Stack>
             <Stack direction="column">
@@ -305,8 +305,8 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
               >
                 {community?.properties?.userData?.roleName}
               </Typography>
-              <Typography variant="caption" className="text-secondary">
-                DAO Role
+              <Typography variant="caption" color="offWhite.main">
+                Nova Role
               </Typography>
             </Stack>
           </Box>

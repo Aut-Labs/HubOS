@@ -34,6 +34,7 @@ const fetch = async (body: any, api: BaseQueryApi) => {
       moduleData.metadata.properties.type =
         moduleData.metadata.properties.title;
 
+      //TODO Change once the title changes to Onboarding Strategies in metadata
       if (moduleData.metadata.properties.title === "Onboarding Strategy") {
         moduleData.metadata.properties.type = "OnboardingStrategy";
       }

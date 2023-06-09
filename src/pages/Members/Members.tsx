@@ -72,6 +72,7 @@ const MemberType = styled(Chip)(({ theme }) => {
 
 const MemberCard = memo(
   ({ member, isFetching }: { member: DAOMember; isFetching: boolean }) => {
+    console.log(member, "MEMBERRRR");
     const urls = autUrls();
     return (
       <>
@@ -121,37 +122,39 @@ const MemberCard = memo(
               <Stack direction="column">
                 <Typography
                   fontFamily="FractulAltBold"
-                  color="primary"
+                  color="offWhite.main"
                   variant="subtitle2"
                 >
                   {member.name}
                 </Typography>
-                <Typography variant="caption" className="text-secondary">
-                  Āut name
+                <Typography variant="caption" color="primary">
+                  ĀutID
                 </Typography>
               </Stack>
               <Stack direction="column">
                 <Typography
                   fontFamily="FractulAltBold"
-                  color="primary"
+                  color="offWhite.main"
                   variant="subtitle2"
                 >
                   {member?.properties.role?.roleName}
                 </Typography>
-                <Typography variant="caption" className="text-secondary">
+                <Typography variant="caption" color="primary">
                   DAO Role
                 </Typography>
               </Stack>
               <Stack direction="column">
                 <Typography
                   fontFamily="FractulAltBold"
-                  color="primary"
+                  color="offWhite.main"
                   variant="subtitle2"
                 >
-                  {member?.properties?.commitmentDescription}
+                  {`${member?.properties?.commitment || 0}  ${
+                    member?.properties?.commitmentDescription
+                  }`}
                 </Typography>
-                <Typography variant="caption" className="text-secondary">
-                  Commitment
+                <Typography variant="caption" color="primary">
+                  Commitment level
                 </Typography>
               </Stack>
             </CardContent>
@@ -164,7 +167,9 @@ const MemberCard = memo(
             >
               <Button
                 target="_blank"
-                href={`${urls.myAut}${member.properties.address}`}
+                href={`${urls.myAut}${
+                  member.name || member.properties.address
+                }`}
                 color="offWhite"
               >
                 View profile
@@ -211,14 +216,14 @@ function Members() {
             justifyContent: "flex-end"
           }}
         >
-          <Button
+          {/* <Button
             startIcon={<IosShareIcon />}
             variant="outlined"
             size="medium"
             color="offWhite"
           >
             Invite contributors
-          </Button>
+          </Button> */}
         </Box>
       </Box>
 

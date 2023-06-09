@@ -89,8 +89,7 @@ const Quests = ({ plugin }: PluginParams) => {
 We are now onboarding ${roles} - take a quest, prove yourself, & join us as we bring human Coordination to the next level⚖️`,
     // hashtags: ["Āut", "DAO", "Blockchain"]
     url: communityData?.properties?.address
-      ? //TODO: Replace url with valid showcase/#dao-address when available,
-        //also keep this bizarre formatting otherwise the tweet won't have the correct new lines and alignment
+      ? // keep this bizarre formatting otherwise the tweet won't have the correct new lines and alignment
         `${urls.showcase}?daoAddress=${communityData?.properties?.address}`
       : "https://Aut.id/"
   };
@@ -349,7 +348,7 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
           }}
         >
           <Typography color="rgb(107, 114, 128)" variant="subtitle2">
-            You have not created any onboarding quests...
+            No Onboarding Quests yet…
           </Typography>
           <Button
             startIcon={<AddIcon />}

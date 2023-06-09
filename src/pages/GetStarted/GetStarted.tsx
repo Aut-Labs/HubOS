@@ -150,7 +150,7 @@ const GetStarted = () => {
             variant="subtitle2"
             fontWeight="normal"
           >
-            There is no community like yours - Set your own Standard. Opt Āut.
+            There is no community like yours - create your own Standard.
           </Typography>
           <DautPlaceholder />
         </Content>
