@@ -132,7 +132,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         role: values.role,
         // durationInDays: 2,
         durationInDays: questDates.durationInHours,
-        startDate: addMinutes(new Date(), 40).getTime(),
+        startDate,
         metadata: {
           name:
             values.title || roles.find((r) => r.id === values.role)?.roleName,

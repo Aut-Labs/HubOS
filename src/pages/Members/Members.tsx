@@ -72,7 +72,6 @@ const MemberType = styled(Chip)(({ theme }) => {
 
 const MemberCard = memo(
   ({ member, isFetching }: { member: DAOMember; isFetching: boolean }) => {
-    console.log(member, "MEMBERRRR");
     const urls = autUrls();
     return (
       <>
@@ -149,7 +148,7 @@ const MemberCard = memo(
                   color="offWhite.main"
                   variant="subtitle2"
                 >
-                  {`${member?.properties?.commitment || 0}  ${
+                  {`${member?.properties?.commitment || 0} - ${
                     member?.properties?.commitmentDescription
                   }`}
                 </Typography>

@@ -393,7 +393,7 @@ const Dashboard = () => {
                         }}
                       />
                     ) : (
-                      `${averageCommitment}  ${CommitmentMessages(
+                      `${averageCommitment} - ${CommitmentMessages(
                         averageCommitment
                       )}`
                     )}
@@ -412,7 +412,7 @@ const Dashboard = () => {
                   <TaskStyledTableCell align="right">
                     {`${
                       community?.properties?.commitment
-                    }  ${CommitmentMessages(
+                    } - ${CommitmentMessages(
                       community?.properties?.commitment
                     )}`}
                   </TaskStyledTableCell>
