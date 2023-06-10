@@ -468,6 +468,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                 name={name}
                 value={value || ""}
                 onChange={onChange}
+                disabled
                 placeholder="Copy your Contract function"
                 InputProps={{
                   endAdornment: (
