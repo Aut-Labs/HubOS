@@ -49,9 +49,7 @@ function getQuestDates(startDate: Date) {
 
   const questStartDateOffset = 10 * 60 * 1000; // 10 hours in milliseconds
 
-  const questStartDate = new Date(
-    phaseOneStartDate.getTime() + questStartDateOffset
-  );
+  const questStartDate = new Date(phaseOneStartDate.getTime());
   const questEndDate = phaseTwoEndDate;
 
   return {
