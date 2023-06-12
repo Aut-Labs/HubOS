@@ -452,6 +452,31 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                     </InputAdornment>
                   )
                 }}
+                helperText={
+                  <FormHelperText
+                    errorTypes={errorTypes}
+                    value={value}
+                    name={name}
+                    errors={formState.errors}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column"
+                      }}
+                    >
+                      <Typography
+                        color="white"
+                        variant="caption"
+                        textAlign="right"
+                      >
+                        *Please remember that when using metatxs, you should use
+                        the contract address of your trusted forwarder instead
+                        of the address of your deployed contract.
+                      </Typography>
+                    </Box>
+                  </FormHelperText>
+                }
               />
             );
           }}
