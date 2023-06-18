@@ -8,6 +8,7 @@ import reportWebVitals from "./reportWebVitals";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import AutTheme from "./theme/theme";
+import markerSDK from "@marker.io/browser";
 import "./App.scss";
 // import { PersistGate } from "redux-persist/integration/react";
 // import { persistStore } from "redux-persist";
@@ -19,6 +20,14 @@ const root = createRoot(container);
 import { ConfirmDialogProvider } from "react-mui-confirm";
 
 // const persistor = persistStore(store);
+
+markerSDK.loadWidget({
+  project: `${process.env.REACT_APP_MARKER}`,
+  reporter: {
+    email: "frontend@aut.id",
+    fullName: "Āut Dashboard"
+  }
+});
 
 root.render(
   <StyledEngineProvider injectFirst>
