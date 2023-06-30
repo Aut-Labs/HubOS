@@ -35,6 +35,12 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { QuestDates } from "@auth/auth.reducer";
 import { autUrls } from "@api/environment";
 import { addMinutes } from "date-fns";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+// import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 
 const Strong = styled("strong")(({ theme }) => ({
   // color: theme.palette.primary.main
@@ -318,6 +324,24 @@ const CreateQuest = ({ plugin }: PluginParams) => {
             );
           }}
         />
+
+        {/* @ts-ignore */}
+        {/* <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <div className="sw-form-field">
+            <div className="sw-form-field-content">
+              <CalendarPicker
+                control={control}
+                name="startDate"
+                minDate={new Date()}
+              />
+            </div>
+          </div>
+        </LocalizationProvider> */}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DemoContainer components={["DateTimePicker"]}>
+            <DateTimePicker label="Basic date time picker" />
+          </DemoContainer>
+        </LocalizationProvider>
 
         {/* <Controller
               name="durationInDays"
