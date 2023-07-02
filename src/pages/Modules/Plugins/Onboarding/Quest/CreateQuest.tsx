@@ -32,15 +32,13 @@ import {
 } from "react-router-dom";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { QuestDates } from "@auth/auth.reducer";
 import { autUrls } from "@api/environment";
-import { addMinutes } from "date-fns";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-// import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { getMemberPhases } from "@utils/beta-phases";
+import { addDays, format } from "date-fns";
 
 const Strong = styled("strong")(({ theme }) => ({
   // color: theme.palette.primary.main
@@ -50,22 +48,50 @@ interface PluginParams {
   plugin: PluginDefinition;
 }
 
+function getQuestDates(startDate: Date) {
+  const { phaseOneStartDate, phaseTwoEndDate } = getMemberPhases(startDate);
+
+  const questStartDateOffset = 10 * 60 * 1000; // 10 hours in milliseconds
+
+  const questStartDate = new Date(phaseOneStartDate.getTime());
+  const questEndDate = phaseTwoEndDate;
+
+  return {
+    questStartDate,
+    questEndDate
+  };
+}
+
+function questDurationInDays(startDate: Date, endDate: Date) {
+  const durationInMilliseconds: number =
+    endDate.getTime() - startDate.getTime();
+  const durationInDays: number = durationInMilliseconds / (24 * 60 * 60 * 1000);
+
+  return Number(durationInDays.toFixed(2));
+}
+
+function questDurationInHours(startDate: Date, endDate: Date) {
+  const durationInMilliseconds: number =
+    endDate.getTime() - startDate.getTime();
+  const durationInHours: number = durationInMilliseconds / (60 * 60 * 1000);
+
+  return Math.floor(durationInHours);
+}
+
 const CreateQuest = ({ plugin }: PluginParams) => {
   const [roles] = useState(useSelector(allRoles));
   const [searchParams] = useSearchParams();
-  const questDates = useSelector(QuestDates);
   const [initialized, setInitialized] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const urls = autUrls();
 
-  console.log("questDates: ", questDates);
   const {
     control,
     handleSubmit,
-    getValues,
     reset: resetForm,
-    formState
+    formState,
+    watch
   } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -73,10 +99,12 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       // description: "",
       // durationInDays: questDurationInDays(),
       // startDate: addMinutes(new Date(), 40), // @TO-USE for testing - 30 minutes
-      startDate: null,
+      startDate: new Date(),
       role: null
     }
   });
+
+  const values = watch();
 
   const { quests, quest } = useGetAllOnboardingQuestsQuery(
     plugin.pluginAddress,
@@ -89,6 +117,18 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       })
     }
   );
+
+  const questDates = useMemo(() => {
+    // const { questEndDate, questStartDate } = getQuestDates(values?.startDate);
+    const startDate = values?.startDate ? values?.startDate : new Date();
+    const endDate = addDays(startDate, 3);
+    return {
+      startDate,
+      endDate,
+      durationInHours: questDurationInHours(startDate, endDate),
+      durationInDays: questDurationInDays(startDate, endDate)
+    };
+  }, [values?.startDate]);
 
   const [
     createQuest,
@@ -115,8 +155,10 @@ const CreateQuest = ({ plugin }: PluginParams) => {
   ] = useUpdateQuestMutation();
 
   const onSubmit = async () => {
-    const values = getValues();
-    const startDate = Math.floor(new Date(values.startDate).getTime() / 1000);
+    const numberOfDaysToAdd = 2;
+    const startDate = Math.floor(
+      addDays(values.startDate, numberOfDaysToAdd).getTime() / 1000
+    );
     if (quest?.questId) {
       updateQuest({
         ...quest,
@@ -150,21 +192,15 @@ const CreateQuest = ({ plugin }: PluginParams) => {
   };
 
   useEffect(() => {
-    if (!initialized) {
-      if (!quest && questDates?.startDate) {
-        resetForm({
-          startDate: questDates.startDate
-        });
-      } else {
-        resetForm({
-          title: quest.metadata.name,
-          startDate: new Date(quest.startDate),
-          role: quest.role
-        });
-        setInitialized(true);
-      }
+    if (!initialized && quest) {
+      resetForm({
+        title: quest.metadata.name,
+        startDate: new Date(quest.startDate),
+        role: quest.role
+      });
+      setInitialized(true);
     }
-  }, [initialized, quest, questDates]);
+  }, [initialized, quest]);
 
   const path = useMemo(() => {
     if (updateIsSuccess) {
@@ -337,11 +373,27 @@ const CreateQuest = ({ plugin }: PluginParams) => {
             </div>
           </div>
         </LocalizationProvider> */}
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DemoContainer components={["DateTimePicker"]}>
-            <DateTimePicker label="Basic date time picker" />
-          </DemoContainer>
-        </LocalizationProvider>
+
+        <Controller
+          name="startDate"
+          control={control}
+          rules={{
+            required: true
+          }}
+          render={({ field: { name, value, onChange } }) => {
+            return (
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DemoContainer components={["DateTimePicker"]}>
+                  <DateTimePicker
+                    value={value || ""}
+                    onAccept={(newValue) => onChange(newValue)}
+                    label="Basic date time picker"
+                  />
+                </DemoContainer>
+              </LocalizationProvider>
+            );
+          }}
+        />
 
         {/* <Controller
               name="durationInDays"
@@ -435,8 +487,11 @@ const CreateQuest = ({ plugin }: PluginParams) => {
         <Typography color="white" variant="body">
           During the closed beta, the duration of each onboarding quest will be
           <Strong> {questDates.durationInDays} days</Strong>, starting on{" "}
-          <Strong>{questDates.startDate.toDateString()}</Strong>, until then you
-          can invite new community members to take the quests you launched.
+          <Strong>
+            {format(questDates.startDate, "EEE MMM dd yyyy 'at' h:mm a")}
+          </Strong>
+          , until then you can invite new community members to take the quests
+          you launched.
           <br />
           During the onboarding period, every community will be listed on the{" "}
           <BtnLink

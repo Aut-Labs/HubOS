@@ -15,7 +15,8 @@ import {
   MenuItem,
   debounce,
   Badge,
-  IconButton
+  IconButton,
+  ButtonProps
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { memo, useMemo, useState } from "react";
@@ -28,8 +29,9 @@ import Tasks from "../../Task/Shared/Tasks";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import LinkWithQuery from "@components/LinkWithQuery";
-import OverflowTooltip from "@components/OverflowTooltip";
-import CopyLink from "@components/CopyLink";
+import { addDays, format, isAfter } from "date-fns";
+import InfoIcon from "@mui/icons-material/Info";
+import { autUrls } from "@api/environment";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
@@ -39,6 +41,88 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     border: 0
   }
 }));
+
+export const ButtonWithPulse = styled<ButtonProps<any, any>>(Button)`
+  width: 100%;
+  &:not(.Mui-disabled) {
+    box-shadow: 0 0 0 0 rgba(37, 107, 176, 1);
+    animation: pulse 1.5s infinite;
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(37, 107, 176, 0.7);
+      }
+
+      70% {
+        box-shadow: 0 0 0 15px rgba(37, 107, 176, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(37, 107, 176, 0);
+      }
+    }
+  }
+`;
+
+export const getQuestStatus = (quest: Quest) => {
+  if (!quest?.startDate) {
+    return {
+      color: "error",
+      label: "Inactive",
+      description: "The quest has started, but no tasks have been added."
+    };
+  }
+  const currentDate = new Date();
+
+  const hasStarted = isAfter(currentDate, new Date(quest.startDate));
+  const hasEnded = isAfter(
+    currentDate,
+    addDays(new Date(quest.startDate), quest.durationInDays)
+  );
+  const hasTasks = quest.tasksCount > 0;
+  const isOngoing = hasStarted && !hasEnded;
+
+  if (isOngoing) {
+    if (!hasTasks || !quest?.active) {
+      return {
+        color: "error",
+        label: "Inactive",
+        description: "The quest has started, but no tasks have been added."
+      };
+    }
+    return {
+      color: "success",
+      label: "Ongoing",
+      description: "The quest is ongoing and has tasks."
+    };
+  } else if (hasEnded) {
+    return {
+      color: "error",
+      label: "Ended",
+      description: "The quest has ended."
+    };
+  } else if (hasTasks && !hasStarted) {
+    if (quest?.active) {
+      return {
+        color: "success",
+        label: "Active",
+        description: `The quest is active. Your quest is now available in ${
+          autUrls().showcase
+        }, and contributors can apply.`
+      };
+    }
+    return {
+      color: "info",
+      label: "Ready",
+      description: `The quest is ready to start. At least one task have been added.`
+    };
+  }
+  return {
+    color: "warning",
+    label: "Pending",
+    description:
+      "The quest is pending. Add at least one task to mark it as Ready."
+  };
+};
 
 export const QuestStyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}, &.${tableCellClasses.body}`]: {
@@ -66,6 +150,8 @@ export const QuestListItem = memo(
     const roleName = useMemo(() => {
       return roles.find((r) => r.id === row.role)?.roleName;
     }, [roles]);
+
+    const questStatus = useMemo(() => getQuestStatus(row), [row]);
 
     return (
       <StyledTableRow
@@ -177,39 +263,81 @@ export const QuestListItem = memo(
           </QuestStyledTableCell>
         )}
         <QuestStyledTableCell align="right">
-          {row.durationInDays} days
+          <Tooltip title={questStatus?.description}>
+            <Chip
+              label={questStatus?.label}
+              color={questStatus?.color as any}
+              size="small"
+            />
+          </Tooltip>
+        </QuestStyledTableCell>
+
+        <QuestStyledTableCell align="right">
+          {format(new Date(row.startDate), "EEE MMM dd yyyy 'at' h:mm a")}
         </QuestStyledTableCell>
         <QuestStyledTableCell align="right">
-          <Chip
-            label={row.active ? "Active" : "Inactive"}
-            color={row.active ? "success" : "error"}
-            size="small"
-          />
+          {format(
+            addDays(new Date(row.startDate), row.durationInDays),
+            "EEE MMM dd yyyy 'at' h:mm a"
+          )}
         </QuestStyledTableCell>
+        {/* <QuestStyledTableCell align="right">
+          {row.durationInDays} days
+        </QuestStyledTableCell> */}
 
         {isAdmin && !row.active && (
           <QuestStyledTableCell align="right">
-            <Button
-              sx={{
-                minWidth: "130px"
-              }}
-              color="offWhite"
-              size="small"
-              variant="outlined"
-              startIcon={<AddIcon />}
-              disabled={row.tasksCount >= 5}
-              to="/aut-dashboard/modules/Task"
-              preserveParams
-              queryParams={{
-                onboardingQuestAddress: pluginAddress,
-                returnUrlLinkName: "Back to quest",
-                returnUrl: `${location.pathname}/${row.questId.toString()}`,
-                questId: row.questId.toString()
-              }}
-              component={LinkWithQuery}
-            >
-              Add task
-            </Button>
+            <Stack gap={2}>
+              <Button
+                sx={{
+                  minWidth: "130px"
+                }}
+                color="offWhite"
+                size="small"
+                variant="outlined"
+                startIcon={<AddIcon />}
+                disabled={row.tasksCount >= 5}
+                to="/aut-dashboard/modules/Task"
+                preserveParams
+                queryParams={{
+                  onboardingQuestAddress: pluginAddress,
+                  returnUrlLinkName: "Back to quest",
+                  returnUrl: `${location.pathname}/${row.questId.toString()}`,
+                  questId: row.questId.toString()
+                }}
+                component={LinkWithQuery}
+              >
+                Add task
+              </Button>
+              {/* <Badge
+                invisible={row?.tasksCount > 0}
+                badgeContent={
+                  <Tooltip title="You need at least 1 task to launch the quest.">
+                    <InfoIcon
+                      sx={{
+                        color: "offWhite.main"
+                      }}
+                    />
+                  </Tooltip>
+                }
+              >
+                <ButtonWithPulse
+                  variant="outlined"
+                  disabled={row?.tasksCount === 0}
+                  size="small"
+                  color="offWhite"
+                  // onClick={() =>
+                  //   launchOnboarding({
+                  //     quests,
+                  //     userAddress: account,
+                  //     pluginAddress: plugin.pluginAddress
+                  //   })
+                  // }
+                >
+                  Launch quest
+                </ButtonWithPulse>
+              </Badge> */}
+            </Stack>
           </QuestStyledTableCell>
         )}
       </StyledTableRow>

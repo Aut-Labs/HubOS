@@ -1,6 +1,7 @@
 import {
   useGetAllOnboardingQuestsQuery,
-  useGetAllTasksPerQuestQuery
+  useGetAllTasksPerQuestQuery,
+  useLaunchOnboardingMutation
 } from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import {
@@ -11,15 +12,16 @@ import {
   Stack,
   IconButton,
   Tooltip,
-  Chip
+  Chip,
+  Badge
 } from "@mui/material";
 import { Link, useLocation, useParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { memo, useEffect, useMemo } from "react";
-import { IsAdmin } from "@store/Community/community.reducer";
+import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
 import LinkWithQuery from "@components/LinkWithQuery";
-import { QuestTasks } from "./QuestShared";
+import { ButtonWithPulse, QuestTasks, getQuestStatus } from "./QuestShared";
 import Tasks from "../../Task/Shared/Tasks";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import LoadingProgressBar from "@components/LoadingProgressBar";
@@ -29,6 +31,11 @@ import { useAppDispatch } from "@store/store.model";
 import AutLoading from "@components/AutLoading";
 import { useEthers } from "@usedapp/core";
 import EditIcon from "@mui/icons-material/Edit";
+import InfoIcon from "@mui/icons-material/Info";
+import LoadingDialog from "@components/Dialog/LoadingPopup";
+import SuccessDialog from "@components/Dialog/SuccessPopup";
+import { autUrls } from "@api/environment";
+import ErrorDialog from "@components/Dialog/ErrorPopup";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -40,6 +47,8 @@ const Quest = ({ plugin }: PluginParams) => {
   const isAdmin = useSelector(IsAdmin);
   const { account: userAddress } = useEthers();
   const params = useParams<{ questId: string }>();
+  const communityData = useSelector(CommunityData);
+  const urls = autUrls();
 
   const {
     data: tasksAndSubmissions,
@@ -74,6 +83,28 @@ const Quest = ({ plugin }: PluginParams) => {
     }
   );
 
+  const twitterProps = {
+    title: `${communityData?.name} has just launched on Āut Labs and joined the Coordination Renaissance🎉
+
+We are now onboarding ${quest?.metadata?.name} - take a quest, prove yourself, & join us as we bring human Coordination to the next level⚖️`,
+    // hashtags: ["Āut", "DAO", "Blockchain"]
+    url: communityData?.properties?.address
+      ? // keep this bizarre formatting otherwise the tweet won't have the correct new lines and alignment
+        `${urls.showcase}?daoAddress=${communityData?.properties?.address}`
+      : "https://Aut.id/"
+  };
+
+  const [
+    launchOnboarding,
+    {
+      error: activateError,
+      isError: activateIsError,
+      isLoading: isActivating,
+      isSuccess: isSuccessOnboarding,
+      reset: activateReset
+    }
+  ] = useLaunchOnboardingMutation();
+
   useEffect(() => {
     dispatch(setTitle(`Quest - ${quest?.metadata?.name || ""}`));
   }, [dispatch, quest]);
@@ -86,6 +117,8 @@ const Quest = ({ plugin }: PluginParams) => {
     return isLoadingPlugins || isLoadingTasks;
   }, [isLoadingTasks, isLoadingPlugins]);
 
+  const questStatus = useMemo(() => getQuestStatus(quest), [quest]);
+
   return (
     <Container
       maxWidth="lg"
@@ -97,6 +130,26 @@ const Quest = ({ plugin }: PluginParams) => {
         position: "relative"
       }}
     >
+      <ErrorDialog
+        handleClose={() => activateReset()}
+        open={activateIsError}
+        message={activateError}
+      />
+      <LoadingDialog
+        open={isActivating}
+        message={
+          isActivating ? "Launching quest..." : "Deactivating onboarding..."
+        }
+      />
+      <SuccessDialog
+        open={isSuccessOnboarding}
+        message="Success!"
+        titleVariant="h2"
+        subtitle="Whoop! You launched your Quest. Now it's time to share and check the submissions!"
+        subtitleVariant="subtitle1"
+        handleClose={() => activateReset()}
+        twitterProps={twitterProps}
+      ></SuccessDialog>
       <LoadingProgressBar isLoading={isFetching} />
       {isLoading ? (
         <AutLoading width="130px" height="130px" />
@@ -181,16 +234,17 @@ const Quest = ({ plugin }: PluginParams) => {
               justifyContent: "center"
             }}
           >
-            <Chip
-              sx={{
-                mt: 1
-              }}
-              label={quest?.active ? "Active" : "Inactive"}
-              color={quest?.active ? "success" : "error"}
-              // label={hasQuestStarted ? "Ongoing" : "Active"}
-              // color={hasQuestStarted ? "info" : "success"}
-              size="small"
-            />
+            <Tooltip title={questStatus?.description}>
+              <Chip
+                sx={{
+                  mt: 1
+                }}
+                label={questStatus?.label}
+                color={questStatus?.color as any}
+                size="small"
+              />
+            </Tooltip>
+
             {/* <OverflowTooltip
               typography={{
                 maxWidth: "400px"
@@ -238,6 +292,62 @@ const Quest = ({ plugin }: PluginParams) => {
               </Badge>
             </Box>
           )} */}
+        </Box>
+      )}
+
+      {!!quest && (
+        <Box
+          sx={{
+            display: "flex",
+            mt: 4,
+            alignItems: "center",
+            justifyContent: "flex-end"
+          }}
+        >
+          <Stack
+            width="100%"
+            direction={{
+              sm: "row"
+            }}
+            justifyContent="flex-end"
+            alignItems={{
+              xs: "center"
+            }}
+            gap={2}
+          >
+            {isAdmin && (
+              <Box>
+                <Badge
+                  invisible={quest?.tasksCount > 0}
+                  badgeContent={
+                    <Tooltip title="You need 3 active quests to launch.">
+                      <InfoIcon
+                        sx={{
+                          color: "offWhite.main"
+                        }}
+                      />
+                    </Tooltip>
+                  }
+                >
+                  <ButtonWithPulse
+                    disabled={quest?.tasksCount === 0}
+                    variant="outlined"
+                    size="medium"
+                    color="offWhite"
+                    onClick={() =>
+                      launchOnboarding({
+                        quests: [],
+                        userAddress: userAddress,
+                        pluginAddress: plugin.pluginAddress
+                      })
+                    }
+                  >
+                    Launch quest
+                  </ButtonWithPulse>
+                </Badge>
+              </Box>
+            )}
+          </Stack>
         </Box>
       )}
 
