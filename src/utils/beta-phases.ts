@@ -31,14 +31,11 @@ export function getOwnerPhases(startDate: Date) {
 }
 
 export function getMemberPhases(startDate: Date) {
-  const { phaseThreeEndDate: ownerPhaseThreeEndDate } =
-    getOwnerPhases(startDate);
-
   const phaseOneDuration = 48 * 60 * 60 * 1000; // 48 hours in milliseconds
   const phaseTwoDuration = 48 * 60 * 60 * 1000; // 48 hours in milliseconds
   const phaseThreeDuration = 72 * 60 * 60 * 1000; // 72 hours in milliseconds
 
-  const phaseOneStartDate = new Date(ownerPhaseThreeEndDate.getTime());
+  const phaseOneStartDate = new Date(startDate.getTime());
   const phaseOneEndDate = new Date(
     phaseOneStartDate.getTime() + phaseOneDuration
   );

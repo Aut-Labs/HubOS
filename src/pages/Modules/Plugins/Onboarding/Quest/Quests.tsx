@@ -48,26 +48,6 @@ interface PluginParams {
   plugin: PluginDefinition;
 }
 
-const ButtonWithPulse = styled<ButtonProps<any, any>>(Button)`
-  &:not(.Mui-disabled) {
-    box-shadow: 0 0 0 0 rgba(37, 107, 176, 1);
-    animation: pulse 1.5s infinite;
-    @keyframes pulse {
-      0% {
-        box-shadow: 0 0 0 0 rgba(37, 107, 176, 0.7);
-      }
-
-      70% {
-        box-shadow: 0 0 0 15px rgba(37, 107, 176, 0);
-      }
-
-      100% {
-        box-shadow: 0 0 0 0 rgba(37, 107, 176, 0);
-      }
-    }
-  }
-`;
-
 const Quests = ({ plugin }: PluginParams) => {
   const dispatch = useAppDispatch();
   const isAdmin = useSelector(IsAdmin);
@@ -177,15 +157,15 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
         open={deactivateIsError}
         message={deactivateError}
       />
-      <LoadingDialog
+      {/* <LoadingDialog
         open={isActivating || isDeactivating}
         message={
           isActivating
             ? "Launching onboarding..."
             : "Deactivating onboarding..."
         }
-      />
-      <SuccessDialog
+      /> */}
+      {/* <SuccessDialog
         open={isSuccessOnboarding}
         message="Success!"
         titleVariant="h2"
@@ -193,7 +173,7 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
         subtitleVariant="subtitle1"
         handleClose={() => activateReset()}
         twitterProps={twitterProps}
-      ></SuccessDialog>
+      ></SuccessDialog> */}
       <Box>
         <Typography textAlign="center" color="white" variant="h3">
           Onboarding Quests
@@ -212,7 +192,7 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
             </IconButton>
           </Tooltip>
         </Typography>
-        {isOnboardingActive && (
+        {/* {isOnboardingActive && (
           <Box
             sx={{
               mt: 1,
@@ -222,7 +202,7 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
           >
             <Chip color="success" label="ACTIVATED"></Chip>
           </Box>
-        )}
+        )} */}
         {!!quests?.length && (
           <Box
             sx={{
@@ -271,7 +251,7 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
                         </Badge>
                       </Box>
 
-                      <Box>
+                      {/* <Box>
                         <Badge
                           invisible={quests?.length >= 3}
                           badgeContent={
@@ -304,7 +284,7 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
                             Launch quest onboarding
                           </ButtonWithPulse>
                         </Badge>
-                      </Box>
+                      </Box> */}
                     </>
                   ) : (
                     <>
@@ -317,7 +297,7 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
                       >
                         View all submissions
                       </Button>
-                      <Button
+                      {/* <Button
                         startIcon={<AddIcon />}
                         disabled={quests?.length < 3}
                         variant="outlined"
@@ -326,7 +306,7 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
                         onClick={() => confimDeactivate()}
                       >
                         Deactivate onboarding
-                      </Button>
+                      </Button> */}
                     </>
                   )}
                 </>
@@ -413,10 +393,13 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
                       </QuestStyledTableCell>
                     )}
                     <QuestStyledTableCell align="right">
-                      Duration
+                      Status
                     </QuestStyledTableCell>
                     <QuestStyledTableCell align="right">
-                      Status
+                      Start date
+                    </QuestStyledTableCell>
+                    <QuestStyledTableCell align="right">
+                      End date
                     </QuestStyledTableCell>
                     {isAdmin && !isOnboardingActive && (
                       <QuestStyledTableCell align="right">
