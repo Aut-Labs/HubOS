@@ -85,7 +85,10 @@ function ActionList(props: PickersActionBarProps) {
     <Box sx={{ display: "flex", width: "100%", marginBottom: "10px" }}>
       <StepperButton
         label="Confirm"
-        onClick={onAccept}
+        onClick={(event) => {
+          event.stopPropagation();
+          onAccept();
+        }}
         sx={{ width: "250px", margin: "0 auto" }}
       />
     </Box>
@@ -450,6 +453,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
                   <DateTimePicker
                     value={value || ""}
                     disablePast
+                    closeOnSelect={false}
                     desktopModeMediaQuery={theme.breakpoints.up("sm")}
                     onAccept={(newValue) => onChange(newValue)}
                     label="Start Date"
@@ -477,7 +481,8 @@ const CreateQuest = ({ plugin }: PluginParams) => {
                             ul: {
                               borderLeft: 0,
                               "&:last-of-type": {
-                                overflow: "hidden"
+                                display: "flex",
+                                flexDirection: "column"
                               }
                             }
                           },
