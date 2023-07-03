@@ -17,7 +17,12 @@ import {
   Stack,
   Link as BtnLink,
   Typography,
-  styled
+  styled,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  useMediaQuery
 } from "@mui/material";
 import { allRoles } from "@store/Community/community.reducer";
 import { AutSelectField } from "@theme/field-select-styles";
@@ -38,7 +43,65 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { getMemberPhases } from "@utils/beta-phases";
-import { addDays, format } from "date-fns";
+import { addDays, addMinutes, format } from "date-fns";
+import "./ScrollbarStyles.scss";
+
+import {
+  usePickerLayout,
+  PickersLayoutRoot,
+  pickersLayoutClasses,
+  PickersLayoutContentWrapper
+} from "@mui/x-date-pickers/PickersLayout";
+import { PickersActionBarProps } from "@mui/x-date-pickers";
+import theme from "@theme/theme";
+
+function CustomLayout(props) {
+  const { toolbar, tabs, content, actionBar } = usePickerLayout(props);
+  return (
+    <PickersLayoutRoot className={pickersLayoutClasses.root} ownerState={props}>
+      {toolbar}
+      <PickersLayoutContentWrapper
+        className={pickersLayoutClasses.contentWrapper}
+        sx={{
+          padding: {
+            sm: "10px",
+            xl: "20px"
+          }
+        }}
+      >
+        {tabs}
+        {content}
+      </PickersLayoutContentWrapper>
+      {actionBar}
+    </PickersLayoutRoot>
+  );
+}
+
+function ActionList(props: PickersActionBarProps) {
+  const { onAccept, className } = props;
+  const isDesktop = useMediaQuery(theme.breakpoints.up("sm"));
+
+  return isDesktop ? (
+    <Box sx={{ display: "flex", width: "100%", marginBottom: "10px" }}>
+      <StepperButton
+        label="Confirm"
+        onClick={onAccept}
+        sx={{ width: "250px", margin: "0 auto" }}
+      />
+    </Box>
+  ) : (
+    <List className={className}>
+      <ListItem key={"Confirm"} disablePadding>
+        <ListItemButton
+          onClick={onAccept}
+          sx={{ textAlign: "center", textTransform: "uppercase" }}
+        >
+          <ListItemText primary={"Confirm"} />
+        </ListItemButton>
+      </ListItem>
+    </List>
+  );
+}
 
 const Strong = styled("strong")(({ theme }) => ({
   // color: theme.palette.primary.main
@@ -99,7 +162,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
       // description: "",
       // durationInDays: questDurationInDays(),
       // startDate: addMinutes(new Date(), 40), // @TO-USE for testing - 30 minutes
-      startDate: new Date(),
+      startDate: addMinutes(new Date(), 5),
       role: null
     }
   });
@@ -386,8 +449,96 @@ const CreateQuest = ({ plugin }: PluginParams) => {
                 <DemoContainer components={["DateTimePicker"]}>
                   <DateTimePicker
                     value={value || ""}
+                    disablePast
+                    desktopModeMediaQuery={theme.breakpoints.up("sm")}
                     onAccept={(newValue) => onChange(newValue)}
-                    label="Basic date time picker"
+                    label="Start Date"
+                    slots={{
+                      layout: CustomLayout,
+                      actionBar: ActionList
+                    }}
+                    slotProps={{
+                      popper: {
+                        sx: {
+                          ".MuiDateCalendar-root": {
+                            borderRight: "1px white solid",
+                            paddingRight: "10px"
+                          },
+                          ".MuiDivider-root": {
+                            width: 0
+                          },
+                          ".MuiMultiSectionDigitalClock-root": {
+                            ul: {
+                              borderLeft: 0
+                            }
+                          },
+                          "div.MuiMultiSectionDigitalClock-root": {
+                            marginLeft: "30px",
+                            ul: {
+                              borderLeft: 0,
+                              "&:last-of-type": {
+                                overflow: "hidden"
+                              }
+                            }
+                          },
+                          "MuiPickersCalendarHeader-label": {
+                            fontSize: "18px"
+                          }
+                        }
+                      },
+                      desktopPaper: {
+                        sx: {
+                          svg: { color: theme.palette.offWhite.main },
+                          span: { color: theme.palette.offWhite.main },
+                          backgroundColor: theme.palette.background.default,
+                          color: theme.palette.offWhite.main,
+                          ".MuiPickersLayout-root": {
+                            display: "flex",
+                            flexDirection: "column"
+                          },
+                          ".MuiPickersCalendarHeader-label": {
+                            fontSize: "18px"
+                          }
+                        }
+                      },
+                      mobilePaper: {
+                        sx: {
+                          svg: { color: theme.palette.offWhite.main },
+                          span: { color: theme.palette.offWhite.main },
+                          backgroundColor: theme.palette.background.default,
+                          color: theme.palette.offWhite.main,
+                          ".MuiPickersToolbarText-root.Mui-selected": {
+                            color: theme.palette.primary.main
+                          }
+                        }
+                      },
+                      textField: {
+                        sx: {
+                          ".MuiFormLabel-root": {
+                            color: theme.palette.offWhite.main
+                          }
+                        }
+                      },
+                      openPickerButton: {
+                        sx: {
+                          color: theme.palette.offWhite.main
+                        }
+                      },
+                      day: {
+                        sx: {
+                          color: theme.palette.offWhite.main,
+                          "&.MuiPickersDay-today": {
+                            borderColor: theme.palette.offWhite.main
+                          }
+                        }
+                      },
+                      layout: {
+                        sx: {
+                          display: "flex",
+                          flexDirection: "column"
+                        }
+                      }
+                    }}
                   />
                 </DemoContainer>
               </LocalizationProvider>
