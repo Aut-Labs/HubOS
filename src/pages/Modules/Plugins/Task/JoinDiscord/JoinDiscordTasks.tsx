@@ -12,7 +12,6 @@ import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { dateToUnix } from "@utils/date-format";
-import { addMinutes } from "date-fns";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useSelector } from "react-redux";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
@@ -26,6 +25,7 @@ import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVeri
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
 import { useEthers } from "@usedapp/core";
+import addMinutes from "date-fns/addMinutes";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,

@@ -20,10 +20,10 @@ import {
   ActivityGroupCallData,
   activityUpdateGroupCallData
 } from "@store/Activity/call.reducer";
-import { format, isEqual } from "date-fns";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
 import { useNavigation } from "react-router-dom";
+import format from "date-fns/format";
 
 const StepWrapper = styled("form")({
   textAlign: "center",

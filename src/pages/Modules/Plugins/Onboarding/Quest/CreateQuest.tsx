@@ -43,7 +43,6 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { getMemberPhases } from "@utils/beta-phases";
-import { addDays, addMinutes, format } from "date-fns";
 import "./ScrollbarStyles.scss";
 
 import {
@@ -54,6 +53,9 @@ import {
 } from "@mui/x-date-pickers/PickersLayout";
 import { PickersActionBarProps } from "@mui/x-date-pickers";
 import theme from "@theme/theme";
+import addMinutes from "date-fns/addMinutes";
+import addDays from "date-fns/addDays";
+import format from "date-fns/format";
 
 function CustomLayout(props) {
   const { toolbar, tabs, content, actionBar } = usePickerLayout(props);

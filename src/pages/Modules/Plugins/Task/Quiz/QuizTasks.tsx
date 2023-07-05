@@ -12,7 +12,6 @@ import { memo, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { dateToUnix } from "@utils/date-format";
-import { addMinutes } from "date-fns";
 import AddIcon from "@mui/icons-material/Add";
 import QuestionsAndAnswers, { emptyQuestion } from "./QuestionsAndAnswers";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
@@ -23,6 +22,7 @@ import { countWords } from "@utils/helpers";
 import { useEthers } from "@usedapp/core";
 import { allRoles } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
+import addMinutes from "date-fns/addMinutes";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,

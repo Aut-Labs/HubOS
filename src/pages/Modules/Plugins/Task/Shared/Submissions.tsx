@@ -28,22 +28,16 @@ import {
   PluginDefinitionType
 } from "@aut-labs-private/sdk/dist/models/plugin";
 import { TaskType } from "@aut-labs-private/sdk/dist/models/task";
-import { useConfirmDialog } from "react-mui-confirm";
 import OverflowTooltip from "@components/OverflowTooltip";
 import AutLoading from "@components/AutLoading";
-import {
-  useGetAllTasksPerQuestQuery,
-  useRemoveTaskFromQuestMutation
-} from "@api/onboarding.api";
-import ErrorDialog from "@components/Dialog/ErrorPopup";
-import EditIcon from "@mui/icons-material/Edit";
-import { differenceInDays } from "date-fns";
+import { useGetAllTasksPerQuestQuery } from "@api/onboarding.api";
 import { useEthers } from "@usedapp/core";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useSelector } from "react-redux";
 import { IsAdmin } from "@store/Community/community.reducer";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CopyAddress from "@components/CopyAddress";
+import differenceInDays from "date-fns/differenceInDays";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {

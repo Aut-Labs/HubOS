@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { useEffect, useMemo, useState } from "react";
+import { lazy, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
 import { Route, Routes, useLocation, Navigate } from "react-router-dom";
@@ -15,11 +15,12 @@ import { setNetworks } from "@store/WalletProvider/WalletProvider";
 import { getAppConfig } from "@api/aut.api";
 import AutSDK from "@aut-labs-private/sdk";
 import { IsAuthenticated } from "@auth/auth.reducer";
-import AutDashboardMain from "./pages/AutDashboardMain";
 import GetStarted from "./pages/GetStarted/GetStarted";
 import AutLoading from "@components/AutLoading";
 import ErrorPage from "@components/ErrorPage";
 import Callback from "./pages/Oauth2Callback/Callback";
+
+const AutDashboardMain = lazy(() => import("./pages/AutDashboardMain"));
 
 const generateConfig = (networks: NetworkConfig[]): Config => {
   const enabled_networks = networks.filter((n) => !n.disabled);

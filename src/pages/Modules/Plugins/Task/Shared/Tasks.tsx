@@ -25,8 +25,8 @@ import AutLoading from "@components/AutLoading";
 import { useRemoveTaskFromQuestMutation } from "@api/onboarding.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import AddIcon from "@mui/icons-material/Add";
-import { differenceInDays } from "date-fns";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
+import differenceInDays from "date-fns/differenceInDays";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {

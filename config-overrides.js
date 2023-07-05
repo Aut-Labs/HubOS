@@ -1,9 +1,11 @@
 const path = require("path");
 const { alias } = require("react-app-rewire-alias");
 const webpack = require("webpack");
+// const rewireBundleAnalyzer = require("react-app-rewire-bundle-analyzer");
 
 module.exports = {
-  webpack: (config) => {
+  webpack: (config, env) => {
+    // config = rewireBundleAnalyzer(config, env);
     config.ignoreWarnings = [/Failed to parse source map/];
 
     const fallback = config.resolve.fallback || {};
@@ -17,6 +19,7 @@ module.exports = {
       http: false
     });
     config.plugins = (config.plugins || []).concat([
+      // new BundleAnalyzerPlugin(),
       new webpack.ProvidePlugin({
         Buffer: ["buffer", "Buffer"]
       })

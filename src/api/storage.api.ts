@@ -1,6 +1,4 @@
-import axios from "axios";
 import { environment } from "./environment";
-import { addHours } from "date-fns";
 
 export const isValidUrl = (uri: string) => {
   let url = null as any;

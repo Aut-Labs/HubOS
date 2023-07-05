@@ -25,7 +25,6 @@ import {
   activityUpdateGroupCallData,
   activityUpdateGroupCallStatus
 } from "@store/Activity/call.reducer";
-import { format } from "date-fns";
 import { allRoles } from "@store/Community/community.reducer";
 import { addGroupCall } from "@api/activities.api";
 import { ResultState } from "@store/result-status";
@@ -35,6 +34,7 @@ import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
 import { AutSelectField, AutTextField } from "@components/Fields";
 import { useNavigation } from "react-router-dom";
+import format from "date-fns/format";
 
 const StepWrapper = styled("form")({
   textAlign: "center",

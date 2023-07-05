@@ -1,11 +1,10 @@
-/* eslint-disable react/no-unstable-nested-components */
 import AutLoading from "@components/AutLoading";
-import { Box, CircularProgress, ListItem, Typography } from "@mui/material";
+import { Box, ListItem, Typography } from "@mui/material";
 import { PollStatus } from "@store/Activity/poll.reducer";
 import { PastEvents } from "@store/Activity/upcoming.reducer";
 import { ResultState } from "@store/result-status";
 import { pxToRem } from "@utils/text-size";
-import { format } from "date-fns";
+import format from "date-fns/format";
 import { useSelector } from "react-redux";
 
 const PastEventsList = () => {

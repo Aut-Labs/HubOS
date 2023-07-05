@@ -4,8 +4,6 @@ import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
 import BubbleTopRight from "@assets/bubble.svg";
 import BubbleBottomLeft from "@assets/bubble2.svg";
 import TryFoldImage from "@assets/tryfold.png";
-import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
-import { useOAuth } from "@components/Oauth2/oauth2";
 
 const Grid = styled("div")(({ theme }) => {
   return {

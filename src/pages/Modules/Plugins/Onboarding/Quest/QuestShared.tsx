@@ -29,9 +29,10 @@ import Tasks from "../../Task/Shared/Tasks";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import LinkWithQuery from "@components/LinkWithQuery";
-import { addDays, format, isAfter } from "date-fns";
-import InfoIcon from "@mui/icons-material/Info";
 import { autUrls } from "@api/environment";
+import isAfter from "date-fns/isAfter";
+import addDays from "date-fns/addDays";
+import format from "date-fns/format";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {

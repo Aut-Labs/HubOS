@@ -74,26 +74,26 @@ const getOnboardingProgress = async (
   }
   return {
     data: {
-      daoAddress: cacheData.daoAddress,
-      onboardingQuestAddress: cacheData.onboardingQuestAddress,
+      daoAddress: cacheData?.daoAddress,
+      onboardingQuestAddress: cacheData?.onboardingQuestAddress,
       daoProgress: daoProgress.filter((c) => c.address !== cache.address),
       quests: [
         {
           questId: 1,
-          daoAddress: cacheData.daoAddress,
-          onboardingQuestAddress: cacheData.onboardingQuestAddress,
+          daoAddress: cacheData?.daoAddress,
+          onboardingQuestAddress: cacheData?.onboardingQuestAddress,
           tasksAndSubmissions: tasksAndSubmissions[0]
         },
         {
           questId: 2,
-          daoAddress: cacheData.daoAddress,
-          onboardingQuestAddress: cacheData.onboardingQuestAddress,
+          daoAddress: cacheData?.daoAddress,
+          onboardingQuestAddress: cacheData?.onboardingQuestAddress,
           tasksAndSubmissions: tasksAndSubmissions[1]
         },
         {
           questId: 3,
-          daoAddress: cacheData.daoAddress,
-          onboardingQuestAddress: cacheData.onboardingQuestAddress,
+          daoAddress: cacheData?.daoAddress,
+          onboardingQuestAddress: cacheData?.onboardingQuestAddress,
           tasksAndSubmissions: tasksAndSubmissions[2]
         }
       ]

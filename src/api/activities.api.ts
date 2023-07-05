@@ -8,7 +8,6 @@ import { Task, TaskStatus } from "@store/model";
 import axios from "axios";
 import { dateToUnix } from "@utils/date-format";
 import { sendDiscordNotification } from "@store/ui-reducer";
-import { addMinutes, format, set } from "date-fns";
 import { ActivityPoll, ActivityTypes } from "./api.model";
 import { ipfsCIDToHttpUrl } from "./storage.api";
 import {
@@ -24,6 +23,8 @@ import {
 } from "./ProviderFactory/web3.thunk.type";
 import { DiscordMessage } from "./discord.api";
 import { environment } from "./environment";
+import addMinutes from "date-fns/addMinutes";
+import set from "date-fns/set";
 
 const callThunkProvider = Web3ThunkProviderFactory("Call", {
   provider: null

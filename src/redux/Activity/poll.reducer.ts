@@ -2,7 +2,8 @@ import { addPoll, getPolls } from "@api/activities.api";
 import { ActivityPoll, ActivityPollData } from "@api/api.model";
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 import { ResultState } from "@store/result-status";
-import { addDays, isBefore } from "date-fns";
+import addDays from "date-fns/addDays";
+import isBefore from "date-fns/isBefore";
 
 export interface PollState {
   status: ResultState;
