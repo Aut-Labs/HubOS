@@ -6,13 +6,13 @@ import {
   GridRenderEditCellParams,
   GridRowApi
 } from "@mui/x-data-grid";
-import SWDatatable from "@components/datatable/Datatable";
+import AutDatatable from "@components/datatable/Datatable";
 import {
   CustomEditComponent,
   useDatatableApiRef
 } from "@components/datatable/DatatableRef";
-import { Container, Typography, useMediaQuery } from "@mui/material";
-import SwEditToolbar from "@components/datatable/DatatableToolbar";
+import { Button, Container, Typography, useMediaQuery } from "@mui/material";
+import EditToolbar from "@components/datatable/DatatableToolbar";
 import {
   GetDatatableItems,
   GetDatatableChangedItems
@@ -78,16 +78,16 @@ const tableColumns = (
       editable: true,
       flex: 1,
       sortable: false,
-      renderEditCell: (props) => CustomEditComponent(props, `Ox...`),
-      valueGetter: ({ row: { address } }) => {
-        if (address) {
-          const middle = Math.ceil(address.length / 2);
-          const left = address.slice(0, middle).substring(0, 8);
-          let right = address.slice(middle);
-          right = right.substr(right.length - 8);
-          return `${left}...${right}`;
-        }
-      }
+      renderEditCell: (props) => CustomEditComponent(props, `Ox...`)
+      // valueGetter: ({ row: { address } }) => {
+      //   if (address) {
+      //     const middle = Math.ceil(address.length / 2);
+      //     const left = address.slice(0, middle).substring(0, 8);
+      //     let right = address.slice(middle);
+      //     right = right.substr(right.length - 8);
+      //     return `${left}...${right}`;
+      //   }
+      // }
     },
     {
       headerName: "",
@@ -125,7 +125,7 @@ const tableColumns = (
             label="Edit"
             className="textPrimary"
             onClick={handleEditClick(id)}
-            color="inherit"
+            color="secondary"
           />
         ];
       }
@@ -161,6 +161,10 @@ const Admins = () => {
     }
   }, [data]);
 
+  useEffect(() => {
+    console.log("adminsUpdating", adminsUpdating);
+  }, [adminsUpdating]);
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -175,14 +179,13 @@ const Admins = () => {
     const { allItems } = GetDatatableItems(state);
     const { removedItems, updatedItems, noChangedItems, newItems } =
       GetDatatableChangedItems(allItems, initialData);
-    const addedAdmins = newItems.map((x) => x.address);
-    const removedAdmins = removedItems.map((x) => x.address);
-    debugger;
+    const addedAddresses = newItems.map((x) => x.address);
+    const removedAddresses = removedItems.map((x) => x.address);
     if (!newItems.length && !removedItems.length) {
       setOpen(true);
       return;
     }
-    // await updateAdmins({ added: addedAdmins, removed: removedAdmins });
+    await updateAdmins({ added: addedAddresses, removed: removedAddresses });
     // await dispatch(
     //   updateAdmins({ added: addedAdmins, removed: removedAdmins })
     // );
@@ -220,10 +223,7 @@ const Admins = () => {
 
   return (
     <Container maxWidth="md" className="sw-core-team">
-      <LoadingDialog
-        open={status === ResultState.Updating}
-        message="Updating contracts..."
-      />
+      <LoadingDialog open={adminsUpdating} message="Updating admins..." />
       <ErrorDialog
         open={open}
         handleClose={handleClose}
@@ -234,28 +234,11 @@ const Admins = () => {
         handleClose={handleClose}
         message={errorMessage}
       />
-      <Typography
-        sx={{
-          mt: pxToRem(20)
-        }}
-        color="primary.main"
-        fontSize={pxToRem(50)}
-        component="div"
-      >
-        The admins of your DAO
-      </Typography>
-      <Typography
-        sx={{
-          mb: pxToRem(50)
-        }}
-        color="primary.main"
-        fontSize={pxToRem(25)}
-        component="div"
-      >
-        Add or remove admins of your DAO
+      <Typography mt={7} textAlign="center" color="white" variant="h3">
+        Admins
       </Typography>
       {data && data.admins && (
-        <SWDatatable
+        <AutDatatable
           apiRef={apiRef}
           columns={columns}
           data={AdminsMap}
@@ -268,7 +251,7 @@ const Admins = () => {
             setIsDisabled(rowsToEdit > 0);
           }}
           components={{
-            Toolbar: SwEditToolbar
+            Toolbar: EditToolbar
           }}
           componentsProps={{
             toolbar: { apiRef, title: "Add new Admin", focusOn: "use" }
@@ -276,13 +259,25 @@ const Admins = () => {
         />
       )}
       <div className="sw-table-actions">
-        <AutButton
-          disabled={isDisabled || status === ResultState.Loading}
+        <Button
+          disabled={isDisabled || adminsUpdating}
+          sx={{
+            height: "50px"
+          }}
+          type="button"
+          color="offWhite"
+          variant="outlined"
+          size="medium"
+          onClick={submit}
+        >
+          Save changes
+        </Button>
+        {/* <AutButton
           onClick={submit}
           endIcon={<PinIcon />}
         >
           Save changes
-        </AutButton>
+        </AutButton> */}
       </div>
     </Container>
   );

@@ -15,6 +15,7 @@ const GridEditInputCellRoot = styled(InputBase, {
   overridesResolver: (props, styles) => styles.editInputCell
 })(({ theme }) => ({
   ...theme.typography.body2,
+  backgroundColor: "transparent",
   padding: "1px 0",
   "& input": {
     padding: "0 16px",

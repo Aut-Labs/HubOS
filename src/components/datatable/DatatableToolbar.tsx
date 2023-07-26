@@ -2,7 +2,7 @@ import { GridToolbarContainer } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import { Button } from "@mui/material";
 
-const SwEditToolbar = (props) => {
+const EditToolbar = (props) => {
   const { apiRef, maxSize, title, focusOn } = props;
 
   const handleClick = () => {
@@ -27,6 +27,10 @@ const SwEditToolbar = (props) => {
         }}
         disabled={maxSize && apiRef?.current?.getAllRowIds()?.length >= maxSize}
         startIcon={<AddIcon />}
+        type="button"
+        color="offWhite"
+        variant="outlined"
+        size="medium"
         onClick={handleClick}
       >
         Add new
@@ -35,4 +39,4 @@ const SwEditToolbar = (props) => {
   );
 };
 
-export default SwEditToolbar;
+export default EditToolbar;
