@@ -202,7 +202,7 @@ function Web3DautConnect({
         }}
         use-dev={environment.env == EnvMode.Development}
         flow-config='{"mode" : "tryAut", "customCongratsMessage": ""}'
-        dao-expander={"0x1d87E51043F83807EEc3B77301410D75BDa48A01"}
+        dao-expander={"0xb7947C6F1674129A383639e3977DDFE5189C66DF"}
         id="d-aut"
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
         button-type="simple"

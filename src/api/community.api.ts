@@ -9,6 +9,7 @@ import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { base64toFile } from "@utils/to-base-64";
 import { environment } from "./environment";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { ethers } from "ethers";
 
 const communityExtensionThunkProvider = Web3ThunkProviderFactory(
   "CommunityExtension",
@@ -421,6 +422,58 @@ const getMembers = async (body, api: BaseQueryApi) => {
   };
 };
 
+interface UpdateAdminsData {
+  added: string[];
+  removed: string[];
+}
+
+// export const updateAdmins = createAsyncThunk(
+//   "community/admins/update",
+//   async (args: UpdateAdminsData, { rejectWithValue, getState, dispatch }) => {
+//     const sdk = AutSDK.getInstance();
+//     try {
+//       args.added.forEach(async (address) => {
+//         const response = await sdk.daoExpander.contract.functions.addAdmin(
+//           address
+//         );
+//       });
+//       args.removed.forEach(async (address) => {
+//         const response = await sdk.daoExpander.contract.functions.removeAdmin(
+//           address
+//         );
+//       });
+//       dispatch(fetchCommunity(null));
+//     } catch (error) {
+//       return rejectWithValue(error.message);
+//     }
+//   }
+// );
+
+export const updateAdmins = (data: UpdateAdminsData, api: BaseQueryApi) => {
+  const sdk = AutSDK.getInstance();
+  try {
+    data.added.forEach(async (address) => {
+      const response = await sdk.daoExpander.contract.functions.addAdmin(
+        address
+      );
+    });
+    data.removed.forEach(async (address) => {
+      const response = await sdk.daoExpander.contract.functions.removeAdmin(
+        address
+      );
+    });
+
+    return {
+      data: null
+    };
+  } catch (error) {
+    return {
+      error: error
+    };
+    console.log(error);
+  }
+};
+
 const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
 
@@ -438,11 +491,16 @@ const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
   );
 
   const adminResponse = await sdk.daoExpander.contract.admins.getAdmins();
+  const filteredEmptyAddresses = adminResponse.data.filter(
+    (address) => address !== "0x0000000000000000000000000000000000000000"
+  );
+  // filter the empty addresses from adminResponse.data
   const community = new Community(metadata);
   return {
     data: {
       community,
-      admin: adminResponse.data[0]
+      admin: adminResponse.data[0],
+      admins: filteredEmptyAddresses
     }
   };
 };
@@ -458,10 +516,15 @@ export const communityApi = createApi({
     if (url === "getCommunity") {
       return getCommunity(body, api);
     }
+
+    if (url === "updateAdmins") {
+      return updateAdmins(body, api);
+    }
     return {
       data: "Test"
     };
   },
+  tagTypes: ["Community"],
   endpoints: (builder) => ({
     getAllMembers: builder.query<DAOMember[], void>({
       query: (body) => {
@@ -471,10 +534,20 @@ export const communityApi = createApi({
         };
       }
     }),
+    updateAdmins: builder.mutation({
+      query: (body) => {
+        return {
+          body,
+          url: "updateAdmins"
+        };
+      },
+      invalidatesTags: ["Community"]
+    }),
     getCommunity: builder.query<
       {
         community: Community;
         admin: string;
+        admins: string[];
       },
       void
     >({
@@ -483,9 +556,14 @@ export const communityApi = createApi({
           body,
           url: "getCommunity"
         };
-      }
+      },
+      providesTags: ["Community"]
     })
   })
 });
 
-export const { useGetAllMembersQuery, useGetCommunityQuery } = communityApi;
+export const {
+  useGetAllMembersQuery,
+  useGetCommunityQuery,
+  useUpdateAdminsMutation
+} = communityApi;

@@ -18,7 +18,7 @@ export const GetDatatableItems = (state) => {
 };
 
 export const GetDatatableChangedItems = (allItems, initialData) => {
-  return initialData.reduce(
+  const result = initialData.reduce(
     (prev, curr) => {
       const item = allItems.find((i) => i.id === curr.id);
 
@@ -35,9 +35,17 @@ export const GetDatatableChangedItems = (allItems, initialData) => {
     {
       removedItems: [],
       updatedItems: [],
-      noChangedItems: []
+      noChangedItems: [],
+      newItems: []
     }
   );
+  allItems.forEach((admin) => {
+    const item = initialData.find((a) => a.address === admin.address);
+    if (!item) {
+      result.newItems = [...result.newItems, admin];
+    }
+  });
+  return result;
 };
 
 export const LockDatatableItems = (items) => {

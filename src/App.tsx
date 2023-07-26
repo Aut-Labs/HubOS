@@ -19,6 +19,7 @@ import GetStarted from "./pages/GetStarted/GetStarted";
 import AutLoading from "@components/AutLoading";
 import ErrorPage from "@components/ErrorPage";
 import Callback from "./pages/Oauth2Callback/Callback";
+import Admins from "./pages/Admins/Admins";
 
 const AutDashboardMain = lazy(() => import("./pages/AutDashboardMain"));
 

@@ -28,6 +28,11 @@ const menuItems: SidebarMenuItem[] = [
     icon: DashboardIcon
   },
   {
+    title: "Admins",
+    route: "/aut-dashboard/admins",
+    icon: ManageIcon
+  },
+  {
     title: "Community",
     icon: ManageIcon,
     route: "/aut-dashboard/members"
