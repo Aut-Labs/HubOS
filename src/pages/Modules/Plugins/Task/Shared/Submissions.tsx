@@ -34,7 +34,7 @@ import { useGetAllTasksPerQuestQuery } from "@api/onboarding.api";
 import { useEthers } from "@usedapp/core";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useSelector } from "react-redux";
-import { IsAdmin } from "@store/Community/community.reducer";
+import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CopyAddress from "@components/CopyAddress";
 import differenceInDays from "date-fns/differenceInDays";
@@ -94,6 +94,7 @@ export const SubmissionCard = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const communityData = useSelector(CommunityData);
   const theme = useTheme();
 
   const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
@@ -219,7 +220,7 @@ export const SubmissionCard = ({
               }}
               onClick={() => {
                 navigate({
-                  pathname: `/aut-dashboard/${path}/${row.taskId}`,
+                  pathname: `/${communityData?.name}/${path}/${row.taskId}`,
                   search: new URLSearchParams({
                     submitter: row.submitter,
                     questId: questId.toString(),
@@ -287,6 +288,7 @@ const Submissions = ({ plugin }: PluginParams) => {
   const { account: userAddress } = useEthers();
   const params = useParams<{ taskId: string }>();
   const isAdmin = useSelector(IsAdmin);
+  const communityData = useSelector(CommunityData);
 
   const { task, submissions, isLoading } = useGetAllTasksPerQuestQuery(
     {
@@ -370,7 +372,9 @@ const Submissions = ({ plugin }: PluginParams) => {
                   }
                 }}
                 to={{
-                  pathname: `/aut-dashboard/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
+                  pathname: `/${
+                    communityData?.name
+                  }/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
                     RequiredQueryParams.QuestId
                   )}`,
                   search: searchParams.toString()

@@ -28,7 +28,7 @@ import { InteractionNetworks } from "@utils/transaction-networks";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
 import { useEthers } from "@usedapp/core";
-import { allRoles } from "@store/Community/community.reducer";
+import { CommunityData, allRoles } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
 import addMinutes from "date-fns/addMinutes";
 
@@ -45,6 +45,7 @@ interface PluginParams {
 const TaskSuccess = ({ pluginId, reset }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const communityData = useSelector(CommunityData);
 
   return (
     <Container
@@ -82,7 +83,7 @@ const TaskSuccess = ({ pluginId, reset }) => {
             }}
             size="medium"
             color="offWhite"
-            to="/aut-dashboard/modules/Task"
+            to={`/${communityData?.name}/modules/Task`}
             preserveParams
             component={LinkWithQuery}
           >
@@ -122,6 +123,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
   const navigate = useNavigate();
   const roles = useSelector(allRoles);
   const { account } = useEthers();
+  const communityData = useSelector(CommunityData);
   const { control, handleSubmit, getValues, formState } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -169,13 +171,15 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
   useEffect(() => {
     if (isSuccess) {
       navigate({
-        pathname: `/aut-dashboard/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
+        pathname: `/${
+          communityData?.name
+        }/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
           RequiredQueryParams.QuestId
         )}`,
         search: searchParams.toString()
       });
     }
-  }, [isSuccess]);
+  }, [isSuccess, communityData]);
 
   const selectedRole = useMemo(() => {
     return roles.find(

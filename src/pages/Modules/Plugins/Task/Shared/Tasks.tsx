@@ -27,6 +27,8 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import AddIcon from "@mui/icons-material/Add";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import differenceInDays from "date-fns/differenceInDays";
+import { CommunityData } from "@store/Community/community.reducer";
+import { useSelector } from "react-redux";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {
@@ -87,6 +89,7 @@ const TaskCard = ({
   const navigate = useNavigate();
   const confirm = useConfirmDialog();
   const [searchParams] = useSearchParams();
+  const communityData = useSelector(CommunityData);
   const [removeTask, { error, isError, isLoading, reset }] =
     useRemoveTaskFromQuestMutation();
 
@@ -218,11 +221,11 @@ const TaskCard = ({
                 }}
                 onClick={() => {
                   navigate({
-                    pathname: `/aut-dashboard/modules/Task/OnboardingOpenTaskPlugin/${row.taskId}/submissions`,
+                    pathname: `/${communityData?.name}/modules/Task/OnboardingOpenTaskPlugin/${row.taskId}/submissions`,
                     search: new URLSearchParams({
                       onboardingQuestAddress,
                       returnUrlLinkName: "Back to quest",
-                      returnUrl: `/aut-dashboard/modules/OnboardingStrategy/QuestOnboardingPlugin/${questId}`,
+                      returnUrl: `/${communityData?.name}/modules/OnboardingStrategy/QuestOnboardingPlugin/${questId}`,
                       questId: `${questId}`
                     }).toString()
                   });
@@ -247,7 +250,7 @@ const TaskCard = ({
             size="small"
             onClick={() => {
               navigate({
-                pathname: `/aut-dashboard/${path}/${row.taskId}`,
+                pathname: `/${communityData?.name}/${path}/${row.taskId}`,
                 search: new URLSearchParams({
                   questId: params.questId,
                   onboardingQuestAddress: searchParams.get(
@@ -296,6 +299,7 @@ const GridBox = styled(Box)(({ theme }) => {
 
 export const EmptyTaskCard = ({ onboardingQuestAddress, questId }) => {
   const navigate = useNavigate();
+  const communityData = useSelector(CommunityData);
 
   return (
     <GridCard
@@ -312,11 +316,11 @@ export const EmptyTaskCard = ({ onboardingQuestAddress, questId }) => {
       <CardActionArea
         onClick={() => {
           navigate({
-            pathname: "/aut-dashboard/modules/Task",
+            pathname: `/${communityData?.name}/modules/Task`,
             search: new URLSearchParams({
               onboardingQuestAddress,
               returnUrlLinkName: "Back to quest",
-              returnUrl: `/aut-dashboard/modules/OnboardingStrategy/QuestOnboardingPlugin/${questId}`,
+              returnUrl: `/${communityData?.name}/modules/OnboardingStrategy/QuestOnboardingPlugin/${questId}`,
               questId: questId
             }).toString()
           });

@@ -312,7 +312,10 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
           </Box>
         </Box>
         <Divider />
-        <MenuItems addonMenuItems={addonMenuItems} />
+        <MenuItems
+          addonMenuItems={addonMenuItems}
+          communityName={community?.name}
+        />
         <Box
           sx={{
             display: "flex",

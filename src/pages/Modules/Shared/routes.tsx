@@ -76,7 +76,13 @@ export const pluginRoutes = (
         (m) => m.metadata.properties.type === moduleType
       );
 
-      if (!moduleDefinition.isActivated) return prev;
+      // workaround!
+
+      const isTaskTypeModule = moduleDefinition.id === 2;
+
+      if (!moduleDefinition.isActivated && !isTaskTypeModule) {
+        return prev;
+      }
 
       if (!prev.taskTypesMainMenu[moduleType]) {
         prev.allRoutes.push(
@@ -87,7 +93,7 @@ export const pluginRoutes = (
           />
         );
 
-        if (moduleDefinition.id === 1) {
+        if (moduleDefinition.id === 1 || moduleDefinition.id === 2) {
           // for now we will ignore Task module menu
           const mainMenu = {
             title: plugin.metadata.properties.module.title,
@@ -115,7 +121,7 @@ export const pluginRoutes = (
             route: path,
             children: []
           };
-          mainMenu.children.push(childMenuItem);
+          // mainMenu.children.push(childMenuItem);
         }
         switch (plugin.pluginDefinitionId) {
           case PluginDefinitionType.QuestOnboardingPlugin:

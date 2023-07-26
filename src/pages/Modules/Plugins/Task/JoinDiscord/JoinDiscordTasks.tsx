@@ -17,6 +17,7 @@ import { useSelector } from "react-redux";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import DoneIcon from "@mui/icons-material/Done";
 import {
+  CommunityData,
   DiscordLink,
   IsDiscordVerified,
   allRoles
@@ -39,6 +40,7 @@ interface PluginParams {
 
 const TaskSuccess = ({ pluginId, reset }) => {
   const [searchParams] = useSearchParams();
+  const communityData = useSelector(CommunityData);
   const navigate = useNavigate();
 
   return (
@@ -77,7 +79,7 @@ const TaskSuccess = ({ pluginId, reset }) => {
             }}
             size="medium"
             color="offWhite"
-            to="/aut-dashboard/modules/Task"
+            to={`/${communityData?.name}/modules/Task`}
             preserveParams
             component={LinkWithQuery}
           >
@@ -111,6 +113,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
   const isDiscordVerified = useSelector(IsDiscordVerified);
   const inviteLink = useSelector(DiscordLink);
   const roles = useSelector(allRoles);
+  const communityData = useSelector(CommunityData);
   const { account } = useEthers();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -162,13 +165,15 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
   useEffect(() => {
     if (isSuccess) {
       navigate({
-        pathname: `/aut-dashboard/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
+        pathname: `/${
+          communityData?.name
+        }/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
           RequiredQueryParams.QuestId
         )}`,
         search: searchParams.toString()
       });
     }
-  }, [isSuccess]);
+  }, [isSuccess, communityData]);
 
   return (
     <Container

@@ -275,11 +275,11 @@ export const EmptyPluginCard = ({ type, typeformLink }) => {
 };
 
 export const ModuleDefinitionCard = ({
-  module,
+  pluginModule,
   isFetching
 }: {
   isFetching: boolean;
-  module: ModuleDefinition;
+  pluginModule: ModuleDefinition;
 }) => {
   const [activateOnboarding, { isLoading }] = useActivateModuleMutation();
 
@@ -312,7 +312,7 @@ export const ModuleDefinitionCard = ({
           color: "white",
           variant: "subtitle1"
         }}
-        title={`${module?.metadata?.properties?.title}`}
+        title={`${pluginModule?.metadata?.properties?.title}`}
       />
       <CardContent
         sx={{
@@ -323,7 +323,7 @@ export const ModuleDefinitionCard = ({
       >
         <Stack flex={1} maxWidth="80%" mx="auto">
           <Typography variant="body" textAlign="center" color="white">
-            {module?.metadata?.properties?.shortDescription}
+            {pluginModule?.metadata?.properties?.shortDescription}
           </Typography>
         </Stack>
         <LoadingButton
@@ -341,24 +341,24 @@ export const ModuleDefinitionCard = ({
               <Typography className="text-secondary">Activating...</Typography>
               <CircularProgress
                 size="20px"
-                color={module.isActivated ? "offWhite" : "primary"}
+                color={pluginModule.isActivated ? "offWhite" : "primary"}
               />
             </Stack>
           }
-          {...(module.isActivated && {
-            to: module?.metadata?.properties?.type,
+          {...(pluginModule.isActivated && {
+            to: pluginModule?.metadata?.properties?.type,
             preserveParams: true,
             component: LinkWithQuery
           })}
-          {...(!module.isActivated && {
+          {...(!pluginModule.isActivated && {
             onClick: () =>
               activateOnboarding({
-                moduleId: 1
+                moduleId: pluginModule.id
               })
           })}
           color="offWhite"
         >
-          {module.isActivated ? "Go to plugins" : "Activate"}
+          {pluginModule.isActivated ? "Go to plugins" : "Activate"}
         </LoadingButton>
 
         {/* <Stack direction="row" justifyContent="flex-end">
