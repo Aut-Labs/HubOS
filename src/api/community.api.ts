@@ -455,14 +455,11 @@ const getAddAdminsPromise = async (sdk: AutSDK, address: string) => {
     try {
       const response = await sdk.daoExpander.addAdmin(address);
       if (!response.isSuccess) {
-        debugger;
         reject(response.errorMessage);
       }
       resolve(response);
     } catch (e) {
-      console.log("ERROR", e);
-      debugger;
-      return reject("ERROR");
+      return reject(e);
     }
   });
 };
@@ -473,14 +470,11 @@ const getRemoveAdminsPromise = async (sdk: AutSDK, address: string) => {
     try {
       const response = await sdk.daoExpander.removeAdmin(address);
       if (!response.isSuccess) {
-        debugger;
         reject(response.errorMessage);
       }
       resolve(response);
     } catch (e) {
-      console.log("ERROR", e);
-      debugger;
-      return reject("ERROR");
+      return reject(e);
     }
   });
 };
@@ -504,8 +498,6 @@ export const updateAdmins = async (
       data: result
     };
   } catch (error) {
-    console.log("ERROR", error);
-    debugger;
     return {
       error
     };

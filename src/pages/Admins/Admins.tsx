@@ -228,7 +228,6 @@ const Admins = () => {
                 const { noChangedItems, removedItems, updatedItems, newItems } =
                   GetDatatableChangedItems(allItems, initialData, "address");
                 const rowsToEdit = Object.keys(state.editRows || {}).length;
-                debugger;
                 setIsDisabled(
                   rowsToEdit > 0 ||
                     (removedItems.length === 0 &&

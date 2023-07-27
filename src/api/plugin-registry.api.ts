@@ -58,8 +58,6 @@ const add = async (body: PluginDefinition, api: BaseQueryApi) => {
     (n) => n.network === selectedNetwork
   );
 
-  debugger;
-
   // temporary
   const { data } =
     state.pluginRegistryApi.queries["getAllPluginDefinitionsByDAO(null)"];
