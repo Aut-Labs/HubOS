@@ -4,7 +4,7 @@ import {
   useGetAllOnboardingQuestsQuery,
   useUpdateQuestMutation
 } from "@api/onboarding.api";
-import { PluginDefinition } from "@aut-labs-private/sdk";
+import { PluginDefinition } from "@aut-labs/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { FormHelperText } from "@components/Fields";

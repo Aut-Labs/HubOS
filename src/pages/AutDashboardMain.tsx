@@ -14,7 +14,7 @@ import { useGetAllModuleDefinitionsQuery } from "@api/module-registry.api";
 import QuestSubmissions from "./QuestSubmissions/QuestSubmissions";
 import PeopleIcon from "@mui/icons-material/People";
 import { useGetOnboardingProgressQuery } from "@api/onboarding.api";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import Admins from "./Admins/Admins";
 
 const AutDashboardMain = () => {

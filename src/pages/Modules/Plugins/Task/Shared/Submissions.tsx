@@ -1,4 +1,4 @@
-import { Task } from "@aut-labs-private/sdk";
+import { Task } from "@aut-labs/sdk";
 import {
   Box,
   Stack,
@@ -26,8 +26,8 @@ import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import {
   PluginDefinition,
   PluginDefinitionType
-} from "@aut-labs-private/sdk/dist/models/plugin";
-import { TaskType } from "@aut-labs-private/sdk/dist/models/task";
+} from "@aut-labs/sdk/dist/models/plugin";
+import { TaskType } from "@aut-labs/sdk/dist/models/task";
 import OverflowTooltip from "@components/OverflowTooltip";
 import AutLoading from "@components/AutLoading";
 import { useGetAllTasksPerQuestQuery } from "@api/onboarding.api";

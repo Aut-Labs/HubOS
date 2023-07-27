@@ -11,7 +11,13 @@ import {
   CustomEditComponent,
   useDatatableApiRef
 } from "@components/datatable/DatatableRef";
-import { Button, Container, Typography, useMediaQuery } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Container,
+  Typography,
+  useMediaQuery
+} from "@mui/material";
 import EditToolbar from "@components/datatable/DatatableToolbar";
 import {
   GetDatatableItems,
@@ -37,7 +43,7 @@ import {
 } from "@api/community.api";
 import { getLockedContracts } from "@store/AutDashboard/aut-dashboard.reducer";
 import { AutButton } from "@components/buttons";
-import AutSDK from "@aut-labs-private/sdk";
+import AutSDK from "@aut-labs/sdk";
 
 const tableColumns = (
   getRef: () => MutableRefObject<GridEditRowApi & GridRowApi>
@@ -55,7 +61,7 @@ const tableColumns = (
     apiRef.current.setRowMode(id, "view");
 
     const row = apiRef.current.getRow(id);
-    apiRef.current.updateRows([{ ...row, isNew: false }]);
+    apiRef.current.updateRows([{ ...row }]);
   };
 
   const handleDeleteClick = (id) => (event) => {
@@ -78,6 +84,7 @@ const tableColumns = (
       editable: true,
       flex: 1,
       sortable: false,
+      cellClassName: "being-edited-cell",
       renderEditCell: (props) => CustomEditComponent(props, `Ox...`)
       // valueGetter: ({ row: { address } }) => {
       //   if (address) {
@@ -137,7 +144,7 @@ const Admins = () => {
   const dispatch = useAppDispatch();
   const { apiRef, columns } = useDatatableApiRef(tableColumns);
   const [initialData, setInitialData] = useState([]);
-  const [isDisabled, setIsDisabled] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(true);
   const [open, setOpen] = useState(false);
   const lockedContracts = useSelector(getLockedContracts);
   const { status, errorMessage } = useSelector(
@@ -161,24 +168,23 @@ const Admins = () => {
     }
   }, [data]);
 
-  useEffect(() => {
-    console.log("adminsUpdating", adminsUpdating);
-  }, [adminsUpdating]);
-
   const handleClose = () => {
     setOpen(false);
   };
 
+  const handleError = () => {
+    reset();
+  };
+
   const submit = async () => {
     const state = apiRef?.current?.state;
-
     if (!state) {
       return;
     }
 
     const { allItems } = GetDatatableItems(state);
     const { removedItems, updatedItems, noChangedItems, newItems } =
-      GetDatatableChangedItems(allItems, initialData);
+      GetDatatableChangedItems(allItems, initialData, "address");
     const addedAddresses = newItems.map((x) => x.address);
     const removedAddresses = removedItems.map((x) => x.address);
     if (!newItems.length && !removedItems.length) {
@@ -186,40 +192,7 @@ const Admins = () => {
       return;
     }
     await updateAdmins({ added: addedAddresses, removed: removedAddresses });
-    // await dispatch(
-    //   updateAdmins({ added: addedAdmins, removed: removedAdmins })
-    // );
-    // refetch();
   };
-
-  // useEffect(() => {
-  //   const fetchAdmins = async () => {
-  //     const admins =
-  //       await AutSDK.getInstance().daoExpander.contract.admins.getAdmins();
-  //     debugger;
-  //   };
-  //   fetchAdmins();
-  // }, []);
-
-  // useEffect(() => {
-  //   const [firstItem] = lockedContracts;
-
-  //   // debugger;
-  //   if (firstItem?.isNew) {
-  //     const timeout = setTimeout(() => {
-  //       if (apiRef.current) {
-  //         apiRef.current.setRowMode(0, "edit");
-  //       }
-  //     });
-  //     return () => clearTimeout(timeout);
-  //   }
-  //   setInitialData(lockedContracts);
-  // }, [apiRef, lockedContracts]);
-
-  // useEffect(() => {
-  //   // const promise = dispatch(getPAContracts(null));
-  //   // return () => promise.abort();
-  // }, [dispatch]);
 
   return (
     <Container maxWidth="md" className="sw-core-team">
@@ -229,56 +202,71 @@ const Admins = () => {
         handleClose={handleClose}
         message=" No new addresses were added!"
       />
-      <ErrorDialog
-        open={status === ResultState.Failed}
-        handleClose={handleClose}
-        message={errorMessage}
-      />
+      <ErrorDialog open={isError} handleClose={handleError} message={error} />
       <Typography mt={7} textAlign="center" color="white" variant="h3">
         Admins
       </Typography>
-      {data && data.admins && (
-        <AutDatatable
-          apiRef={apiRef}
-          columns={columns}
-          data={AdminsMap}
-          loading={status === ResultState.Loading}
-          isCellEditable={(params) => {
-            return !params.row.locked;
-          }}
-          onStateChange={(state) => {
-            const rowsToEdit = Object.keys(state.editRows || {}).length;
-            setIsDisabled(rowsToEdit > 0);
-          }}
-          components={{
-            Toolbar: EditToolbar
-          }}
-          componentsProps={{
-            toolbar: { apiRef, title: "Add new Admin", focusOn: "use" }
-          }}
+      {isLoading ? (
+        <CircularProgress
+          className="spinner-center"
+          size="60px"
+          style={{ top: "calc(50% - 30px)" }}
         />
+      ) : (
+        <>
+          {data && data.admins && (
+            <AutDatatable
+              apiRef={apiRef}
+              columns={columns}
+              data={AdminsMap}
+              loading={status === ResultState.Loading}
+              isCellEditable={(params) => {
+                return !params.row.locked;
+              }}
+              onStateChange={(state) => {
+                const { allItems } = GetDatatableItems(state);
+                const { noChangedItems, removedItems, updatedItems, newItems } =
+                  GetDatatableChangedItems(allItems, initialData, "address");
+                const rowsToEdit = Object.keys(state.editRows || {}).length;
+                debugger;
+                setIsDisabled(
+                  rowsToEdit > 0 ||
+                    (removedItems.length === 0 &&
+                      updatedItems.length === 0 &&
+                      newItems.length === 0)
+                );
+              }}
+              components={{
+                Toolbar: EditToolbar
+              }}
+              componentsProps={{
+                toolbar: { apiRef, title: "Add new Admin", focusOn: "use" }
+              }}
+            />
+          )}
+          <div
+            className="sw-table-actions"
+            style={{
+              display: "flex",
+              justifyContent: "center"
+            }}
+          >
+            <Button
+              disabled={isDisabled || adminsUpdating}
+              sx={{
+                height: "50px"
+              }}
+              type="button"
+              color="offWhite"
+              variant="outlined"
+              size="medium"
+              onClick={submit}
+            >
+              Save changes
+            </Button>
+          </div>
+        </>
       )}
-      <div className="sw-table-actions">
-        <Button
-          disabled={isDisabled || adminsUpdating}
-          sx={{
-            height: "50px"
-          }}
-          type="button"
-          color="offWhite"
-          variant="outlined"
-          size="medium"
-          onClick={submit}
-        >
-          Save changes
-        </Button>
-        {/* <AutButton
-          onClick={submit}
-          endIcon={<PinIcon />}
-        >
-          Save changes
-        </AutButton> */}
-      </div>
     </Container>
   );
 };

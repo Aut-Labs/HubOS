@@ -14,8 +14,8 @@ import {
 import { memo, useMemo, useState } from "react";
 import PluginCard, { EmptyPluginCard } from "./PluginCard";
 import LoadingProgressBar from "@components/LoadingProgressBar";
-import { BaseNFTModel } from "@aut-labs-private/sdk/dist/models/baseNFTModel";
-import { PluginDefinitionProperties } from "@aut-labs-private/sdk/dist/models/plugin";
+import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
+import { PluginDefinitionProperties } from "@aut-labs/sdk/dist/models/plugin";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { useSelector } from "react-redux";
 import { IsAdmin } from "@store/Community/community.reducer";

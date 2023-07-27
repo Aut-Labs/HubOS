@@ -21,13 +21,13 @@ import { ConfirmDialogProvider } from "react-mui-confirm";
 
 // const persistor = persistStore(store);
 
-// markerSDK.loadWidget({
-//   project: `${process.env.REACT_APP_MARKER}`,
-//   reporter: {
-//     email: "frontend@aut.id",
-//     fullName: "Āut Dashboard"
-//   }
-// });
+markerSDK.loadWidget({
+  project: `${process.env.REACT_APP_MARKER}`,
+  reporter: {
+    email: "frontend@aut.id",
+    fullName: "Āut Dashboard"
+  }
+});
 
 root.render(
   <StyledEngineProvider injectFirst>

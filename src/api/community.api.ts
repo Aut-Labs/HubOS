@@ -4,7 +4,7 @@ import { Community, findRoleName } from "./community.model";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
 import { ipfsCIDToHttpUrl, isValidUrl } from "./storage.api";
 import { AutID, DAOMember } from "./aut.model";
-import AutSDK, { DAOExpander, fetchMetadata } from "@aut-labs-private/sdk";
+import AutSDK, { DAOExpander, fetchMetadata } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { base64toFile } from "@utils/to-base-64";
 import { environment } from "./environment";
@@ -449,28 +449,66 @@ interface UpdateAdminsData {
 //   }
 // );
 
-export const updateAdmins = (data: UpdateAdminsData, api: BaseQueryApi) => {
+const getAddAdminsPromise = async (sdk: AutSDK, address: string) => {
+  // eslint-disable-next-line no-async-promise-executor
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await sdk.daoExpander.addAdmin(address);
+      if (!response.isSuccess) {
+        debugger;
+        reject(response.errorMessage);
+      }
+      resolve(response);
+    } catch (e) {
+      console.log("ERROR", e);
+      debugger;
+      return reject("ERROR");
+    }
+  });
+};
+
+const getRemoveAdminsPromise = async (sdk: AutSDK, address: string) => {
+  // eslint-disable-next-line no-async-promise-executor
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await sdk.daoExpander.removeAdmin(address);
+      if (!response.isSuccess) {
+        debugger;
+        reject(response.errorMessage);
+      }
+      resolve(response);
+    } catch (e) {
+      console.log("ERROR", e);
+      debugger;
+      return reject("ERROR");
+    }
+  });
+};
+
+export const updateAdmins = async (
+  data: UpdateAdminsData,
+  api: BaseQueryApi
+) => {
   const sdk = AutSDK.getInstance();
   try {
+    const promises = [];
     data.added.forEach(async (address) => {
-      const response = await sdk.daoExpander.contract.functions.addAdmin(
-        address
-      );
+      promises.push(getAddAdminsPromise(sdk, address));
     });
     data.removed.forEach(async (address) => {
-      const response = await sdk.daoExpander.contract.functions.removeAdmin(
-        address
-      );
+      promises.push(getRemoveAdminsPromise(sdk, address));
     });
 
+    const result = await Promise.all(promises);
     return {
-      data: null
+      data: result
     };
   } catch (error) {
+    console.log("ERROR", error);
+    debugger;
     return {
-      error: error
+      error
     };
-    console.log(error);
   }
 };
 
@@ -492,7 +530,7 @@ const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
 
   const adminResponse = await sdk.daoExpander.contract.admins.getAdmins();
   const filteredEmptyAddresses = adminResponse.data.filter(
-    (address) => address !== "0x0000000000000000000000000000000000000000"
+    (address) => address !== ethers.constants.AddressZero
   );
   // filter the empty addresses from adminResponse.data
   const community = new Community(metadata);

@@ -6,10 +6,11 @@ const EditToolbar = (props) => {
   const { apiRef, maxSize, title, focusOn } = props;
 
   const handleClick = () => {
+    debugger;
     const ids =
       apiRef?.current?.getAllRowIds && apiRef?.current?.getAllRowIds();
-    const id = ids?.length !== undefined ? ids?.length : 0;
-    apiRef.current.updateRows([{ id, isNew: true }]);
+    const id = ids?.length !== undefined ? ids[ids?.length - 1] + 1 : 0;
+    apiRef.current.updateRows([{ id }]);
     apiRef.current.setRowMode(id, "edit");
     setTimeout(() => {
       apiRef.current.scrollToIndexes({

@@ -1,4 +1,4 @@
-import { PluginDefinition } from "@aut-labs-private/sdk";
+import { PluginDefinition } from "@aut-labs/sdk";
 import React, { lazy } from "react";
 import { Route } from "react-router-dom";
 import { SidebarMenuItem } from "@components/Sidebar/MenuItems";
@@ -6,7 +6,7 @@ import ExtensionIcon from "@mui/icons-material/Extension";
 import {
   ModuleDefinition,
   PluginDefinitionType
-} from "@aut-labs-private/sdk/dist/models/plugin";
+} from "@aut-labs/sdk/dist/models/plugin";
 import { ReactComponent as SubStackIcon } from "@assets/aut/sub-stack.svg";
 import Submissions from "../Plugins/Task/Shared/Submissions";
 

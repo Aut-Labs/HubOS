@@ -71,7 +71,8 @@ const Datatable = ({
           },
           ".MuiDataGrid-cell": {
             fontSize: "16px",
-            textAlign: "center"
+            textAlign: "center",
+            backgroundColor: "transparent !important"
           },
           ".MuiDataGrid-columnHeaderTitle": {
             width: "100%",

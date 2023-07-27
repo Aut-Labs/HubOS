@@ -15,10 +15,10 @@ const GridEditInputCellRoot = styled(InputBase, {
   overridesResolver: (props, styles) => styles.editInputCell
 })(({ theme }) => ({
   ...theme.typography.body2,
-  backgroundColor: "transparent",
   padding: "1px 0",
   "& input": {
     padding: "0 16px",
+    color: "white !important",
     height: "100%",
     "&::placeholder": {
       opacity: 1,

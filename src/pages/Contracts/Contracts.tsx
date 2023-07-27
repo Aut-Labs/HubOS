@@ -48,7 +48,7 @@ const tableColumns = (
     apiRef.current.setRowMode(id, "view");
 
     const row = apiRef.current.getRow(id);
-    apiRef.current.updateRows([{ ...row, isNew: false }]);
+    apiRef.current.updateRows([{ ...row }]);
   };
 
   const handleDeleteClick = (id) => (event) => {

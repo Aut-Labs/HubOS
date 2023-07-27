@@ -1,5 +1,5 @@
 import { useGetAllTasksPerQuestQuery } from "@api/onboarding.api";
-import { PluginDefinition } from "@aut-labs-private/sdk";
+import { PluginDefinition } from "@aut-labs/sdk";
 import AutLoading from "@components/AutLoading";
 import {
   Box,
@@ -20,7 +20,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
 import { GridBox } from "./QuestionsAndAnswers";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import { useEthers } from "@usedapp/core";
 import { getQestions } from "@api/tasks.api";

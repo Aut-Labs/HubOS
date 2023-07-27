@@ -13,7 +13,7 @@ import { DAppProvider, Config, MetamaskConnector } from "@usedapp/core";
 import { WalletConnectConnector } from "@usedapp/wallet-connect-connector";
 import { setNetworks } from "@store/WalletProvider/WalletProvider";
 import { getAppConfig } from "@api/aut.api";
-import AutSDK from "@aut-labs-private/sdk";
+import AutSDK from "@aut-labs/sdk";
 import { IsAuthenticated } from "@auth/auth.reducer";
 import GetStarted from "./pages/GetStarted/GetStarted";
 import AutLoading from "@components/AutLoading";

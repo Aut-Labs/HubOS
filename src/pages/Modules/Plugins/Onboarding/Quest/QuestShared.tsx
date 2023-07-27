@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { Quest, Task } from "@aut-labs-private/sdk";
+import { Quest, Task } from "@aut-labs/sdk";
 import {
   Box,
   Typography,

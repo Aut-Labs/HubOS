@@ -16,11 +16,11 @@ import { allRoles } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
 import { memo, useMemo, useState } from "react";
 import { useGetOnboardingProgressQuery } from "@api/onboarding.api";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import AutLoading from "@components/AutLoading";
 import { AutSelectField } from "@theme/field-select-styles";
-import { Task } from "@aut-labs-private/sdk";
+import { Task } from "@aut-labs/sdk";
 import {
   SubmissionCard,
   SubmissionsGridBox
