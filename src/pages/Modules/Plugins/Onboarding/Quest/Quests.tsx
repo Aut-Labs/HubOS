@@ -4,7 +4,7 @@ import {
   useDeactivateOnboardingMutation,
   useGetAllOnboardingQuestsQuery
 } from "@api/onboarding.api";
-import { PluginDefinition } from "@aut-labs-private/sdk";
+import { PluginDefinition } from "@aut-labs/sdk";
 import {
   Container,
   Box,

@@ -32,7 +32,7 @@ const Datatable = ({
     <div
       className="sw-datatable"
       style={{
-        border: `3px solid ${theme.palette.primary.main}`,
+        // border: `3px solid ${theme.palette.offWhite.main}`,DAO Members
         padding: "35px"
       }}
     >
@@ -56,22 +56,23 @@ const Datatable = ({
         density="compact"
         sx={{
           border: "none",
-          color: "primary.main",
+          color: "offWhite.main",
           ".MuiInputBase-input": {
-            color: "info.dark",
+            color: "offWhite.contrastText",
             fontSize: "16px",
             textAlign: "center"
           },
           ".MuiDataGrid-columnHeaders": {
             borderBottom: "2px solid",
-            borderColor: "primary.main"
+            borderColor: "offWhite.main"
           },
           ".MuiDataGrid-columnSeparator": {
             display: "none"
           },
           ".MuiDataGrid-cell": {
             fontSize: "16px",
-            textAlign: "center"
+            textAlign: "center",
+            backgroundColor: "transparent !important"
           },
           ".MuiDataGrid-columnHeaderTitle": {
             width: "100%",
@@ -81,10 +82,10 @@ const Datatable = ({
             fontSize: "20px"
           },
           "& .actions": {
-            color: "primary.main"
+            color: "offWhite.main"
           },
           "& .textPrimary": {
-            color: "primary.main"
+            color: "offWhite.main"
           },
           ".MuiDataGrid-columnHeaderTitleContainer": {
             padding: 0
@@ -99,8 +100,8 @@ const Datatable = ({
   );
 };
 
-const SWDatatable = React.forwardRef((props: any, ref) => (
+const AutDatatable = React.forwardRef((props: any, ref) => (
   <Datatable innerRef={ref} {...props} />
 ));
 
-export default SWDatatable;
+export default AutDatatable;

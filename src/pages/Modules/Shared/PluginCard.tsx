@@ -1,5 +1,5 @@
 import { useAddPluginToDAOMutation } from "@api/plugin-registry.api";
-import { PluginDefinition } from "@aut-labs-private/sdk";
+import { PluginDefinition } from "@aut-labs/sdk";
 import {
   Box,
   Button,
@@ -25,7 +25,7 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import {
   ModuleDefinition,
   PluginDefinitionType
-} from "@aut-labs-private/sdk/dist/models/plugin";
+} from "@aut-labs/sdk/dist/models/plugin";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { useEthers } from "@usedapp/core";
 import { useActivateModuleMutation } from "@api/module-registry.api";

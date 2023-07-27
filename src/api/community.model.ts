@@ -1,11 +1,7 @@
 import { CommitmentMessages } from "@utils/misc";
 import { httpUrlToIpfsCID } from "./storage.api";
-import { BaseNFTModel } from "@aut-labs-private/sdk/dist/models/baseNFTModel";
-import {
-  DAOProperties,
-  Role,
-  RoleSet
-} from "@aut-labs-private/sdk/dist/models/dao";
+import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
+import { DAOProperties, Role, RoleSet } from "@aut-labs/sdk/dist/models/dao";
 import { AutSocial } from "./api.model";
 import { socialUrls } from "./aut.model";
 

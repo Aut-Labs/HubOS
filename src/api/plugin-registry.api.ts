@@ -1,8 +1,8 @@
-import AutSDK, { PluginDefinition, fetchMetadata } from "@aut-labs-private/sdk";
+import AutSDK, { PluginDefinition, fetchMetadata } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { NetworkConfig } from "./ProviderFactory/network.config";
 
 const fetch = async (body: any, api: BaseQueryApi) => {
@@ -57,8 +57,6 @@ const add = async (body: PluginDefinition, api: BaseQueryApi) => {
   const network: NetworkConfig = networksConfig.find(
     (n) => n.network === selectedNetwork
   );
-
-  debugger;
 
   // temporary
   const { data } =

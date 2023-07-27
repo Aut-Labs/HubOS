@@ -14,7 +14,8 @@ import { useGetAllModuleDefinitionsQuery } from "@api/module-registry.api";
 import QuestSubmissions from "./QuestSubmissions/QuestSubmissions";
 import PeopleIcon from "@mui/icons-material/People";
 import { useGetOnboardingProgressQuery } from "@api/onboarding.api";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
+import Admins from "./Admins/Admins";
 
 const AutDashboardMain = () => {
   const communityData = useSelector(CommunityData);
@@ -103,6 +104,7 @@ const AutDashboardMain = () => {
           <Suspense fallback={<AutLoading width="130px" height="130px" />}>
             <Routes>
               <Route index element={<Dashboard />} />
+              <Route path="admins" element={<Admins />} />
               <Route path="members" element={<Members />} />
               {modulesRoutes?.routes?.length && (
                 <Route

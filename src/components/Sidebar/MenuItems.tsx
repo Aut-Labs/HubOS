@@ -6,6 +6,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import { alpha, Badge, styled, SvgIcon } from "@mui/material";
 import { ReactComponent as ManageIcon } from "@assets/manage.svg";
 import { ReactComponent as DashboardIcon } from "@assets/dashboard.svg";
+import { ReactComponent as AdminIcon } from "@assets/admin.svg";
 import { NavLink as RouteNavLink } from "react-router-dom";
 import { forwardRef, Fragment } from "react";
 import { pxToRem } from "@utils/text-size";
@@ -26,6 +27,11 @@ const menuItems = (communityName: string): SidebarMenuItem[] => [
     route: `/${communityName}`,
     exact: true,
     icon: DashboardIcon
+  },
+  {
+    title: "Admins",
+    route: "/aut-dashboard/admins",
+    icon: AdminIcon
   },
   {
     title: "Community",

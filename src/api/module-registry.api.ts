@@ -1,8 +1,8 @@
-import AutSDK, { DAOExpander, fetchMetadata } from "@aut-labs-private/sdk";
+import AutSDK, { DAOExpander, fetchMetadata } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
-import { ModuleDefinition } from "@aut-labs-private/sdk/dist/models/plugin";
+import { ModuleDefinition } from "@aut-labs/sdk/dist/models/plugin";
 
 const fetch = async (body: any, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();

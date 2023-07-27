@@ -1,5 +1,5 @@
 import { useGetAllTasksPerQuestQuery } from "@api/onboarding.api";
-import { PluginDefinition } from "@aut-labs-private/sdk";
+import { PluginDefinition } from "@aut-labs/sdk";
 import AutLoading from "@components/AutLoading";
 import { Button, Container, Stack } from "@mui/material";
 import { IsAdmin } from "@store/Community/community.reducer";
@@ -9,10 +9,10 @@ import { useSelector } from "react-redux";
 import { useSearchParams, useParams, Link } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import { useEthers } from "@usedapp/core";
-import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
+import { TaskStatus } from "@aut-labs/sdk/dist/models/task";
 import { InteractionNetworks } from "@utils/transaction-networks";
 
 interface PluginParams {
