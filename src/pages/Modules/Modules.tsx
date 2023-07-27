@@ -53,7 +53,7 @@ const Modules = () => {
   const myModules = useMemo(() => {
     return modules.reduce(
       (prev, curr) => {
-        if (curr.id === 1) {
+        if (curr.id === 1 || curr.id === 2) {
           prev[curr.id] = true;
           prev.types.push(curr);
         }
@@ -82,7 +82,6 @@ const Modules = () => {
             <Tooltip title="Refresh modules">
               <IconButton
                 size="medium"
-                component="span"
                 color="offWhite"
                 sx={{
                   ml: 1
@@ -112,7 +111,6 @@ const Modules = () => {
             </Typography>
             <Button
               size="medium"
-              component="span"
               color="offWhite"
               startIcon={<RefreshIcon />}
               sx={{
@@ -131,11 +129,11 @@ const Modules = () => {
         ) : (
           <>
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>
-              {myModules.map((module, index) => (
+              {myModules.map((pluginModule, index) => (
                 <ModuleDefinitionCard
                   key={`modules-plugin-${index}`}
                   isFetching={isFetching}
-                  module={module}
+                  pluginModule={pluginModule}
                 />
               ))}
             </GridBox>

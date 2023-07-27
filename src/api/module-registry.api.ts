@@ -20,7 +20,7 @@ const fetch = async (body: any, api: BaseQueryApi) => {
     const definitionsWithMetadata: ModuleDefinition[] = [];
     for (let i = 1; i < response.data.length; i++) {
       const def = response.data[i];
-      const isActivatedResponse = await sdk.daoExpander.isModuleActivated(1);
+      const isActivatedResponse = await sdk.daoExpander.isModuleActivated(i);
 
       const moduleData = {
         ...def,

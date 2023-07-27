@@ -20,6 +20,7 @@ import AutLoading from "@components/AutLoading";
 import ErrorPage from "@components/ErrorPage";
 import Callback from "./pages/Oauth2Callback/Callback";
 import Admins from "./pages/Admins/Admins";
+import { CommunityData } from "@store/Community/community.reducer";
 
 const AutDashboardMain = lazy(() => import("./pages/AutDashboardMain"));
 
@@ -78,16 +79,20 @@ function App() {
   const [config, setConfig] = useState<Config>();
   const [error, setError] = useState(false);
   const isAutheticated = useSelector(IsAuthenticated);
+  const communityData = useSelector(CommunityData);
   const location = useLocation();
 
   const returnUrl = useMemo(() => {
     if (!isAutheticated) return "/";
     const shouldGoToDashboard =
-      location.pathname === "/" || !location.pathname.includes("aut-dashboard");
-    const goTo = shouldGoToDashboard ? "/aut-dashboard" : location.pathname;
+      location.pathname === "/" ||
+      !location.pathname.includes(communityData?.name);
+    const goTo = shouldGoToDashboard
+      ? `/${communityData?.name}`
+      : location.pathname;
     const url = location.state?.from;
     return url || goTo;
-  }, [isAutheticated]);
+  }, [isAutheticated, communityData]);
 
   useEffect(() => {
     getAppConfig()
@@ -135,7 +140,7 @@ function App() {
                   {isAutheticated && (
                     <>
                       <Route
-                        path="aut-dashboard/*"
+                        path={`${communityData?.name}/*`}
                         element={<AutDashboardMain />}
                       />
                       <Route path="*" element={<Navigate to={returnUrl} />} />

@@ -21,10 +21,10 @@ export interface SidebarMenuItem {
   children?: SidebarMenuItem[];
 }
 
-const menuItems: SidebarMenuItem[] = [
+const menuItems = (communityName: string): SidebarMenuItem[] => [
   {
     title: "Home",
-    route: "/aut-dashboard",
+    route: `/${communityName}`,
     exact: true,
     icon: DashboardIcon
   },
@@ -36,7 +36,7 @@ const menuItems: SidebarMenuItem[] = [
   {
     title: "Community",
     icon: ManageIcon,
-    route: "/aut-dashboard/members"
+    route: `/${communityName}/members`
   }
 ];
 
@@ -153,7 +153,7 @@ const childItems = (menu: SidebarMenuItem, level = 1) => {
   });
 };
 
-const MenuItems = ({ addonMenuItems = [] }) => {
+const MenuItems = ({ addonMenuItems = [], communityName }) => {
   return (
     <List
       sx={{
@@ -166,7 +166,7 @@ const MenuItems = ({ addonMenuItems = [] }) => {
       }}
       component="nav"
     >
-      {[...menuItems, ...addonMenuItems].map((menu, index) => {
+      {[...menuItems(communityName), ...addonMenuItems].map((menu, index) => {
         return (
           <Fragment key={`menu-item-${menu.title}-${index}`}>
             {autMenuItem(menu)}

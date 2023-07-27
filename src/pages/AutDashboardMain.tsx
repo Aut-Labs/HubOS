@@ -9,7 +9,7 @@ import AutLoading from "@components/AutLoading";
 import { pluginRoutes } from "./Modules/Shared/routes";
 import Modules from "./Modules/Modules";
 import { useSelector } from "react-redux";
-import { IsAdmin } from "@store/Community/community.reducer";
+import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
 import { useGetAllModuleDefinitionsQuery } from "@api/module-registry.api";
 import QuestSubmissions from "./QuestSubmissions/QuestSubmissions";
 import PeopleIcon from "@mui/icons-material/People";
@@ -18,6 +18,7 @@ import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import Admins from "./Admins/Admins";
 
 const AutDashboardMain = () => {
+  const communityData = useSelector(CommunityData);
   const isAdmin = useSelector(IsAdmin);
   const { data: plugins, isLoading } = useGetAllPluginDefinitionsByDAOQuery(
     null,
@@ -71,7 +72,7 @@ const AutDashboardMain = () => {
     return {
       submissionsItem: {
         title: "Quest Submissions",
-        route: "/aut-dashboard/quest-submissions",
+        route: `/${communityData?.name}/quest-submissions`,
         exact: true,
         icon: PeopleIcon,
         badgeCounter: totalSubmissions,
@@ -86,7 +87,7 @@ const AutDashboardMain = () => {
       },
       routes: allRoutes
     };
-  }, [plugins, modules, isAdmin, totalSubmissions]);
+  }, [plugins, modules, isAdmin, totalSubmissions, communityData]);
 
   return (
     <>
@@ -113,7 +114,10 @@ const AutDashboardMain = () => {
               )}
               <Route path="modules" element={<Modules />} />
               {modulesRoutes.routes.map((r) => r)}
-              <Route path="*" element={<Navigate to="/aut-dashboard" />} />
+              <Route
+                path="*"
+                element={<Navigate to={`/${communityData.name}`} />}
+              />
             </Routes>
           </Suspense>
         </SidebarDrawer>

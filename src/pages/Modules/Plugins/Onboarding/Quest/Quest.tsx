@@ -174,7 +174,7 @@ We are now onboarding ${quest?.metadata?.name} - take a quest, prove yourself, &
                   sm: "0"
                 }
               }}
-              to="/aut-dashboard/modules/OnboardingStrategy/QuestOnboardingPlugin"
+              to={`/${communityData?.name}/modules/OnboardingStrategy/QuestOnboardingPlugin`}
               component={Link}
             >
               All Quests
@@ -192,7 +192,6 @@ We are now onboarding ${quest?.metadata?.name} - take a quest, prove yourself, &
                 <Tooltip title="Refresh quests">
                   <IconButton
                     size="medium"
-                    component="span"
                     color="offWhite"
                     sx={{
                       ml: 1
@@ -277,7 +276,7 @@ We are now onboarding ${quest?.metadata?.name} - take a quest, prove yourself, &
                   disabled={tasks?.length >= 5}
                   size="medium"
                   color="primary"
-                  to="/aut-dashboard/modules/Task"
+                  to={`/${communityData?.name}/modules/Task`}
                   preserveParams
                   queryParams={{
                     onboardingQuestAddress: plugin?.pluginAddress,
@@ -370,7 +369,7 @@ We are now onboarding ${quest?.metadata?.name} - take a quest, prove yourself, &
             variant="outlined"
             size="large"
             color="offWhite"
-            to="/aut-dashboard/modules/Task"
+            to={`/${communityData?.name}/modules/Task`}
             preserveParams
             queryParams={{
               onboardingQuestAddress: plugin.pluginAddress,

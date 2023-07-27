@@ -1,4 +1,4 @@
-import { useEffect, memo } from "react";
+import { useEffect, memo, useMemo } from "react";
 import Box from "@mui/material/Box";
 import { useAppDispatch } from "@store/store.model";
 import {
@@ -22,6 +22,28 @@ import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import AutLoading from "@components/AutLoading";
 import { autUrls } from "@api/environment";
+import AutTabs from "@components/AutTabs/AutTabs";
+import { useSelector } from "react-redux";
+import { CommunityData } from "@store/Community/community.reducer";
+
+const generateMemberTabs = (members: { [role: string]: DAOMember[] }) => {
+  return Object.keys(members || []).reduce((prev, curr) => {
+    const item = members[curr];
+    if (Array.isArray(item)) {
+      prev = [
+        ...prev,
+        {
+          label: curr,
+          props: {
+            members: item
+          },
+          component: MembersList
+        }
+      ];
+    }
+    return prev;
+  }, []);
+};
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -181,6 +203,39 @@ const MemberCard = memo(
   }
 );
 
+const MembersList = ({ members = [] }: { members: DAOMember[] }) => {
+  return (
+    <>
+      {members.length ? (
+        <GridBox sx={{ flexGrow: 1, mt: 6 }}>
+          {members.map((member, index) => (
+            <MemberCard
+              key={`member-plugin-${index}`}
+              member={member}
+              isFetching={false}
+            />
+          ))}
+        </GridBox>
+      ) : (
+        <Box
+          sx={{
+            display: "flex",
+            p: "10px 30px 30px 30px",
+            mt: "48px",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <Typography color="rgb(107, 114, 128)" variant="subtitle2">
+            There are no contributors with this role yet...
+          </Typography>
+        </Box>
+      )}
+    </>
+  );
+};
+
 function Members() {
   const dispatch = useAppDispatch();
 
@@ -192,6 +247,29 @@ function Members() {
   useEffect(() => {
     dispatch(setTitle(`DAO - Members & Roles in your Community.`));
   }, [dispatch]);
+
+  const community = useSelector(CommunityData);
+  const initializedTabs = community?.properties.rolesSets[0].roles.reduce(
+    (tab, role) => {
+      const key = role.roleName;
+      tab[key] = [];
+      return tab;
+    },
+    {}
+  );
+
+  const tabs = useMemo(() => {
+    const groupedMembers = data?.reduce((group, member) => {
+      const key = member.properties.role.roleName;
+      if (!group[key]) {
+        group[key] = [];
+      }
+      group[key].push(member);
+      return group;
+    }, initializedTabs);
+
+    return generateMemberTabs(groupedMembers);
+  }, [data]);
 
   return (
     <Container maxWidth="lg" sx={{ py: "20px" }}>
@@ -215,14 +293,14 @@ function Members() {
             justifyContent: "flex-end"
           }}
         >
-          {/* <Button
+          <Button
             startIcon={<IosShareIcon />}
             variant="outlined"
             size="medium"
             color="offWhite"
           >
             Invite contributors
-          </Button> */}
+          </Button>
         </Box>
       </Box>
 
@@ -246,15 +324,12 @@ function Members() {
       {isLoading ? (
         <AutLoading width="130px" height="130px" />
       ) : (
-        <GridBox sx={{ flexGrow: 1, mt: 6 }}>
-          {data.map((member, index) => (
-            <MemberCard
-              key={`member-plugin-${index}`}
-              member={member}
-              isFetching={false}
-            />
-          ))}
-        </GridBox>
+        <AutTabs
+          // tabStyles={{
+          //   border: "2px solid #439EDD"
+          // }}
+          tabs={tabs}
+        />
       )}
     </Container>
   );

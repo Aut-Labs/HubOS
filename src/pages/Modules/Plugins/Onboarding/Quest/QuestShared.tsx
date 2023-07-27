@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { memo, useMemo, useState } from "react";
-import { allRoles } from "@store/Community/community.reducer";
+import { CommunityData, allRoles } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
 import { AutSelectField } from "@theme/field-select-styles";
 import { AutTextField } from "@theme/field-text-styles";
@@ -146,6 +146,7 @@ export const QuestListItem = memo(
   }) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const communityData = useSelector(CommunityData);
     const [roles] = useState(useSelector(allRoles));
 
     const roleName = useMemo(() => {
@@ -298,7 +299,7 @@ export const QuestListItem = memo(
                 variant="outlined"
                 startIcon={<AddIcon />}
                 disabled={row.tasksCount >= 5}
-                to="/aut-dashboard/modules/Task"
+                to={`/${communityData?.name}/modules/Task`}
                 preserveParams
                 queryParams={{
                   onboardingQuestAddress: pluginAddress,
