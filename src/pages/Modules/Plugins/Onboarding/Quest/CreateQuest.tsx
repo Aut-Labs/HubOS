@@ -24,7 +24,7 @@ import {
   ListItemText,
   useMediaQuery
 } from "@mui/material";
-import { allRoles } from "@store/Community/community.reducer";
+import { CommunityData, allRoles } from "@store/Community/community.reducer";
 import { AutSelectField } from "@theme/field-select-styles";
 import { memo, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -151,6 +151,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const [initialized, setInitialized] = useState(false);
   const location = useLocation();
+  const communityData = useSelector(CommunityData);
   const navigate = useNavigate();
   const urls = autUrls();
 
@@ -283,7 +284,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
   useEffect(() => {
     if (createIsSuccess) {
       navigate({
-        pathname: "/aut-dashboard/modules/Task",
+        pathname: `/${communityData?.name}/modules/Task`,
         search: new URLSearchParams({
           onboardingQuestAddress: plugin.pluginAddress,
           returnUrlLinkName: "Back to quest",
@@ -295,7 +296,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
     if (updateIsSuccess) {
       navigate(path);
     }
-  }, [createIsSuccess, updateIsSuccess]);
+  }, [createIsSuccess, updateIsSuccess, communityData]);
 
   const isDisabled = useMemo(() => {
     return !formState.isValid || Object.keys(formState.dirtyFields).length == 0;

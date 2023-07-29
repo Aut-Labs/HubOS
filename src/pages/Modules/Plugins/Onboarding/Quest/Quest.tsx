@@ -145,7 +145,7 @@ We are now onboarding ${quest?.metadata?.name} - take a quest, prove yourself, &
         open={isSuccessOnboarding}
         message="Success!"
         titleVariant="h2"
-        subtitle="Whoop! You launched your Quest. Now it's time to share and check the submissions!"
+        subtitle="uh-uh! You launched your Quest. Now it's time to share and check the submissions!"
         subtitleVariant="subtitle1"
         handleClose={() => activateReset()}
         twitterProps={twitterProps}
@@ -328,7 +328,7 @@ We are now onboarding ${quest?.metadata?.name} - take a quest, prove yourself, &
                     </Tooltip>
                   }
                 >
-                  <ButtonWithPulse
+                  <Button
                     disabled={quest?.tasksCount === 0}
                     variant="outlined"
                     size="medium"
@@ -342,7 +342,7 @@ We are now onboarding ${quest?.metadata?.name} - take a quest, prove yourself, &
                     }
                   >
                     Launch quest
-                  </ButtonWithPulse>
+                  </Button>
                 </Badge>
               </Box>
             )}

@@ -30,7 +30,7 @@ const menuItems = (communityName: string): SidebarMenuItem[] => [
   },
   {
     title: "Admins",
-    route: "/aut-dashboard/admins",
+    route: `/${communityName}/admins`,
     icon: AdminIcon
   },
   {
