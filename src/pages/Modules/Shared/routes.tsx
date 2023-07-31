@@ -9,6 +9,8 @@ import {
 } from "@aut-labs/sdk/dist/models/plugin";
 import { ReactComponent as SubStackIcon } from "@assets/aut/sub-stack.svg";
 import Submissions from "../Plugins/Task/Shared/Submissions";
+import PeopleIcon from "@mui/icons-material/People";
+import QuestSubmissions from "../../QuestSubmissions/QuestSubmissions";
 
 const Plugins = lazy(() => import("./Plugins"));
 
@@ -55,7 +57,9 @@ const CreateTransactionTask = lazy(
 export const pluginRoutes = (
   plugins: PluginDefinition[],
   modules: ModuleDefinition[],
-  isAdmin: boolean
+  isAdmin: boolean,
+  totalSubmissions: number,
+  communityName: string
 ): {
   menuItems: SidebarMenuItem[];
   allRoutes: React.ReactElement[];
@@ -66,6 +70,8 @@ export const pluginRoutes = (
       allRoutes: []
     };
   }
+
+  // let questSubmissionsAdded = false;
 
   return plugins.reduce(
     (prev, plugin) => {
@@ -94,7 +100,6 @@ export const pluginRoutes = (
         );
 
         if (moduleDefinition.id === 1 || moduleDefinition.id === 2) {
-          // for now we will ignore Task module menu
           const mainMenu = {
             title: plugin.metadata.properties.module.title,
             route: modulePath,
@@ -102,7 +107,11 @@ export const pluginRoutes = (
             exact: true,
             children: []
           };
-          prev.menuItems.push(mainMenu);
+
+          if (moduleDefinition.isActivated) {
+            prev.menuItems.push(mainMenu);
+          }
+
           prev.taskTypesMainMenu[moduleType] = mainMenu;
         }
       }
@@ -121,7 +130,23 @@ export const pluginRoutes = (
             route: path,
             children: []
           };
-          // mainMenu.children.push(childMenuItem);
+
+          // if (!questSubmissionsAdded && moduleDefinition.id === 1) {
+          //   const questSubmissionsItem: SidebarMenuItem = {
+          //     title: "Quest Submissions",
+          //     route: `/${communityName}/quest-submissions`,
+          //     exact: true,
+          //     icon: PeopleIcon,
+          //     badgeCounter: totalSubmissions,
+          //     children: []
+          //   };
+          //   questSubmissionsAdded = true;
+          //   prev.allRoutes.push(
+          //     <Route path="quest-submissions" element={<QuestSubmissions />} />
+          //   );
+          //   mainMenu.children.push(questSubmissionsItem);
+          // }
+          mainMenu.children.push(childMenuItem);
         }
         switch (plugin.pluginDefinitionId) {
           case PluginDefinitionType.QuestOnboardingPlugin:
