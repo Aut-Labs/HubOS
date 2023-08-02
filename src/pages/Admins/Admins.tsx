@@ -79,6 +79,24 @@ const tableColumns = (
       valueGetter: ({ id }) => `${+id + 1}.`
     },
     {
+      headerName: "Note",
+      field: "note",
+      editable: true,
+      flex: 1,
+      sortable: false,
+      cellClassName: "being-edited-cell-note",
+      renderEditCell: (props) => CustomEditComponent(props, `Ox...`)
+      // valueGetter: ({ row: { address } }) => {
+      //   if (address) {
+      //     const middle = Math.ceil(address.length / 2);
+      //     const left = address.slice(0, middle).substring(0, 8);
+      //     let right = address.slice(middle);
+      //     right = right.substr(right.length - 8);
+      //     return `${left}...${right}`;
+      //   }
+      // }
+    },
+    {
       headerName: "Address",
       field: "address",
       editable: true,
