@@ -423,8 +423,8 @@ const getMembers = async (body, api: BaseQueryApi) => {
 };
 
 interface UpdateAdminsData {
-  added: string[];
-  removed: string[];
+  added: { address: string; role: number }[];
+  removed: { address: string; role: number }[];
 }
 
 // export const updateAdmins = createAsyncThunk(
@@ -486,11 +486,11 @@ export const updateAdmins = async (
   const sdk = AutSDK.getInstance();
   try {
     const promises = [];
-    data.added.forEach(async (address) => {
-      promises.push(getAddAdminsPromise(sdk, address));
+    data.added.forEach(async (admin) => {
+      promises.push(getAddAdminsPromise(sdk, admin.address));
     });
-    data.removed.forEach(async (address) => {
-      promises.push(getRemoveAdminsPromise(sdk, address));
+    data.removed.forEach(async (admin) => {
+      promises.push(getRemoveAdminsPromise(sdk, admin.address));
     });
 
     const result = await Promise.all(promises);
@@ -524,13 +524,20 @@ const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
   const filteredEmptyAddresses = adminResponse.data.filter(
     (address) => address !== ethers.constants.AddressZero
   );
+  const getNotes = filteredEmptyAddresses.map((address) => {
+    return { address: address, note: Math.random().toString(36).substring(7) };
+  });
+  // add note property with random string to each item of filteredEmptyAddresses array
+  getNotes.forEach((address) => {
+    address["note"] = Math.random().toString(36).substring(7);
+  });
   // filter the empty addresses from adminResponse.data
   const community = new Community(metadata);
   return {
     data: {
       community,
       admin: adminResponse.data[0],
-      admins: filteredEmptyAddresses
+      admins: getNotes
     }
   };
 };
@@ -577,7 +584,7 @@ export const communityApi = createApi({
       {
         community: Community;
         admin: string;
-        admins: string[];
+        admins: { address: string; note: string }[];
       },
       void
     >({

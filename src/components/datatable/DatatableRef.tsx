@@ -44,6 +44,7 @@ export function CustomEditComponent(
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value; // The new value entered by the user
+    debugger;
     apiRef.current.setEditCellValue({ id, field, value: newValue });
   };
 

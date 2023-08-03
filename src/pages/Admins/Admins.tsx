@@ -55,6 +55,7 @@ const tableColumns = (
   };
 
   const handleSaveClick = (id) => (event) => {
+    debugger;
     const apiRef = getRef();
     event.stopPropagation();
     apiRef.current.commitRowChange(id);
@@ -85,14 +86,12 @@ const tableColumns = (
       flex: 1,
       sortable: false,
       cellClassName: "being-edited-cell-note",
-      renderEditCell: (props) => CustomEditComponent(props, `Ox...`)
-      // valueGetter: ({ row: { address } }) => {
-      //   if (address) {
-      //     const middle = Math.ceil(address.length / 2);
-      //     const left = address.slice(0, middle).substring(0, 8);
-      //     let right = address.slice(middle);
-      //     right = right.substr(right.length - 8);
-      //     return `${left}...${right}`;
+      renderEditCell: (props) =>
+        CustomEditComponent(props, `Enter note here...`)
+      // valueGetter: ({ row: { note } }) => {
+      //   debugger;
+      //   if (note) {
+      //     return `${note}`;
       //   }
       // }
     },
@@ -104,6 +103,12 @@ const tableColumns = (
       sortable: false,
       cellClassName: "being-edited-cell",
       renderEditCell: (props) => CustomEditComponent(props, `Ox...`)
+      // valueGetter: ({ row: { address } }) => {
+      //   debugger;
+      //   if (address) {
+      //     return `${address}`;
+      //   }
+      // }
       // valueGetter: ({ row: { address } }) => {
       //   if (address) {
       //     const middle = Math.ceil(address.length / 2);
@@ -179,7 +184,7 @@ const Admins = () => {
   const AdminsMap = useMemo(() => {
     if (data && data.admins) {
       const mapped = data.admins.map((x, i) => {
-        return { id: i, address: x };
+        return { id: i, address: x.address, note: x.note };
       });
       setInitialData(mapped);
       return mapped;
@@ -202,9 +207,14 @@ const Admins = () => {
 
     const { allItems } = GetDatatableItems(state);
     const { removedItems, updatedItems, noChangedItems, newItems } =
-      GetDatatableChangedItems(allItems, initialData, "address");
-    const addedAddresses = newItems.map((x) => x.address);
-    const removedAddresses = removedItems.map((x) => x.address);
+      GetDatatableChangedItems(allItems, initialData);
+    const addedAddresses = newItems.map((x) => {
+      return { address: x.address, note: x.note };
+    });
+    const removedAddresses = removedItems.map((x) => {
+      return { address: x.address, note: x.note };
+    });
+    debugger;
     if (!newItems.length && !removedItems.length) {
       setOpen(true);
       return;
