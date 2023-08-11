@@ -423,8 +423,10 @@ const getMembers = async (body, api: BaseQueryApi) => {
 };
 
 interface UpdateAdminsData {
-  added: { address: string; role: number }[];
-  removed: { address: string; role: number }[];
+  added: { address: string; note: string }[];
+  removed: { address: string; note: string }[];
+  updated: { address: string; note: string }[];
+  initialData: { address: string; note: string }[];
 }
 
 // export const updateAdmins = createAsyncThunk(
@@ -449,7 +451,7 @@ interface UpdateAdminsData {
 //   }
 // );
 
-const getAddAdminsPromise = async (sdk: AutSDK, address: string) => {
+const getAddAdminsPromise = async (sdk: AutSDK, address: string, note = "") => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
@@ -494,6 +496,37 @@ export const updateAdmins = async (
     });
 
     const result = await Promise.all(promises);
+
+    // const updated = data.updated.filter(
+    //   (x) =>
+    //     x.note !== data.initialData.find((a) => a.address === x.address).note
+    // );
+
+    const address = (api.getState() as any)?.community
+      ?.selectedCommunityAddress;
+
+    if (data.removed.length > 0) {
+      const mapped = data.removed.map((x) => x.address);
+      const notesDelete = await axios.delete(
+        `${environment.apiUrl}/autid/user/notes/addresses`,
+        {
+          data: {
+            daoAddress: address,
+            admins: [...mapped]
+          }
+        }
+      );
+    }
+
+    if (data.added.length > 0 || data.updated.length > 0) {
+      const notesResult = await axios.post(
+        `${environment.apiUrl}/autid/user/notes/setmany`,
+        {
+          daoAddress: address,
+          admins: [...data.added, ...data.updated]
+        }
+      );
+    }
     return {
       data: result
     };
@@ -507,8 +540,9 @@ export const updateAdmins = async (
 const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
 
-  const response = await sdk.daoExpander.contract.metadata.getMetadataUri();
+  const address = (api.getState() as any)?.community?.selectedCommunityAddress;
 
+  const response = await sdk.daoExpander.contract.metadata.getMetadataUri();
   if (!response.isSuccess) {
     return {
       error: response.errorMessage
@@ -524,14 +558,19 @@ const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
   const filteredEmptyAddresses = adminResponse.data.filter(
     (address) => address !== ethers.constants.AddressZero
   );
+
+  const notes = await axios
+    .post(`${environment.apiUrl}/autid/user/notes/addresses`, {
+      daoAddress: address,
+      admins: filteredEmptyAddresses
+    })
+    .then((res) => res.data);
   const getNotes = filteredEmptyAddresses.map((address) => {
-    return { address: address, note: Math.random().toString(36).substring(7) };
+    return {
+      address: address,
+      note: notes.find((x) => x.address === address)?.note
+    };
   });
-  // add note property with random string to each item of filteredEmptyAddresses array
-  getNotes.forEach((address) => {
-    address["note"] = Math.random().toString(36).substring(7);
-  });
-  // filter the empty addresses from adminResponse.data
   const community = new Community(metadata);
   return {
     data: {

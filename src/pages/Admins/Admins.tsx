@@ -55,7 +55,6 @@ const tableColumns = (
   };
 
   const handleSaveClick = (id) => (event) => {
-    debugger;
     const apiRef = getRef();
     event.stopPropagation();
     apiRef.current.commitRowChange(id);
@@ -80,29 +79,18 @@ const tableColumns = (
       valueGetter: ({ id }) => `${+id + 1}.`
     },
     {
-      headerName: "Note",
-      field: "note",
-      editable: true,
-      flex: 1,
-      sortable: false,
-      cellClassName: "being-edited-cell-note",
-      renderEditCell: (props) =>
-        CustomEditComponent(props, `Enter note here...`)
-      // valueGetter: ({ row: { note } }) => {
-      //   debugger;
-      //   if (note) {
-      //     return `${note}`;
-      //   }
-      // }
-    },
-    {
       headerName: "Address",
       field: "address",
       editable: true,
       flex: 1,
       sortable: false,
       cellClassName: "being-edited-cell",
-      renderEditCell: (props) => CustomEditComponent(props, `Ox...`)
+      renderEditCell: (props) => {
+        if (props.id !== 0) {
+          return CustomEditComponent(props, `Ox...`);
+        }
+      }
+      // renderEditCell: (props) => CustomEditComponent(props, `Ox...`)
       // valueGetter: ({ row: { address } }) => {
       //   debugger;
       //   if (address) {
@@ -120,6 +108,22 @@ const tableColumns = (
       // }
     },
     {
+      headerName: "Note",
+      field: "note",
+      editable: true,
+      flex: 1,
+      sortable: false,
+      cellClassName: "being-edited-cell-note",
+      renderEditCell: (props) =>
+        CustomEditComponent(props, `Enter note here...`)
+      // valueGetter: ({ row: { note } }) => {
+      //   debugger;
+      //   if (note) {
+      //     return `${note}`;
+      //   }
+      // }
+    },
+    {
       headerName: "",
       field: "actions",
       sortable: false,
@@ -130,6 +134,16 @@ const tableColumns = (
         const isInEditMode = apiRef.current.getRowMode(id) === "edit";
 
         if (isInEditMode) {
+          if (id === 0) {
+            return [
+              <GridActionsCellItem
+                icon={<SaveIcon />}
+                label="Save"
+                onClick={handleSaveClick(id)}
+                color="primary"
+              />
+            ];
+          }
           return [
             <GridActionsCellItem
               icon={<CancelIcon />}
@@ -147,7 +161,7 @@ const tableColumns = (
           ];
         }
 
-        if (id === 0) return [];
+        // if (id === 0) return [];
 
         return [
           <GridActionsCellItem
@@ -214,12 +228,16 @@ const Admins = () => {
     const removedAddresses = removedItems.map((x) => {
       return { address: x.address, note: x.note };
     });
-    debugger;
-    if (!newItems.length && !removedItems.length) {
+    if (!newItems.length && !removedItems.length && !updatedItems.length) {
       setOpen(true);
       return;
     }
-    await updateAdmins({ added: addedAddresses, removed: removedAddresses });
+    await updateAdmins({
+      added: addedAddresses,
+      removed: removedAddresses,
+      updated: updatedItems,
+      initialData
+    });
   };
 
   return (
@@ -267,7 +285,14 @@ const Admins = () => {
                 Toolbar: EditToolbar
               }}
               componentsProps={{
-                toolbar: { apiRef, title: "Add new Admin", focusOn: "use" }
+                toolbar: {
+                  apiRef,
+                  title: "Add new Admin",
+                  focusOn: "use",
+                  isSaveDisabled: isDisabled,
+                  adminsUpdating,
+                  onSubmitChanges: submit
+                }
               }}
             />
           )}
@@ -278,7 +303,7 @@ const Admins = () => {
               justifyContent: "center"
             }}
           >
-            <Button
+            {/* <Button
               disabled={isDisabled || adminsUpdating}
               sx={{
                 height: "50px"
@@ -290,7 +315,7 @@ const Admins = () => {
               onClick={submit}
             >
               Save changes
-            </Button>
+            </Button> */}
           </div>
         </>
       )}

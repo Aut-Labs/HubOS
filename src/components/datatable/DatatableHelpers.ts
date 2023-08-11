@@ -29,7 +29,7 @@ export const GetDatatableChangedItems = (
       if (!item) {
         prev.removedItems = [...prev.removedItems, curr];
       } else if (JSON.stringify(item) !== JSON.stringify(curr)) {
-        prev.updatedItems = [...prev.updatedItems, curr];
+        prev.updatedItems = [...prev.updatedItems, item];
       } else {
         prev.noChangedItems = [...prev.noChangedItems, curr];
       }
