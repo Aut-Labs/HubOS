@@ -85,7 +85,18 @@ const tableColumns = (
       flex: 1,
       sortable: false,
       cellClassName: "being-edited-cell",
-      renderEditCell: (props) => CustomEditComponent(props, `Ox...`)
+      renderEditCell: (props) => {
+        if (props.id !== 0) {
+          return CustomEditComponent(props, `Ox...`);
+        }
+      }
+      // renderEditCell: (props) => CustomEditComponent(props, `Ox...`)
+      // valueGetter: ({ row: { address } }) => {
+      //   debugger;
+      //   if (address) {
+      //     return `${address}`;
+      //   }
+      // }
       // valueGetter: ({ row: { address } }) => {
       //   if (address) {
       //     const middle = Math.ceil(address.length / 2);
@@ -93,6 +104,22 @@ const tableColumns = (
       //     let right = address.slice(middle);
       //     right = right.substr(right.length - 8);
       //     return `${left}...${right}`;
+      //   }
+      // }
+    },
+    {
+      headerName: "Note",
+      field: "note",
+      editable: true,
+      flex: 1,
+      sortable: false,
+      cellClassName: "being-edited-cell-note",
+      renderEditCell: (props) =>
+        CustomEditComponent(props, `Enter note here...`)
+      // valueGetter: ({ row: { note } }) => {
+      //   debugger;
+      //   if (note) {
+      //     return `${note}`;
       //   }
       // }
     },
@@ -107,6 +134,16 @@ const tableColumns = (
         const isInEditMode = apiRef.current.getRowMode(id) === "edit";
 
         if (isInEditMode) {
+          if (id === 0) {
+            return [
+              <GridActionsCellItem
+                icon={<SaveIcon />}
+                label="Save"
+                onClick={handleSaveClick(id)}
+                color="primary"
+              />
+            ];
+          }
           return [
             <GridActionsCellItem
               icon={<CancelIcon />}
@@ -124,7 +161,7 @@ const tableColumns = (
           ];
         }
 
-        if (id === 0) return [];
+        // if (id === 0) return [];
 
         return [
           <GridActionsCellItem
@@ -161,7 +198,7 @@ const Admins = () => {
   const AdminsMap = useMemo(() => {
     if (data && data.admins) {
       const mapped = data.admins.map((x, i) => {
-        return { id: i, address: x };
+        return { id: i, address: x.address, note: x.note };
       });
       setInitialData(mapped);
       return mapped;
@@ -184,14 +221,23 @@ const Admins = () => {
 
     const { allItems } = GetDatatableItems(state);
     const { removedItems, updatedItems, noChangedItems, newItems } =
-      GetDatatableChangedItems(allItems, initialData, "address");
-    const addedAddresses = newItems.map((x) => x.address);
-    const removedAddresses = removedItems.map((x) => x.address);
-    if (!newItems.length && !removedItems.length) {
+      GetDatatableChangedItems(allItems, initialData);
+    const addedAddresses = newItems.map((x) => {
+      return { address: x.address, note: x.note };
+    });
+    const removedAddresses = removedItems.map((x) => {
+      return { address: x.address, note: x.note };
+    });
+    if (!newItems.length && !removedItems.length && !updatedItems.length) {
       setOpen(true);
       return;
     }
-    await updateAdmins({ added: addedAddresses, removed: removedAddresses });
+    await updateAdmins({
+      added: addedAddresses,
+      removed: removedAddresses,
+      updated: updatedItems,
+      initialData
+    });
   };
 
   return (
@@ -239,7 +285,14 @@ const Admins = () => {
                 Toolbar: EditToolbar
               }}
               componentsProps={{
-                toolbar: { apiRef, title: "Add new Admin", focusOn: "use" }
+                toolbar: {
+                  apiRef,
+                  title: "Add new Admin",
+                  focusOn: "use",
+                  isSaveDisabled: isDisabled,
+                  adminsUpdating,
+                  onSubmitChanges: submit
+                }
               }}
             />
           )}
@@ -250,7 +303,7 @@ const Admins = () => {
               justifyContent: "center"
             }}
           >
-            <Button
+            {/* <Button
               disabled={isDisabled || adminsUpdating}
               sx={{
                 height: "50px"
@@ -262,7 +315,7 @@ const Admins = () => {
               onClick={submit}
             >
               Save changes
-            </Button>
+            </Button> */}
           </div>
         </>
       )}

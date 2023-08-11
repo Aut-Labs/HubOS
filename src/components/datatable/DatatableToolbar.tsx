@@ -3,7 +3,15 @@ import AddIcon from "@mui/icons-material/Add";
 import { Button } from "@mui/material";
 
 const EditToolbar = (props) => {
-  const { apiRef, maxSize, title, focusOn } = props;
+  const {
+    apiRef,
+    maxSize,
+    title,
+    focusOn,
+    isSaveDisabled,
+    adminsUpdating,
+    onSubmitChanges
+  } = props;
 
   const handleClick = () => {
     const ids =
@@ -20,7 +28,7 @@ const EditToolbar = (props) => {
   };
 
   return (
-    <GridToolbarContainer>
+    <GridToolbarContainer sx={{ justifyContent: "space-around" }}>
       <Button
         sx={{
           width: "220px"
@@ -34,6 +42,19 @@ const EditToolbar = (props) => {
         onClick={handleClick}
       >
         Add new
+      </Button>
+      <Button
+        disabled={isSaveDisabled || adminsUpdating}
+        type="button"
+        color="offWhite"
+        variant="outlined"
+        size="medium"
+        sx={{
+          width: "220px"
+        }}
+        onClick={onSubmitChanges}
+      >
+        Save changes
       </Button>
     </GridToolbarContainer>
   );

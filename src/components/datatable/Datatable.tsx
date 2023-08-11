@@ -56,6 +56,7 @@ const Datatable = ({
         density="compact"
         sx={{
           border: "none",
+          flexDirection: "column-reverse",
           color: "offWhite.main",
           ".MuiInputBase-input": {
             color: "offWhite.contrastText",

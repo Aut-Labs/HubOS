@@ -128,6 +128,7 @@ function App() {
               ) : (
                 <Routes>
                   <Route path="callback" element={<Callback />} />
+                  <Route path="admins" element={<Admins />} />
                   {!isAutheticated && (
                     <>
                       <Route path="/" element={<GetStarted />} />
