@@ -169,7 +169,7 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
         open={isSuccessOnboarding}
         message="Success!"
         titleVariant="h2"
-        subtitle="Whoop! You launched your Onboarding Quests. Now it's time to share and check the submissions!"
+        subtitle="uh-uh! You launched your Onboarding Quests. Now it's time to share and check the submissions!"
         subtitleVariant="subtitle1"
         handleClose={() => activateReset()}
         twitterProps={twitterProps}

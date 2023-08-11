@@ -28,33 +28,33 @@ const AutDashboardMain = () => {
     }
   );
 
-  const { questOnboarding } = useGetAllPluginDefinitionsByDAOQuery(null, {
-    selectFromResult: ({ data }) => ({
-      questOnboarding: (data || []).find(
-        (p) =>
-          PluginDefinitionType.QuestOnboardingPlugin === p.pluginDefinitionId
-      )
-    })
-  });
+  // const { questOnboarding } = useGetAllPluginDefinitionsByDAOQuery(null, {
+  //   selectFromResult: ({ data }) => ({
+  //     questOnboarding: (data || []).find(
+  //       (p) =>
+  //         PluginDefinitionType.QuestOnboardingPlugin === p.pluginDefinitionId
+  //     )
+  //   })
+  // });
 
-  const { data: onboardingProgress } = useGetOnboardingProgressQuery(
-    questOnboarding?.pluginAddress,
-    {
-      pollingInterval: 15000,
-      refetchOnMountOrArgChange: true
-    }
-  );
+  // const { data: onboardingProgress } = useGetOnboardingProgressQuery(
+  //   questOnboarding?.pluginAddress,
+  //   {
+  //     pollingInterval: 15000,
+  //     refetchOnMountOrArgChange: true
+  //   }
+  // );
 
-  const totalSubmissions = useMemo(() => {
-    if (onboardingProgress?.quests) {
-      return onboardingProgress?.quests.reduce((prev, curr) => {
-        prev += curr.tasksAndSubmissions.submissions.length;
-        return prev;
-      }, 0);
-    }
+  // const totalSubmissions = useMemo(() => {
+  //   if (onboardingProgress?.quests) {
+  //     return onboardingProgress?.quests.reduce((prev, curr) => {
+  //       prev += curr.tasksAndSubmissions.submissions.length;
+  //       return prev;
+  //     }, 0);
+  //   }
 
-    return 0;
-  }, [onboardingProgress]);
+  //   return 0;
+  // }, [onboardingProgress]);
 
   const { data: modules, isLoading: isLoadingModules } =
     useGetAllModuleDefinitionsQuery(null, {
@@ -66,18 +66,20 @@ const AutDashboardMain = () => {
     const { allRoutes, menuItems } = pluginRoutes(
       plugins || [],
       modules || [],
-      isAdmin
+      isAdmin,
+      0,
+      ""
     );
 
     return {
-      submissionsItem: {
-        title: "Quest Submissions",
-        route: `/${communityData?.name}/quest-submissions`,
-        exact: true,
-        icon: PeopleIcon,
-        badgeCounter: totalSubmissions,
-        children: []
-      },
+      // submissionsItem: {
+      //   title: "Quest Submissions",
+      //   route: `/${communityData?.name}/quest-submissions`,
+      //   exact: true,
+      //   icon: PeopleIcon,
+      //   badgeCounter: totalSubmissions,
+      //   children: []
+      // },
       menuItem: {
         title: "Modules",
         route: "modules",
@@ -87,7 +89,7 @@ const AutDashboardMain = () => {
       },
       routes: allRoutes
     };
-  }, [plugins, modules, isAdmin, totalSubmissions, communityData]);
+  }, [plugins, modules, isAdmin]);
 
   return (
     <>
@@ -97,7 +99,7 @@ const AutDashboardMain = () => {
         <SidebarDrawer
           addonMenuItems={
             modulesRoutes?.routes?.length
-              ? [modulesRoutes.submissionsItem, modulesRoutes.menuItem]
+              ? [modulesRoutes.menuItem]
               : [modulesRoutes.menuItem]
           }
         >
@@ -106,12 +108,12 @@ const AutDashboardMain = () => {
               <Route index element={<Dashboard />} />
               <Route path="admins" element={<Admins />} />
               <Route path="members" element={<Members />} />
-              {modulesRoutes?.routes?.length && (
+              {/* {modulesRoutes?.routes?.length && (
                 <Route
                   path="quest-submissions"
                   element={<QuestSubmissions />}
                 />
-              )}
+              )} */}
               <Route path="modules" element={<Modules />} />
               {modulesRoutes.routes.map((r) => r)}
               <Route
