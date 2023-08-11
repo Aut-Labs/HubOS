@@ -27,10 +27,10 @@ import { AutSelectField } from "@theme/field-select-styles";
 import { InteractionNetworks } from "@utils/transaction-networks";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
-import { useEthers } from "@usedapp/core";
 import { CommunityData, allRoles } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
 import addMinutes from "date-fns/addMinutes";
+import { useAccount } from "wagmi";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -122,7 +122,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const roles = useSelector(allRoles);
-  const { account } = useEthers();
+  const { address: account } = useAccount();
   const communityData = useSelector(CommunityData);
   const { control, handleSubmit, getValues, formState } = useForm({
     mode: "onChange",

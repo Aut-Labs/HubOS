@@ -25,8 +25,8 @@ import {
 import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
-import { useEthers } from "@usedapp/core";
 import addMinutes from "date-fns/addMinutes";
+import { useAccount } from "wagmi";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -114,7 +114,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
   const inviteLink = useSelector(DiscordLink);
   const roles = useSelector(allRoles);
   const communityData = useSelector(CommunityData);
-  const { account } = useEthers();
+  const { address: account } = useAccount();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [discordDialogOpen, setDiscordDialogOpen] = useState(false);

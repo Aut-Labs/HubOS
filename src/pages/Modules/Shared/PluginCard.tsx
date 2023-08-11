@@ -18,16 +18,14 @@ import { memo, useMemo } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddIcon from "@mui/icons-material/Add";
 import LoadingButton from "@mui/lab/LoadingButton";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useSelector } from "react-redux";
-import { SelectedNetworkConfig } from "@store/WalletProvider/WalletProvider";
+import { SelectedNetwork } from "@store/WalletProvider/WalletProvider";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import {
   ModuleDefinition,
   PluginDefinitionType
 } from "@aut-labs/sdk/dist/models/plugin";
 import LinkWithQuery from "@components/LinkWithQuery";
-import { useEthers } from "@usedapp/core";
 import { useActivateModuleMutation } from "@api/module-registry.api";
 
 const GridCard = styled(Card)(({ theme }) => {
@@ -52,15 +50,15 @@ const PluginCard = ({
   isFetching: boolean;
   hasCopyright: boolean;
 }) => {
-  const selectedNetworkConfig = useSelector(SelectedNetworkConfig);
+  const selectedNetwork = useSelector(SelectedNetwork);
   const [addPlugin, { error, isLoading, isError, reset }] =
     useAddPluginToDAOMutation();
 
   const exploreAddressUrl = useMemo(() => {
-    if (!selectedNetworkConfig) return;
-    const [exploreUrl] = selectedNetworkConfig.explorerUrls;
+    if (!selectedNetwork) return;
+    const [exploreUrl] = selectedNetwork.explorerUrls;
     return `${exploreUrl}address/${plugin?.pluginAddress}`;
-  }, [selectedNetworkConfig?.explorerUrls, plugin?.pluginAddress]);
+  }, [selectedNetwork?.explorerUrls, plugin?.pluginAddress]);
 
   const path = useMemo(() => {
     return `${PluginDefinitionType[plugin.pluginDefinitionId]}`;
@@ -138,7 +136,7 @@ const PluginCard = ({
             </Typography>
 
             {!!plugin.pluginAddress && (
-              <Tooltip title={`Explore in ${selectedNetworkConfig?.name}`}>
+              <Tooltip title={`Explore in ${selectedNetwork?.name}`}>
                 <IconButton
                   href={exploreAddressUrl}
                   target="_blank"

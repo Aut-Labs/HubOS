@@ -26,10 +26,10 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
-import { useEthers } from "@usedapp/core";
 import { CommunityData, allRoles } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
 import addMinutes from "date-fns/addMinutes";
+import { useAccount } from "wagmi";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -125,7 +125,7 @@ const endDatetime = new Date();
 addMinutes(endDatetime, 45);
 
 const OpenTasks = ({ plugin }: PluginParams) => {
-  const { account } = useEthers();
+  const { address: account } = useAccount();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const roles = useSelector(allRoles);

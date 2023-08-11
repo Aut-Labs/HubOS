@@ -170,7 +170,7 @@ export const updateDiscordSocials = createAsyncThunk(
     );
 
     if (response.isSuccess) {
-      const autIdData = JSON.parse(window.sessionStorage.getItem("aut-data"));
+      const autIdData = JSON.parse(window.localStorage.getItem("aut-data"));
       let foundSocial = false;
       for (let i = 0; i < autIdData.properties.communities.length; i++) {
         if (foundSocial) {
@@ -187,7 +187,7 @@ export const updateDiscordSocials = createAsyncThunk(
             }
           }
       }
-      window.sessionStorage.setItem("aut-data", JSON.stringify(autIdData));
+      window.localStorage.setItem("aut-data", JSON.stringify(autIdData));
       return args.community;
     }
     return rejectWithValue(response?.errorMessage);
@@ -423,8 +423,10 @@ const getMembers = async (body, api: BaseQueryApi) => {
 };
 
 interface UpdateAdminsData {
-  added: string[];
-  removed: string[];
+  added: { address: string; note: string }[];
+  removed: { address: string; note: string }[];
+  updated: { address: string; note: string }[];
+  initialData: { address: string; note: string }[];
 }
 
 // export const updateAdmins = createAsyncThunk(
@@ -449,7 +451,7 @@ interface UpdateAdminsData {
 //   }
 // );
 
-const getAddAdminsPromise = async (sdk: AutSDK, address: string) => {
+const getAddAdminsPromise = async (sdk: AutSDK, address: string, note = "") => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
@@ -486,14 +488,45 @@ export const updateAdmins = async (
   const sdk = AutSDK.getInstance();
   try {
     const promises = [];
-    data.added.forEach(async (address) => {
-      promises.push(getAddAdminsPromise(sdk, address));
+    data.added.forEach(async (admin) => {
+      promises.push(getAddAdminsPromise(sdk, admin.address));
     });
-    data.removed.forEach(async (address) => {
-      promises.push(getRemoveAdminsPromise(sdk, address));
+    data.removed.forEach(async (admin) => {
+      promises.push(getRemoveAdminsPromise(sdk, admin.address));
     });
 
     const result = await Promise.all(promises);
+
+    // const updated = data.updated.filter(
+    //   (x) =>
+    //     x.note !== data.initialData.find((a) => a.address === x.address).note
+    // );
+
+    const address = (api.getState() as any)?.community
+      ?.selectedCommunityAddress;
+
+    if (data.removed.length > 0) {
+      const mapped = data.removed.map((x) => x.address);
+      const notesDelete = await axios.delete(
+        `${environment.apiUrl}/autid/user/notes/addresses`,
+        {
+          data: {
+            daoAddress: address,
+            admins: [...mapped]
+          }
+        }
+      );
+    }
+
+    if (data.added.length > 0 || data.updated.length > 0) {
+      const notesResult = await axios.post(
+        `${environment.apiUrl}/autid/user/notes/setmany`,
+        {
+          daoAddress: address,
+          admins: [...data.added, ...data.updated]
+        }
+      );
+    }
     return {
       data: result
     };
@@ -507,8 +540,9 @@ export const updateAdmins = async (
 const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
 
-  const response = await sdk.daoExpander.contract.metadata.getMetadataUri();
+  const address = (api.getState() as any)?.community?.selectedCommunityAddress;
 
+  const response = await sdk.daoExpander.contract.metadata.getMetadataUri();
   if (!response.isSuccess) {
     return {
       error: response.errorMessage
@@ -524,13 +558,25 @@ const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
   const filteredEmptyAddresses = adminResponse.data.filter(
     (address) => address !== ethers.constants.AddressZero
   );
-  // filter the empty addresses from adminResponse.data
+
+  const notes = await axios
+    .post(`${environment.apiUrl}/autid/user/notes/addresses`, {
+      daoAddress: address,
+      admins: filteredEmptyAddresses
+    })
+    .then((res) => res.data);
+  const getNotes = filteredEmptyAddresses.map((address) => {
+    return {
+      address: address,
+      note: notes.find((x) => x.address === address)?.note
+    };
+  });
   const community = new Community(metadata);
   return {
     data: {
       community,
       admin: adminResponse.data[0],
-      admins: filteredEmptyAddresses
+      admins: getNotes
     }
   };
 };
@@ -577,7 +623,7 @@ export const communityApi = createApi({
       {
         community: Community;
         admin: string;
-        admins: string[];
+        admins: { address: string; note: string }[];
       },
       void
     >({

@@ -53,10 +53,8 @@ const add = async (body: PluginDefinition, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
   const state = api.getState() as any;
   const { selectedCommunityAddress } = state.community;
-  const { networksConfig, selectedNetwork } = state.walletProvider;
-  const network: NetworkConfig = networksConfig.find(
-    (n) => n.network === selectedNetwork
-  );
+  const { selectedNetwork } = state.walletProvider;
+  const network: NetworkConfig = selectedNetwork;
 
   // temporary
   const { data } =

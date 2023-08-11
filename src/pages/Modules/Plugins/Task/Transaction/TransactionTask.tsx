@@ -11,9 +11,9 @@ import TaskDetails from "../Shared/TaskDetails";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
-import { useEthers } from "@usedapp/core";
 import { TaskStatus } from "@aut-labs/sdk/dist/models/task";
 import { InteractionNetworks } from "@utils/transaction-networks";
+import { useAccount } from "wagmi";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -22,7 +22,7 @@ interface PluginParams {
 const TransactionTask = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const isAdmin = useSelector(IsAdmin);
-  const { account: userAddress } = useEthers();
+  const { address: userAddress } = useAccount();
 
   const params = useParams();
   const { task } = useGetAllTasksPerQuestQuery(
