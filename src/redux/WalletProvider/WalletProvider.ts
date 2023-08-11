@@ -10,7 +10,7 @@ export enum ConnectorTypes {
 export interface WalletProviderState {
   signer: ethers.providers.JsonRpcSigner;
   selectedWalletType: "injected" | "walletConnect";
-  selectedNetwork: string;
+  selectedNetwork: NetworkConfig;
   networksConfig: NetworkConfig[];
   isOpen: boolean;
   sdkInitialized: boolean;
@@ -46,7 +46,7 @@ export const walletProviderSlice = createSlice({
       state.isOpen = action.payload;
     },
     setNetwork(state, action) {
-      state.selectedNetwork = action.payload as string;
+      state.selectedNetwork = action.payload as NetworkConfig;
     },
     setNetworks(state, action) {
       state.networksConfig = action.payload;
@@ -95,23 +95,20 @@ export const networksConfig = (state: any) =>
 export const NetworksConfig = createSelector([networksConfig], (a) => a);
 
 export const selectedNetwork = (state: any) =>
-  state.walletProvider.selectedNetwork as string;
+  state.walletProvider.selectedNetwork as NetworkConfig;
 export const SelectedNetwork = createSelector([selectedNetwork], (a) => a);
 
-export const SelectedNetworkConfig = createSelector(
-  NetworksConfig,
-  SelectedNetwork,
-  (networks, networkName) => networks.find((r) => r.network === networkName)
-);
+// export const SelectedNetworkConfig = createSelector(
+//   NetworksConfig,
+//   SelectedNetwork,
+//   (networks, n) => networks.find((r) => r.network === n?.ne)
+// );
 
-export const BlockExplorerUrl = createSelector(
-  SelectedNetworkConfig,
-  (config) => {
-    if (config) {
-      return config.explorerUrls[0];
-    }
+export const BlockExplorerUrl = createSelector(SelectedNetwork, (config) => {
+  if (config) {
+    return config.explorerUrls[0];
   }
-);
+});
 
 export const NetworkWalletConnectors = (state: any) =>
   state.walletProvider.wallets as any;

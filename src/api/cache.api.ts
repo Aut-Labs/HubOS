@@ -1,6 +1,5 @@
 import axios from "axios";
 import { environment } from "./environment";
-import { AUTH_TOKEN_KEY } from "./auth.api";
 
 export enum CacheTypes {
   UserPhases = "UserPhases",
@@ -17,15 +16,22 @@ export interface CacheModel {
   createdAt?: Date;
 }
 
-export const getCache = async (cacheKey: string): Promise<CacheModel> => {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+export const getCache = async (
+  cacheKey: string,
+  address: string
+): Promise<CacheModel> => {
+  // if (!AUTH_TOKEN_KEY || !isAuthenticated) {
+  //   localStorage.removeItem(AUTH_TOKEN_KEY);
+  //   return;
+  // }
+  // const token = localStorage.getItem(AUTH_TOKEN_KEY);
   const res = await axios.get(
-    `${environment.apiUrl}/autID/cache/getCache/${cacheKey}`,
-    {
-      headers: {
-        Authorization: token
-      }
-    }
+    `${environment.apiUrl}/autID/cache/getCache/${cacheKey}?address=${address}`
+    // {
+    //   headers: {
+    //     Authorization: token
+    //   }
+    // }
   );
   return res?.data || null;
 };
@@ -33,28 +39,31 @@ export const getCache = async (cacheKey: string): Promise<CacheModel> => {
 export const updateCache = async (
   cache: Partial<CacheModel>
 ): Promise<CacheModel> => {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  // const token = localStorage.getItem(AUTH_TOKEN_KEY);
   const res = await axios.post(
     `${environment.apiUrl}/autID/cache/addOrUpdateCache/${cache.cacheKey}`,
-    cache,
-    {
-      headers: {
-        Authorization: token
-      }
-    }
+    cache
+    // {
+    //   headers: {
+    //     Authorization: token
+    //   }
+    // }
   );
   return res?.data || null;
 };
 
-export const deleteCache = async (cacheKey: string): Promise<void> => {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+export const deleteCache = async (
+  cacheKey: string,
+  address: string
+): Promise<void> => {
+  // const token = localStorage.getItem(AUTH_TOKEN_KEY);
   const res = await axios.delete(
-    `${environment.apiUrl}/autID/cache/deleteCache/${cacheKey}`,
-    {
-      headers: {
-        Authorization: token
-      }
-    }
+    `${environment.apiUrl}/autID/cache/deleteCache/${cacheKey}?address=${address}`
+    // {
+    //   headers: {
+    //     Authorization: token
+    //   }
+    // }
   );
   return res?.data || null;
 };

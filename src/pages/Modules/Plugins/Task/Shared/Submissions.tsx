@@ -31,13 +31,13 @@ import { TaskType } from "@aut-labs/sdk/dist/models/task";
 import OverflowTooltip from "@components/OverflowTooltip";
 import AutLoading from "@components/AutLoading";
 import { useGetAllTasksPerQuestQuery } from "@api/onboarding.api";
-import { useEthers } from "@usedapp/core";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useSelector } from "react-redux";
 import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CopyAddress from "@components/CopyAddress";
 import differenceInDays from "date-fns/differenceInDays";
+import { useAccount } from "wagmi";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {
@@ -285,7 +285,7 @@ interface PluginParams {
 
 const Submissions = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
-  const { account: userAddress } = useEthers();
+  const { address: userAddress } = useAccount();
   const params = useParams<{ taskId: string }>();
   const isAdmin = useSelector(IsAdmin);
   const communityData = useSelector(CommunityData);

@@ -20,7 +20,7 @@ import DashboardTitle from "@components/AppTitle";
 import { ReactComponent as AutWhiteIcon } from "@assets/aut/aut-white.svg";
 import { useSelector } from "react-redux";
 import { AppTitle } from "@store/ui-reducer";
-import { SelectedNetworkConfig } from "@store/WalletProvider/WalletProvider";
+import { SelectedNetwork } from "@store/WalletProvider/WalletProvider";
 import {
   CommunityData,
   IsDiscordVerified
@@ -101,7 +101,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
   const theme = useTheme();
   const community = useSelector(CommunityData);
   const userInfo = useSelector(UserInfo);
-  const network = useSelector(SelectedNetworkConfig);
+  const network = useSelector(SelectedNetwork);
   const appTitle = useSelector(AppTitle);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isExtraLarge = useMediaQuery(theme.breakpoints.up("xxl"));

@@ -32,12 +32,12 @@ import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
-import { useEthers } from "@usedapp/core";
 import { TaskStatus } from "@aut-labs/sdk/dist/models/task";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import CopyAddress from "@components/CopyAddress";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import axios from "axios";
+import { useAccount } from "wagmi";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -95,6 +95,7 @@ const UserSubmitContent = ({
 
   const onSubmit = async (values) => {
     submitTask({
+      userAddress,
       task: {
         ...task,
         submission: {
@@ -886,7 +887,7 @@ const OwnerFinalizeContent = ({
 
 const OpenTask = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
-  const { account: userAddress } = useEthers();
+  const { address: userAddress } = useAccount();
   const isAdmin = useSelector(IsAdmin);
 
   const params = useParams();

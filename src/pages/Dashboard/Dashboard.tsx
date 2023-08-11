@@ -40,7 +40,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   // "&:nth-of-type(odd)": {
   //   backgroundColor: theme.palette.action.hover
   // },
-  "&:first-child td, &:first-child th": {
+  "&:first-of-type td, &:first-of-type th": {
     borderTop: `2px solid ${theme.palette.divider}`
   },
   "&:last-child td, &:last-child th": {
@@ -54,7 +54,7 @@ const StyledMembersTableRow = styled(TableRow)(({ theme }) => ({
     backgroundColor: theme.palette.nightBlack.light
   },
   border: 0,
-  "&:first-child td, &:first-child th": {
+  "&:first-of-type td, &:first-of-type th": {
     borderTop: `2px solid ${theme.palette.divider}`
   },
 
@@ -281,8 +281,8 @@ const Dashboard = () => {
                   position: "relative"
                 }}
               >
-                {roles.map((role) => (
-                  <StyledMembersTableRow>
+                {roles.map((role, index) => (
+                  <StyledMembersTableRow key={`roles-key-${index}`}>
                     <MembersStyledTableCell>
                       <Typography
                         variant="subtitle2"
@@ -298,11 +298,15 @@ const Dashboard = () => {
                   </StyledMembersTableRow>
                 ))}
                 {isLoading && (
-                  <CircularProgress
-                    className="spinner-center"
-                    size="60px"
-                    style={{ top: "calc(50% - 30px)" }}
-                  />
+                  <tr>
+                    <td>
+                      <CircularProgress
+                        className="spinner-center"
+                        size="60px"
+                        style={{ top: "calc(50% - 30px)" }}
+                      />
+                    </td>
+                  </tr>
                 )}
 
                 <StyledMembersTableRow>

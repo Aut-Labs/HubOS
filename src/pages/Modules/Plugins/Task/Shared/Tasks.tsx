@@ -29,6 +29,7 @@ import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import differenceInDays from "date-fns/differenceInDays";
 import { CommunityData } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
+import { useAccount } from "wagmi";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {
@@ -90,6 +91,7 @@ const TaskCard = ({
   const confirm = useConfirmDialog();
   const [searchParams] = useSearchParams();
   const communityData = useSelector(CommunityData);
+  const { address: userAddress } = useAccount();
   const [removeTask, { error, isError, isLoading, reset }] =
     useRemoveTaskFromQuestMutation();
 
@@ -113,6 +115,7 @@ const TaskCard = ({
       title: "Are you sure you want to delete this task?",
       onConfirm: () => {
         removeTask({
+          userAddress,
           task: row,
           questId: +params.questId,
           pluginTokenId: plugin.tokenId,

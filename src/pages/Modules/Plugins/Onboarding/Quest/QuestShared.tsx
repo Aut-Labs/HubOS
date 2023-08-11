@@ -287,8 +287,8 @@ export const QuestListItem = memo(
           {row.durationInDays} days
         </QuestStyledTableCell> */}
 
-        {isAdmin && !row.active && (
-          <QuestStyledTableCell align="right">
+        <QuestStyledTableCell align="right">
+          {isAdmin && !row.active && (
             <Stack gap={2}>
               <Button
                 sx={{
@@ -340,8 +340,8 @@ export const QuestListItem = memo(
                 </ButtonWithPulse>
               </Badge> */}
             </Stack>
-          </QuestStyledTableCell>
-        )}
+          )}
+        </QuestStyledTableCell>
       </StyledTableRow>
     );
   }

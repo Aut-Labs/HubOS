@@ -6,11 +6,7 @@ import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { useAppDispatch } from "@store/store.model";
 import SWSnackbar from "./components/snackbar";
 import Web3DautConnect from "@api/ProviderFactory/web3-daut-connect";
-import { NetworkConfig } from "@api/ProviderFactory/network.config";
 import { environment } from "@api/environment";
-import { ethers } from "ethers";
-import { DAppProvider, Config, MetamaskConnector } from "@usedapp/core";
-import { WalletConnectConnector } from "@usedapp/wallet-connect-connector";
 import { setNetworks } from "@store/WalletProvider/WalletProvider";
 import { getAppConfig } from "@api/aut.api";
 import AutSDK from "@aut-labs/sdk";
@@ -19,64 +15,16 @@ import GetStarted from "./pages/GetStarted/GetStarted";
 import AutLoading from "@components/AutLoading";
 import ErrorPage from "@components/ErrorPage";
 import Callback from "./pages/Oauth2Callback/Callback";
-import Admins from "./pages/Admins/Admins";
 import { CommunityData } from "@store/Community/community.reducer";
+import { generateNetworkConfig } from "@api/ProviderFactory/setup.config";
+import { WagmiConfig } from "wagmi";
 
 const AutDashboardMain = lazy(() => import("./pages/AutDashboardMain"));
-
-const generateConfig = (networks: NetworkConfig[]): Config => {
-  const enabled_networks = networks.filter((n) => !n.disabled);
-  const readOnlyUrls = enabled_networks.reduce((prev, curr) => {
-    const network = {
-      name: "mumbai",
-      chainId: 80001,
-      _defaultProvider: (providers) =>
-        new providers.JsonRpcProvider(curr.rpcUrls[0])
-    };
-    const provider = ethers.getDefaultProvider(network);
-    prev[curr.chainId] = provider;
-    return prev;
-  }, {});
-
-  return {
-    readOnlyUrls,
-    notifications: {
-      checkInterval: 0,
-      expirationPeriod: 0
-    },
-    autoConnect: false,
-    // @ts-ignore
-    networks: enabled_networks.map((n) => ({
-      isLocalChain: false,
-      isTestChain: environment.networkEnv === "testing",
-      chainId: n.chainId,
-      chainName: n.network,
-      rpcUrl: n.rpcUrls[0],
-      nativeCurrency: n.nativeCurrency
-    })),
-    gasLimitBufferPercentage: 50000,
-    pollingIntervals: enabled_networks.reduce((prev, curr) => {
-      prev[curr.chainId] = 40000;
-      return prev;
-    }, {}),
-    connectors: {
-      metamask: new MetamaskConnector(),
-      walletConnect: new WalletConnectConnector({
-        rpc: enabled_networks.reduce((prev, curr) => {
-          // eslint-disable-next-line prefer-destructuring
-          prev[curr.chainId] = curr.rpcUrls[0];
-          return prev;
-        }, {}),
-        infuraId: "d8df2cb7844e4a54ab0a782f608749dd"
-      })
-    }
-  };
-};
 
 function App() {
   const dispatch = useAppDispatch();
   const [isLoading, setLoading] = useState(true);
-  const [config, setConfig] = useState<Config>();
+  const [config, setConfig] = useState<any>();
   const [error, setError] = useState(false);
   const isAutheticated = useSelector(IsAuthenticated);
   const communityData = useSelector(CommunityData);
@@ -98,7 +46,8 @@ function App() {
     getAppConfig()
       .then(async (res) => {
         dispatch(setNetworks(res));
-        setConfig(generateConfig(res));
+        const [network] = res.filter((d) => !d.disabled);
+        setConfig(generateNetworkConfig(network));
         new AutSDK({
           nftStorageApiKey: environment.nftStorageKey
         });
@@ -114,7 +63,7 @@ function App() {
       {error && <ErrorPage />}
       {!error && config && (
         <>
-          <DAppProvider config={config}>
+          <WagmiConfig config={config}>
             <Web3DautConnect config={config} setLoading={setLoading} />
             <Box
               sx={{
@@ -149,7 +98,7 @@ function App() {
                 </Routes>
               )}
             </Box>
-          </DAppProvider>
+          </WagmiConfig>
         </>
       )}
     </>
