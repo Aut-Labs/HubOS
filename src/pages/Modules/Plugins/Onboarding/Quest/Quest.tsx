@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import {
   useGetAllOnboardingQuestsQuery,
   useGetAllTasksPerQuestQuery,
@@ -29,13 +30,12 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { setTitle } from "@store/ui-reducer";
 import { useAppDispatch } from "@store/store.model";
 import AutLoading from "@components/AutLoading";
-import { useEthers } from "@usedapp/core";
-import EditIcon from "@mui/icons-material/Edit";
 import InfoIcon from "@mui/icons-material/Info";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import { autUrls } from "@api/environment";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
+import { useAccount } from "wagmi";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -45,7 +45,7 @@ const Quest = ({ plugin }: PluginParams) => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const isAdmin = useSelector(IsAdmin);
-  const { account: userAddress } = useEthers();
+  const { address: userAddress } = useAccount();
   const params = useParams<{ questId: string }>();
   const communityData = useSelector(CommunityData);
   const urls = autUrls();

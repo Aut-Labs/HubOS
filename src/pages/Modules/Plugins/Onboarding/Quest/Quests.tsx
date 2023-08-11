@@ -19,10 +19,7 @@ import {
   Stack,
   IconButton,
   Tooltip,
-  Badge,
-  Chip,
-  styled,
-  ButtonProps
+  Badge
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -36,13 +33,10 @@ import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
 import { setTitle } from "@store/ui-reducer";
 import { useAppDispatch } from "@store/store.model";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
-import LoadingDialog from "@components/Dialog/LoadingPopup";
 import AutLoading from "@components/AutLoading";
-import { useEthers } from "@usedapp/core";
 import { useConfirmDialog } from "react-mui-confirm";
-import InfoIcon from "@mui/icons-material/Info";
-import SuccessDialog from "@components/Dialog/SuccessPopup";
 import { autUrls } from "@api/environment";
+import { useAccount } from "wagmi";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -52,7 +46,7 @@ const Quests = ({ plugin }: PluginParams) => {
   const dispatch = useAppDispatch();
   const isAdmin = useSelector(IsAdmin);
   const [search, setSearchState] = useState(null);
-  const { account } = useEthers();
+  const { address: account } = useAccount();
   const communityData = useSelector(CommunityData);
   const confirm = useConfirmDialog();
   const urls = autUrls();

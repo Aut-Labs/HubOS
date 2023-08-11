@@ -189,7 +189,7 @@ const launchOnboarding = async (
   }
 
   try {
-    const cache = await getCache(CacheTypes.UserPhases);
+    const cache = await getCache(CacheTypes.UserPhases, userAddress);
     cache.list[2].status = 1; // complete phase 3
     await updateCache(cache);
   } catch (error) {
@@ -219,7 +219,7 @@ const deactivateOnboarding = async (
   }
 
   try {
-    const cache = await getCache(CacheTypes.UserPhases);
+    const cache = await getCache(CacheTypes.UserPhases, userAddress);
     cache.list[2].status = 0; // reset phase 3
     await updateCache(cache);
   } catch (error) {
@@ -369,6 +369,7 @@ const createTaskPerQuest = async (
 
 const createQuizTaskPerQuest = async (
   body: {
+    userAddress: string;
     task: Task;
     questId: number;
     allQuestions: any[];
@@ -386,7 +387,12 @@ const createQuizTaskPerQuest = async (
 
   const uuid = uuidv4();
   try {
-    await saveQestions(body.pluginAddress, uuid, body.allQuestions);
+    await saveQestions(
+      body.userAddress,
+      body.pluginAddress,
+      uuid,
+      body.allQuestions
+    );
   } catch (error) {
     return {
       error: "An error occurred storing the quiz answers. Please try again."
@@ -402,7 +408,12 @@ const createQuizTaskPerQuest = async (
 
   if (!response.isSuccess) {
     try {
-      await deleteQestions(body.pluginAddress, uuid, body.allQuestions);
+      await deleteQestions(
+        body.userAddress,
+        body.pluginAddress,
+        uuid,
+        body.allQuestions
+      );
     } catch (error) {
       return {
         error: "An error occurred deleting the quiz answers. Please try again."
@@ -452,6 +463,7 @@ const removeTaskFromQuest = async (
 
 const submitOpenTask = async (
   body: {
+    userAddress: string;
     task: Task;
     pluginAddress: string;
     onboardingQuestAddress: string;
@@ -483,6 +495,7 @@ const submitOpenTask = async (
 
 const submitJoinDiscordTask = async (
   body: {
+    userAddress: string;
     task: Task;
     bearerToken: string;
     onboardingPluginAddress: string;
@@ -491,6 +504,7 @@ const submitJoinDiscordTask = async (
 ) => {
   try {
     await finaliseJoinDiscordTask(
+      body.userAddress,
       body.task.pluginAddress,
       body.onboardingPluginAddress,
       body.task.taskId,
@@ -783,6 +797,7 @@ export const onboardingApi = createApi({
     removeTaskFromQuest: builder.mutation<
       Task,
       {
+        userAddress: string;
         task: Task;
         questId: number;
         pluginAddress: string;
@@ -801,6 +816,7 @@ export const onboardingApi = createApi({
     submitOpenTask: builder.mutation<
       Task,
       {
+        userAddress: string;
         task: Task;
         pluginAddress: string;
         onboardingQuestAddress: string;
@@ -818,6 +834,7 @@ export const onboardingApi = createApi({
     submitJoinDiscordTask: builder.mutation<
       Task,
       {
+        userAddress: string;
         task: Task;
         bearerToken: string;
         onboardingPluginAddress: string;

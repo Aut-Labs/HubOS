@@ -170,7 +170,7 @@ export const updateDiscordSocials = createAsyncThunk(
     );
 
     if (response.isSuccess) {
-      const autIdData = JSON.parse(window.sessionStorage.getItem("aut-data"));
+      const autIdData = JSON.parse(window.localStorage.getItem("aut-data"));
       let foundSocial = false;
       for (let i = 0; i < autIdData.properties.communities.length; i++) {
         if (foundSocial) {
@@ -187,7 +187,7 @@ export const updateDiscordSocials = createAsyncThunk(
             }
           }
       }
-      window.sessionStorage.setItem("aut-data", JSON.stringify(autIdData));
+      window.localStorage.setItem("aut-data", JSON.stringify(autIdData));
       return args.community;
     }
     return rejectWithValue(response?.errorMessage);

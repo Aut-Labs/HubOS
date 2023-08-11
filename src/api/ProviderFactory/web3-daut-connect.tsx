@@ -1,6 +1,6 @@
-import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { memo, useEffect, useLayoutEffect, useRef } from "react";
 import { useAppDispatch } from "@store/store.model";
-import { resetAuthState, setAuthenticated } from "@auth/auth.reducer";
+import { setAuthenticated } from "@auth/auth.reducer";
 import { AutID } from "@api/aut.model";
 import { Init } from "@aut-labs/d-aut";
 import { communityUpdateState } from "@store/Community/community.reducer";
@@ -12,34 +12,31 @@ import { useSelector } from "react-redux";
 import AutSDK from "@aut-labs/sdk";
 import { ethers } from "ethers";
 import { NetworkConfig } from "./network.config";
-import { Config, Connector, useConnector, useEthers } from "@usedapp/core";
 import { debounce } from "@mui/material";
-import { useSearchParams } from "react-router-dom";
 import { AUTH_TOKEN_KEY } from "@api/auth.api";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { IAutButtonConfig } from "@aut-labs/d-aut/build/components/AutButtonMenu/AutMenuUtils";
 import { resetState } from "@store/store";
 import { CacheTypes, getCache } from "@api/cache.api";
 import { autUrls } from "@api/environment";
 import { EnvMode, environment } from "@api/environment";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { useEthersSigner } from "./ethers";
 
 function Web3DautConnect({
-  setLoading,
-  config
+  setLoading
 }: {
   setLoading: (loading: boolean) => void;
-  config: Config;
+  config: any;
 }) {
   const dispatch = useAppDispatch();
-  const [searchParams] = useSearchParams();
-  const [daoAddress] = useState(localStorage.getItem("temp_dao_address"));
   const abort = useRef<AbortController>();
   const networks = useSelector(NetworksConfig);
-  const { activate } = useConnector();
-  const { activateBrowserWallet, switchNetwork, chainId } = useEthers();
+  const { connector, isConnected } = useAccount();
+  const { connectAsync, connectors } = useConnect();
+  const { disconnectAsync } = useDisconnect();
+  const signer = useEthersSigner();
 
   const onAutInit = async () => {
-    const connetectedAlready = sessionStorage.getItem("aut-data");
+    const connetectedAlready = localStorage.getItem("aut-data");
     if (!connetectedAlready) {
       setLoading(false);
     }
@@ -60,30 +57,22 @@ function Web3DautConnect({
     });
   };
 
-  const activateNetwork = async (
-    network: NetworkConfig,
-    conn: Connector,
-    wallet?: string
-  ) => {
-    try {
-      await activate(conn);
-      await switchNetwork(+network.chainId);
-    } catch (error) {
-      console.error(error, "error");
+  useEffect(() => {
+    if (connector?.ready && isConnected && signer) {
+      const start = async () => {
+        const [network] = networks.filter((d) => !d.disabled);
+        const itemsToUpdate = {
+          sdkInitialized: true,
+          selectedNetwork: network,
+          signer
+        };
+
+        await initialiseSDK(network, signer);
+        await dispatch(updateWalletProviderState(itemsToUpdate));
+      };
+      start();
     }
-    const signer = conn?.provider?.getSigner();
-    const itemsToUpdate = {
-      sdkInitialized: true,
-      selectedWalletType: wallet,
-      selectedNetwork: network.network,
-      signer
-    };
-    if (!wallet) {
-      delete itemsToUpdate.selectedWalletType;
-    }
-    await dispatch(updateWalletProviderState(itemsToUpdate));
-    await initialiseSDK(network, signer as ethers.providers.JsonRpcSigner);
-  };
+  }, [isConnected, connector?.ready, signer]);
 
   const onAutLogin = async ({ detail }: any) => {
     const profile = JSON.parse(JSON.stringify(detail));
@@ -91,52 +80,63 @@ function Web3DautConnect({
     autID.properties.communities = autID.properties.communities.filter((c) => {
       return c.properties.userData?.isActive;
     });
+
     autID.properties.address = profile.address;
-    autID.properties.network = profile.network?.toLowerCase();
+    autID.properties.network = profile.network?.network?.toLowerCase();
 
-    const [network] = networks.filter((n) => !n.disabled);
+    if (profile.network) {
+      const walletName = localStorage.getItem("wagmi.wallet").replace(/"/g, "");
+      if (walletName) {
+        const c = connectors.find((c) => c.id === walletName);
+        if (!isConnected && c) {
+          await connectAsync({ connector: c, chainId: c.chains[0].id });
+          const [network] = networks.filter((d) => !d.disabled);
+          const itemsToUpdate = {
+            sdkInitialized: true,
+            selectedNetwork: network,
+            signer
+          };
 
-    if (network) {
-      const connector = config.connectors[profile.provider];
-      activateBrowserWallet({ type: profile.provider });
-      await activateNetwork(network, connector, profile.provider);
-    }
+          await initialiseSDK(network, signer);
+          await dispatch(updateWalletProviderState(itemsToUpdate));
+        }
+      }
 
-    if (searchParams.get(RequiredQueryParams.DaoAddress)) {
-      localStorage.setItem(
-        "temp_dao_address",
-        searchParams.get(RequiredQueryParams.DaoAddress)
+      await dispatch(
+        communityUpdateState({
+          communities: autID.properties.communities,
+          selectedCommunityAddress:
+            autID.properties.communities[0].properties?.address
+        })
       );
+
+      const cache = await getCache(
+        CacheTypes.UserPhases,
+        autID.properties.address
+      );
+      await dispatch(
+        setAuthenticated({
+          cache,
+          isAuthenticated: true,
+          userInfo: autID
+        })
+      );
+
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
     }
-
-    await dispatch(
-      communityUpdateState({
-        communities: autID.properties.communities,
-        selectedCommunityAddress:
-          autID.properties.communities[0].properties?.address
-      })
-    );
-
-    const cache = await getCache(CacheTypes.UserPhases);
-    await dispatch(
-      setAuthenticated({
-        cache,
-        isAuthenticated: true,
-        userInfo: autID
-      })
-    );
-
-    setLoading(false);
   };
 
-  const onDisconnected = () => {
+  const onDisconnected = async () => {
+    await disconnectAsync();
     dispatch(resetState);
     localStorage.removeItem(AUTH_TOKEN_KEY);
   };
 
   const onAutMenuProfile = () => {
     const urls = autUrls();
-    const profile = JSON.parse(sessionStorage.getItem("aut-data"));
+    const profile = JSON.parse(localStorage.getItem("aut-data"));
     window.open(`${urls.myAut}${profile.name}`, "_blank");
   };
 
@@ -146,7 +146,7 @@ function Web3DautConnect({
     window.addEventListener("aut-onConnected", onAutLogin);
     window.addEventListener("aut-onDisconnected", onDisconnected);
 
-    const config: IAutButtonConfig = {
+    const config: any = {
       defaultText: "Connect Wallet",
       textAlignment: "right",
       menuTextAlignment: "left",

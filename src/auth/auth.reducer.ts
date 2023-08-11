@@ -38,9 +38,16 @@ export const { setAuthenticated, setUserAddress, resetAuthState } =
   authSlice.actions;
 
 export const userInfo = (state) => state.auth.userInfo as AutID;
+export const sdkInitialized = (state) =>
+  state.walletProvider.sdkInitialized as boolean;
 export const UserInfo = createSelector([userInfo], (a) => a);
 export const isAuthenticated = (state) => state.auth.isAuthenticated as boolean;
-export const IsAuthenticated = createSelector([isAuthenticated], (a) => a);
+export const IsAuthenticated = createSelector(
+  [isAuthenticated, sdkInitialized],
+  (a, b) => {
+    return a && b;
+  }
+);
 export const userPhasesCache = (state) => state.auth.cache as CacheModel;
 export const UserPhasesCache = createSelector([userPhasesCache], (a) => a);
 

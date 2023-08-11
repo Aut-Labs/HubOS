@@ -22,8 +22,8 @@ import { GridBox } from "./QuestionsAndAnswers";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
-import { useEthers } from "@usedapp/core";
 import { getQestions } from "@api/tasks.api";
+import { useAccount } from "wagmi";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -107,7 +107,7 @@ const Answers = memo(({ control, questionIndex, answers, isDisabled }: any) => {
 const QuizTask = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const isAdmin = useSelector(IsAdmin);
-  const { account: userAddress } = useEthers();
+  const { address: userAddress } = useAccount();
   const params = useParams();
   const [initialized, setInitialized] = useState(false);
 
