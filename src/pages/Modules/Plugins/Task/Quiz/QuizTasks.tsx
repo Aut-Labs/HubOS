@@ -13,7 +13,9 @@ import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { dateToUnix } from "@utils/date-format";
 import AddIcon from "@mui/icons-material/Add";
-import QuestionsAndAnswers, { emptyQuestion } from "./QuestionsAndAnswers";
+import QuestionsAndAnswers, {
+  emptyMultipleQuestion
+} from "./QuestionsAndAnswers";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
@@ -121,6 +123,8 @@ const QuizTasks = ({ plugin }: PluginParams) => {
     handleSubmit,
     getValues,
     reset: resetForm,
+    setValue,
+    watch,
     formState
   } = useForm({
     mode: "all",
@@ -128,9 +132,11 @@ const QuizTasks = ({ plugin }: PluginParams) => {
     defaultValues: {
       title: "",
       description: "",
-      questions: [emptyQuestion]
+      questions: []
     }
   });
+
+  const allValues = watch();
 
   const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
     useCreateQuizTaskPerQuestMutation();
@@ -349,7 +355,11 @@ const QuizTasks = ({ plugin }: PluginParams) => {
         />
       </Stack>
 
-      <QuestionsAndAnswers control={control} />
+      <QuestionsAndAnswers
+        getFormValues={getValues}
+        updateForm={resetForm}
+        control={control}
+      />
 
       <Stack
         sx={{
@@ -375,7 +385,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
         >
           <StepperButton
             label="Confirm"
-            disabled={!formState.isValid}
+            disabled={!formState.isValid || !allValues?.questions?.length}
             sx={{ width: "250px" }}
           />
         </Box>

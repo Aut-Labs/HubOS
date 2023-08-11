@@ -320,7 +320,7 @@ const Dashboard = () => {
                   </MembersStyledTableCell>
                 </StyledMembersTableRow>
               </TableBody>
-              <Stack
+              {/* <Stack
                 sx={{
                   display: "flex",
                   justifyContent: {
@@ -352,7 +352,7 @@ const Dashboard = () => {
                 >
                   See your Nova Ranking
                 </Button>
-              </Stack>
+              </Stack> */}
             </Stack>
 
             <Stack>
