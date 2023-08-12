@@ -81,6 +81,9 @@ const PluginCard = ({
       <GridCard
         sx={{
           bgcolor: "nightBlack.main",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
           borderColor: "divider",
           borderRadius: "16px",
           minHeight: "300px",

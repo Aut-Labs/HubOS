@@ -293,14 +293,14 @@ function Members() {
             justifyContent: "flex-end"
           }}
         >
-          <Button
+          {/* <Button
             startIcon={<IosShareIcon />}
             variant="outlined"
             size="medium"
             color="offWhite"
           >
             Invite contributors
-          </Button>
+          </Button> */}
         </Box>
       </Box>
 
