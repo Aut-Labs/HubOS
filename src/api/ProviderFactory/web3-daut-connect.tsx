@@ -18,8 +18,8 @@ import { resetState } from "@store/store";
 import { CacheTypes, getCache } from "@api/cache.api";
 import { autUrls } from "@api/environment";
 import { EnvMode, environment } from "@api/environment";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { useEthersSigner } from "./ethers";
+import { WalletClient, useAccount, useConnect, useDisconnect } from "wagmi";
+import { useEthersSigner, walletClientToSigner } from "./ethers";
 
 function Web3DautConnect({
   setLoading
@@ -89,15 +89,21 @@ function Web3DautConnect({
       if (walletName) {
         const c = connectors.find((c) => c.id === walletName);
         if (!isConnected && c) {
-          await connectAsync({ connector: c, chainId: c.chains[0].id });
+          const client = await connectAsync({
+            connector: c,
+            chainId: c.chains[0].id
+          });
           const [network] = networks.filter((d) => !d.disabled);
           const itemsToUpdate = {
             sdkInitialized: true,
-            selectedNetwork: network,
-            signer
+            selectedNetwork: network
           };
 
-          await initialiseSDK(network, signer);
+          client["transport"] = client["provider"];
+          const temp_signer = walletClientToSigner(
+            client as unknown as WalletClient
+          );
+          await initialiseSDK(network, temp_signer);
           await dispatch(updateWalletProviderState(itemsToUpdate));
         }
       }
