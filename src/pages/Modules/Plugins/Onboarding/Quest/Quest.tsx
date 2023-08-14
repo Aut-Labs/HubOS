@@ -314,12 +314,12 @@ We are now onboarding ${quest?.metadata?.name} - take a quest, prove yourself, &
             }}
             gap={2}
           >
-            {isAdmin && (
+            {isAdmin && !quest.active && (
               <Box>
                 <Badge
                   invisible={quest?.tasksCount > 0}
                   badgeContent={
-                    <Tooltip title="You need 3 active quests to launch.">
+                    <Tooltip title="You need at least one task to launch.">
                       <InfoIcon
                         sx={{
                           color: "offWhite.main"
