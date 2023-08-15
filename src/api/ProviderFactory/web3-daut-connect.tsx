@@ -10,7 +10,6 @@ import {
 } from "@store/WalletProvider/WalletProvider";
 import { useSelector } from "react-redux";
 import AutSDK from "@aut-labs/sdk";
-import { ethers } from "ethers";
 import { NetworkConfig } from "./network.config";
 import { debounce } from "@mui/material";
 import { AUTH_TOKEN_KEY } from "@api/auth.api";
@@ -20,6 +19,7 @@ import { autUrls } from "@api/environment";
 import { EnvMode, environment } from "@api/environment";
 import { WalletClient, useAccount, useConnect, useDisconnect } from "wagmi";
 import { useEthersSigner, walletClientToSigner } from "./ethers";
+import { MultiSigner } from "@aut-labs/sdk/dist/models/models";
 
 function Web3DautConnect({
   setLoading
@@ -33,7 +33,7 @@ function Web3DautConnect({
   const { connector, isConnected } = useAccount();
   const { connectAsync, connectors } = useConnect();
   const { disconnectAsync } = useDisconnect();
-  const signer = useEthersSigner();
+  const multiSigner = useEthersSigner();
 
   const onAutInit = async () => {
     const connetectedAlready = localStorage.getItem("aut-data");
@@ -44,10 +44,10 @@ function Web3DautConnect({
 
   const initialiseSDK = async (
     network: NetworkConfig,
-    signer: ethers.providers.JsonRpcSigner
+    multiSigner: MultiSigner
   ) => {
     const sdk = AutSDK.getInstance();
-    return sdk.init(signer, {
+    return sdk.init(multiSigner, {
       daoTypesAddress: network.contracts.daoTypesAddress,
       novaRegistryAddress: network.contracts.novaRegistryAddress,
       autIDAddress: network.contracts.autIDAddress,
@@ -58,21 +58,20 @@ function Web3DautConnect({
   };
 
   useEffect(() => {
-    if (connector?.ready && isConnected && signer) {
+    if (connector?.ready && isConnected && multiSigner) {
       const start = async () => {
         const [network] = networks.filter((d) => !d.disabled);
         const itemsToUpdate = {
           sdkInitialized: true,
-          selectedNetwork: network,
-          signer
+          selectedNetwork: network
+          // signer: multiSigner
         };
-
-        await initialiseSDK(network, signer);
+        await initialiseSDK(network, multiSigner);
         await dispatch(updateWalletProviderState(itemsToUpdate));
       };
       start();
     }
-  }, [isConnected, connector?.ready, signer]);
+  }, [isConnected, connector?.ready, multiSigner]);
 
   const onAutLogin = async ({ detail }: any) => {
     const profile = JSON.parse(JSON.stringify(detail));
@@ -86,27 +85,28 @@ function Web3DautConnect({
 
     if (profile.network) {
       const walletName = localStorage.getItem("wagmi.wallet").replace(/"/g, "");
+      const [network] = networks.filter((d) => !d.disabled);
       if (walletName) {
         const c = connectors.find((c) => c.id === walletName);
-        if (!isConnected && c) {
+        if (c && !isConnected) {
           const client = await connectAsync({
             connector: c,
             chainId: c.chains[0].id
           });
-          const [network] = networks.filter((d) => !d.disabled);
-          const itemsToUpdate = {
-            sdkInitialized: true,
-            selectedNetwork: network
-          };
 
           client["transport"] = client["provider"];
           const temp_signer = walletClientToSigner(
             client as unknown as WalletClient
           );
           await initialiseSDK(network, temp_signer);
-          await dispatch(updateWalletProviderState(itemsToUpdate));
         }
       }
+
+      const itemsToUpdate = {
+        sdkInitialized: true,
+        selectedNetwork: network
+      };
+      await dispatch(updateWalletProviderState(itemsToUpdate));
 
       await dispatch(
         communityUpdateState({
