@@ -45,8 +45,9 @@ const fetch = async (body: any, api: BaseQueryApi) => {
 
       definitionsWithMetadata.push(moduleData);
     }
-    response.data = definitionsWithMetadata;
-    return response;
+    return {
+      data: definitionsWithMetadata
+    };
   }
   return {
     error: response.errorMessage

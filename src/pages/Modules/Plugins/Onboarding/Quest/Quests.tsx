@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import {
-  useLaunchOnboardingMutation,
-  useDeactivateOnboardingMutation,
+  useActivateQuestMutation,
+  useDeactivateQuestMutation,
   useGetAllOnboardingQuestsQuery
 } from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs/sdk";
@@ -79,7 +79,7 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
   });
 
   const [
-    launchOnboarding,
+    activateQuest,
     {
       error: activateError,
       isError: activateIsError,
@@ -87,25 +87,25 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
       isSuccess: isSuccessOnboarding,
       reset: activateReset
     }
-  ] = useLaunchOnboardingMutation();
+  ] = useActivateQuestMutation();
 
   const [
-    deactivateOnboarding,
+    deactivateQuest,
     {
       error: deactivateError,
       isError: deactivateIsError,
       isLoading: isDeactivating,
       reset: deactivateReset
     }
-  ] = useDeactivateOnboardingMutation();
+  ] = useDeactivateQuestMutation();
 
   const confimDeactivate = () =>
     confirm({
-      title: "Are you sure you want to deactivate onboarding?",
+      title: "Are you sure you want to deactivate quest?",
       confirmButtonText: "Deactivate",
       onConfirm: () => {
-        deactivateOnboarding({
-          quests,
+        deactivateQuest({
+          questId: null,
           userAddress: account,
           pluginAddress: plugin.pluginAddress
         });

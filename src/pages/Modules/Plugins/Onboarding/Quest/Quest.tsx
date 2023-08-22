@@ -2,7 +2,7 @@
 import {
   useGetAllOnboardingQuestsQuery,
   useGetAllTasksPerQuestQuery,
-  useLaunchOnboardingMutation
+  useActivateQuestMutation
 } from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs/sdk";
 import {
@@ -22,7 +22,7 @@ import { memo, useEffect, useMemo } from "react";
 import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
 import LinkWithQuery from "@components/LinkWithQuery";
-import { ButtonWithPulse, QuestTasks, getQuestStatus } from "./QuestShared";
+import { QuestTasks, getQuestStatus } from "./QuestShared";
 import Tasks from "../../Task/Shared/Tasks";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import LoadingProgressBar from "@components/LoadingProgressBar";
@@ -95,7 +95,7 @@ We are now onboarding ${quest?.metadata?.name} - take a quest, prove yourself, &
   };
 
   const [
-    launchOnboarding,
+    activateQuest,
     {
       error: activateError,
       isError: activateIsError,
@@ -103,7 +103,7 @@ We are now onboarding ${quest?.metadata?.name} - take a quest, prove yourself, &
       isSuccess: isSuccessOnboarding,
       reset: activateReset
     }
-  ] = useLaunchOnboardingMutation();
+  ] = useActivateQuestMutation();
 
   useEffect(() => {
     dispatch(setTitle(`Quest - ${quest?.metadata?.name || ""}`));
@@ -334,8 +334,8 @@ We are now onboarding ${quest?.metadata?.name} - take a quest, prove yourself, &
                     size="medium"
                     color="offWhite"
                     onClick={() =>
-                      launchOnboarding({
-                        quests: [],
+                      activateQuest({
+                        questId: quest.questId,
                         userAddress: userAddress,
                         pluginAddress: plugin.pluginAddress
                       })

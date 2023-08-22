@@ -170,8 +170,8 @@ const fetchQuestById = async (
   };
 };
 
-const launchOnboarding = async (
-  { quests, pluginAddress, userAddress },
+const activateQuest = async (
+  { questId, pluginAddress, userAddress },
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
@@ -180,7 +180,8 @@ const launchOnboarding = async (
     pluginAddress
   );
 
-  const response = await sdk.questOnboarding.launchOnboarding(quests);
+  const questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  const response = await questOnboarding.activateQuest(questId);
 
   if (!response.isSuccess) {
     return {
@@ -200,8 +201,8 @@ const launchOnboarding = async (
   };
 };
 
-const deactivateOnboarding = async (
-  { quests, pluginAddress, userAddress },
+const deactivateQuest = async (
+  { questId, pluginAddress, userAddress },
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
@@ -210,7 +211,8 @@ const deactivateOnboarding = async (
     pluginAddress
   );
 
-  const response = await sdk.questOnboarding.deactivateOnboarding(quests);
+  const questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  const response = await questOnboarding.deactivateQuest(questId);
 
   if (!response.isSuccess) {
     return {
@@ -218,13 +220,13 @@ const deactivateOnboarding = async (
     };
   }
 
-  try {
-    const cache = await getCache(CacheTypes.UserPhases, userAddress);
-    cache.list[2].status = 0; // reset phase 3
-    await updateCache(cache);
-  } catch (error) {
-    console.log(error);
-  }
+  // try {
+  //   const cache = await getCache(CacheTypes.UserPhases, userAddress);
+  //   cache.list[2].status = 0; // reset phase 3
+  //   await updateCache(cache);
+  // } catch (error) {
+  //   console.log(error);
+  // }
   return {
     data: response.data
   };
@@ -583,12 +585,12 @@ export const onboardingApi = createApi({
       return getAllTasksPerQuest(body, api);
     }
 
-    if (url === "launchOnboarding") {
-      return launchOnboarding(body, api);
+    if (url === "activateQuest") {
+      return activateQuest(body, api);
     }
 
     if (url === "deactivateOnboarding") {
-      return deactivateOnboarding(body, api);
+      return deactivateQuest(body, api);
     }
 
     if (url === "createTaskPerQuest") {
@@ -697,10 +699,10 @@ export const onboardingApi = createApi({
       },
       providesTags: ["Tasks"]
     }),
-    launchOnboarding: builder.mutation<
+    activateQuest: builder.mutation<
       boolean,
       {
-        quests: Quest[];
+        questId: number;
         pluginAddress: string;
         userAddress: string;
       }
@@ -708,15 +710,15 @@ export const onboardingApi = createApi({
       query: (body) => {
         return {
           body,
-          url: "launchOnboarding"
+          url: "activateQuest"
         };
       },
       invalidatesTags: ["Quests", "Tasks"]
     }),
-    deactivateOnboarding: builder.mutation<
+    deactivateQuest: builder.mutation<
       boolean,
       {
-        quests: Quest[];
+        questId: number;
         pluginAddress: string;
         userAddress: string;
       }
@@ -884,7 +886,7 @@ export const {
   useGetAllTasksPerQuestQuery,
   useLazyGetAllTasksPerQuestQuery,
   useGetAllOnboardingQuestsQuery,
-  useLaunchOnboardingMutation,
-  useDeactivateOnboardingMutation,
+  useActivateQuestMutation,
+  useDeactivateQuestMutation,
   useSubmitJoinDiscordTaskMutation
 } = onboardingApi;
