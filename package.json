@@ -31,11 +31,11 @@
     ]
   },
   "dependencies": {
-    "@aut-labs/abi-types": "^0.0.46",
-    "@aut-labs/d-aut": "^1.0.58-dev",
-    "@aut-labs/sdk": "^0.0.74",
+    "@aut-labs/abi-types": "^0.0.49",
+    "@aut-labs/d-aut": "^1.0.58-dev", 
     "@emoji-mart/data": "^1.1.2",
     "@emoji-mart/react": "^1.1.1",
+    "@aut-labs/sdk": "^0.0.79",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@leenguyen/react-flip-clock-countdown": "^1.4.0",
