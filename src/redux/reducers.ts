@@ -6,6 +6,7 @@ import uiSliceReducer from "./ui-reducer";
 import tasksReducer from "./Activity/tasks.reducer";
 import callReducer from "./Activity/call.reducer";
 import pollReducer from "./Activity/poll.reducer";
+import gatheringReducer from "./Bot/gathering.reducer";
 import autDashboardReducer from "./AutDashboard/aut-dashboard.reducer";
 import upcomingReducer from "./Activity/upcoming.reducer";
 import walletProviderReduce from "./WalletProvider/WalletProvider";
@@ -13,6 +14,7 @@ import { pluginRegistryApi } from "@api/plugin-registry.api";
 import { onboardingApi } from "@api/onboarding.api";
 import { communityApi } from "@api/community.api";
 import { moduleRegistryApi } from "@api/module-registry.api";
+import { botApi } from "@api/discord.api";
 
 export const reducers = combineReducers({
   community: communityReducer,
@@ -25,8 +27,10 @@ export const reducers = combineReducers({
   poll: pollReducer,
   upcoming: upcomingReducer,
   walletProvider: walletProviderReduce,
+  gathering: gatheringReducer,
   [onboardingApi.reducerPath]: onboardingApi.reducer,
   [communityApi.reducerPath]: communityApi.reducer,
   [pluginRegistryApi.reducerPath]: pluginRegistryApi.reducer,
-  [moduleRegistryApi.reducerPath]: moduleRegistryApi.reducer
+  [moduleRegistryApi.reducerPath]: moduleRegistryApi.reducer,
+  [botApi.reducerPath]: botApi.reducer
 });

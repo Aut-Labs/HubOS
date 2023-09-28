@@ -25,15 +25,15 @@ export const getCache = async (
   //   return;
   // }
   // const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  const res = await axios.get(
-    `${environment.apiUrl}/autID/cache/getCache/${cacheKey}?address=${address}`
-    // {
-    //   headers: {
-    //     Authorization: token
-    //   }
-    // }
-  );
-  return res?.data || null;
+  // const res = await axios.get(
+  //   `${environment.apiUrl}/autID/cache/getCache/${cacheKey}?address=${address}`
+  // {
+  //   headers: {
+  //     Authorization: token
+  //   }
+  // }
+
+  return null;
 };
 
 export const updateCache = async (

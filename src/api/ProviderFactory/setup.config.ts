@@ -11,7 +11,7 @@ import {
   createConfig
 } from "wagmi";
 import { NetworkConfig } from "@api/ProviderFactory/network.config";
-import { polygonMumbai } from "viem/dist/types/chains";
+// import { polygonMumbai } from "viem/dist/types/chains";
 
 export const generateNetworkConfig = (network: NetworkConfig) => {
   const networkDefinition = {

@@ -267,7 +267,6 @@ function Members() {
       group[key].push(member);
       return group;
     }, initializedTabs);
-
     return generateMemberTabs(groupedMembers);
   }, [data]);
 

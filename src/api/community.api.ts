@@ -560,7 +560,7 @@ const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
   );
 
   const notes = await axios
-    .post(`${environment.apiUrl}/autid/user/notes/addresses`, {
+    .post(`https://dev-api.aut.id/api/autid/user/notes/addresses`, {
       daoAddress: address,
       admins: filteredEmptyAddresses
     })

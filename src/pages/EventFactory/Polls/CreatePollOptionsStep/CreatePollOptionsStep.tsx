@@ -1,6 +1,6 @@
 import { Box, Link, styled, Typography } from "@mui/material";
 import { useAppDispatch } from "@store/store.model";
-import { useNavigation } from "react-router-dom";
+import { useNavigate, useNavigation } from "react-router-dom";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { pxToRem } from "@utils/text-size";
 import EmojiInputPicker, {
@@ -11,6 +11,7 @@ import { CreatePollData, pollUpdateData } from "@store/Activity/poll.reducer";
 import { useSelector } from "react-redux";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
+import { CommunityData } from "@store/Community/community.reducer";
 
 const StepWrapper = styled("form")({
   textAlign: "center",
@@ -61,8 +62,9 @@ function FormArrayHelperText({ errors, name, children = null, value }) {
 }
 
 const CreatePollOptionsStep = () => {
+  const communityData = useSelector(CommunityData);
   const dispatch = useAppDispatch();
-  const navigate = useNavigation();
+  const navigate = useNavigate();
   const data = useSelector(CreatePollData);
 
   const {
@@ -86,7 +88,7 @@ const CreatePollOptionsStep = () => {
 
   const onSubmit = async () => {
     await dispatch(pollUpdateData(values));
-    // navigate.push("/aut-dashboard/event-factory/polls/participants");
+    navigate(`/${communityData.name}/bot/poll/participants`);
   };
 
   return (

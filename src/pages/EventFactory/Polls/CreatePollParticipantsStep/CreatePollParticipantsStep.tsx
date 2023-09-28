@@ -20,7 +20,7 @@ import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
 import { allRoles } from "@store/Community/community.reducer";
 import { AutSelectField } from "@components/Fields";
-import { useNavigation } from "react-router-dom";
+import { useNavigate, useNavigation } from "react-router-dom";
 
 const StepWrapper = styled("form")({
   textAlign: "center",
@@ -31,7 +31,7 @@ const StepWrapper = styled("form")({
 
 const CreatePollParticipantsStep = () => {
   const dispatch = useAppDispatch();
-  const navigation = useNavigation();
+  const navigate = useNavigate();
   const [roles] = useState(useSelector(allRoles));
   const status = useSelector(PollStatus);
   const errorMessage = useSelector(PollError);
@@ -72,7 +72,7 @@ const CreatePollParticipantsStep = () => {
     await dispatch(pollUpdateData(values));
     const result = await dispatch(addPoll(metadata));
     if (result.meta.requestStatus === "fulfilled") {
-      // navigation.push("/aut-dashboard/event-factory/polls/success");
+      navigate("/aut-dashboard/event-factory/polls/success");
     }
   };
 

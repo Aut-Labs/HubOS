@@ -5,6 +5,7 @@ import { pluginRegistryApi } from "@api/plugin-registry.api";
 import { onboardingApi } from "@api/onboarding.api";
 import { communityApi } from "@api/community.api";
 import { moduleRegistryApi } from "@api/module-registry.api";
+import { botApi } from "@api/discord.api";
 // import storage from "redux-persist/lib/storage";
 // import {
 //   FLUSH,
@@ -61,7 +62,8 @@ export const store = configureStore({
       pluginRegistryApi.middleware,
       moduleRegistryApi.middleware,
       onboardingApi.middleware,
-      communityApi.middleware
+      communityApi.middleware,
+      botApi.middleware
     ),
   reducer: rootReducer
 });

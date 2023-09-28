@@ -1,4 +1,6 @@
-import "emoji-mart/css/emoji-mart.css";
+// import "emoji-mart/css/emoji-mart.css";
+import data from "@emoji-mart/data";
+import Picker from "@emoji-mart/react";
 import {
   IconButton,
   InputAdornment,
@@ -97,7 +99,7 @@ const EmojiInputPicker = ({
                 }}
                 disabled={emojiButtonProps?.disabled}
                 onClick={openMenu}
-                component="span"
+                // component="span"
               >
                 <SvgIcon
                   sx={{
@@ -124,7 +126,7 @@ const EmojiInputPicker = ({
         onChange={(event) => {
           onChange({
             ...(value as unknown as any),
-            option: event.target.value,
+            option: event.target.value
           });
         }}
         InputProps={{
@@ -137,12 +139,12 @@ const EmojiInputPicker = ({
                   height: "25px",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
+                  justifyContent: "center"
                 }}
                 disabled={emojiButtonProps?.disabled}
                 onClick={openMenu}
                 color="primary"
-                component="span"
+                // component="span"
               >
                 <SvgIcon
                   sx={{
@@ -153,13 +155,13 @@ const EmojiInputPicker = ({
                     position: "absolute",
                     left: "50%",
                     top: "50%",
-                    transform: "translate(-43%, -43%)",
+                    transform: "translate(-43%, -43%)"
                   }}
                   component={EmojiIcon}
                 />
               </IconButton>
             </InputAdornment>
-          ),
+          )
         }}
       /> */}
       <Menu
@@ -180,6 +182,7 @@ const EmojiInputPicker = ({
           }
         }}
       >
+        <Picker data={data} onEmojiSelect={console.log} />
         {/* <Picker onSelect={onSelectEmoji} /> */}
       </Menu>
     </>

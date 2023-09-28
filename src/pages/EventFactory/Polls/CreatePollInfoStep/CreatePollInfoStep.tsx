@@ -9,7 +9,8 @@ import { useSelector } from "react-redux";
 import { AutHeader } from "@components/AutHeader";
 import { AutTextField, FormHelperText } from "@components/Fields";
 import { AutButton } from "@components/buttons";
-import { useNavigation } from "react-router-dom";
+import { useNavigate, useNavigation } from "react-router-dom";
+import { CommunityData } from "@store/Community/community.reducer";
 
 const StepWrapper = styled("form")({
   textAlign: "center",
@@ -23,8 +24,9 @@ const errorTypes = {
 };
 
 const CreatePollInfoStep = () => {
+  const communityData = useSelector(CommunityData);
   const dispatch = useAppDispatch();
-  const navigate = useNavigation();
+  const navigate = useNavigate();
   const { title, description, duration } = useSelector(CreatePollData);
 
   const {
@@ -51,7 +53,7 @@ const CreatePollInfoStep = () => {
 
   const onSubmit = async (data: any) => {
     await dispatch(pollUpdateData(data));
-    // navigate.push("/aut-dashboard/event-factory/polls/options");
+    navigate(`/${communityData.name}/bot/poll/options`);
   };
 
   return (

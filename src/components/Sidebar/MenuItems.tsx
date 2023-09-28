@@ -6,6 +6,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import { alpha, Badge, styled, SvgIcon } from "@mui/material";
 import { ReactComponent as ManageIcon } from "@assets/manage.svg";
 import { ReactComponent as DashboardIcon } from "@assets/dashboard.svg";
+import { ReactComponent as BotIcon } from "@assets/bot.svg";
 import { ReactComponent as AdminIcon } from "@assets/admin.svg";
 import { NavLink as RouteNavLink } from "react-router-dom";
 import { forwardRef, Fragment } from "react";
@@ -37,6 +38,11 @@ const menuItems = (communityName: string): SidebarMenuItem[] => [
     title: "Community",
     icon: ManageIcon,
     route: `/${communityName}/members`
+  },
+  {
+    title: "Discord Bot",
+    route: `/${communityName}/bot`,
+    icon: BotIcon
   }
 ];
 

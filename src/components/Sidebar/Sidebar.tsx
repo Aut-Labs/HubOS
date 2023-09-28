@@ -72,7 +72,7 @@ interface AppBarProps extends MuiAppBarProps {
   toolbarHeight: number;
 }
 
-const AppBar = styled(MuiAppBar, {
+export const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) =>
     prop !== "open" && prop !== "drawerWidth" && prop !== "toolbarHeight"
 })<AppBarProps>(({ theme, open, drawerWidth, toolbarHeight }) => ({

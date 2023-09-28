@@ -23,7 +23,6 @@ import { useNavigation } from "react-router-dom";
 
 const DescriptionStep = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigation();
   const { activeStep } = useSelector(ActivityCurrentStep);
   const status = useSelector(ActivityStatus);
   const webhookUrl = useSelector(DiscordWebHookUrl);

@@ -18,6 +18,8 @@ import Callback from "./pages/Oauth2Callback/Callback";
 import { CommunityData } from "@store/Community/community.reducer";
 import { generateNetworkConfig } from "@api/ProviderFactory/setup.config";
 import { WagmiConfig } from "wagmi";
+import ClaimRole from "./pages/Bot/ClaimRole";
+import { ethers } from "ethers";
 
 const AutDashboardMain = lazy(() => import("./pages/AutDashboardMain"));
 
@@ -77,6 +79,7 @@ function App() {
               ) : (
                 <Routes>
                   <Route path="callback" element={<Callback />} />
+                  <Route path="claimrole" element={<ClaimRole />} />
                   {!isAutheticated && (
                     <>
                       <Route path="/" element={<GetStarted />} />

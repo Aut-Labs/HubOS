@@ -16,6 +16,14 @@ import PeopleIcon from "@mui/icons-material/People";
 import { useGetOnboardingProgressQuery } from "@api/onboarding.api";
 import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import Admins from "./Admins/Admins";
+import Bot from "./Bot/Bot";
+import { botActionRoutes } from "./Bot/routes";
+import GatheringInitialStep from "./Bot/Gatherings/GatheringIntialStep";
+import GatheringCalendarStep from "./Bot/Gatherings/GatheringCalendarStep";
+import GatheringSuccessStep from "./Bot/Gatherings/GatheringSuccessStep";
+import CreatePollInfoStep from "./EventFactory/Polls/CreatePollInfoStep/CreatePollInfoStep";
+import CreatePollOptionsStep from "./EventFactory/Polls/CreatePollOptionsStep/CreatePollOptionsStep";
+import CreatePollParticipantsStep from "./EventFactory/Polls/CreatePollParticipantsStep/CreatePollParticipantsStep";
 
 const AutDashboardMain = () => {
   const communityData = useSelector(CommunityData);
@@ -107,6 +115,25 @@ const AutDashboardMain = () => {
             <Routes>
               <Route index element={<Dashboard />} />
               <Route path="admins" element={<Admins />} />
+              <Route path="bot" element={<Bot />} />
+              <Route path="bot/gathering" element={<GatheringInitialStep />} />
+              <Route path="bot/poll/info" element={<CreatePollInfoStep />} />
+              <Route
+                path="bot/poll/options"
+                element={<CreatePollOptionsStep />}
+              />
+              <Route
+                path="bot/poll/participants"
+                element={<CreatePollParticipantsStep />}
+              />
+              <Route
+                path="bot/gathering/success"
+                element={<GatheringSuccessStep />}
+              />
+              {/* <Route
+                path="bot/gathering/calendar"
+                element={<GatheringCalendarStep />}
+              /> */}
               <Route path="members" element={<Members />} />
               {/* {modulesRoutes?.routes?.length && (
                 <Route
@@ -115,6 +142,7 @@ const AutDashboardMain = () => {
                 />
               )} */}
               <Route path="modules" element={<Modules />} />
+
               {modulesRoutes.routes.map((r) => r)}
               <Route
                 path="*"
