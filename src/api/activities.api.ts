@@ -379,6 +379,7 @@ export const addPoll = pollsThunkProvider(
       callData;
     const communities = state.community.communities as Community[];
     const communityAddress = state.community.selectedCommunityAddress as string;
+    debugger;
     // const community = communities.find(
     //   (c) => c.properties.address === communityAddress
     // );

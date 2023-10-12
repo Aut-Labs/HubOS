@@ -39,7 +39,7 @@ const ClaimRole = () => {
   // const [error, setError] = useState(false);
 
   const handleAddBot = async () => {
-    // const apiUrl = "http://localhost:4006/guild"; // Replace with your API endpoint URL
+    // const apiUrl = "${environment.discordBotUrl}/guild"; // Replace with your API endpoint URL
     // console.log("communityData", communityData);
     // const roles = communityData?.properties.rolesSets[0].roles.map((role) => {
     //   return { name: role.roleName, id: role.id };

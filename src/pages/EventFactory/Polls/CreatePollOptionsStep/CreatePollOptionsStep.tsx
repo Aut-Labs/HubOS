@@ -1,4 +1,4 @@
-import { Box, Link, styled, Typography } from "@mui/material";
+import { Box, Link, Stack, styled, Typography } from "@mui/material";
 import { useAppDispatch } from "@store/store.model";
 import { useNavigate, useNavigation } from "react-router-dom";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
@@ -17,6 +17,7 @@ const StepWrapper = styled("form")({
   textAlign: "center",
   display: "flex",
   justifyContent: "center",
+  alignItems: "center",
   flexDirection: "column"
 });
 
@@ -92,14 +93,33 @@ const CreatePollOptionsStep = () => {
   };
 
   return (
-    <>
-      <AutHeader
-        title=" Polls"
-        titleStyles={{
-          m: 0
-        }}
-        subtitle={<>Add 2-to-5 options & pick an emoji for each!</>}
-      />
+    <Stack
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        margin: "0 auto",
+        width: {
+          xs: "100%",
+          sm: "400px",
+          xxl: "500px"
+        }
+      }}
+    >
+      <Typography mt={7} textAlign="center" color="white" variant="h3">
+        Polls
+      </Typography>
+      <Typography
+        className="text-secondary"
+        mx="auto"
+        my={2}
+        textAlign="center"
+        color="white"
+        variant="body1"
+      >
+        Add 2-to-5 options & pick an emoji for each!
+      </Typography>
       <StepWrapper autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         {fields.map((field, index) => (
           <div
@@ -126,7 +146,7 @@ const CreatePollOptionsStep = () => {
                     onChange={onChange}
                     placeholder={`Option ${index + 1}`}
                     autoFocus={index === 0}
-                    color="primary"
+                    color="offWhite"
                     sx={{
                       mb: pxToRem(45)
                     }}
@@ -173,6 +193,7 @@ const CreatePollOptionsStep = () => {
           disabled={values?.options?.length > 4}
           component="button"
           type="button"
+          color="white"
           fontSize={pxToRem(18)}
           onClick={() => {
             append({ option: "", emoji: "" });
@@ -180,7 +201,6 @@ const CreatePollOptionsStep = () => {
         >
           + Add Option
         </Link>
-
         <AutButton
           sx={{
             minWidth: pxToRem(325),
@@ -189,13 +209,13 @@ const CreatePollOptionsStep = () => {
             mt: pxToRem(100)
           }}
           type="submit"
-          color="primary"
+          color="offWhite"
           variant="outlined"
         >
           Next
         </AutButton>
       </StepWrapper>
-    </>
+    </Stack>
   );
 };
 

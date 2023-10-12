@@ -57,15 +57,15 @@ const EmojiInputPicker = ({
     setAnchorEl(null);
   };
 
-  const onSelectEmoji = ({ native }) => {
+  const onSelectEmoji = (test) => {
     if (textRef.current) {
       // textRef.current.value = `${removeEmojisFromText(textRef.current.value).trim()} ${native}`;
       onChange({
         ...(value as unknown as any),
-        emoji: native,
+        emoji: test.native,
         option: `${removeEmojisFromText(
           (value as unknown as any)?.option
-        ).trim()} ${native}`
+        ).trim()} ${test.native}`
       });
       closeMenu();
     }
@@ -182,8 +182,8 @@ const EmojiInputPicker = ({
           }
         }}
       >
-        <Picker data={data} onEmojiSelect={console.log} />
-        {/* <Picker onSelect={onSelectEmoji} /> */}
+        {/* <Picker data={data} onEmojiSelect={console.log} /> */}
+        <Picker onEmojiSelect={onSelectEmoji} />
       </Menu>
     </>
   );

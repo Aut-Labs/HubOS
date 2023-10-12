@@ -24,6 +24,9 @@ import GatheringSuccessStep from "./Bot/Gatherings/GatheringSuccessStep";
 import CreatePollInfoStep from "./EventFactory/Polls/CreatePollInfoStep/CreatePollInfoStep";
 import CreatePollOptionsStep from "./EventFactory/Polls/CreatePollOptionsStep/CreatePollOptionsStep";
 import CreatePollParticipantsStep from "./EventFactory/Polls/CreatePollParticipantsStep/CreatePollParticipantsStep";
+import CallInformationStep from "./EventFactory/GroupCall/CallInformationStep/CallInformationStep";
+import CalendarStep from "./EventFactory/GroupCall/CalendarStep/CalendarStep";
+import BotPluginsPage from "./Bot/BotPluginsPage";
 
 const AutDashboardMain = () => {
   const communityData = useSelector(CommunityData);
@@ -116,8 +119,11 @@ const AutDashboardMain = () => {
               <Route index element={<Dashboard />} />
               <Route path="admins" element={<Admins />} />
               <Route path="bot" element={<Bot />} />
+              {/* <Route path="bot" element={<BotPluginsPage />} /> */}
+              <Route path="bot/plugins" element={<BotPluginsPage />} />
               <Route path="bot/gathering" element={<GatheringInitialStep />} />
               <Route path="bot/poll/info" element={<CreatePollInfoStep />} />
+              {/* <Route path="bot/gathering" element={<CalendarStep />} /> */}
               <Route
                 path="bot/poll/options"
                 element={<CreatePollOptionsStep />}

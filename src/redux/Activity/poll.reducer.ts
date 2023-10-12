@@ -31,7 +31,8 @@ const initialState: PollState = {
       }
     ],
     role: null,
-    allRoles: null
+    allRoles: null,
+    channelId: null
   }
 };
 

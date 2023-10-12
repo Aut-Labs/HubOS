@@ -33,7 +33,15 @@ import AutTabs from "@components/AutTabs/AutTabs";
 import { AutButton } from "@components/buttons";
 import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 import { AppBar } from "@components/Sidebar/Sidebar";
-import { useGetGatheringsQuery, useGetGuildIdQuery } from "@api/discord.api";
+import {
+  useActivateDiscordBotPluginMutation,
+  useGetGatheringsQuery,
+  useGetGuildIdQuery
+} from "@api/discord.api";
+import { updateDiscordSocials } from "@api/community.api";
+import { useDispatch } from "react-redux";
+import { useAppDispatch } from "@store/store.model";
+import { environment } from "@api/environment";
 
 const GatheringStyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}, &.${tableCellClasses.body}`]: {
@@ -105,6 +113,103 @@ const GatheringsList = ({ gatheringsList }) => {
   );
 };
 
+const PollsList = ({ gatheringsList }) => {
+  const theme = useTheme();
+  return (
+    <Box sx={{ display: "flex", justifyContent: "center" }}>
+      <TableContainer
+        component={Paper}
+        sx={{
+          backgroundColor: "transparent",
+          boxShadow: "none",
+          borderStyle: "none"
+        }}
+      >
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <GatheringStyledTableCell>Name</GatheringStyledTableCell>
+              <GatheringStyledTableCell align="right">
+                Duration
+              </GatheringStyledTableCell>
+              <GatheringStyledTableCell align="right">
+                Role
+              </GatheringStyledTableCell>
+              <GatheringStyledTableCell align="right"></GatheringStyledTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {gatheringsList &&
+              gatheringsList.map((row) => (
+                <TableRow
+                  key={row.title}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <GatheringStyledTableCell component="th" scope="row">
+                    <Stack
+                      sx={{
+                        margin: "0 auto",
+                        width: "100%"
+                      }}
+                    >
+                      <Typography variant="h6">{row.title}</Typography>
+                      <Typography variant="caption">
+                        {row.description}
+                      </Typography>
+                    </Stack>
+                  </GatheringStyledTableCell>
+                  <GatheringStyledTableCell align="right">
+                    {row.duration}
+                  </GatheringStyledTableCell>
+                  <GatheringStyledTableCell align="right">
+                    {row.roles}
+                  </GatheringStyledTableCell>
+                  <GatheringStyledTableCell align="right">
+                    SHARE
+                  </GatheringStyledTableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
+  );
+};
+
+const CreateEvent = () => {
+  const communityData = useSelector(CommunityData);
+  const navigate = useNavigate();
+  const theme = useTheme();
+  return (
+    <Box
+      sx={{
+        width: "100%",
+        display: "flex",
+        justifyContent: "flexEnd"
+      }}
+    >
+      <AutButton
+        variant="outlined"
+        color="offWhite"
+        onClick={() => {
+          navigate(`/${communityData.name}/bot/gathering`);
+        }}
+      >
+        Create Gathering
+      </AutButton>
+      <AutButton
+        variant="outlined"
+        color="offWhite"
+        onClick={() => {
+          navigate(`/${communityData.name}/bot/poll/info`);
+        }}
+      >
+        Create Poll
+      </AutButton>
+    </Box>
+  );
+};
+
 const Bot = () => {
   const theme = useTheme();
   const [botActive, setBotActive] = useState(false);
@@ -116,16 +221,29 @@ const Bot = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [open, setOpen] = useState(!isMobile);
   const [discordDialogOpen, setDiscordDialogOpen] = useState(false);
-  const { data, isLoading, isFetching, refetch } = useGetGuildIdQuery();
+  const dispatch = useAppDispatch();
+  const {
+    data: guildId,
+    isLoading,
+    isFetching,
+    refetch
+  } = useGetGuildIdQuery(null, {
+    skip: isDiscordVerified === false
+  });
 
   const {
     data: gatherings,
     isLoading: gatheringsLoading,
     isSuccess
-  } = useGetGatheringsQuery(data, {
+  } = useGetGatheringsQuery(guildId, {
     // refetchOnMountOrArgChange: false,
-    skip: data === undefined || botActive === false
+    skip: guildId === undefined || botActive === false
   });
+
+  const [
+    activateDiscordBotPlugin,
+    { isLoading: isActivatingBotPlugin, isSuccess: activatedPluginSuccessfully }
+  ] = useActivateDiscordBotPluginMutation();
 
   const drawerWidth = useMemo(() => {
     return isExtraLarge ? 350 : 300;
@@ -138,27 +256,19 @@ const Bot = () => {
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
 
   const handleAddBot = async () => {
-    const apiUrl = "http://localhost:4006/guild"; // Replace with your API endpoint URL
+    // await activateDiscordBotPlugin();
+    const apiUrl = `${environment.discordBotUrl}/guild`; // Replace with your API endpoint URL
     console.log("communityData", communityData);
     const roles = communityData?.properties.rolesSets[0].roles.map((role) => {
       return { name: role.roleName, id: role.id };
     });
-    const discordLink = communityData?.properties.socials.find(
-      (l) => l.type === "discord"
-    ).link;
-    const serverCode = discordLink.match(/discord\.gg\/(.+)/i)[1];
-    const serverIdResponse = await axios.get(
-      `https://discord.com/api/invites/${serverCode}`
-    );
-    const guildId = serverIdResponse.data.guild.id;
-    // const guildId = "1133407677091942480";
     const requestObject = {
       daoAddress: communityData?.properties.address,
       roles: roles,
       guildId
     };
     try {
-      const result = await axios.post(apiUrl, requestObject);
+      await axios.post(apiUrl, requestObject);
 
       const discordBotLink =
         "https://discord.com/api/oauth2/authorize?client_id=1129037421615529984&permissions=8&scope=bot%20applications.commands";
@@ -166,12 +276,9 @@ const Bot = () => {
       setLoading(true);
       intervalRef.current = setInterval(async () => {
         const botActiveRequest = await axios.get(
-          `http://localhost:4006/check/${guildId}`
+          `${environment.discordBotUrl}/check/${guildId}`
         );
         const botActive = botActiveRequest.data.active;
-        // if (botActive) {
-        //   navigate(`/${communityData.name}/bot/gathering`);
-        // }
         if (botActive) {
           setLoading(false);
           setBotActive(botActive);
@@ -183,6 +290,44 @@ const Bot = () => {
     }
   };
 
+  useEffect(() => {
+    const activate = async () => {
+      await activateDiscordBotPlugin();
+      const apiUrl = `${environment.discordBotUrl}/guild`; // Replace with your API endpoint URL
+      console.log("communityData", communityData);
+      const roles = communityData?.properties.rolesSets[0].roles.map((role) => {
+        return { name: role.roleName, id: role.id };
+      });
+      const requestObject = {
+        daoAddress: communityData?.properties.address,
+        roles: roles,
+        guildId
+      };
+      try {
+        await axios.post(apiUrl, requestObject);
+
+        const discordBotLink =
+          "https://discord.com/api/oauth2/authorize?client_id=1129037421615529984&permissions=8&scope=bot%20applications.commands";
+        window.open(discordBotLink, "_blank");
+        setLoading(true);
+        intervalRef.current = setInterval(async () => {
+          const botActiveRequest = await axios.get(
+            `${environment.discordBotUrl}/check/${guildId}`
+          );
+          const botActive = botActiveRequest.data.active;
+          if (botActive) {
+            setLoading(false);
+            setBotActive(botActive);
+            clearInterval(intervalRef.current);
+          }
+        }, 2000);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    if (activatedPluginSuccessfully) activate();
+  }, [activatedPluginSuccessfully]);
+
   const gatheringsList = useMemo(() => {
     if (isSuccess) return gatherings;
     return null;
@@ -190,23 +335,18 @@ const Bot = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      if (data) {
+      if (guildId) {
         const botActiveRequest = await axios.get(
-          `http://localhost:4006/check/${data}`
+          `${environment.discordBotUrl}/check/${guildId}`
         );
         const botActive = botActiveRequest.data.active;
-        setLoading(false);
         setBotActive(botActive);
       }
+      setLoading(false);
     };
 
     fetch();
-  }, [data]);
-
-  // useEffect(() => {
-
-  // }, [botActive]);
-
+  }, [guildId]);
   return (
     <Container maxWidth="md">
       {/* <LoadingDialog open={false} message="Updating admins..." />
@@ -224,7 +364,7 @@ const Bot = () => {
         Āut Bot
       </Typography>
 
-      {loading ? (
+      {loading || isActivatingBotPlugin ? (
         <>
           {" "}
           <CircularProgress
@@ -281,35 +421,19 @@ const Bot = () => {
                     label: "Gatherings",
                     component: GatheringsList,
                     props: { gatheringsList }
+                  },
+                  {
+                    label: "Polls",
+                    component: PollsList,
+                    props: { gatheringsList }
                   }
                 ]}
-              />
-              <Box
-                sx={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "flexEnd"
+                staticTab={{
+                  label: "Create Event",
+                  component: CreateEvent,
+                  props: null
                 }}
-              >
-                <AutButton
-                  variant="outlined"
-                  color="offWhite"
-                  onClick={() => {
-                    navigate(`/${communityData.name}/bot/gathering`);
-                  }}
-                >
-                  Create Gathering
-                </AutButton>
-                <AutButton
-                  variant="outlined"
-                  color="offWhite"
-                  onClick={() => {
-                    navigate(`/${communityData.name}/bot/poll/info`);
-                  }}
-                >
-                  Create Poll
-                </AutButton>
-              </Box>
+              />
             </>
           ) : (
             <>

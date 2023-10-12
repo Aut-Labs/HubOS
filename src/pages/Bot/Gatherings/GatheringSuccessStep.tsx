@@ -55,7 +55,7 @@ import theme from "@theme/theme";
 import { CommunityData } from "@store/Community/community.reducer";
 import {
   useCreateGatheringMutation,
-  useGetChannelsQuery
+  useGetVoiceChannelsQuery
 } from "@api/discord.api";
 import axios from "axios";
 import AutLoading from "@components/AutLoading";

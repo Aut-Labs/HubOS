@@ -28,7 +28,7 @@ import {
 import LinkWithQuery from "@components/LinkWithQuery";
 import { useActivateModuleMutation } from "@api/module-registry.api";
 
-const GridCard = styled(Card)(({ theme }) => {
+export const GridCard = styled(Card)(({ theme }) => {
   return {
     minHeight: "365px",
     width: "100%",

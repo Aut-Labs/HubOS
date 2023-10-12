@@ -14,6 +14,7 @@ interface AutTabParams {
 
 interface AutTabsParams {
   tabs: AutTabParams[];
+  staticTab?: AutTabParams;
   selectedTabIndex?: number;
   selectedTab?: (value: any, event: React.SyntheticEvent) => void;
   tabStyles?: React.CSSProperties | SxProps<any>;
@@ -117,19 +118,60 @@ function AutTabs(props: AutTabsParams) {
             }
           }}
         >
-          {props.tabs.map(({ label }) => (
-            <Tab key={label} label={label} />
+          {props.tabs.map(({ label }, i) => (
+            <Tab
+              key={label}
+              label={label}
+              sx={{
+                borderTopRightRadius:
+                  props.staticTab && i === props.tabs.length - 1
+                    ? "16px"
+                    : "initial"
+              }}
+            />
           ))}
+          {props.staticTab && (
+            <Tab
+              sx={{ marginLeft: "auto", borderTopLeftRadius: "16px" }}
+              key={props.staticTab.label}
+              label={props.staticTab.label}
+            />
+          )}
         </Tabs>
       </Box>
-      {props.tabs.map(({ props: childProps, component }, index) => {
-        const Component = component;
-        return (
-          <TabPanel key={index} value={value} index={index}>
-            <Component {...childProps} />
-          </TabPanel>
-        );
-      })}
+      {props.staticTab
+        ? [...props.tabs, props.staticTab].map(
+            ({ props: childProps, component }, index) => {
+              const Component = component;
+              return (
+                <TabPanel
+                  sx={{
+                    borderTopRightRadius: props.staticTab ? "initial" : "16px"
+                  }}
+                  key={index}
+                  value={value}
+                  index={index}
+                >
+                  <Component {...childProps} />
+                </TabPanel>
+              );
+            }
+          )
+        : props.tabs.map(({ props: childProps, component }, index) => {
+            const Component = component;
+            return (
+              <TabPanel
+                sx={{
+                  borderTopRightRadius: props.staticTab ? "initial" : "16px"
+                }}
+                key={index}
+                value={value}
+                index={index}
+              >
+                <Component {...childProps} />
+              </TabPanel>
+            );
+          })}
     </Box>
   );
 }

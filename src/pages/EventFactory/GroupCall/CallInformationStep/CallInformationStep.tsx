@@ -25,7 +25,7 @@ import {
   activityUpdateGroupCallData,
   activityUpdateGroupCallStatus
 } from "@store/Activity/call.reducer";
-import { allRoles } from "@store/Community/community.reducer";
+import { allRoles, CommunityData } from "@store/Community/community.reducer";
 import { addGroupCall } from "@api/activities.api";
 import { ResultState } from "@store/result-status";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
@@ -33,7 +33,7 @@ import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
 import { AutSelectField, AutTextField } from "@components/Fields";
-import { useNavigation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import format from "date-fns/format";
 
 const StepWrapper = styled("form")({
@@ -45,9 +45,10 @@ const StepWrapper = styled("form")({
 
 const CallInformationStep = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigation();
+  const navigate = useNavigate();
   const roles = useSelector(allRoles);
   const status = useSelector(ActivityGroupCallStatus);
+  const communityData = useSelector(CommunityData);
   const errorMessage = useSelector(ActivityGroupCallError);
   const {
     startDate,
@@ -82,7 +83,7 @@ const CallInformationStep = () => {
     await dispatch(activityUpdateGroupCallData(values));
     const result = await dispatch(addGroupCall(metadata));
     if (result.meta.requestStatus === "fulfilled") {
-      // navigate.push("/aut-dashboard/event-factory/group-call/success");
+      navigate(`${communityData.name}/bot/gathering/calendar`);
     }
   };
 

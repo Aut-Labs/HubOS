@@ -22,7 +22,7 @@ import {
 } from "@store/Activity/call.reducer";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
-import { useNavigation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import format from "date-fns/format";
 
 const StepWrapper = styled("form")({
@@ -34,7 +34,7 @@ const StepWrapper = styled("form")({
 
 const CalendarStep = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigation();
+  const navigate = useNavigate();
   const { startDate, startTime } = useSelector(ActivityGroupCallData);
   const [timeSlots] = useState(
     generateTimeSlots({

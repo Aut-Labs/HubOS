@@ -65,6 +65,7 @@ export interface ActivityPollData {
   role: string;
   roleName?: string;
   allRoles: boolean;
+  channelId: string;
 }
 export interface CommunityContractError {
   code: number;

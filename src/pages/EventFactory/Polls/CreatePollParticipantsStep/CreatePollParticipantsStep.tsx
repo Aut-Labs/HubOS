@@ -1,4 +1,4 @@
-import { MenuItem, styled, Typography } from "@mui/material";
+import { MenuItem, Stack, styled, Typography } from "@mui/material";
 import { useAppDispatch } from "@store/store.model";
 import { Controller, useForm } from "react-hook-form";
 import { pxToRem } from "@utils/text-size";
@@ -19,8 +19,13 @@ import { addPoll } from "@api/activities.api";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
 import { allRoles } from "@store/Community/community.reducer";
-import { AutSelectField } from "@components/Fields";
+import { AutSelectField, FormHelperText } from "@components/Fields";
 import { useNavigate, useNavigation } from "react-router-dom";
+import {
+  useCreatePollMutation,
+  useGetTextChannelsQuery,
+  useGetGuildIdQuery
+} from "@api/discord.api";
 
 const StepWrapper = styled("form")({
   textAlign: "center",
@@ -30,6 +35,7 @@ const StepWrapper = styled("form")({
 });
 
 const CreatePollParticipantsStep = () => {
+  const [createPoll, { isLoading, isSuccess }] = useCreatePollMutation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [roles] = useState(useSelector(allRoles));
@@ -37,11 +43,23 @@ const CreatePollParticipantsStep = () => {
   const errorMessage = useSelector(PollError);
   const data = useSelector(CreatePollData);
 
-  const { control, handleSubmit, watch, reset } = useForm({
+  const {
+    data: guildId,
+    isLoading: guildIdLoading,
+    isFetching,
+    refetch
+  } = useGetGuildIdQuery(null);
+
+  const { data: channels } = useGetTextChannelsQuery(guildId, {
+    skip: guildId === undefined
+  });
+
+  const { control, handleSubmit, watch, reset, formState } = useForm({
     mode: "onSubmit",
     defaultValues: {
       role: data.role,
-      allRoles: data.allRoles
+      allRoles: data.allRoles,
+      channelId: null
     }
   });
 
@@ -63,17 +81,19 @@ const CreatePollParticipantsStep = () => {
       }
     );
     const metadata = {
+      guildId,
       ...data,
       ...values,
       options,
       emojis
     };
-
+    debugger;
     await dispatch(pollUpdateData(values));
-    const result = await dispatch(addPoll(metadata));
-    if (result.meta.requestStatus === "fulfilled") {
-      navigate("/aut-dashboard/event-factory/polls/success");
-    }
+    await createPoll(metadata);
+    // const result = await dispatch(addPoll(metadata));
+    // if (result.meta.requestStatus === "fulfilled") {
+    //   navigate("/aut-dashboard/event-factory/polls/success");
+    // }
   };
 
   useEffect(() => {
@@ -83,7 +103,20 @@ const CreatePollParticipantsStep = () => {
   }, [dispatch]);
 
   return (
-    <>
+    <Stack
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        margin: "0 auto",
+        width: {
+          xs: "100%",
+          sm: "400px",
+          xxl: "500px"
+        }
+      }}
+    >
       <ErrorDialog
         handleClose={handleDialogClose}
         open={status === ResultState.Failed}
@@ -94,20 +127,27 @@ const CreatePollParticipantsStep = () => {
         open={status === ResultState.Updating}
         message="Creating community poll..."
       />
-      <AutHeader
-        title=" Polls"
-        titleStyles={{
-          m: 0
-        }}
-        subtitle={
-          <>
-            Decide whether this is a Poll for the entire Community, or for a
-            specific Role. <br /> Who will participate in this Poll?
-          </>
-        }
-      />
+      <Typography mt={7} textAlign="center" color="white" variant="h3">
+        Polls
+      </Typography>
+      <Typography
+        className="text-secondary"
+        mx="auto"
+        my={2}
+        textAlign="center"
+        color="white"
+        variant="body1"
+      >
+        Decide whether this is a Poll for the entire Community, or for a
+        specific Role. <br /> Who will participate in this Poll?
+      </Typography>
       <StepWrapper
-        className="sw-poll-participants-wrapper"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center"
+        }}
         autoComplete="off"
         onSubmit={handleSubmit(onSubmit)}
       >
@@ -130,7 +170,7 @@ const CreatePollParticipantsStep = () => {
                 }}
                 width="450"
                 name={name}
-                color="primary"
+                color="offWhite"
                 value={value || ""}
                 displayEmpty
                 disabled={values.allRoles}
@@ -158,6 +198,8 @@ const CreatePollParticipantsStep = () => {
             return (
               <AutButton
                 name={name}
+                color="offWhite"
+                variant="outlined"
                 type="button"
                 onClick={() => {
                   reset({
@@ -181,6 +223,60 @@ const CreatePollParticipantsStep = () => {
           }}
         />
 
+        <Controller
+          name="channelId"
+          control={control}
+          rules={{
+            required: true,
+            validate: {
+              selected: (v) => !!v
+            }
+          }}
+          render={({ field: { name, value, onChange } }) => {
+            return (
+              <AutSelectField
+                variant="standard"
+                color="offWhite"
+                // renderValue={(selected) => {
+                //   if (!selected) {
+                //     return "Role" as any;
+                //   }
+                //   const role = roles.find((t) => t.id === selected);
+                //   return role?.roleName || selected;
+                // }}
+                name={name}
+                width="450"
+                value={value || ""}
+                displayEmpty
+                required
+                onChange={onChange}
+                helperText={
+                  <FormHelperText
+                    value={value}
+                    name={name}
+                    errors={formState.errors}
+                  >
+                    Select text channel
+                  </FormHelperText>
+                }
+              >
+                {channels &&
+                  !isLoading &&
+                  channels.map((channel) => {
+                    return (
+                      <MenuItem
+                        key={`channel-${channel.id}`}
+                        value={channel.id}
+                      >
+                        {channel.name}
+                      </MenuItem>
+                    );
+                  })}
+              </AutSelectField>
+            );
+          }}
+        />
+
         <AutButton
           sx={{
             minWidth: pxToRem(325),
@@ -189,14 +285,14 @@ const CreatePollParticipantsStep = () => {
             mt: pxToRem(100)
           }}
           type="submit"
-          color="primary"
+          color="offWhite"
           variant="outlined"
           disabled={!values?.role && !values.allRoles}
         >
           Submit
         </AutButton>
       </StepWrapper>
-    </>
+    </Stack>
   );
 };
 

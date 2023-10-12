@@ -56,7 +56,7 @@ import theme from "@theme/theme";
 import { CommunityData } from "@store/Community/community.reducer";
 import {
   useCreateGatheringMutation,
-  useGetChannelsQuery
+  useGetVoiceChannelsQuery
 } from "@api/discord.api";
 import axios from "axios";
 import AutLoading from "@components/AutLoading";
@@ -145,7 +145,12 @@ const GatheringInitialStep = () => {
     fetchGuild();
   }, [communityData]);
 
-  const { data, isLoading, isFetching, refetch } = useGetChannelsQuery(
+  const {
+    data: voiceChannels,
+    isLoading,
+    isFetching,
+    refetch
+  } = useGetVoiceChannelsQuery(
     { guildId },
     {
       // refetchOnMountOrArgChange: true,
@@ -589,9 +594,9 @@ const GatheringInitialStep = () => {
                   </FormHelperText>
                 }
               >
-                {data &&
+                {voiceChannels &&
                   !isLoading &&
-                  data.map((channel) => {
+                  voiceChannels.map((channel) => {
                     return (
                       <MenuItem
                         key={`channel-${channel.id}`}

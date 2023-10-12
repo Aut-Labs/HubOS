@@ -1,4 +1,4 @@
-import { styled, Typography } from "@mui/material";
+import { Button, Stack, styled, Typography } from "@mui/material";
 import { useAppDispatch } from "@store/store.model";
 import { Controller, useForm } from "react-hook-form";
 import { pxToRem } from "@utils/text-size";
@@ -57,16 +57,33 @@ const CreatePollInfoStep = () => {
   };
 
   return (
-    <>
-      <AutHeader
-        title="Polls"
-        titleStyles={{
-          m: 0
-        }}
-        subtitle={
-          <>Add Title, Description and Duration for your Community Proposal.</>
+    <Stack
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        margin: "0 auto",
+        width: {
+          xs: "100%",
+          sm: "400px",
+          xxl: "500px"
         }
-      />
+      }}
+    >
+      <Typography mt={7} textAlign="center" color="white" variant="h3">
+        Polls
+      </Typography>
+      <Typography
+        className="text-secondary"
+        mx="auto"
+        my={2}
+        textAlign="center"
+        color="white"
+        variant="body1"
+      >
+        Add Title, Description and Duration for your Community Proposal.
+      </Typography>
       <StepWrapper autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <Controller
           name="title"
@@ -87,6 +104,7 @@ const CreatePollInfoStep = () => {
                   name={name}
                   value={value}
                   width="450"
+                  color="offWhite"
                   autoFocus
                   placeholder="Poll Title"
                   onChange={onChange}
@@ -121,7 +139,7 @@ const CreatePollInfoStep = () => {
                 name={name}
                 value={value || ""}
                 onChange={onChange}
-                color="primary"
+                color="offWhite"
                 multiline
                 rows={5}
                 sx={{
@@ -163,6 +181,7 @@ const CreatePollInfoStep = () => {
                       <AutButton
                         name={name}
                         type="button"
+                        color="offWhite"
                         onClick={() => onChange(durationValue)}
                         sx={{
                           "&.MuiButton-root": {
@@ -182,7 +201,19 @@ const CreatePollInfoStep = () => {
           })}
         </div>
 
-        <AutButton
+        <Button
+          sx={{
+            my: "40px"
+          }}
+          type="submit"
+          variant="outlined"
+          disabled={!values?.description || !values.title || !values.duration}
+          size="small"
+          color="offWhite"
+        >
+          Next
+        </Button>
+        {/* <AutButton
           sx={{
             minWidth: pxToRem(325),
             maxWidth: pxToRem(325),
@@ -193,11 +224,9 @@ const CreatePollInfoStep = () => {
           color="primary"
           variant="outlined"
           disabled={!values?.description || !values.title || !values.duration}
-        >
-          Next
-        </AutButton>
+        ></AutButton> */}
       </StepWrapper>
-    </>
+    </Stack>
   );
 };
 
