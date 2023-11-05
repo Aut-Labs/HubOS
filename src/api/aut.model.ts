@@ -26,6 +26,10 @@ export const socialUrls = {
   lensfrens: {
     prefix: "https://www.lensfrens.xyz/",
     placeholder: ""
+  },
+  website: {
+    prefix: "",
+    placeholder: ""
   }
 };
 

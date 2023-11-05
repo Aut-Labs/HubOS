@@ -1,4 +1,4 @@
-import { useGetAllTasksPerQuestQuery } from "@api/onboarding.api";
+import { useGetAllTasksQuery } from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs/sdk";
 import AutLoading from "@components/AutLoading";
 import { Button, Container, Stack } from "@mui/material";
@@ -25,14 +25,11 @@ const TransactionTask = ({ plugin }: PluginParams) => {
   const { address: userAddress } = useAccount();
 
   const params = useParams();
-  const { task } = useGetAllTasksPerQuestQuery(
+  const { task } = useGetAllTasksQuery(
     {
       userAddress,
       isAdmin,
-      pluginAddress: searchParams.get(
-        RequiredQueryParams.OnboardingQuestAddress
-      ),
-      questId: +searchParams.get(RequiredQueryParams.QuestId)
+      novaAddress: searchParams.get(RequiredQueryParams.DaoAddress)
     },
     {
       selectFromResult: ({ data, isLoading, isFetching }) => ({

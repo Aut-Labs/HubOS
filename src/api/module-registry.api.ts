@@ -1,4 +1,5 @@
-import AutSDK, { DAOExpander, fetchMetadata } from "@aut-labs/sdk";
+/* eslint-disable max-len */
+import AutSDK, { Nova, fetchMetadata } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
@@ -9,10 +10,7 @@ const fetch = async (body: any, api: BaseQueryApi) => {
   const state = api.getState() as any;
   const { selectedCommunityAddress } = state.community;
 
-  sdk.daoExpander = sdk.initService<DAOExpander>(
-    DAOExpander,
-    selectedCommunityAddress
-  );
+  const nova: Nova = sdk.initService<Nova>(Nova, selectedCommunityAddress);
 
   const response = await sdk.moduleRegistry.getModuleDefinitions();
 
@@ -20,7 +18,7 @@ const fetch = async (body: any, api: BaseQueryApi) => {
     const definitionsWithMetadata: ModuleDefinition[] = [];
     for (let i = 1; i < response.data.length; i++) {
       const def = response.data[i];
-      const isActivatedResponse = await sdk.daoExpander.isModuleActivated(i);
+      const isActivatedResponse = await nova.isModuleActivated(i);
 
       const moduleData = {
         ...def,
@@ -42,11 +40,31 @@ const fetch = async (body: any, api: BaseQueryApi) => {
       if (moduleData.metadata.properties.title === "Task Type") {
         moduleData.metadata.properties.type = "Task";
       }
-
       definitionsWithMetadata.push(moduleData);
     }
+
+    const dAutModule = {
+      metadataURI:
+        "ipfs://bafkreieg7dwphs4554g726kalv5ez22hd55k3bksepa6rrvon6gf4mupey",
+      id: 4,
+      isActivated: true,
+      metadata: {
+        name: "Aut Labs Default Module",
+        description: "Aut Labs Modules",
+        properties: {
+          type: "dAut",
+          title: "dĀut",
+          buttonName: "See Domains",
+          shortDescription:
+            "integrate dĀut is here (it’s a library that needs to know only the web domain where you’re going to install it - and you need to prove ownership of that domain",
+          longDescription:
+            "integrate dĀut is here (it’s a library that needs to know only the web domain where you’re going to install it - and you need to prove ownership of that domain"
+        }
+      }
+    };
+
     return {
-      data: definitionsWithMetadata
+      data: [dAutModule, ...definitionsWithMetadata.filter((m) => m.id !== 1)]
     };
   }
   return {
@@ -59,12 +77,8 @@ const activateModule = async ({ moduleId = 1 }, api: BaseQueryApi) => {
   const state = api.getState() as any;
   const { selectedCommunityAddress } = state.community;
 
-  sdk.daoExpander = sdk.initService<DAOExpander>(
-    DAOExpander,
-    selectedCommunityAddress
-  );
-
-  const response = await sdk.daoExpander.activateModule(moduleId);
+  const nova: Nova = sdk.initService<Nova>(Nova, selectedCommunityAddress);
+  const response = await nova.activateModule(moduleId);
 
   if (response.isSuccess) {
     return {

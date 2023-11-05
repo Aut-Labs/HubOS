@@ -1,11 +1,11 @@
 /* eslint-disable max-len */
-import { useCreateQuizTaskPerQuestMutation } from "@api/onboarding.api";
+import { useCreateQuizTaskMutation } from "@api/onboarding.api";
 import { PluginDefinition, Task } from "@aut-labs/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { FormHelperText } from "@components/Fields";
 import { StepperButton } from "@components/Stepper";
-import { Box, Button, Container, Stack, Typography } from "@mui/material";
+import { Box, Button, Container, Grid, Stack, Typography } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
 import { memo, useEffect, useMemo, useState } from "react";
@@ -132,14 +132,15 @@ const QuizTasks = ({ plugin }: PluginParams) => {
     defaultValues: {
       title: "",
       description: "",
-      questions: []
+      questions: [],
+      weight: ""
     }
   });
 
   const allValues = watch();
 
   const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
-    useCreateQuizTaskPerQuestMutation();
+    useCreateQuizTaskMutation();
 
   const onSubmit = async () => {
     const values = getValues();
@@ -161,15 +162,12 @@ const QuizTasks = ({ plugin }: PluginParams) => {
     createTask({
       userAddress: account,
       isAdmin: true,
-      onboardingQuestAddress: searchParams.get(
-        RequiredQueryParams.OnboardingQuestAddress
-      ),
+      novaAddress: communityData.properties.address,
       pluginTokenId: plugin.tokenId,
-      questId: +searchParams.get(RequiredQueryParams.QuestId),
       pluginAddress: plugin.pluginAddress,
       allQuestions: values.questions,
       task: {
-        role: +searchParams.get(RequiredQueryParams.QuestId),
+        role: 1,
         metadata: {
           name: values.title,
           description: values.description,
@@ -184,21 +182,16 @@ const QuizTasks = ({ plugin }: PluginParams) => {
   };
 
   const selectedRole = useMemo(() => {
-    return roles.find(
-      (r) => r.id === +searchParams.get(RequiredQueryParams.QuestId)
-    );
+    return roles.find((r) => r.id === 1);
   }, [roles, searchParams]);
 
   useEffect(() => {
     if (isSuccess) {
-      navigate({
-        pathname: `/${
-          communityData?.name
-        }/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
-          RequiredQueryParams.QuestId
-        )}`,
-        search: searchParams.toString()
-      });
+      // @TODO go to tasks
+      // navigate({
+      //   pathname: `/${communityData?.name}/modules/OnboardingStrategy/QuestOnboardingPlugin`,
+      //   search: searchParams.toString()
+      // });
     }
   }, [isSuccess, communityData]);
 
@@ -281,43 +274,90 @@ const QuizTasks = ({ plugin }: PluginParams) => {
           }
         }}
       >
-        <Controller
-          name="title"
-          control={control}
-          rules={{
-            required: true,
-            validate: {
-              maxWords: (v: string) => countWords(v) <= 6
-            }
-          }}
-          render={({ field: { name, value, onChange } }) => {
-            return (
-              <AutTextField
-                variant="standard"
-                color="offWhite"
-                required
-                autoFocus
-                name={name}
-                value={value || ""}
-                onChange={onChange}
-                placeholder="Title"
-                helperText={
-                  <FormHelperText
-                    errorTypes={errorTypes}
-                    value={value}
-                    name={name}
-                    errors={formState.errors}
-                  >
-                    <Typography color="white" variant="caption">
-                      {6 - countWords(value)} Words left
-                    </Typography>
-                  </FormHelperText>
+        <Grid container spacing={2}>
+          <Grid item xs={8}>
+            <Controller
+              name="title"
+              control={control}
+              rules={{
+                required: true,
+                validate: {
+                  maxWords: (v: string) => countWords(v) <= 6
                 }
-              />
-            );
-          }}
-        />
-
+              }}
+              render={({ field: { name, value, onChange } }) => {
+                return (
+                  <AutTextField
+                    variant="standard"
+                    color="offWhite"
+                    required
+                    sx={{
+                      width: "100%"
+                    }}
+                    autoFocus
+                    name={name}
+                    value={value || ""}
+                    onChange={onChange}
+                    placeholder="Title"
+                    helperText={
+                      <FormHelperText
+                        errorTypes={errorTypes}
+                        value={value}
+                        name={name}
+                        errors={formState.errors}
+                      >
+                        <Typography color="white" variant="caption">
+                          {6 - countWords(value)} Words left
+                        </Typography>
+                      </FormHelperText>
+                    }
+                  />
+                );
+              }}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Controller
+              name="weight"
+              control={control}
+              rules={{
+                required: true,
+                min: 1,
+                max: 10
+              }}
+              render={({ field: { name, value, onChange } }) => {
+                return (
+                  <AutTextField
+                    variant="standard"
+                    color="offWhite"
+                    required
+                    type="number"
+                    sx={{
+                      width: "100%"
+                    }}
+                    autoFocus
+                    name={name}
+                    value={value || ""}
+                    onChange={onChange}
+                    placeholder="Weight"
+                    helperText={
+                      <FormHelperText
+                        errorTypes={errorTypes}
+                        value={value}
+                        name={name}
+                        errors={formState.errors}
+                      >
+                        <Typography color="white" variant="caption">
+                          Between 1 - 10
+                        </Typography>
+                      </FormHelperText>
+                    }
+                  />
+                );
+              }}
+            />
+          </Grid>
+        </Grid>
         <Controller
           name="description"
           control={control}

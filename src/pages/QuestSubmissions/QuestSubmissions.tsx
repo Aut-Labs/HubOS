@@ -136,12 +136,13 @@ const Dashboard = () => {
   const roles = useSelector(allRoles);
   const [search, setSearchState] = useState(null);
 
+  // @ts-ignore
   const { questOnboarding } = useGetAllPluginDefinitionsByDAOQuery(null, {
     selectFromResult: ({ data }) => ({
-      questOnboarding: (data || []).find(
-        (p) =>
-          PluginDefinitionType.QuestOnboardingPlugin === p.pluginDefinitionId
-      )
+      // questOnboarding: (data || []).find(
+      //   (p) =>
+      //     // PluginDefinitionType.QuestOnboardingPlugin === p.pluginDefinitionId
+      // )
     })
   });
 

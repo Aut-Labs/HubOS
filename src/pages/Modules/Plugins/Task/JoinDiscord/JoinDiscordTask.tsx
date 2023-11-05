@@ -1,5 +1,5 @@
 import {
-  useGetAllTasksPerQuestQuery,
+  useGetAllTasksQuery,
   useSubmitJoinDiscordTaskMutation
 } from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs/sdk";
@@ -34,14 +34,11 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
   const { getAuth } = useOAuth();
   const [joinClicked, setJoinClicked] = useState(false);
 
-  const { task } = useGetAllTasksPerQuestQuery(
+  const { task } = useGetAllTasksQuery(
     {
+      novaAddress: searchParams.get(RequiredQueryParams.DaoAddress),
       userAddress,
-      isAdmin,
-      pluginAddress: searchParams.get(
-        RequiredQueryParams.OnboardingQuestAddress
-      ),
-      questId: +searchParams.get(RequiredQueryParams.QuestId)
+      isAdmin
     },
     {
       selectFromResult: ({ data, isLoading, isFetching }) => ({

@@ -2,6 +2,7 @@ import AutSDK, {
   Quest,
   QuestOnboarding,
   Task,
+  TaskOnboarding,
   fetchMetadata
 } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
@@ -293,6 +294,64 @@ const getAllTasksPerQuest = async (
   };
 };
 
+const getAllTasks = async (
+  { questId, novaAddress, isAdmin, userAddress },
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  sdk.taskOnboarding = sdk.initService<TaskOnboarding>(
+    TaskOnboarding,
+    novaAddress
+  );
+
+  const taskOnboarding: TaskOnboarding = sdk.taskOnboarding;
+
+  let tasks: Task[] = [];
+  let submissions: Task[] = [];
+
+  if (isAdmin) {
+    const response = await taskOnboarding.getAllTasksAndSubmissions();
+
+    tasks = response.data.tasks;
+    submissions = response.data.submissions;
+  } else {
+    const response = await taskOnboarding.getAllTasks(userAddress);
+    tasks = response.data;
+  }
+
+  const tasksWithMetadata: Task[] = [];
+  const submissionsWithMetadata: Task[] = [];
+
+  for (let i = 0; i < tasks.length; i++) {
+    const def = tasks[i];
+    tasksWithMetadata.push({
+      ...def,
+      metadata: await fetchMetadata(def.metadataUri, environment.nftStorageUrl),
+      submission: await fetchMetadata(
+        def.submitionUrl,
+        environment.nftStorageUrl
+      )
+    });
+  }
+  for (let i = 0; i < submissions.length; i++) {
+    const def = submissions[i];
+    submissionsWithMetadata.push({
+      ...def,
+      metadata: await fetchMetadata(def.metadataUri, environment.nftStorageUrl),
+      submission: await fetchMetadata(
+        def.submitionUrl,
+        environment.nftStorageUrl
+      )
+    });
+  }
+  return {
+    data: {
+      tasks: tasksWithMetadata,
+      submissions: submissionsWithMetadata
+    }
+  };
+};
+
 const createQuest = async (
   body: Quest & { pluginAddress: string },
   api: BaseQueryApi
@@ -337,25 +396,28 @@ const updateQuest = async (
   };
 };
 
-const createTaskPerQuest = async (
+const createTask = async (
   body: {
     task: Task;
-    questId: number;
     pluginAddress: string;
-    onboardingQuestAddress: string;
+    novaAddress: string;
     pluginTokenId: number;
   },
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
-    QuestOnboarding,
-    body.onboardingQuestAddress
+
+  debugger;
+  sdk.taskOnboarding = sdk.initService<TaskOnboarding>(
+    TaskOnboarding,
+    body.novaAddress
   );
 
-  const response = await sdk.questOnboarding.createTask(
+  const taskOnboarding: TaskOnboarding = sdk.taskOnboarding;
+
+  const response = await taskOnboarding.createTask(
     body.task,
-    body.questId,
+    body.pluginAddress,
     body.pluginTokenId
   );
 
@@ -369,22 +431,21 @@ const createTaskPerQuest = async (
   };
 };
 
-const createQuizTaskPerQuest = async (
+const CreateQuizTask = async (
   body: {
     userAddress: string;
     task: Task;
-    questId: number;
     allQuestions: any[];
     pluginAddress: string;
-    onboardingQuestAddress: string;
+    novaAddress: string;
     pluginTokenId: number;
   },
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  const questOnboarding: QuestOnboarding = sdk.initService<QuestOnboarding>(
-    QuestOnboarding,
-    body.onboardingQuestAddress
+  const taskOnboarding: TaskOnboarding = sdk.initService<TaskOnboarding>(
+    TaskOnboarding,
+    body.novaAddress
   );
 
   const uuid = uuidv4();
@@ -402,9 +463,9 @@ const createQuizTaskPerQuest = async (
   }
 
   body.task.metadata.properties["uuid"] = uuid;
-  const response = await questOnboarding.createTask(
+  const response = await taskOnboarding.createTask(
     body.task,
-    body.questId,
+    body.pluginAddress,
     body.pluginTokenId
   );
 
@@ -448,6 +509,41 @@ const removeTaskFromQuest = async (
   );
 
   const response = await sdk.questOnboarding.removeTasks(
+    [body.task],
+    body.questId,
+    body.pluginTokenId
+  );
+
+  if (!response.isSuccess) {
+    return {
+      error: response.errorMessage
+    };
+  }
+  return {
+    data: response.data
+  };
+};
+
+const removeTask = async (
+  body: {
+    task: Task;
+    questId: number;
+    pluginAddress: string;
+    novaAddress: string;
+    pluginTokenId: number;
+  },
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  sdk.taskOnboarding = sdk.initService<TaskOnboarding>(
+    TaskOnboarding,
+    body.novaAddress
+  );
+
+  const taskOnboarding: TaskOnboarding = sdk.taskOnboarding;
+
+  // @ts-ignore
+  const response = await taskOnboarding.removeTasks(
     [body.task],
     body.questId,
     body.pluginTokenId
@@ -526,18 +622,19 @@ const finaliseOpenTask = async (
   body: {
     task: Task;
     pluginAddress: string;
-    onboardingQuestAddress: string;
     pluginDefinitionId: PluginDefinitionType;
   },
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  sdk.questOnboarding = sdk.initService<QuestOnboarding>(
-    QuestOnboarding,
-    body.onboardingQuestAddress
+  sdk.taskOnboarding = sdk.initService<TaskOnboarding>(
+    TaskOnboarding,
+    body.pluginAddress
   );
 
-  const response = await sdk.questOnboarding.finalizeFor(
+  const taskOnboarding: TaskOnboarding = sdk.taskOnboarding;
+
+  const response = await taskOnboarding.finalizeFor(
     body.task,
     body.pluginAddress,
     body.pluginDefinitionId
@@ -585,6 +682,10 @@ export const onboardingApi = createApi({
       return getAllTasksPerQuest(body, api);
     }
 
+    if (url === "getAllTasks") {
+      return getAllTasks(body, api);
+    }
+
     if (url === "activateQuest") {
       return activateQuest(body, api);
     }
@@ -593,16 +694,20 @@ export const onboardingApi = createApi({
       return deactivateQuest(body, api);
     }
 
-    if (url === "createTaskPerQuest") {
-      return createTaskPerQuest(body, api);
+    if (url === "createTask") {
+      return createTask(body, api);
     }
 
-    if (url === "createQuizTaskPerQuest") {
-      return createQuizTaskPerQuest(body, api);
+    if (url === "CreateQuizTask") {
+      return CreateQuizTask(body, api);
     }
 
     if (url === "removeTaskFromQuest") {
       return removeTaskFromQuest(body, api);
+    }
+
+    if (url === "removeTask") {
+      return removeTask(body, api);
     }
 
     if (url === "submitOpenTask") {
@@ -699,6 +804,25 @@ export const onboardingApi = createApi({
       },
       providesTags: ["Tasks"]
     }),
+    getAllTasks: builder.query<
+      {
+        tasks: Task[];
+        submissions: Task[];
+      },
+      {
+        userAddress: string;
+        isAdmin: boolean;
+        novaAddress: string;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "getAllTasks"
+        };
+      },
+      providesTags: ["Tasks"]
+    }),
     activateQuest: builder.mutation<
       boolean,
       {
@@ -755,46 +879,42 @@ export const onboardingApi = createApi({
       },
       invalidatesTags: ["Quests"]
     }),
-    createTaskPerQuest: builder.mutation<
+    createTask: builder.mutation<
       Task,
       {
         task: Task;
-        userAddress: string;
-        isAdmin: boolean;
-        questId: number;
         pluginAddress: string;
-        onboardingQuestAddress: string;
+        novaAddress: string;
         pluginTokenId: number;
       }
     >({
       query: (body) => {
         return {
           body,
-          url: "createTaskPerQuest"
+          url: "createTask"
         };
       },
-      invalidatesTags: ["Tasks", "Quests"]
+      invalidatesTags: ["Tasks"]
     }),
-    createQuizTaskPerQuest: builder.mutation<
+    CreateQuizTask: builder.mutation<
       Task,
       {
         task: Task;
         userAddress: string;
         isAdmin: boolean;
-        questId: number;
         pluginAddress: string;
         allQuestions: any[];
-        onboardingQuestAddress: string;
+        novaAddress: string;
         pluginTokenId: number;
       }
     >({
       query: (body) => {
         return {
           body,
-          url: "createQuizTaskPerQuest"
+          url: "CreateQuizTask"
         };
       },
-      invalidatesTags: ["Tasks", "Quests"]
+      invalidatesTags: ["Tasks"]
     }),
     removeTaskFromQuest: builder.mutation<
       Task,
@@ -814,6 +934,25 @@ export const onboardingApi = createApi({
         };
       },
       invalidatesTags: ["Tasks", "Quests"]
+    }),
+    removeTask: builder.mutation<
+      Task,
+      {
+        userAddress: string;
+        task: Task;
+        questId: number;
+        pluginAddress: string;
+        novaAddress: string;
+        pluginTokenId: number;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "removeTask"
+        };
+      },
+      invalidatesTags: ["Tasks"]
     }),
     submitOpenTask: builder.mutation<
       Task,
@@ -855,10 +994,8 @@ export const onboardingApi = createApi({
       {
         task: Task;
         isAdmin: boolean;
-        questId: number;
         userAddress: string;
         pluginAddress: string;
-        onboardingQuestAddress: string;
         pluginDefinitionId: PluginDefinitionType;
       }
     >({
@@ -868,7 +1005,7 @@ export const onboardingApi = createApi({
           url: "finaliseOpenTask"
         };
       },
-      invalidatesTags: ["Tasks", "Quests"]
+      invalidatesTags: ["Tasks"]
     })
   })
 });
@@ -881,11 +1018,13 @@ export const {
   useLazyGetOnboardingProgressQuery,
   useSubmitOpenTaskMutation,
   useRemoveTaskFromQuestMutation,
-  useCreateQuizTaskPerQuestMutation,
-  useCreateTaskPerQuestMutation,
+  useRemoveTaskMutation,
+  useCreateQuizTaskMutation,
+  useCreateTaskMutation,
   useGetAllTasksPerQuestQuery,
   useLazyGetAllTasksPerQuestQuery,
   useGetAllOnboardingQuestsQuery,
+  useGetAllTasksQuery,
   useActivateQuestMutation,
   useDeactivateQuestMutation,
   useSubmitJoinDiscordTaskMutation

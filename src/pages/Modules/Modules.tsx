@@ -53,7 +53,7 @@ const Modules = () => {
   const myModules = useMemo(() => {
     return modules.reduce(
       (prev, curr) => {
-        if (curr.id === 1 || curr.id === 2) {
+        if (curr.id === 1 || curr.id === 2 || curr.id === 4) {
           prev[curr.id] = true;
           prev.types.push(curr);
         }

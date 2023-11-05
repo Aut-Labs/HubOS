@@ -22,7 +22,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useConfirmDialog } from "react-mui-confirm";
 import OverflowTooltip from "@components/OverflowTooltip";
 import AutLoading from "@components/AutLoading";
-import { useRemoveTaskFromQuestMutation } from "@api/onboarding.api";
+import {
+  useRemoveTaskFromQuestMutation,
+  useRemoveTaskMutation
+} from "@api/onboarding.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import AddIcon from "@mui/icons-material/Add";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
@@ -56,11 +59,11 @@ export const taskTypes = {
     label: "Open Task",
     labelColor: "#FFC1A9"
   },
-  [TaskType.ContractInteraction]: {
-    pluginType: PluginDefinitionType.OnboardingTransactionTaskPlugin,
-    label: "Contract Interaction",
-    labelColor: "#FFECB3"
-  },
+  // [TaskType.ContractInteraction]: {
+  //   pluginType: PluginDefinitionType.OnboardingTransactionTaskPlugin,
+  //   label: "Contract Interaction",
+  //   labelColor: "#FFECB3"
+  // },
   [TaskType.Quiz]: {
     pluginType: PluginDefinitionType.OnboardingQuizTaskPlugin,
     label: "Multiple-Choice Quiz",
@@ -93,22 +96,15 @@ const TaskCard = ({
   const communityData = useSelector(CommunityData);
   const { address: userAddress } = useAccount();
   const [removeTask, { error, isError, isLoading, reset }] =
-    useRemoveTaskFromQuestMutation();
+    useRemoveTaskMutation();
 
-  const { plugin, questOnboarding } = useGetAllPluginDefinitionsByDAOQuery(
-    null,
-    {
-      selectFromResult: ({ data }) => ({
-        questOnboarding: (data || []).find(
-          (p) =>
-            PluginDefinitionType.QuestOnboardingPlugin === p.pluginDefinitionId
-        ),
-        plugin: (data || []).find(
-          (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
-        )
-      })
-    }
-  );
+  const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
+    selectFromResult: ({ data }) => ({
+      plugin: (data || []).find(
+        (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
+      )
+    })
+  });
 
   const confimDelete = () =>
     confirm({
@@ -120,7 +116,7 @@ const TaskCard = ({
           questId: +params.questId,
           pluginTokenId: plugin.tokenId,
           pluginAddress: plugin.pluginAddress,
-          onboardingQuestAddress: questOnboarding?.pluginAddress
+          novaAddress: searchParams.get(RequiredQueryParams.DaoAddress)
         });
       }
     });

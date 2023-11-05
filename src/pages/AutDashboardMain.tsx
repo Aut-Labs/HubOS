@@ -11,11 +11,12 @@ import Modules from "./Modules/Modules";
 import { useSelector } from "react-redux";
 import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
 import { useGetAllModuleDefinitionsQuery } from "@api/module-registry.api";
-import QuestSubmissions from "./QuestSubmissions/QuestSubmissions";
-import PeopleIcon from "@mui/icons-material/People";
-import { useGetOnboardingProgressQuery } from "@api/onboarding.api";
-import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import Admins from "./Admins/Admins";
+import CommunityEdit from "./CommunityEdit/CommunityEdit";
+import { ReactComponent as ManageIcon } from "@assets/manage.svg";
+import Archetype from "./Archetype/Archetype";
+import DAut from "./Modules/Plugins/DAut/DAut";
+import { useGetArchetypeAndStatsQuery } from "@api/community.api";
 
 const AutDashboardMain = () => {
   const communityData = useSelector(CommunityData);
@@ -27,6 +28,13 @@ const AutDashboardMain = () => {
       skip: false
     }
   );
+
+  const { data: archetype } = useGetArchetypeAndStatsQuery(null, {
+    refetchOnMountOrArgChange: false,
+    skip: false
+  });
+
+  console.log(archetype, "archetype");
 
   // const { questOnboarding } = useGetAllPluginDefinitionsByDAOQuery(null, {
   //   selectFromResult: ({ data }) => ({
@@ -71,21 +79,22 @@ const AutDashboardMain = () => {
       ""
     );
 
+    console.log(allRoutes, menuItems, "allRoutes");
+
     return {
-      // submissionsItem: {
-      //   title: "Quest Submissions",
-      //   route: `/${communityData?.name}/quest-submissions`,
-      //   exact: true,
-      //   icon: PeopleIcon,
-      //   badgeCounter: totalSubmissions,
-      //   children: []
-      // },
       menuItem: {
-        title: "Modules",
-        route: "modules",
-        exact: true,
-        icon: StackIcon,
-        children: menuItems
+        title: "Community",
+        icon: ManageIcon,
+        route: `community`,
+        children: [
+          {
+            title: "Onboard new members",
+            route: "modules",
+            exact: true,
+            icon: StackIcon,
+            children: menuItems
+          }
+        ]
       },
       routes: allRoutes
     };
@@ -107,7 +116,10 @@ const AutDashboardMain = () => {
             <Routes>
               <Route index element={<Dashboard />} />
               <Route path="admins" element={<Admins />} />
-              <Route path="members" element={<Members />} />
+              <Route path="community" element={<Members />} />
+              <Route path="edit-community" element={<CommunityEdit />} />
+              <Route path="your-archetype" element={<Archetype />} />
+              <Route path="modules/dAut" element={<DAut />} />
               {/* {modulesRoutes?.routes?.length && (
                 <Route
                   path="quest-submissions"

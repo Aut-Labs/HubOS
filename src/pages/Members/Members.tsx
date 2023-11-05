@@ -304,7 +304,7 @@ function Members() {
         </Box>
       </Box>
 
-      {!isLoading && !data?.length && (
+      {/* {!isLoading && !data?.length && (
         <Box
           sx={{
             display: "flex",
@@ -319,7 +319,7 @@ function Members() {
             There are no contributors in this community yet...
           </Typography>
         </Box>
-      )}
+      )} */}
 
       {isLoading ? (
         <AutLoading width="130px" height="130px" />
