@@ -188,7 +188,7 @@ function Web3DautConnect({
 
   return (
     <>
-      <d-aut
+      {/* <d-aut
         style={{
           display: "none",
           position: "absolute",
@@ -200,19 +200,19 @@ function Web3DautConnect({
         flow-config='{"mode" : "dashboard", "customCongratsMessage": ""}'
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
         button-type="simple"
-      />
-      {/* <d-aut
+      /> */}
+      <d-aut
         style={{
           position: "absolute",
           zIndex: 99999
         }}
         use-dev={environment.env == EnvMode.Development}
         flow-config='{"mode" : "tryAut", "customCongratsMessage": ""}'
-        dao-expander={"0x3DE0673355bbBE016A3978870F006D828489C825"}
+        dao-expander={"0x03ce48bba84427e12897939123f89248d44F29B0"}
         id="d-aut"
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
         button-type="simple"
-      /> */}
+      />
     </>
   );
 }

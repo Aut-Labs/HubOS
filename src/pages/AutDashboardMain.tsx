@@ -16,7 +16,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import { useGetOnboardingProgressQuery } from "@api/onboarding.api";
 import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import Admins from "./Admins/Admins";
-import Bot from "./Bot/Bot";
+import BotGatherings from "./Bot/BotGatherings";
 import { botActionRoutes } from "./Bot/routes";
 import GatheringInitialStep from "./Bot/Gatherings/GatheringIntialStep";
 import GatheringCalendarStep from "./Bot/Gatherings/GatheringCalendarStep";
@@ -27,6 +27,7 @@ import CreatePollParticipantsStep from "./EventFactory/Polls/CreatePollParticipa
 import CallInformationStep from "./EventFactory/GroupCall/CallInformationStep/CallInformationStep";
 import CalendarStep from "./EventFactory/GroupCall/CalendarStep/CalendarStep";
 import BotPluginsPage from "./Bot/BotPluginsPage";
+import CreatePollSuccessStep from "./EventFactory/Polls/SuccessStep/CreatePollSuccessStep";
 
 const AutDashboardMain = () => {
   const communityData = useSelector(CommunityData);
@@ -118,9 +119,11 @@ const AutDashboardMain = () => {
             <Routes>
               <Route index element={<Dashboard />} />
               <Route path="admins" element={<Admins />} />
-              <Route path="bot" element={<Bot />} />
+              {/* <Route path="bot" element={<Bot />} /> */}
               {/* <Route path="bot" element={<BotPluginsPage />} /> */}
               <Route path="bot/plugins" element={<BotPluginsPage />} />
+              <Route path="bot/polls" element={<BotGatherings />} />
+              <Route path="bot/gatherings" element={<BotGatherings />} />
               <Route path="bot/gathering" element={<GatheringInitialStep />} />
               <Route path="bot/poll/info" element={<CreatePollInfoStep />} />
               {/* <Route path="bot/gathering" element={<CalendarStep />} /> */}
@@ -131,6 +134,10 @@ const AutDashboardMain = () => {
               <Route
                 path="bot/poll/participants"
                 element={<CreatePollParticipantsStep />}
+              />
+              <Route
+                path="bot/poll/success"
+                element={<CreatePollSuccessStep />}
               />
               <Route
                 path="bot/gathering/success"

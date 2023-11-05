@@ -41,7 +41,7 @@ const menuItems = (communityName: string): SidebarMenuItem[] => [
   },
   {
     title: "Discord Bot",
-    route: `/${communityName}/bot`,
+    route: `/${communityName}/bot/plugins`,
     icon: BotIcon
   }
 ];

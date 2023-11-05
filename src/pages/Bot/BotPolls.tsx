@@ -36,7 +36,8 @@ import { AppBar } from "@components/Sidebar/Sidebar";
 import {
   useActivateDiscordBotPluginMutation,
   useGetGatheringsQuery,
-  useGetGuildIdQuery
+  useGetGuildIdQuery,
+  useGetPollsQuery
 } from "@api/discord.api";
 import { updateDiscordSocials } from "@api/community.api";
 import { useDispatch } from "react-redux";
@@ -113,7 +114,7 @@ const GatheringsList = ({ gatheringsList }) => {
   );
 };
 
-const PollsList = ({ gatheringsList }) => {
+const PollsList = ({ pollsList }) => {
   const theme = useTheme();
   return (
     <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -130,7 +131,7 @@ const PollsList = ({ gatheringsList }) => {
             <TableRow>
               <GatheringStyledTableCell>Name</GatheringStyledTableCell>
               <GatheringStyledTableCell align="right">
-                Duration
+                EndDate
               </GatheringStyledTableCell>
               <GatheringStyledTableCell align="right">
                 Role
@@ -139,8 +140,8 @@ const PollsList = ({ gatheringsList }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {gatheringsList &&
-              gatheringsList.map((row) => (
+            {pollsList &&
+              pollsList.map((row) => (
                 <TableRow
                   key={row.title}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -159,7 +160,7 @@ const PollsList = ({ gatheringsList }) => {
                     </Stack>
                   </GatheringStyledTableCell>
                   <GatheringStyledTableCell align="right">
-                    {row.duration}
+                    {row.endDate}
                   </GatheringStyledTableCell>
                   <GatheringStyledTableCell align="right">
                     {row.roles}
@@ -234,8 +235,17 @@ const Bot = () => {
   const {
     data: gatherings,
     isLoading: gatheringsLoading,
-    isSuccess
+    isSuccess: gatheringsSuccess
   } = useGetGatheringsQuery(guildId, {
+    // refetchOnMountOrArgChange: false,
+    skip: guildId === undefined || botActive === false
+  });
+
+  const {
+    data: polls,
+    isLoading: pollsLoading,
+    isSuccess: pollsSuccess
+  } = useGetPollsQuery(guildId, {
     // refetchOnMountOrArgChange: false,
     skip: guildId === undefined || botActive === false
   });
@@ -292,7 +302,7 @@ const Bot = () => {
 
   useEffect(() => {
     const activate = async () => {
-      await activateDiscordBotPlugin();
+      // await activateDiscordBotPlugin();
       const apiUrl = `${environment.discordBotUrl}/guild`; // Replace with your API endpoint URL
       console.log("communityData", communityData);
       const roles = communityData?.properties.rolesSets[0].roles.map((role) => {
@@ -329,9 +339,14 @@ const Bot = () => {
   }, [activatedPluginSuccessfully]);
 
   const gatheringsList = useMemo(() => {
-    if (isSuccess) return gatherings;
+    if (gatheringsSuccess) return gatherings;
     return null;
-  }, [isSuccess]);
+  }, [gatheringsSuccess]);
+
+  const pollsList = useMemo(() => {
+    if (pollsSuccess) return polls;
+    return null;
+  }, [pollsSuccess]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -425,7 +440,7 @@ const Bot = () => {
                   {
                     label: "Polls",
                     component: PollsList,
-                    props: { gatheringsList }
+                    props: { pollsList }
                   }
                 ]}
                 staticTab={{

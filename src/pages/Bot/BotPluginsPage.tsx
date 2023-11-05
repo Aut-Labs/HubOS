@@ -70,68 +70,16 @@ const BotPluginsPage = () => {
     skip: isDiscordVerified === false
   });
 
-  const {
-    data: gatherings,
-    isLoading: gatheringsLoading,
-    isSuccess
-  } = useGetGatheringsQuery(guildId, {
-    // refetchOnMountOrArgChange: false,
-    skip: guildId === undefined || botActive === false
-  });
-
   const [
     activateDiscordBotPlugin,
     { isLoading: isActivatingBotPlugin, isSuccess: activatedPluginSuccessfully }
   ] = useActivateDiscordBotPluginMutation();
 
-  const drawerWidth = useMemo(() => {
-    return isExtraLarge ? 350 : 300;
-  }, [isExtraLarge]);
-
-  const toolbarHeight = useMemo(() => {
-    return isExtraLarge ? 92 : 72;
-  }, [isExtraLarge]);
-
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
-
-  const handleAddBot = async () => {
-    // await activateDiscordBotPlugin();
-    const apiUrl = `${environment.discordBotUrl}/guild`; // Replace with your API endpoint URL
-    console.log("communityData", communityData);
-    const roles = communityData?.properties.rolesSets[0].roles.map((role) => {
-      return { name: role.roleName, id: role.id };
-    });
-    const requestObject = {
-      daoAddress: communityData?.properties.address,
-      roles: roles,
-      guildId
-    };
-    try {
-      await axios.post(apiUrl, requestObject);
-
-      const discordBotLink =
-        "https://discord.com/api/oauth2/authorize?client_id=1129037421615529984&permissions=8&scope=bot%20applications.commands";
-      window.open(discordBotLink, "_blank");
-      setLoading(true);
-      intervalRef.current = setInterval(async () => {
-        const botActiveRequest = await axios.get(
-          `${environment.discordBotUrl}/check/${guildId}`
-        );
-        const botActive = botActiveRequest.data.active;
-        if (botActive) {
-          setLoading(false);
-          setBotActive(botActive);
-          clearInterval(intervalRef.current);
-        }
-      }, 2000);
-    } catch (e) {
-      console.log(e);
-    }
-  };
 
   useEffect(() => {
     const activate = async () => {
-      await activateDiscordBotPlugin();
+      // await activateDiscordBotPlugin();
       const apiUrl = `${environment.discordBotUrl}/guild`; // Replace with your API endpoint URL
       console.log("communityData", communityData);
       const roles = communityData?.properties.rolesSets[0].roles.map((role) => {
@@ -164,13 +112,9 @@ const BotPluginsPage = () => {
         console.log(e);
       }
     };
+    //TODO CHECK if already active
     if (activatedPluginSuccessfully) activate();
   }, [activatedPluginSuccessfully]);
-
-  const gatheringsList = useMemo(() => {
-    if (isSuccess) return gatherings;
-    return null;
-  }, [isSuccess]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -187,15 +131,22 @@ const BotPluginsPage = () => {
     fetch();
   }, [guildId]);
 
+  const handleActivatePlugin = (moduleId) => {
+    activateDiscordBotPlugin({ moduleId });
+  };
+
   const BotPluginCard = ({
     pluginModule,
-    isFetching
+    isFetching,
+    onActivatePlugin
   }: {
     isFetching: boolean;
     pluginModule: any;
+    onActivatePlugin: any;
   }) => {
+    const communityData = useSelector(CommunityData);
+    const navigate = useNavigate();
     // const [activateOnboarding, { isLoading }] = useActivateModuleMutation();
-
     return (
       <GridCard
         sx={{
@@ -261,35 +212,29 @@ const BotPluginsPage = () => {
               </Stack>
             }
             {...(pluginModule.isActivated && {
-              to: pluginModule?.properties?.type,
-              preserveParams: true,
-              component: LinkWithQuery
+              onClick: () => {
+                console.log(
+                  `/${
+                    communityData.name
+                  }/bot/${pluginModule?.properties?.title.toLowerCase()}`
+                );
+                navigate(
+                  `/${
+                    communityData.name
+                  }/bot/${pluginModule?.properties?.title.toLowerCase()}`
+                );
+              }
             })}
             {...(!pluginModule.isActivated && {
               onClick: () =>
-                // activateOnboarding({
-                //   moduleId: pluginModule.id
-                // })
-                console.log("activate")
+                onActivatePlugin({
+                  moduleId: pluginModule.id
+                })
             })}
             color="offWhite"
           >
-            {pluginModule.isActivated ? "Go to plugins" : "Activate"}
+            {pluginModule.isActivated ? "Go to plugin" : "Activate"}
           </LoadingButton>
-
-          {/* <Stack direction="row" justifyContent="flex-end">
-            <Typography
-              className="text-secondary"
-              sx={{
-                mr: "2px",
-                fontWeight: "bold",
-                fontFamily: "FractulAltBold",
-                fontSize: "12px"
-              }}
-            >
-              {plugin?.metadata?.name}
-            </Typography>
-          </Stack> */}
         </CardContent>
       </GridCard>
     );
@@ -315,20 +260,22 @@ const BotPluginsPage = () => {
       <Stack mt={7} alignItems="center" justifyContent="center">
         <GridBox sx={{ flexGrow: 1, mt: 4 }}>
           <BotPluginCard
+            onActivatePlugin={handleActivatePlugin}
             isFetching={isFetching}
             // isAdmin={true}
             key={`modules-plugin-${1}`}
             pluginModule={JSON.parse(
-              '{"name":"Aut Labs Plugin","properties":{"shortDescription":"This is a description for the social bot plugin.","longDescription":"This is a description for the social bot plugin.","author":"Āut Labs","tags":["Workflow"],"contract":"SocialBotPlugin","module":{"type":"Default","title":"DiscordBot"},"title":"Social bot","type":"Default"}}'
+              '{"isActivated": "true","name":"Aut Labs Plugin","properties":{"shortDescription":"This is a description for the gatherings bot plugin.","longDescription":"This is a description for the gatherings bot plugin.","author":"Āut Labs","tags":["Workflow"],"contract":"SocialBotPlugin","module":{"type":"Default","title":"DiscordBot"},"title":"Gatherings","type":"Default"}}'
             )}
             //   hasCopyright={definition?.properties?.type === "Task"}
           />{" "}
           <BotPluginCard
+            onActivatePlugin={handleActivatePlugin}
             isFetching={isFetching}
             // isAdmin={true}
             key={`modules-plugin-${2}`}
             pluginModule={JSON.parse(
-              '{"name":"Aut Labs Plugin","properties":{"shortDescription":"This is a description for the social bot plugin.","longDescription":"This is a description for the social bot plugin.","author":"Āut Labs","tags":["Workflow"],"contract":"SocialBotPlugin","module":{"type":"Default","title":"DiscordBot"},"title":"Social bot","type":"Default"}}'
+              '{"isActivated": "true","name":"Aut Labs Plugin","properties":{"shortDescription":"This is a description for the polls bot plugin.","longDescription":"This is a description for the polls bot plugin.","author":"Āut Labs","tags":["Workflow"],"contract":"SocialBotPlugin","module":{"type":"Default","title":"DiscordBot"},"title":"Polls","type":"Default"}}'
             )}
             //   hasCopyright={definition?.properties?.type === "Task"}
           />

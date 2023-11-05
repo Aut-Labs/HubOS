@@ -63,12 +63,12 @@ import LoadingProgressBar from "@components/LoadingProgressBar";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 
-const GatheringSuccessStep = () => {
+const CreatePollSuccessStep = () => {
   const communityData = useSelector(CommunityData);
   const navigate = useNavigate();
 
   const goBack = async () => {
-    navigate(`/${communityData.name}/bot/gatherings`);
+    navigate(`/${communityData.name}/bot`);
   };
 
   return (
@@ -89,7 +89,7 @@ const GatheringSuccessStep = () => {
       >
         <Stack alignItems="center" justifyContent="center">
           <Typography textAlign="center" color="white" variant="h3">
-            Successfully created gathering
+            Successfully created poll
           </Typography>
         </Stack>
       </Box>
@@ -119,4 +119,4 @@ const GatheringSuccessStep = () => {
   );
 };
 
-export default GatheringSuccessStep;
+export default CreatePollSuccessStep;

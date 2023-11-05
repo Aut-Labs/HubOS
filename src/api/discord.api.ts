@@ -4,9 +4,10 @@ import { Community } from "./community.model";
 import { environment } from "./environment";
 import { AutID } from "./aut.model";
 import { createApi } from "@reduxjs/toolkit/dist/query/react";
-import AutSDK from "@aut-labs/sdk";
+import AutSDK, { PluginDefinition, SocialBotRegistry } from "@aut-labs/sdk";
 import { addMinutes, set } from "date-fns";
 import { dateToUnix } from "@utils/date-format";
+import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 
 export interface TaskData {
   role: string;
@@ -229,6 +230,13 @@ const getGatherings = async (body: any, api: any) => {
   };
 };
 
+const getPolls = async (body: any, api: any) => {
+  const polls = await axios.get(`${environment.discordBotUrl}/polls/${body}`);
+  return {
+    data: polls.data
+  };
+};
+
 const createGathering = async (body: any, api: any) => {
   const endDate = new Date();
   //add 15 minutes to date
@@ -266,15 +274,24 @@ const getGuildId = async (body: any, api: any) => {
 };
 
 const activateDiscordBotPlugin = async (body: any, api: any) => {
+  const state = api.getState();
   await new Promise((resolve) => setTimeout(resolve, 2000));
   const addressResult = await axios.get(`${environment.discordBotUrl}/address`);
+  //check admins list
   const sdk = AutSDK.getInstance();
   try {
     const result = await sdk.daoExpander.addAdmin(addressResult.data.address);
     if (result.isSuccess) {
-      return {
-        data: null
-      };
+      // return {
+      //   data: null
+      // };
+      const sdk = AutSDK.getInstance();
+      const pluginData =
+        state.pluginRegistryApi.queries["getAllPluginDefinitionsByDAO(null)"];
+      const plugin: PluginDefinition = pluginData.find(
+        (d: PluginDefinition) =>
+          d.pluginDefinitionId === PluginDefinitionType.SocialBotPlugin
+      );
     } else {
       return { error: result.errorMessage };
     }
@@ -297,15 +314,7 @@ export const createPoll = async (body: any, api: any) => {
   const { options, title, description, channelId } = state.poll.pollData;
   // const { community } = state.community;
   debugger;
-  const {
-    guildId,
-    startDate,
-    // startTime,
-    duration,
-    allParticipants,
-    participants,
-    role
-  } = body;
+  const { guildId, duration, allParticipants, participants, role } = body;
 
   try {
     // const optionsMapped = options.map((o) => {
@@ -327,34 +336,35 @@ export const createPoll = async (body: any, api: any) => {
     //   ({ roleName }) => roleName === role
     // );
 
-    const startTime = new Date();
-    startTime.setSeconds(0);
+    const startDate = new Date();
+    startDate.setSeconds(0);
     // set(startDatetime, {
     //   hours: time.getHours(),
     //   minutes: time.getMinutes(),
     //   seconds: 0
     // });
 
-    const endTime = new Date(startTime);
-    switch (duration) {
-      case "15m":
-        addMinutes(endTime, 15);
-        break;
-      case "30m":
-        addMinutes(endTime, 30);
-        break;
-      case "45m":
-        addMinutes(endTime, 45);
-        break;
-      default:
-        addMinutes(endTime, 60);
-    }
+    const endDate = new Date(startDate);
+    addMinutes(endDate, 1);
+    // switch (duration) {
+    //   case "15m":
+    //     addMinutes(endDate, 15);
+    //     break;
+    //   case "30m":
+    //     addMinutes(endDate, 30);
+    //     break;
+    //   case "45m":
+    //     addMinutes(endDate, 45);
+    //     break;
+    //   default:
+    //     addMinutes(endDate, 60);
+    // }
     //add option for multiple roles
     const pollRequestModel = {
       guildId,
-      startTime,
+      startDate,
       channelId,
-      endTime,
+      endDate,
       roles: [role],
       allCanAttend: allParticipants,
       options,
@@ -435,6 +445,9 @@ export const botApi = createApi({
     if (url === "getGatherings") {
       return getGatherings(body, api);
     }
+    if (url === "getPolls") {
+      return getPolls(body, api);
+    }
     if (url === "getGuildId") {
       return getGuildId(body, api);
     }
@@ -448,9 +461,9 @@ export const botApi = createApi({
       data: "Test"
     };
   },
-  tagTypes: ["Discord", "Gatherings", "Guild"],
+  tagTypes: ["Discord", "Gatherings", "Polls", "Guild"],
   endpoints: (builder) => ({
-    activateDiscordBotPlugin: builder.mutation<void, void>({
+    activateDiscordBotPlugin: builder.mutation<void, { moduleId: string }>({
       query: (body) => {
         return {
           body,
@@ -466,7 +479,7 @@ export const botApi = createApi({
           url: "createGathering"
         };
       },
-      invalidatesTags: []
+      invalidatesTags: ["Gatherings"]
     }),
     createPoll: builder.mutation({
       query: (body) => {
@@ -475,7 +488,7 @@ export const botApi = createApi({
           url: "createPoll"
         };
       },
-      invalidatesTags: []
+      invalidatesTags: ["Polls"]
     }),
     getGuildId: builder.query<{ guildId: string }, void>({
       query: (body) => {
@@ -521,6 +534,18 @@ export const botApi = createApi({
         };
       },
       providesTags: ["Gatherings"]
+    }),
+    getPolls: builder.query<
+      [{ title: string; description: string; endDate: string; roles: string }],
+      { guildId: string }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "getPolls"
+        };
+      },
+      providesTags: ["Polls"]
     })
   })
 });
@@ -532,5 +557,6 @@ export const {
   useGetVoiceChannelsQuery,
   useGetTextChannelsQuery,
   useGetGatheringsQuery,
+  useGetPollsQuery,
   useGetGuildIdQuery
 } = botApi;

@@ -10,7 +10,7 @@ import {
   pollUpdateData,
   resetPollState
 } from "@store/Activity/poll.reducer";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
@@ -18,7 +18,7 @@ import { ResultState } from "@store/result-status";
 import { addPoll } from "@api/activities.api";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
-import { allRoles } from "@store/Community/community.reducer";
+import { allRoles, CommunityData } from "@store/Community/community.reducer";
 import { AutSelectField, FormHelperText } from "@components/Fields";
 import { useNavigate, useNavigation } from "react-router-dom";
 import {
@@ -35,13 +35,15 @@ const StepWrapper = styled("form")({
 });
 
 const CreatePollParticipantsStep = () => {
-  const [createPoll, { isLoading, isSuccess }] = useCreatePollMutation();
+  const [createPoll, { isLoading: creatingPoll, isSuccess }] =
+    useCreatePollMutation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [roles] = useState(useSelector(allRoles));
   const status = useSelector(PollStatus);
   const errorMessage = useSelector(PollError);
   const data = useSelector(CreatePollData);
+  const communityData = useSelector(CommunityData);
 
   const {
     data: guildId,
@@ -97,6 +99,11 @@ const CreatePollParticipantsStep = () => {
   };
 
   useEffect(() => {
+    debugger;
+    if (isSuccess) navigate(`/${communityData.name}/bot/poll/success`);
+  }, [isSuccess]);
+
+  useEffect(() => {
     return () => {
       dispatch(resetPollState());
     };
@@ -127,6 +134,8 @@ const CreatePollParticipantsStep = () => {
         open={status === ResultState.Updating}
         message="Creating community poll..."
       />
+
+      <LoadingDialog open={creatingPoll} message="Creating poll..." />
       <Typography mt={7} textAlign="center" color="white" variant="h3">
         Polls
       </Typography>
@@ -261,7 +270,7 @@ const CreatePollParticipantsStep = () => {
                 }
               >
                 {channels &&
-                  !isLoading &&
+                  !guildIdLoading &&
                   channels.map((channel) => {
                     return (
                       <MenuItem
