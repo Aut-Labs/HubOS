@@ -21,14 +21,14 @@ const AppTitle = (props: TypographyProps) => {
       }}
       {...(props as any)}
     >
+      Nova
       <strong
         style={{
           fontFamily: "FractulAltBold"
         }}
       >
-        Āut
-      </strong>{" "}
-      Dashboard <Typography variant="body"></Typography>
+        OS
+      </strong>
     </Typography>
   );
 };

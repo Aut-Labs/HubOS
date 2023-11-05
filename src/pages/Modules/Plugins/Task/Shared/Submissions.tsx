@@ -30,7 +30,10 @@ import {
 import { TaskType } from "@aut-labs/sdk/dist/models/task";
 import OverflowTooltip from "@components/OverflowTooltip";
 import AutLoading from "@components/AutLoading";
-import { useGetAllTasksPerQuestQuery } from "@api/onboarding.api";
+import {
+  useGetAllTasksPerQuestQuery,
+  useGetAllTasksQuery
+} from "@api/onboarding.api";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useSelector } from "react-redux";
 import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
@@ -64,11 +67,11 @@ export const taskTypes = {
     label: "Open Task",
     labelColor: "#FFC1A9"
   },
-  [TaskType.ContractInteraction]: {
-    pluginType: PluginDefinitionType.OnboardingTransactionTaskPlugin,
-    label: "Contract Interaction",
-    labelColor: "#FFECB3"
-  },
+  // [TaskType.ContractInteraction]: {
+  //   pluginType: PluginDefinitionType.OnboardingTransactionTaskPlugin,
+  //   label: "Contract Interaction",
+  //   labelColor: "#FFECB3"
+  // },
   [TaskType.Quiz]: {
     pluginType: PluginDefinitionType.OnboardingQuizTaskPlugin,
     label: "Multiple-Choice Quiz",
@@ -99,10 +102,6 @@ export const SubmissionCard = ({
 
   const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
     selectFromResult: ({ data }) => ({
-      questOnboarding: (data || []).find(
-        (p) =>
-          PluginDefinitionType.QuestOnboardingPlugin === p.pluginDefinitionId
-      ),
       plugin: (data || []).find(
         (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
       )
@@ -290,14 +289,11 @@ const Submissions = ({ plugin }: PluginParams) => {
   const isAdmin = useSelector(IsAdmin);
   const communityData = useSelector(CommunityData);
 
-  const { task, submissions, isLoading } = useGetAllTasksPerQuestQuery(
+  const { task, submissions, isLoading } = useGetAllTasksQuery(
     {
       userAddress,
       isAdmin,
-      pluginAddress: searchParams.get(
-        RequiredQueryParams.OnboardingQuestAddress
-      ),
-      questId: +searchParams.get(RequiredQueryParams.QuestId)
+      novaAddress: searchParams.get(RequiredQueryParams.DaoAddress)
     },
     {
       selectFromResult: ({ data, isLoading, isFetching }) => {

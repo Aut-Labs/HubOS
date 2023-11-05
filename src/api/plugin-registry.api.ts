@@ -2,7 +2,6 @@ import AutSDK, { PluginDefinition, fetchMetadata } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
-import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { NetworkConfig } from "./ProviderFactory/network.config";
 
 const fetch = async (body: any, api: BaseQueryApi) => {
@@ -60,17 +59,17 @@ const add = async (body: PluginDefinition, api: BaseQueryApi) => {
   // temporary
   const { data } =
     state.pluginRegistryApi.queries["getAllPluginDefinitionsByDAO(null)"];
-  const questPlugin: PluginDefinition = data.find(
-    (d: PluginDefinition) =>
-      d.pluginDefinitionId === PluginDefinitionType.QuestOnboardingPlugin
-  );
+  // const questPlugin: PluginDefinition = data.find(
+  //   (d: PluginDefinition) =>
+  //     d.pluginDefinitionId === PluginDefinitionType.QuestOnboardingPlugin
+  // );
 
   const { pluginDefinitionId } = body;
 
   const response = await sdk.pluginRegistry.addPluginToDAO(
     pluginDefinitionId,
     selectedCommunityAddress,
-    questPlugin.pluginAddress,
+    null,
     network.contracts.offchainVerifierAddress
   );
 

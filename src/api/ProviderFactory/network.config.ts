@@ -16,6 +16,7 @@ export interface NetworkContracts {
   moduleRegistryAddress: string;
   questOpenTaskFactory: string;
   questOffchainTaskFactory: string;
+  allowListAddress: string;
 }
 
 export interface NetworkConfig {

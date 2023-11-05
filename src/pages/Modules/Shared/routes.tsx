@@ -71,6 +71,8 @@ export const pluginRoutes = (
     };
   }
 
+  console.log(plugins, "plugins");
+
   // let questSubmissionsAdded = false;
 
   return plugins.reduce(
@@ -84,9 +86,9 @@ export const pluginRoutes = (
 
       // workaround!
 
-      const isTaskTypeModule = moduleDefinition.id === 2;
+      const isTaskTypeModule = moduleDefinition?.id === 2;
 
-      if (!moduleDefinition.isActivated && !isTaskTypeModule) {
+      if (!moduleDefinition?.isActivated && !isTaskTypeModule) {
         return prev;
       }
 
@@ -149,30 +151,30 @@ export const pluginRoutes = (
           mainMenu.children.push(childMenuItem);
         }
         switch (plugin.pluginDefinitionId) {
-          case PluginDefinitionType.QuestOnboardingPlugin:
-            if (isAdmin) {
-              prev.allRoutes.push(
-                <Route
-                  key={`${path}/create`}
-                  path={`${path}/create`}
-                  element={<CreateQuest plugin={plugin} />}
-                />
-              );
-            }
-            prev.allRoutes.push(
-              <Route
-                key={path}
-                path={path}
-                element={<Quests plugin={plugin} />}
-              />,
-              <Route
-                key={`${path}/:questId`}
-                path={`${path}/:questId`}
-                element={<Quest plugin={plugin} />}
-              />
-            );
+          // case PluginDefinitionType.QuestOnboardingPlugin:
+          //   if (isAdmin) {
+          //     prev.allRoutes.push(
+          //       <Route
+          //         key={`${path}/create`}
+          //         path={`${path}/create`}
+          //         element={<CreateQuest plugin={plugin} />}
+          //       />
+          //     );
+          //   }
+          //   prev.allRoutes.push(
+          //     <Route
+          //       key={path}
+          //       path={path}
+          //       element={<Quests plugin={plugin} />}
+          //     />,
+          //     <Route
+          //       key={`${path}/:questId`}
+          //       path={`${path}/:questId`}
+          //       element={<Quest plugin={plugin} />}
+          //     />
+          //   );
 
-            break;
+          //   break;
           case PluginDefinitionType.OnboardingOpenTaskPlugin:
             if (isAdmin) {
               prev.allRoutes.push(
@@ -202,29 +204,29 @@ export const pluginRoutes = (
             );
 
             break;
-          case PluginDefinitionType.OnboardingTransactionTaskPlugin:
-            if (isAdmin) {
-              prev.allRoutes.push(
-                <Route
-                  key={path}
-                  path={path}
-                  element={<TransactionTasks plugin={plugin} />}
-                />,
-                <Route
-                  key={`${path}/create`}
-                  path={`${path}/create`}
-                  element={<CreateTransactionTask plugin={plugin} />}
-                />
-              );
-            }
-            prev.allRoutes.push(
-              <Route
-                key={`${path}/:taskId`}
-                path={`${path}/:taskId`}
-                element={<TransactionTask plugin={plugin} />}
-              />
-            );
-            break;
+          // case PluginDefinitionType.OnboardingTransactionTaskPlugin:
+          //   if (isAdmin) {
+          //     prev.allRoutes.push(
+          //       <Route
+          //         key={path}
+          //         path={path}
+          //         element={<TransactionTasks plugin={plugin} />}
+          //       />,
+          //       <Route
+          //         key={`${path}/create`}
+          //         path={`${path}/create`}
+          //         element={<CreateTransactionTask plugin={plugin} />}
+          //       />
+          //     );
+          //   }
+          //   prev.allRoutes.push(
+          //     <Route
+          //       key={`${path}/:taskId`}
+          //       path={`${path}/:taskId`}
+          //       element={<TransactionTask plugin={plugin} />}
+          //     />
+          //   );
+          //   break;
           case PluginDefinitionType.OnboardingJoinDiscordTaskPlugin:
             if (isAdmin) {
               prev.allRoutes.push(

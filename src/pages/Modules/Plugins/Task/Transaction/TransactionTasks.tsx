@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { useCreateTaskPerQuestMutation } from "@api/onboarding.api";
+import { useCreateTaskMutation } from "@api/onboarding.api";
 import { PluginDefinition, Task } from "@aut-labs/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
@@ -137,18 +137,13 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
   });
 
   const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
-    useCreateTaskPerQuestMutation();
+    useCreateTaskMutation();
 
   const onSubmit = async () => {
     const values = getValues();
     createTask({
-      isAdmin: true,
-      userAddress: account,
-      onboardingQuestAddress: searchParams.get(
-        RequiredQueryParams.OnboardingQuestAddress
-      ),
+      novaAddress: communityData.properties.address,
       pluginTokenId: plugin.tokenId,
-      questId: +searchParams.get(RequiredQueryParams.QuestId),
       pluginAddress: plugin.pluginAddress,
       task: {
         role: 1,
@@ -170,14 +165,11 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
 
   useEffect(() => {
     if (isSuccess) {
-      navigate({
-        pathname: `/${
-          communityData?.name
-        }/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
-          RequiredQueryParams.QuestId
-        )}`,
-        search: searchParams.toString()
-      });
+      // @TODO go to tasks
+      // navigate({
+      //   pathname: `/${communityData?.name}/modules/OnboardingStrategy/QuestOnboardingPlugin`,
+      //   search: searchParams.toString()
+      // });
     }
   }, [isSuccess, communityData]);
 

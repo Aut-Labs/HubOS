@@ -1,15 +1,16 @@
 import axios from "axios";
 import { CommitmentMessages } from "@utils/misc";
-import { Community, findRoleName } from "./community.model";
+import { Community, CommunityDomains, findRoleName } from "./community.model";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
 import { ipfsCIDToHttpUrl, isValidUrl } from "./storage.api";
 import { AutID, DAOMember } from "./aut.model";
-import AutSDK, { DAOExpander, fetchMetadata } from "@aut-labs/sdk";
+import AutSDK, { Allowlist, Nova, fetchMetadata } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { base64toFile } from "@utils/to-base-64";
 import { environment } from "./environment";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ethers } from "ethers";
+import { NovaArchetypeParameters } from "@aut-labs/sdk/dist/models/dao";
 
 const communityExtensionThunkProvider = Web3ThunkProviderFactory(
   "CommunityExtension",
@@ -29,6 +30,7 @@ export const fetchCommunity = communityExtensionThunkProvider(
   },
   async (contract, _) => {
     const [, , uri] = await contract.getComData();
+
     const metadata: Community = (await axios.get(ipfsCIDToHttpUrl(uri))).data;
     const community = new Community(metadata);
     return community;
@@ -159,15 +161,10 @@ export const updateDiscordSocials = createAsyncThunk(
     const state = getState();
     const { selectedCommunityAddress } = state["community"];
 
-    sdk.daoExpander = sdk.initService<DAOExpander>(
-      DAOExpander,
-      selectedCommunityAddress
-    );
+    sdk.nova = sdk.initService<Nova>(Nova, selectedCommunityAddress);
 
     console.log("New metadata: ->", ipfsCIDToHttpUrl(uri));
-    const response = await sdk.daoExpander.contract.metadata.setMetadataUri(
-      uri
-    );
+    const response = await sdk.nova.contract.metadata.setMetadataUri(uri);
 
     if (response.isSuccess) {
       const autIdData = JSON.parse(window.localStorage.getItem("aut-data"));
@@ -364,22 +361,17 @@ const getMembers = async (body, api: BaseQueryApi) => {
   );
 
   const sdk = AutSDK.getInstance();
-
-  sdk.daoExpander = sdk.initService<DAOExpander>(
-    DAOExpander,
-    selectedCommunityAddress
-  );
+  sdk.nova = sdk.initService<Nova>(Nova, selectedCommunityAddress);
 
   const members: DAOMember[] = [];
-  const membersResponse =
-    await sdk.daoExpander.contract.members.getAllMembers();
+  const membersResponse = await sdk.nova.contract.members.getAllMembers();
   if (!membersResponse) {
     return {
       data: members
     };
   }
 
-  for (let i = 0; i < membersResponse.data.length; i += 1) {
+  for (let i = 0; i < membersResponse?.data?.length; i += 1) {
     try {
       const memberAddress = membersResponse.data[i];
       const autIdResponse = await sdk.autID.findAutID(memberAddress);
@@ -394,7 +386,7 @@ const getMembers = async (body, api: BaseQueryApi) => {
       );
       const { role, commitment } = comDataResponse.data;
       const roleName = findRoleName(role, community.properties.rolesSets);
-      const isAdminResponse = await sdk.daoExpander.contract.admins.isAdmin(
+      const isAdminResponse = await sdk.nova.contract.admins.isAdmin(
         memberAddress
       );
       const member = new DAOMember({
@@ -435,12 +427,12 @@ interface UpdateAdminsData {
 //     const sdk = AutSDK.getInstance();
 //     try {
 //       args.added.forEach(async (address) => {
-//         const response = await sdk.daoExpander.contract.functions.addAdmin(
+//         const response = await sdk.nova.contract.functions.addAdmin(
 //           address
 //         );
 //       });
 //       args.removed.forEach(async (address) => {
-//         const response = await sdk.daoExpander.contract.functions.removeAdmin(
+//         const response = await sdk.nova.contract.functions.removeAdmin(
 //           address
 //         );
 //       });
@@ -455,7 +447,7 @@ const getAddAdminsPromise = async (sdk: AutSDK, address: string, note = "") => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await sdk.daoExpander.addAdmin(address);
+      const response = await sdk.nova.addAdmin(address);
       if (!response.isSuccess) {
         reject(response.errorMessage);
       }
@@ -470,7 +462,7 @@ const getRemoveAdminsPromise = async (sdk: AutSDK, address: string) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await sdk.daoExpander.removeAdmin(address);
+      const response = await sdk.nova.removeAdmin(address);
       if (!response.isSuccess) {
         reject(response.errorMessage);
       }
@@ -537,12 +529,100 @@ export const updateAdmins = async (
   }
 };
 
+export const vouchForAFriend = async (
+  friendAddress: string,
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+
+  const allowList: Allowlist = sdk.allowlist;
+  try {
+    await allowList.contract.addToAllowlist(friendAddress);
+    return {
+      data: true
+    };
+  } catch (error) {
+    return {
+      error
+    };
+  }
+};
+
+export const canVouchForAFriend = async (
+  userAddress: string,
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  const allowList: Allowlist = sdk.allowlist;
+  try {
+    const response = await allowList.contract.functions.canAllowList(
+      userAddress
+    );
+    return {
+      data: response
+    };
+  } catch (error) {
+    return {
+      error
+    };
+  }
+};
+
+export const updateDomains = async (
+  data: {
+    community: Community;
+    refetch: any;
+    domains: CommunityDomains[];
+  },
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+  try {
+    const updatedCommunity = Community.updateCommunity({
+      ...data.community,
+      properties: {
+        ...data.community.properties,
+        domains: data.domains
+      }
+    });
+
+    console.log(updatedCommunity, "updatedCommunity");
+    const uri = await sdk.client.storeAsBlob(updatedCommunity);
+    const state = api.getState();
+    const { selectedCommunityAddress } = state["community"];
+
+    sdk.nova = sdk.initService<Nova>(Nova, selectedCommunityAddress);
+
+    console.log("New metadata: ->", ipfsCIDToHttpUrl(uri));
+    const response = await sdk.nova.contract.metadata.setMetadataUri(uri);
+
+    if (response.isSuccess) {
+      const autIdData = JSON.parse(window.localStorage.getItem("aut-data"));
+      const communities: Community[] = autIdData.properties.communities;
+      const community = communities.find((c) => c.name === data.community.name);
+      community.properties.domains = data.domains;
+      window.localStorage.setItem("aut-data", JSON.stringify(autIdData));
+      await data.refetch();
+    }
+
+    return {
+      data
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      error
+    };
+  }
+};
+
 const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
 
   const address = (api.getState() as any)?.community?.selectedCommunityAddress;
+  const nova: Nova = sdk.initService<Nova>(Nova, address);
 
-  const response = await sdk.daoExpander.contract.metadata.getMetadataUri();
+  const response = await nova.contract.metadata.getMetadataUri();
   if (!response.isSuccess) {
     return {
       error: response.errorMessage
@@ -554,7 +634,7 @@ const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
     environment.nftStorageUrl
   );
 
-  const adminResponse = await sdk.daoExpander.contract.admins.getAdmins();
+  const adminResponse = await nova.contract.admins.getAdmins();
   const filteredEmptyAddresses = adminResponse.data.filter(
     (address) => address !== ethers.constants.AddressZero
   );
@@ -581,12 +661,57 @@ const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
   };
 };
 
+export const getArchetypeAndStats = async (body, api: BaseQueryApi) => {
+  const sdk = AutSDK.getInstance();
+
+  const address = (api.getState() as any)?.community?.selectedCommunityAddress;
+  const nova: Nova = sdk.initService<Nova>(Nova, address);
+  try {
+    const response = await nova.contract.getArchetype();
+    return {
+      data: response?.data
+    };
+  } catch (error) {
+    return {
+      error
+    };
+  }
+};
+
+export const setArchetype = async (
+  body: NovaArchetypeParameters,
+  api: BaseQueryApi
+) => {
+  const sdk = AutSDK.getInstance();
+
+  const address = (api.getState() as any)?.community?.selectedCommunityAddress;
+  const nova: Nova = sdk.initService<Nova>(Nova, address);
+  try {
+    const response = await nova.contract.setArchetype(body);
+    return {
+      data: response?.data
+    };
+  } catch (error) {
+    return {
+      error
+    };
+  }
+};
+
 export const communityApi = createApi({
   reducerPath: "communityApi",
   baseQuery: async (args, api, extraOptions) => {
     const { url, body } = args;
     if (url === "getAllMembers") {
       return getMembers(body, api);
+    }
+
+    if (url === "canVouchForAFriend") {
+      return canVouchForAFriend(body, api);
+    }
+
+    if (url === "vouchForAFriend") {
+      return vouchForAFriend(body, api);
     }
 
     if (url === "getCommunity") {
@@ -596,17 +721,59 @@ export const communityApi = createApi({
     if (url === "updateAdmins") {
       return updateAdmins(body, api);
     }
+
+    if (url === "updateDomains") {
+      return updateDomains(body, api);
+    }
+
+    if (url === "getArchetypeAndStats") {
+      return getArchetypeAndStats(body, api);
+    }
+
+    if (url === "setArchetype") {
+      return setArchetype(body, api);
+    }
     return {
       data: "Test"
     };
   },
-  tagTypes: ["Community"],
+  tagTypes: ["Community", "Vouch", "Archetype"],
   endpoints: (builder) => ({
     getAllMembers: builder.query<DAOMember[], void>({
       query: (body) => {
         return {
           body,
           url: "getAllMembers"
+        };
+      }
+    }),
+    getArchetypeAndStats: builder.query<NovaArchetypeParameters, void>({
+      providesTags: ["Archetype"],
+      query: (body) => {
+        return {
+          body,
+          url: "getArchetypeAndStats"
+        };
+      }
+    }),
+    setArchetype: builder.mutation<
+      NovaArchetypeParameters,
+      NovaArchetypeParameters
+    >({
+      invalidatesTags: ["Archetype"],
+      query: (body) => {
+        return {
+          body,
+          url: "setArchetype"
+        };
+      }
+    }),
+    canVouchForAFriend: builder.query<boolean, string>({
+      providesTags: ["Vouch"],
+      query: (body) => {
+        return {
+          body,
+          url: "canVouchForAFriend"
         };
       }
     }),
@@ -618,6 +785,30 @@ export const communityApi = createApi({
         };
       },
       invalidatesTags: ["Community"]
+    }),
+    updateDomains: builder.mutation<
+      {
+        community: Community;
+        domains: CommunityDomains[];
+      },
+      any
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "updateDomains"
+        };
+      },
+      invalidatesTags: ["Community"]
+    }),
+    vouchForAFriend: builder.mutation<boolean, string>({
+      query: (body) => {
+        return {
+          body,
+          url: "vouchForAFriend"
+        };
+      },
+      invalidatesTags: ["Vouch"]
     }),
     getCommunity: builder.query<
       {
@@ -641,5 +832,10 @@ export const communityApi = createApi({
 export const {
   useGetAllMembersQuery,
   useGetCommunityQuery,
-  useUpdateAdminsMutation
+  useUpdateAdminsMutation,
+  useUpdateDomainsMutation,
+  useCanVouchForAFriendQuery,
+  useVouchForAFriendMutation,
+  useGetArchetypeAndStatsQuery,
+  useSetArchetypeMutation
 } = communityApi;

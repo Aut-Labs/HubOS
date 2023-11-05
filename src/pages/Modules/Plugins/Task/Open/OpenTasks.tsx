@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { useCreateTaskPerQuestMutation } from "@api/onboarding.api";
+import { useCreateTaskMutation } from "@api/onboarding.api";
 import { PluginDefinition, Task } from "@aut-labs/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
@@ -10,6 +10,7 @@ import {
   Button,
   Checkbox,
   Container,
+  Grid,
   MenuItem,
   Stack,
   Typography
@@ -137,25 +138,21 @@ const OpenTasks = ({ plugin }: PluginParams) => {
       description: "",
       attachmentType: "",
       attachmentRequired: false,
-      textRequired: false
+      textRequired: false,
+      weight: ""
     }
   });
 
   const values = useWatch({ control });
 
   const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
-    useCreateTaskPerQuestMutation();
+    useCreateTaskMutation();
 
   const onSubmit = async () => {
     const values = getValues();
     createTask({
-      isAdmin: true,
-      userAddress: account,
-      onboardingQuestAddress: searchParams.get(
-        RequiredQueryParams.OnboardingQuestAddress
-      ),
+      novaAddress: communityData.properties.address,
       pluginTokenId: plugin.tokenId,
-      questId: +searchParams.get(RequiredQueryParams.QuestId),
       pluginAddress: plugin.pluginAddress,
       task: {
         role: 1,
@@ -176,14 +173,11 @@ const OpenTasks = ({ plugin }: PluginParams) => {
 
   useEffect(() => {
     if (isSuccess) {
-      navigate({
-        pathname: `/${
-          communityData?.name
-        }/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
-          RequiredQueryParams.QuestId
-        )}`,
-        search: searchParams.toString()
-      });
+      // @TODO go to tasks
+      // navigate({
+      //   pathname: `/${communityData?.name}/modules/OnboardingStrategy/QuestOnboardingPlugin`,
+      //   search: searchParams.toString()
+      // });
     }
   }, [isSuccess, communityData]);
 
@@ -273,42 +267,90 @@ const OpenTasks = ({ plugin }: PluginParams) => {
           }
         }}
       >
-        <Controller
-          name="title"
-          control={control}
-          rules={{
-            required: true,
-            validate: {
-              maxWords: (v: string) => countWords(v) <= 6
-            }
-          }}
-          render={({ field: { name, value, onChange } }) => {
-            return (
-              <AutTextField
-                variant="standard"
-                color="offWhite"
-                required
-                autoFocus
-                name={name}
-                value={value || ""}
-                onChange={onChange}
-                placeholder="Title"
-                helperText={
-                  <FormHelperText
-                    errorTypes={errorTypes}
-                    value={value}
-                    name={name}
-                    errors={formState.errors}
-                  >
-                    <Typography color="white" variant="caption">
-                      {6 - countWords(value)} Words left
-                    </Typography>
-                  </FormHelperText>
+        <Grid container spacing={2}>
+          <Grid item xs={8}>
+            <Controller
+              name="title"
+              control={control}
+              rules={{
+                required: true,
+                validate: {
+                  maxWords: (v: string) => countWords(v) <= 6
                 }
-              />
-            );
-          }}
-        />
+              }}
+              render={({ field: { name, value, onChange } }) => {
+                return (
+                  <AutTextField
+                    variant="standard"
+                    color="offWhite"
+                    required
+                    sx={{
+                      width: "100%"
+                    }}
+                    autoFocus
+                    name={name}
+                    value={value || ""}
+                    onChange={onChange}
+                    placeholder="Title"
+                    helperText={
+                      <FormHelperText
+                        errorTypes={errorTypes}
+                        value={value}
+                        name={name}
+                        errors={formState.errors}
+                      >
+                        <Typography color="white" variant="caption">
+                          {6 - countWords(value)} Words left
+                        </Typography>
+                      </FormHelperText>
+                    }
+                  />
+                );
+              }}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Controller
+              name="weight"
+              control={control}
+              rules={{
+                required: true,
+                min: 1,
+                max: 10
+              }}
+              render={({ field: { name, value, onChange } }) => {
+                return (
+                  <AutTextField
+                    variant="standard"
+                    color="offWhite"
+                    required
+                    type="number"
+                    sx={{
+                      width: "100%"
+                    }}
+                    autoFocus
+                    name={name}
+                    value={value || ""}
+                    onChange={onChange}
+                    placeholder="Weight"
+                    helperText={
+                      <FormHelperText
+                        errorTypes={errorTypes}
+                        value={value}
+                        name={name}
+                        errors={formState.errors}
+                      >
+                        <Typography color="white" variant="caption">
+                          Between 1 - 10
+                        </Typography>
+                      </FormHelperText>
+                    }
+                  />
+                );
+              }}
+            />
+          </Grid>
+        </Grid>
 
         <Controller
           name="description"

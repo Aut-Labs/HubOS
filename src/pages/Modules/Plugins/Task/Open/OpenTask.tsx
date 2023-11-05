@@ -2,6 +2,7 @@
 import {
   useFinaliseOpenTaskMutation,
   useGetAllTasksPerQuestQuery,
+  useGetAllTasksQuery,
   useSubmitOpenTaskMutation
 } from "@api/onboarding.api";
 import { PluginDefinition, Task } from "@aut-labs/sdk";
@@ -273,14 +274,11 @@ const OwnerFinalizeContent = ({
   const [finalizeTask, { error, isError, isLoading, reset }] =
     useFinaliseOpenTaskMutation();
 
-  const { isLoading: isLoadingTasks } = useGetAllTasksPerQuestQuery(
+  const { isLoading: isLoadingTasks } = useGetAllTasksQuery(
     {
       userAddress,
       isAdmin,
-      pluginAddress: searchParams.get(
-        RequiredQueryParams.OnboardingQuestAddress
-      ),
-      questId: +searchParams.get(RequiredQueryParams.QuestId)
+      novaAddress: searchParams.get(RequiredQueryParams.DaoAddress)
     },
     {
       selectFromResult: ({ isLoading, isFetching }) => ({
@@ -293,11 +291,7 @@ const OwnerFinalizeContent = ({
     finalizeTask({
       userAddress,
       isAdmin: true,
-      questId: +searchParams.get(RequiredQueryParams.QuestId),
       task: submission,
-      onboardingQuestAddress: searchParams.get(
-        RequiredQueryParams.OnboardingQuestAddress
-      ),
       pluginAddress: plugin.pluginAddress,
       pluginDefinitionId: plugin.pluginDefinitionId
     });
@@ -892,14 +886,11 @@ const OpenTask = ({ plugin }: PluginParams) => {
 
   const params = useParams();
 
-  const { task, submission } = useGetAllTasksPerQuestQuery(
+  const { task, submission } = useGetAllTasksQuery(
     {
       userAddress,
       isAdmin,
-      pluginAddress: searchParams.get(
-        RequiredQueryParams.OnboardingQuestAddress
-      ),
-      questId: +searchParams.get(RequiredQueryParams.QuestId)
+      novaAddress: searchParams.get(RequiredQueryParams.DaoAddress)
     },
     {
       selectFromResult: ({ data, isLoading, isFetching }) => ({

@@ -1,4 +1,7 @@
-import { DatePicker, CalendarPicker } from "@mui/lab";
+import { DatePicker } from "@mui/lab";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import {
   Select,
   SelectProps,
@@ -106,10 +109,10 @@ export function FormHelperText({
   );
 }
 
-const CustomSwCalendarPicker = styled(CalendarPicker)(({ theme }) => ({
-  "&.MuiCalendarPicker-root": {
+const CustomSwCalendarPicker = styled(DateCalendar)(({ theme }) => ({
+  "&.MuiDateCalendar-root": {
     width: pxToRem(376),
-    minHeight: pxToRem(450)
+    minHeight: pxToRem(480)
   },
   ".MuiTypography-caption": {
     color: theme.palette.primary.main
@@ -134,15 +137,13 @@ const CustomSwCalendarPicker = styled(CalendarPicker)(({ theme }) => ({
     height: pxToRem(40),
     color: "white"
   },
-  ".PrivatePickersSlideTransition-root": {
+  ".MuiPickersSlideTransition-root": {
     minHeight: pxToRem(320),
     ".MuiButtonBase-root.Mui-disabled": {
       color: "#777777",
+      borderRadius: 0,
       backgroundColor: "black"
     },
-    // '.MuiButtonBase-root': {
-    //   margin: `0 ${pxToRem(6)}`,
-    // },
     ".MuiButtonBase-root:not(.Mui-disabled)": {
       backgroundColor: "#707070",
       color: "white",
@@ -174,7 +175,7 @@ export const SwDatePicker = ({
             maxDate={maxDate}
             PaperProps={{
               sx: {
-                "&.MuiCalendarPicker-root": {
+                "&.MuiDateCalendar-root": {
                   width: pxToRem(480),
                   background: "red",
                   'div[role="presentation"], .MuiButtonBase-root, .MuiTypography-root, .PrivatePickersYear-yearButton':
@@ -230,7 +231,7 @@ export const SwCalendarPicker = ({
           <CustomSwCalendarPicker
             minDate={minDate}
             maxDate={maxDate}
-            date={field.value ? new Date(field.value) : null}
+            value={field.value ? new Date(field.value) : null}
             onChange={field.onChange}
             {...otherProps}
           />
