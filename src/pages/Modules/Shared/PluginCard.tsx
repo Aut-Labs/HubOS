@@ -67,11 +67,11 @@ const PluginCard = ({
   const actionName = useMemo(() => {
     if (!plugin?.pluginAddress) return "Install";
 
-    if (
-      plugin.pluginDefinitionId === PluginDefinitionType.QuestOnboardingPlugin
-    ) {
-      return "Go to Quests";
-    }
+    // if (
+    //   plugin.pluginDefinitionId === PluginDefinitionType.QuestOnboardingPlugin
+    // ) {
+    //   return "Go to Quests";
+    // }
     return "Add Task";
   }, [plugin]);
 
@@ -359,7 +359,19 @@ export const ModuleDefinitionCard = ({
           })}
           color="offWhite"
         >
-          {pluginModule.isActivated ? "Go to plugins" : "Activate"}
+          {/* @ts-ignore */}
+          {pluginModule?.metadata?.properties?.buttonName && (
+            <>
+              {/* @ts-ignore */}
+              {pluginModule?.metadata?.properties?.buttonName}
+            </>
+          )}
+          {/* @ts-ignore */}
+          {!pluginModule?.metadata?.properties?.buttonName
+            ? pluginModule.isActivated
+              ? "Go to plugins"
+              : "Activate"
+            : ""}
         </LoadingButton>
 
         {/* <Stack direction="row" justifyContent="flex-end">

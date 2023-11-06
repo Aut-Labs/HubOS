@@ -28,9 +28,8 @@ export const socialUrls = {
     placeholder: ""
   },
   website: {
-    hidePrefix: true,
-    placeholder: "website",
-    prefix: ""
+    prefix: "",
+    placeholder: ""
   }
 };
 

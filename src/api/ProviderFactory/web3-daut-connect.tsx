@@ -53,7 +53,8 @@ function Web3DautConnect({
       autIDAddress: network.contracts.autIDAddress,
       daoExpanderRegistryAddress: network.contracts.daoExpanderRegistryAddress,
       pluginRegistryAddress: network.contracts.pluginRegistryAddress,
-      moduleRegistryAddress: network.contracts.moduleRegistryAddress
+      moduleRegistryAddress: network.contracts.moduleRegistryAddress,
+      allowListAddress: network.contracts.allowListAddress
     });
   };
 

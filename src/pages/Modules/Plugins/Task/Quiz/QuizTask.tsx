@@ -1,4 +1,4 @@
-import { useGetAllTasksPerQuestQuery } from "@api/onboarding.api";
+import { useGetAllTasksQuery } from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs/sdk";
 import AutLoading from "@components/AutLoading";
 import {
@@ -111,14 +111,11 @@ const QuizTask = ({ plugin }: PluginParams) => {
   const params = useParams();
   const [initialized, setInitialized] = useState(false);
 
-  const { task } = useGetAllTasksPerQuestQuery(
+  const { task } = useGetAllTasksQuery(
     {
       userAddress,
       isAdmin,
-      pluginAddress: searchParams.get(
-        RequiredQueryParams.OnboardingQuestAddress
-      ),
-      questId: +searchParams.get(RequiredQueryParams.QuestId)
+      novaAddress: searchParams.get(RequiredQueryParams.DaoAddress)
     },
     {
       selectFromResult: ({ data, isLoading, isFetching }) => ({

@@ -1,4 +1,4 @@
-import { MutableRefObject, useEffect, useMemo, useState } from "react";
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 import {
   GridActionsCellItem,
   GridColumns,
@@ -6,19 +6,24 @@ import {
   GridRenderEditCellParams,
   GridRowApi
 } from "@mui/x-data-grid";
+import debounce from "lodash.debounce";
 import AutDatatable from "@components/datatable/Datatable";
 import {
   CustomEditComponent,
   useDatatableApiRef
 } from "@components/datatable/DatatableRef";
 import {
+  Badge,
+  Box,
   Button,
   CircularProgress,
   Container,
+  Tooltip,
   Typography,
   useMediaQuery
 } from "@mui/material";
 import EditToolbar from "@components/datatable/DatatableToolbar";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import {
   GetDatatableItems,
   GetDatatableChangedItems
@@ -38,12 +43,16 @@ import {
   addPAContracts,
   getPAContracts,
   updateAdmins,
+  useCanVouchForAFriendQuery,
   useGetCommunityQuery,
-  useUpdateAdminsMutation
+  useUpdateAdminsMutation,
+  useVouchForAFriendMutation
 } from "@api/community.api";
 import { getLockedContracts } from "@store/AutDashboard/aut-dashboard.reducer";
 import { AutButton } from "@components/buttons";
 import AutSDK from "@aut-labs/sdk";
+import { AutTextField } from "@theme/field-text-styles";
+import { useAccount } from "wagmi";
 
 const tableColumns = (
   getRef: () => MutableRefObject<GridEditRowApi & GridRowApi>
@@ -183,6 +192,9 @@ const Admins = () => {
   const [initialData, setInitialData] = useState([]);
   const [isDisabled, setIsDisabled] = useState(true);
   const [open, setOpen] = useState(false);
+  const [friendAddress, setFriendAddress] = useState("");
+  const { address: userAddress } = useAccount();
+  const input = useRef<HTMLElement>();
   const lockedContracts = useSelector(getLockedContracts);
   const { status, errorMessage } = useSelector(
     (state: RootState) => state.dashboard
@@ -191,6 +203,17 @@ const Admins = () => {
     refetchOnMountOrArgChange: true,
     skip: false
   });
+
+  const { data: canVouchForAFriend, isLoading: isLoadingVoucher } =
+    useCanVouchForAFriendQuery(userAddress, {
+      refetchOnMountOrArgChange: true,
+      skip: false
+    });
+
+  console.log(canVouchForAFriend, "canVouchForAFriend");
+
+  const [vouchForAFriend, { error: vouchError, isLoading: vouching }] =
+    useVouchForAFriendMutation();
 
   const [updateAdmins, { error, isLoading: adminsUpdating, isError, reset }] =
     useUpdateAdminsMutation();
@@ -239,6 +262,17 @@ const Admins = () => {
       initialData
     });
   };
+
+  const debouncedChangeHandler = useMemo(() => {
+    const changeHandler = (e) => {
+      setFriendAddress(e.target.value);
+    };
+    return debounce(changeHandler, 10);
+  }, []);
+
+  useEffect(() => {
+    return () => debouncedChangeHandler.cancel();
+  }, [debouncedChangeHandler]);
 
   return (
     <Container maxWidth="md" className="sw-core-team">
@@ -317,6 +351,52 @@ const Admins = () => {
               Save changes
             </Button> */}
           </div>
+
+          <Box
+            sx={{
+              mt: 4,
+              gap: 2,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <Badge
+              badgeContent={
+                <Tooltip title="You can vouch for one friend only to be allow listed.">
+                  <HelpOutlineIcon
+                    color="primary"
+                    sx={{ width: "16px", ml: 1 }}
+                  />
+                </Tooltip>
+              }
+            >
+              <Typography textAlign="center" color="white" variant="subtitle2">
+                Vouch for friend:
+              </Typography>
+            </Badge>
+
+            <AutTextField
+              variant="standard"
+              color="offWhite"
+              disabled={!canVouchForAFriend || isLoadingVoucher || vouching}
+              autoFocus
+              placeholder="Your friends address"
+              inputRef={input}
+              onChange={debouncedChangeHandler}
+            />
+
+            <Button
+              disabled={!canVouchForAFriend || isLoadingVoucher || vouching}
+              type="button"
+              color="offWhite"
+              variant="outlined"
+              size="medium"
+              onClick={() => vouchForAFriend(friendAddress)}
+            >
+              Save
+            </Button>
+          </Box>
         </>
       )}
     </Container>

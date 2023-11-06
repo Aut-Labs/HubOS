@@ -1,7 +1,7 @@
 import { CommitmentMessages } from "@utils/misc";
 import { httpUrlToIpfsCID } from "./storage.api";
 import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
-import { DAOProperties, Role, RoleSet } from "@aut-labs/sdk/dist/models/dao";
+import { NovaProperties, Role, RoleSet } from "@aut-labs/sdk/dist/models/dao";
 import { AutSocial } from "./api.model";
 import { socialUrls } from "./aut.model";
 
@@ -30,7 +30,12 @@ export const findRoleName = (roleId: string, rolesSets: RoleSet[]) => {
   }
 };
 
-export class CommunityProperties extends DAOProperties {
+export interface CommunityDomains {
+  note: string;
+  domain: string;
+}
+
+export class CommunityProperties extends NovaProperties {
   address?: string;
 
   socials: AutSocial[];
@@ -44,6 +49,8 @@ export class CommunityProperties extends DAOProperties {
     isActive?: boolean;
   };
 
+  domains: CommunityDomains[];
+
   additionalProps?: any;
 
   constructor(data: CommunityProperties) {
@@ -56,6 +63,7 @@ export class CommunityProperties extends DAOProperties {
       this.rolesSets = data.rolesSets;
       this.address = data.address;
       this.socials = data.socials;
+      this.domains = data.domains || [];
       this.additionalProps = data.additionalProps;
       this.userData =
         JSON.parse(JSON.stringify(data?.userData || {})) ||
@@ -95,6 +103,7 @@ export class Community extends BaseNFTModel<CommunityProperties> {
         commitment: community.properties.commitment,
         rolesSets: community.properties.rolesSets,
         timestamp: community.properties.timestamp,
+        domains: community.properties.domains,
         socials: community.properties.socials.map((social) => {
           social.link = `${socialUrls[social.type].prefix}${social.link}`;
           return social;

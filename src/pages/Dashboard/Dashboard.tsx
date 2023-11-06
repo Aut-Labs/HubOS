@@ -6,15 +6,14 @@ import {
   CardContent,
   CardHeader,
   Container,
-  TableBody,
-  TableCell,
-  TableRow,
   Typography,
-  styled,
-  tableCellClasses,
   Stack,
-  Button,
-  CircularProgress
+  Grid,
+  IconButton,
+  SvgIcon,
+  Badge,
+  Tooltip,
+  Button
 } from "@mui/material";
 import { allRoles, CommunityData } from "@store/Community/community.reducer";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,60 +22,15 @@ import { memo, useEffect } from "react";
 import { UserInfo } from "@auth/auth.reducer";
 import CopyAddress from "@components/CopyAddress";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
-import { Link } from "react-router-dom";
-import { useGetAllMembersQuery } from "@api/community.api";
+import {
+  useGetAllMembersQuery,
+  useGetArchetypeAndStatsQuery
+} from "@api/community.api";
 import LoadingProgressBar from "@components/LoadingProgressBar";
-import { CommitmentMessages } from "@utils/misc";
-import { autUrls } from "@api/environment";
-
-const StyledTableTitle = styled("div")(({ theme }) => ({
-  alignItems: "flex-start",
-  display: "flex",
-  marginBottom: "10px"
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  width: "100%",
-  // "&:nth-of-type(odd)": {
-  //   backgroundColor: theme.palette.action.hover
-  // },
-  "&:first-of-type td, &:first-of-type th": {
-    borderTop: `2px solid ${theme.palette.divider}`
-  },
-  "&:last-child td, &:last-child th": {
-    border: 0
-  }
-}));
-
-const StyledMembersTableRow = styled(TableRow)(({ theme }) => ({
-  width: "100%",
-  "&:last-of-type": {
-    backgroundColor: theme.palette.nightBlack.light
-  },
-  border: 0,
-  "&:first-of-type td, &:first-of-type th": {
-    borderTop: `2px solid ${theme.palette.divider}`
-  },
-
-  "&:last-child td, &:last-child th": {
-    borderBottom: `2px solid ${theme.palette.divider}`
-  }
-}));
-
-const TaskStyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}, &.${tableCellClasses.body}`]: {
-    color: theme.palette.common.white,
-    borderColor: theme.palette.divider
-  }
-}));
-
-const MembersStyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}, &.${tableCellClasses.body}`]: {
-    color: theme.palette.common.white,
-    border: 0,
-    lineHeight: "20px"
-  }
-}));
+import { ReactComponent as EditIcon } from "@assets/actions/edit.svg";
+import { Link } from "react-router-dom";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import ArchetypePieChart from "./ArchetypePieChart";
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -93,11 +47,22 @@ const Dashboard = () => {
   const userInfo = useSelector(UserInfo);
   const community = useSelector(CommunityData);
   const roles = useSelector(allRoles);
-  const urls = autUrls();
 
   const { data, isLoading, isFetching } = useGetAllMembersQuery(null, {
     refetchOnMountOrArgChange: true,
     skip: false
+  });
+
+  const {
+    archetype,
+    isLoading: isLoadingArchetype,
+    isFetching: isFetchingArchetype
+  } = useGetArchetypeAndStatsQuery(null, {
+    selectFromResult: ({ data, isLoading, isFetching }) => ({
+      isLoading,
+      isFetching,
+      archetype: data
+    })
   });
 
   const membersTableData = {
@@ -112,8 +77,6 @@ const Dashboard = () => {
       const membersByRole = data.reduce(function (n, member) {
         return n + +(member?.properties?.role.id == role.id);
       }, 0);
-
-      console.log(membersByRole);
 
       membersTableData[role.id] = membersByRole;
     });
@@ -149,325 +112,240 @@ const Dashboard = () => {
       }}
     >
       <LoadingProgressBar isLoading={isFetching} />
-      <Card
-        sx={{
-          width: "100%",
-          margin: "0 auto",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          background: "transparent",
-          border: "none",
-          boxShadow: "none"
-        }}
-      >
-        <CardHeader
-          avatar={
-            <Avatar
-              sx={{
-                width: {
-                  xs: "120px",
-                  xxl: "300px"
-                },
-                height: "100%"
-              }}
-              variant="square"
-              srcSet={ipfsCIDToHttpUrl(community?.image as string)}
-            />
-          }
-          sx={{
-            alignItems: "flex-start",
-            flexDirection: {
-              xs: "column",
-              md: "row"
-            },
-            maxWidth: {
-              xs: "100%",
-              sm: "400px",
-              md: "600px",
-              xxl: "800px"
-            },
 
-            ".MuiCardContent-root": {
-              padding: "0px 16px"
-            },
-
-            width: "100%",
-            ".MuiAvatar-root": {
-              backgroundColor: "transparent"
-            }
-          }}
-          title={
-            <>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gridGap: "4px"
-                }}
-              >
-                <Typography variant="h3" color="white">
-                  {community.name}
-                </Typography>
-                {/* <IconButton
-                      component={Link}
-                      to={`${match.url}/edit-community`}
-                    >
-                      <SvgIcon component={EditPencil} />
-                    </IconButton> */}
-              </Box>
-              <CopyAddress address={community.properties.address} />
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Typography color="white" variant="body" sx={{ mb: "20px" }}>
-                  {community.properties.market}
-                </Typography>
-                <Typography color="white" variant="body">
-                  {community.description}
-                </Typography>
-              </Box>
-            </>
-          }
-        />
-        <CardContent
-          sx={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            width: {
-              xs: "90%"
-            }
-          }}
-        >
-          <Box
+      <Grid container spacing={4} mt={0}>
+        <Grid item sm={12} md={6}>
+          <Card
             sx={{
-              display: "grid",
-              gridTemplateColumns: {
-                xs: "1fr",
-                md: "1fr 1fr"
-              },
-              gridGap: {
-                xs: "30px",
-                lg: "50px"
-              },
+              borderColor: "divider",
+              borderRadius: "16px",
+              boxShadow: 7,
+              width: "100%",
+              margin: "0 auto",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "flex-start",
+              background: "transparent",
               maxWidth: {
-                xs: "600px",
-                md: "90%"
+                xs: "100%",
+                sm: "90%",
+                md: "80%",
+                xxl: "65%"
               }
             }}
           >
-            <Stack
+            <CardHeader
+              avatar={
+                <Avatar
+                  sx={{
+                    width: {
+                      xs: "120px",
+                      xxl: "300px"
+                    },
+                    height: "100%"
+                  }}
+                  variant="square"
+                  srcSet={ipfsCIDToHttpUrl(community?.image as string)}
+                />
+              }
               sx={{
-                marginBottom: {
-                  xs: "30px",
-                  md: "40px",
-                  xxl: "50px"
+                px: 4,
+                pt: 4,
+                alignItems: "flex-start",
+                flexDirection: {
+                  xs: "column",
+                  md: "row"
+                },
+                maxWidth: {
+                  xs: "100%",
+                  sm: "400px",
+                  md: "600px",
+                  xxl: "800px"
+                },
+
+                ".MuiCardContent-root": {
+                  width: "100%",
+                  padding: "0px 16px"
+                },
+
+                width: "100%",
+                ".MuiAvatar-root": {
+                  backgroundColor: "transparent"
                 }
               }}
-            >
-              <StyledTableTitle>
-                <Typography color="white" variant="subtitle1">
-                  Roles in your Nova
-                </Typography>
-              </StyledTableTitle>
-
-              <TableBody
-                sx={{
-                  display: "table",
-                  ".MuiTableBody-root > .MuiTableRow-root:hover": {
-                    backgroundColor: "#ffffff0a"
-                  },
-                  position: "relative"
-                }}
-              >
-                {roles.map((role, index) => (
-                  <StyledMembersTableRow key={`roles-key-${index}`}>
-                    <MembersStyledTableCell>
-                      <Typography
-                        variant="subtitle2"
-                        fontWeight="normal"
-                        color="white"
-                      >
-                        {role?.roleName}
-                      </Typography>
-                    </MembersStyledTableCell>
-                    <MembersStyledTableCell align="right">
-                      {!isLoading && membersTableData?.[role.id]}
-                    </MembersStyledTableCell>
-                  </StyledMembersTableRow>
-                ))}
-                {isLoading && (
-                  <tr>
-                    <td>
-                      <CircularProgress
-                        className="spinner-center"
-                        size="60px"
-                        style={{ top: "calc(50% - 30px)" }}
-                      />
-                    </td>
-                  </tr>
-                )}
-
-                <StyledMembersTableRow>
-                  <MembersStyledTableCell>
-                    <Typography
-                      variant="subtitle2"
-                      fontWeight="normal"
-                      color="white"
-                    >
-                      Total Members
-                    </Typography>
-                  </MembersStyledTableCell>
-                  <MembersStyledTableCell align="right">
-                    {!isLoading && membersTableData?.totalMembers}
-                  </MembersStyledTableCell>
-                </StyledMembersTableRow>
-              </TableBody>
-              {/* <Stack
-                sx={{
-                  display: "flex",
-                  justifyContent: {
-                    xs: "center",
-                    md: "flex-start"
-                  },
-                  alignItems: {
-                    xs: "center",
-                    md: "flex-start"
-                  },
-                  marginTop: {
-                    xs: "20px",
-                    md: "20px",
-                    xxl: "30px"
-                  }
-                }}
-              >
-                <Button
-                  sx={{
-                    height: "50px"
-                  }}
-                  type="button"
-                  color="offWhite"
-                  variant="outlined"
-                  size="medium"
-                  component={Link}
-                  to={urls.leaderboard}
-                  target="_blank"
-                >
-                  See your Nova Ranking
-                </Button>
-              </Stack> */}
-            </Stack>
-
-            <Stack>
-              <StyledTableTitle>
-                <Typography color="white" variant="subtitle1">
-                  Your Community Data
-                </Typography>
-              </StyledTableTitle>
-              <TableBody
-                sx={{
-                  display: "table",
-                  ".MuiTableBody-root > .MuiTableRow-root:hover": {
-                    backgroundColor: "#ffffff0a"
-                  }
-                }}
-              >
-                <StyledTableRow>
-                  <TaskStyledTableCell>
-                    <Typography
-                      variant="subtitle2"
-                      fontWeight="normal"
-                      color="white"
-                    >
-                      Average Commitment
-                    </Typography>
-                  </TaskStyledTableCell>
-                  <TaskStyledTableCell
-                    align="right"
-                    style={{ position: "relative" }}
+              title={
+                <>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gridGap: "4px"
+                    }}
                   >
-                    {isLoading ? (
-                      <CircularProgress
-                        className="spinner-center"
-                        size="20px"
-                        style={{
-                          top: "calc(50% - 10px)",
-                          left: "calc(50% + 10px)"
-                        }}
-                      />
-                    ) : (
-                      `${averageCommitment} - ${CommitmentMessages(
-                        averageCommitment
-                      )}`
-                    )}
-                  </TaskStyledTableCell>
-                </StyledTableRow>
-                <StyledTableRow>
-                  <TaskStyledTableCell>
-                    <Typography
-                      variant="subtitle2"
-                      fontWeight="normal"
-                      color="white"
-                    >
-                      Min. Commitment
+                    <Typography variant="subtitle1" color="white">
+                      {community.name}
                     </Typography>
-                  </TaskStyledTableCell>
-                  <TaskStyledTableCell align="right">
-                    {`${
-                      community?.properties?.commitment
-                    } - ${CommitmentMessages(
-                      community?.properties?.commitment
-                    )}`}
-                  </TaskStyledTableCell>
-                </StyledTableRow>
-                <StyledTableRow>
-                  <TaskStyledTableCell>
+                    <IconButton component={Link} to={`edit-community`}>
+                      <SvgIcon component={EditIcon} />
+                    </IconButton>
+                  </Box>
+                  <CopyAddress address={community.properties.address} />
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <Typography
-                      variant="subtitle2"
-                      fontWeight="normal"
                       color="white"
+                      variant="body"
+                      sx={{ mb: "20px" }}
                     >
-                      Nova Address
+                      {community.properties.market}
                     </Typography>
-                  </TaskStyledTableCell>
-                  <TaskStyledTableCell align="right">
-                    <CopyAddress address={community?.properties?.address} />
-                  </TaskStyledTableCell>
-                </StyledTableRow>
+                  </Box>
+                </>
+              }
+            />
+            <CardContent
+              sx={{
+                pt: 0,
+                flex: 1,
+                px: 4,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between"
+              }}
+            >
+              <Typography color="white" variant="body">
+                {community.description}
+              </Typography>
 
-                <StyledTableRow>
-                  <TaskStyledTableCell>
-                    <Typography
-                      variant="subtitle2"
-                      fontWeight="normal"
-                      color="white"
-                    >
-                      Legacy DAO
-                    </Typography>
-                  </TaskStyledTableCell>
-                  <TaskStyledTableCell align="right">
-                    {community?.properties?.additionalProps
-                      ?.legacyDaoAddress ? (
-                      // TODO: Replace with correct property reflecting the Legacy Dao Address
-                      <CopyAddress
-                        address={
-                          community?.properties?.additionalProps
-                            ?.legacyDaoAddress
-                        }
-                      />
-                    ) : (
-                      "N/A"
-                    )}
-                  </TaskStyledTableCell>
-                </StyledTableRow>
-              </TableBody>
-            </Stack>
+              <Stack mt={4} gap={2}>
+                <Box display="flex" gap={2}>
+                  <Typography color="primary" variant="subtitle2">
+                    Market:
+                  </Typography>
+                  <Typography color="primary" variant="subtitle2">
+                    {community.properties.market}
+                  </Typography>
+                </Box>
+                <Box display="flex" gap={2}>
+                  <Typography color="primary" variant="subtitle2">
+                    Your AV:
+                  </Typography>
+                  <Typography color="primary" variant="subtitle2">
+                    1.0
+                  </Typography>
+                </Box>
+                <Box display="flex" gap={2} flexDirection="column">
+                  <Typography color="primary" variant="subtitle2">
+                    Your Roles:
+                  </Typography>
+                  <Stack ml={4} gap={2}>
+                    <Box display="flex" gap={2}>
+                      <Typography color="white" variant="subtitle2">
+                        Role 1:
+                      </Typography>
+                      <Typography color="white" variant="subtitle2">
+                        60%
+                      </Typography>
+                    </Box>
+                    <Box display="flex" gap={2}>
+                      <Typography color="white" variant="subtitle2">
+                        Role 2:
+                      </Typography>
+                      <Typography color="white" variant="subtitle2">
+                        30%
+                      </Typography>
+                    </Box>
+                    <Box display="flex" gap={2}>
+                      <Typography color="white" variant="subtitle2">
+                        Role 3:
+                      </Typography>
+                      <Typography color="white" variant="subtitle2">
+                        10%
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </Box>
+                <Box display="flex" gap={2}>
+                  <Typography color="primary" variant="subtitle2">
+                    Health balance:
+                  </Typography>
+                  <Typography color="primary" variant="subtitle2">
+                    30%
+                  </Typography>
+                </Box>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item sm={12} md={6}>
+          <Box
+            sx={{
+              p: 4,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              margin: "0 auto"
+            }}
+          >
+            <Box mb={4} textAlign="center">
+              <Badge
+                badgeContent={
+                  <Tooltip title="During beta there is a maximum of 3 quests, one for each role.">
+                    <HelpOutlineIcon
+                      sx={{ width: "16px", ml: 1, color: "white" }}
+                    />
+                  </Tooltip>
+                }
+              >
+                <Typography variant="subtitle1" color="white">
+                  Your Archetype:
+                </Typography>
+              </Badge>
+            </Box>
+            <Box
+              sx={{
+                width: "100%",
+                position: "relative",
+                height: "400px"
+              }}
+            >
+              <ArchetypePieChart archetype={archetype} />
+              <Button
+                sx={{
+                  zIndex: 1,
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: "200px",
+                  height: "80px",
+                  textAlign: "center"
+                }}
+                component={Link}
+                to={`your-archetype`}
+                type="button"
+                color="secondary"
+                variant="contained"
+                size="medium"
+              >
+                Set your <br /> archetype
+              </Button>
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  backgroundColor: "transparent",
+                  backdropFilter: "blur(25px)"
+                }}
+              />
+            </Box>
           </Box>
-        </CardContent>
-      </Card>
+        </Grid>
+      </Grid>
     </Container>
   );
 };
-
 export default memo(Dashboard);

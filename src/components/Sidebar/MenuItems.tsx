@@ -7,6 +7,7 @@ import { alpha, Badge, styled, SvgIcon } from "@mui/material";
 import { ReactComponent as ManageIcon } from "@assets/manage.svg";
 import { ReactComponent as DashboardIcon } from "@assets/dashboard.svg";
 import { ReactComponent as BotIcon } from "@assets/bot.svg";
+import { ReactComponent as ArchertypeIcon } from "@assets/archetype.svg";
 import { ReactComponent as AdminIcon } from "@assets/admin.svg";
 import { NavLink as RouteNavLink } from "react-router-dom";
 import { forwardRef, Fragment } from "react";
@@ -30,14 +31,14 @@ const menuItems = (communityName: string): SidebarMenuItem[] => [
     icon: DashboardIcon
   },
   {
+    title: "Your Archertype",
+    route: `/${communityName}/your-archetype`,
+    icon: ArchertypeIcon
+  },
+  {
     title: "Admins",
     route: `/${communityName}/admins`,
     icon: AdminIcon
-  },
-  {
-    title: "Community",
-    icon: ManageIcon,
-    route: `/${communityName}/members`
   },
   {
     title: "Discord Bot",
