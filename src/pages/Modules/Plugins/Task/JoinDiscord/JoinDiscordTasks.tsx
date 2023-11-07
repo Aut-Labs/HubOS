@@ -2,9 +2,18 @@ import { useCreateTaskMutation } from "@api/onboarding.api";
 import { PluginDefinition, Task } from "@aut-labs/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
-import { FormHelperText } from "@components/Fields";
+import { AutDatepicker, FormHelperText } from "@components/Fields";
 import { StepperButton } from "@components/Stepper";
-import { Box, Button, Chip, Container, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  Container,
+  Grid,
+  Slider,
+  Stack,
+  Typography
+} from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
 import { memo, useEffect, useMemo, useState } from "react";
@@ -27,6 +36,7 @@ import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
 import addMinutes from "date-fns/addMinutes";
 import { useAccount } from "wagmi";
+import { FormContainer } from "../Shared/FormContainer";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -118,14 +128,19 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [discordDialogOpen, setDiscordDialogOpen] = useState(false);
-  const { control, handleSubmit, getValues, formState } = useForm({
+  const { control, handleSubmit, getValues, formState, watch } = useForm({
     mode: "onChange",
     defaultValues: {
       title: "",
+      startDate: new Date(),
+      endDate: null,
+      weight: 0,
       // inviteUrl: inviteLink || "",
       description: ""
     }
   });
+
+  const values = watch();
 
   const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
     useCreateTaskMutation();
@@ -138,6 +153,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
       pluginAddress: plugin.pluginAddress,
       task: {
         role: 1,
+        weight: values.weight,
         metadata: {
           name: values.title,
           description: values.description,
@@ -145,8 +161,8 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
             inviteUrl: inviteLink
           }
         },
-        startDate: dateToUnix(new Date()),
-        endDate: dateToUnix(endDatetime)
+        startDate: dateToUnix(values.startDate),
+        endDate: dateToUnix(values.endDate)
       } as unknown as Task
     });
   };
@@ -159,22 +175,14 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
 
   useEffect(() => {
     if (isSuccess) {
-      // @TODO go to tasks
-      // navigate({
-      //   pathname: `/${communityData?.name}/modules/OnboardingStrategy/QuestOnboardingPlugin`,
-      //   search: searchParams.toString()
-      // });
+      navigate({
+        pathname: `/${communityData?.name}/tasks`
+      });
     }
   }, [isSuccess, communityData]);
 
   return (
-    <Container
-      sx={{ py: "30px", display: "flex", flexDirection: "column" }}
-      maxWidth="lg"
-      component="form"
-      autoComplete="off"
-      onSubmit={handleSubmit(onSubmit)}
-    >
+    <FormContainer onSubmit={handleSubmit(onSubmit)}>
       <DiscordServerVerificationPopup
         open={discordDialogOpen}
         handleClose={() => setDiscordDialogOpen(false)}
@@ -204,13 +212,9 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                 sm: "0"
               }
             }}
-            to={{
-              pathname: searchParams.get("returnUrl"),
-              search: searchParams.toString()
-            }}
+            to={`/${communityData?.name}/modules/Task`}
             component={Link}
           >
-            {/* {searchParams.get("returnUrlLinkName") || "Back"} */}
             <Typography color="white" variant="body">
               Back
             </Typography>
@@ -288,42 +292,164 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
         {isDiscordVerified && (
           <Chip icon={<DoneIcon />} color="success" label="Discord Verified" />
         )}
-        <Controller
-          name="title"
-          control={control}
-          rules={{
-            required: true,
-            validate: {
-              maxWords: (v: string) => countWords(v) <= 6
-            }
-          }}
-          render={({ field: { name, value, onChange } }) => {
-            return (
-              <AutTextField
-                variant="standard"
-                color="offWhite"
-                required
-                autoFocus
-                name={name}
-                value={value || ""}
-                onChange={onChange}
-                placeholder="Title"
-                helperText={
-                  <FormHelperText
-                    errorTypes={errorTypes}
-                    value={value}
-                    name={name}
-                    errors={formState.errors}
-                  >
-                    <Typography color="white" variant="caption">
-                      {6 - countWords(value)} Words left
-                    </Typography>
-                  </FormHelperText>
+        <Grid container spacing={2}>
+          <Grid item xs={8}>
+            <Controller
+              name="title"
+              control={control}
+              rules={{
+                required: true,
+                validate: {
+                  maxWords: (v: string) => countWords(v) <= 6
                 }
-              />
-            );
-          }}
-        />
+              }}
+              render={({ field: { name, value, onChange } }) => {
+                return (
+                  <AutTextField
+                    variant="standard"
+                    color="offWhite"
+                    required
+                    sx={{
+                      width: "100%"
+                    }}
+                    autoFocus
+                    name={name}
+                    value={value || ""}
+                    onChange={onChange}
+                    placeholder="Title"
+                    helperText={
+                      <FormHelperText
+                        errorTypes={errorTypes}
+                        value={value}
+                        name={name}
+                        errors={formState.errors}
+                      >
+                        <Typography color="white" variant="caption">
+                          {6 - countWords(value)} Words left
+                        </Typography>
+                      </FormHelperText>
+                    }
+                  />
+                );
+              }}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Controller
+              name="weight"
+              control={control}
+              rules={{
+                required: true,
+                min: 1,
+                max: 10
+              }}
+              render={({ field: { name, value, onChange } }) => {
+                return (
+                  <Box
+                    sx={{
+                      marginTop: "10px"
+                    }}
+                    gap={2}
+                  >
+                    <Slider
+                      step={1}
+                      name={name}
+                      min={1}
+                      max={10}
+                      sx={{
+                        width: "100%",
+                        height: "20px",
+                        ".MuiSlider-thumb": {
+                          display: "none"
+                        }
+                      }}
+                      onChange={onChange}
+                      placeholder="Weight"
+                      value={+(value || 0)}
+                    />
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        minWidth: "40px"
+                      }}
+                    >
+                      <Typography color="white" variant="caption">
+                        Weight (1-10)
+                      </Typography>
+                      <Typography color="white" variant="caption">
+                        {value}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  // <AutTextField
+                  //   variant="standard"
+                  //   color="offWhite"
+                  //   required
+                  //   type="number"
+                  //   sx={{
+                  //     width: "100%"
+                  //   }}
+                  //   autoFocus
+                  //   name={name}
+                  //   value={value || ""}
+                  //   onChange={onChange}
+                  //   placeholder="Weight"
+                  //   helperText={
+                  //     <FormHelperText
+                  //       errorTypes={errorTypes}
+                  //       value={value}
+                  //       name={name}
+                  //       errors={formState.errors}
+                  //     >
+                  //       <Typography color="white" variant="caption">
+                  //         Between 1 - 10
+                  //       </Typography>
+                  //     </FormHelperText>
+                  //   }
+                  // />
+                );
+              }}
+            />
+          </Grid>
+        </Grid>
+
+        <Stack direction="row" gap={4}>
+          <Controller
+            name="startDate"
+            control={control}
+            rules={{
+              required: true
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <AutDatepicker
+                  placeholder="Start date"
+                  value={value}
+                  onChange={onChange}
+                />
+              );
+            }}
+          />
+          <Controller
+            name="endDate"
+            control={control}
+            rules={{
+              required: true
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <AutDatepicker
+                  placeholder="End date"
+                  minDateTime={values.startDate}
+                  value={value}
+                  onChange={onChange}
+                />
+              );
+            }}
+          />
+        </Stack>
 
         <Controller
           name="description"
@@ -407,7 +533,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
           />
         </Box>
       </Stack>
-    </Container>
+    </FormContainer>
   );
 };
 

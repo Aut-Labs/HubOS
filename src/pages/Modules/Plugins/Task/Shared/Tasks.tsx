@@ -79,15 +79,11 @@ export const taskTypes = {
 const TaskCard = ({
   row,
   isAdmin,
-  canDelete,
-  onboardingQuestAddress,
-  questId
+  canDelete
 }: {
   row: Task;
   isAdmin: boolean;
   canDelete: boolean;
-  onboardingQuestAddress: string;
-  questId: number;
 }) => {
   const params = useParams<{ questId: string }>();
   const navigate = useNavigate();
@@ -220,13 +216,7 @@ const TaskCard = ({
                 }}
                 onClick={() => {
                   navigate({
-                    pathname: `/${communityData?.name}/modules/Task/OnboardingOpenTaskPlugin/${row.taskId}/submissions`,
-                    search: new URLSearchParams({
-                      onboardingQuestAddress,
-                      returnUrlLinkName: "Back to quest",
-                      returnUrl: `/${communityData?.name}/modules/OnboardingStrategy/QuestOnboardingPlugin/${questId}`,
-                      questId: `${questId}`
-                    }).toString()
+                    pathname: `/${communityData?.name}/modules/Task/OnboardingOpenTaskPlugin/${row.taskId}/submissions`
                   });
                 }}
                 size="large"
@@ -249,16 +239,7 @@ const TaskCard = ({
             size="small"
             onClick={() => {
               navigate({
-                pathname: `/${communityData?.name}/${path}/${row.taskId}`,
-                search: new URLSearchParams({
-                  questId: params.questId,
-                  onboardingQuestAddress: searchParams.get(
-                    RequiredQueryParams.OnboardingQuestAddress
-                  ),
-                  daoAddress: searchParams.get(RequiredQueryParams.DaoAddress),
-                  returnUrlLinkName: "Back to quest",
-                  returnUrl: `${location?.pathname}`
-                }).toString()
+                pathname: `/${communityData?.name}/${path}/${row.taskId}`
               });
             }}
           >
@@ -296,7 +277,7 @@ const GridBox = styled(Box)(({ theme }) => {
   };
 });
 
-export const EmptyTaskCard = ({ onboardingQuestAddress, questId }) => {
+export const EmptyTaskCard = () => {
   const navigate = useNavigate();
   const communityData = useSelector(CommunityData);
 
@@ -315,13 +296,7 @@ export const EmptyTaskCard = ({ onboardingQuestAddress, questId }) => {
       <CardActionArea
         onClick={() => {
           navigate({
-            pathname: `/${communityData?.name}/modules/Task`,
-            search: new URLSearchParams({
-              onboardingQuestAddress,
-              returnUrlLinkName: "Back to quest",
-              returnUrl: `/${communityData?.name}/modules/OnboardingStrategy/QuestOnboardingPlugin/${questId}`,
-              questId: questId
-            }).toString()
+            pathname: `/${communityData?.name}/modules/Task`
           });
         }}
         sx={{
@@ -361,8 +336,6 @@ interface TasksParams {
   canDelete?: boolean;
   canAdd?: boolean;
   isAdmin: boolean;
-  onboardingQuestAddress: string;
-  questId: number;
 }
 
 const Tasks = ({
@@ -370,9 +343,7 @@ const Tasks = ({
   tasks,
   isAdmin,
   canDelete,
-  canAdd,
-  onboardingQuestAddress,
-  questId
+  canAdd
 }: TasksParams) => {
   return (
     <Box>
@@ -384,20 +355,13 @@ const Tasks = ({
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>
               {tasks.map((row, index) => (
                 <TaskCard
-                  onboardingQuestAddress={onboardingQuestAddress}
-                  questId={questId}
                   isAdmin={isAdmin}
                   canDelete={canDelete}
                   key={`table-row-${index}`}
                   row={row}
                 />
               ))}
-              {canAdd && (
-                <EmptyTaskCard
-                  onboardingQuestAddress={onboardingQuestAddress}
-                  questId={questId}
-                />
-              )}
+              {canAdd && <EmptyTaskCard />}
             </GridBox>
             // <TableContainer
             //   sx={{

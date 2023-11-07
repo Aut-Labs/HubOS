@@ -490,7 +490,7 @@ export const QuestTasks = memo(
           </Box>
         )}
 
-        <Tasks
+        {/* <Tasks
           onboardingQuestAddress={onboardingQuestAddress}
           questId={questId}
           isAdmin={isAdmin}
@@ -498,7 +498,7 @@ export const QuestTasks = memo(
           canDelete={canDelete}
           isLoading={isLoading}
           tasks={filteredTasks}
-        />
+        /> */}
       </Box>
     );
   }

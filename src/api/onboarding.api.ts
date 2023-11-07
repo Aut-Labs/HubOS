@@ -294,14 +294,24 @@ const getAllTasksPerQuest = async (
   };
 };
 
-const getAllTasks = async (
-  { questId, novaAddress, isAdmin, userAddress },
-  api: BaseQueryApi
-) => {
+const getAllTasks = async ({ isAdmin, userAddress }, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
+  const state = api.getState() as any;
+
+  const { data } =
+    state.pluginRegistryApi.queries["getAllPluginDefinitionsByDAO(null)"];
+
+  const pluginAddresses = data?.reduce((prev, curr) => {
+    if (curr.pluginAddress) {
+      prev = [...prev, curr.pluginAddress];
+    }
+    return prev;
+  }, []);
+
+  const { selectedCommunityAddress } = state.community;
   sdk.taskOnboarding = sdk.initService<TaskOnboarding>(
     TaskOnboarding,
-    novaAddress
+    selectedCommunityAddress
   );
 
   const taskOnboarding: TaskOnboarding = sdk.taskOnboarding;
@@ -310,12 +320,17 @@ const getAllTasks = async (
   let submissions: Task[] = [];
 
   if (isAdmin) {
-    const response = await taskOnboarding.getAllTasksAndSubmissions();
+    const response = await taskOnboarding.getAllTasksAndSubmissions(
+      pluginAddresses
+    );
 
     tasks = response.data.tasks;
     submissions = response.data.submissions;
   } else {
-    const response = await taskOnboarding.getAllTasks(userAddress);
+    const response = await taskOnboarding.getAllTasks(
+      userAddress,
+      pluginAddresses
+    );
     tasks = response.data;
   }
 
@@ -407,7 +422,6 @@ const createTask = async (
 ) => {
   const sdk = AutSDK.getInstance();
 
-  debugger;
   sdk.taskOnboarding = sdk.initService<TaskOnboarding>(
     TaskOnboarding,
     body.novaAddress
@@ -812,7 +826,6 @@ export const onboardingApi = createApi({
       {
         userAddress: string;
         isAdmin: boolean;
-        novaAddress: string;
       }
     >({
       query: (body) => {

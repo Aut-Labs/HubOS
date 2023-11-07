@@ -292,8 +292,7 @@ const Submissions = ({ plugin }: PluginParams) => {
   const { task, submissions, isLoading } = useGetAllTasksQuery(
     {
       userAddress,
-      isAdmin,
-      novaAddress: searchParams.get(RequiredQueryParams.DaoAddress)
+      isAdmin
     },
     {
       selectFromResult: ({ data, isLoading, isFetching }) => {

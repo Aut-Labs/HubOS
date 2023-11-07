@@ -16,7 +16,10 @@ const fontSize = {
   xxl: "24px"
 };
 
-const generateColors = (color: PaletteColor, white: PaletteColor) => ({
+export const generateFieldColors = (
+  color: PaletteColor,
+  white: PaletteColor
+) => ({
   "&::placeholder": {
     color: white.dark,
     fontWeight: "normal",
@@ -77,7 +80,7 @@ export default (theme: Theme) =>
     styleOverrides: {
       root: ({ ownerState: { color } }) => {
         const colorVariant = color || "primary";
-        const styles = generateColors(
+        const styles = generateFieldColors(
           theme.palette[colorVariant],
           theme.palette.offWhite
         );

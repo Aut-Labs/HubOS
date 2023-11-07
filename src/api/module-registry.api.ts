@@ -28,7 +28,6 @@ const fetch = async (body: any, api: BaseQueryApi) => {
           environment.nftStorageUrl
         )
       };
-
       moduleData.metadata.properties.type =
         moduleData.metadata.properties.title;
 

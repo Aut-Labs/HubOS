@@ -8,14 +8,16 @@ import {
 } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { memo } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { CommunityData } from "@store/Community/community.reducer";
 
 interface TaskDetailsParams {
   task: Task;
 }
 
 const TaskDetails = ({ task }: TaskDetailsParams) => {
-  const [searchParams] = useSearchParams();
+  const communityData = useSelector(CommunityData);
   const isLoading = false;
 
   return (
@@ -45,10 +47,7 @@ const TaskDetails = ({ task }: TaskDetailsParams) => {
                   sm: "0"
                 }
               }}
-              to={{
-                pathname: searchParams.get("returnUrl"),
-                search: searchParams.toString()
-              }}
+              to={`/${communityData?.name}/tasks`}
               component={Link}
             >
               {/* {searchParams.get("returnUrlLinkName") || "Back"} */}

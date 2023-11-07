@@ -1,17 +1,38 @@
-import { DatePicker } from "@mui/lab";
+import { DatePicker, DateTimePickerProps } from "@mui/lab";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import {
+  Box,
+  Button,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
   Select,
   SelectProps,
   TextField,
   TextFieldProps,
-  Typography
+  Typography,
+  useMediaQuery
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { Breakpoint, styled } from "@mui/material/styles";
 import { pxToRem } from "@utils/text-size";
 import { Controller, FieldErrors } from "react-hook-form";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+// import "./ScrollbarStyles.scss";
+
+import {
+  usePickerLayout,
+  PickersLayoutRoot,
+  pickersLayoutClasses,
+  PickersLayoutContentWrapper
+} from "@mui/x-date-pickers/PickersLayout";
+import { PickersActionBarProps } from "@mui/x-date-pickers";
+import theme from "@theme/theme";
+import { StepperButton } from "./Stepper";
+import { generateFieldColors } from "@theme/field-text-styles";
 
 interface FormHelperTextProps {
   errors: FieldErrors<any>;
@@ -155,6 +176,176 @@ const CustomSwCalendarPicker = styled(DateCalendar)(({ theme }) => ({
     }
   }
 }));
+
+function CustomLayout(props) {
+  const { toolbar, tabs, content, actionBar } = usePickerLayout(props);
+  return (
+    <PickersLayoutRoot className={pickersLayoutClasses.root} ownerState={props}>
+      {actionBar}
+      {toolbar}
+      <PickersLayoutContentWrapper
+        className={pickersLayoutClasses.contentWrapper}
+        sx={{
+          padding: {
+            sm: "10px",
+            xl: "20px"
+          }
+        }}
+      >
+        {tabs}
+        {content}
+      </PickersLayoutContentWrapper>
+    </PickersLayoutRoot>
+  );
+}
+
+function ActionList(props: PickersActionBarProps) {
+  const { onAccept, className } = props;
+  const isDesktop = useMediaQuery(theme.breakpoints.up("sm"));
+
+  return (
+    <Button
+      onClick={onAccept}
+      variant="outlined"
+      size="normal"
+      color="offWhite"
+      sx={{
+        textAlign: "center",
+        textTransform: "uppercase",
+        width: "120px",
+        height: "40px",
+        margin: "8px auto 0 auto"
+      }}
+    >
+      Confirm
+    </Button>
+  );
+}
+
+export const AutDatepicker = ({ value, onChange, placeholder, ...props }) => {
+  return (
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <DateTimePicker
+        value={value || ""}
+        disablePast
+        closeOnSelect={false}
+        desktopModeMediaQuery={theme.breakpoints.up("sm")}
+        {...props}
+        onAccept={(newValue) => onChange(newValue)}
+        slots={{
+          layout: CustomLayout,
+          actionBar: ActionList
+        }}
+        slotProps={{
+          popper: {
+            sx: {
+              ".MuiDateCalendar-root": {
+                borderRight: "1px white solid",
+                paddingRight: "10px"
+              },
+              ".MuiDivider-root": {
+                width: 0
+              },
+              ".MuiMultiSectionDigitalClock-root": {
+                ul: {
+                  borderLeft: 0
+                }
+              },
+              "div.MuiMultiSectionDigitalClock-root": {
+                marginLeft: "30px",
+                ul: {
+                  borderLeft: 0,
+                  "&:last-of-type": {
+                    display: "flex",
+                    flexDirection: "column"
+                  }
+                }
+              },
+              "MuiPickersCalendarHeader-label": {
+                fontSize: "18px"
+              }
+            }
+          },
+          desktopPaper: {
+            sx: {
+              svg: { color: theme.palette.offWhite.main },
+              span: { color: theme.palette.offWhite.main },
+              backgroundColor: theme.palette.background.default,
+              color: theme.palette.offWhite.main,
+              ".MuiPickersLayout-root": {
+                display: "flex",
+                flexDirection: "column"
+              },
+              ".MuiPickersCalendarHeader-label": {
+                fontSize: "18px"
+              }
+            }
+          },
+          mobilePaper: {
+            sx: {
+              svg: { color: theme.palette.offWhite.main },
+              span: { color: theme.palette.offWhite.main },
+              backgroundColor: theme.palette.background.default,
+              color: theme.palette.offWhite.main,
+              ".MuiPickersToolbarText-root.Mui-selected": {
+                color: theme.palette.primary.main
+              }
+            }
+          },
+          textField: {
+            placeholder,
+            variant: "standard",
+            color: "offWhite",
+            sx: (theme) => {
+              const fontSize = {
+                xs: "16px",
+                sm: "16px",
+                md: "16px",
+                lg: "16px",
+                xxl: "24px"
+              };
+              const styles = generateFieldColors(
+                theme.palette["offWhite"],
+                theme.palette.offWhite
+              );
+              Object.keys(fontSize).forEach((key: Breakpoint) => {
+                styles.input[theme.breakpoints.up(key)] = {
+                  fontSize: fontSize[key]
+                };
+                styles.textarea[theme.breakpoints.up(key)] = {
+                  fontSize: fontSize[key]
+                };
+              });
+              return {
+                ...styles,
+                width: "100%"
+              };
+            }
+          },
+          openPickerButton: {
+            sx: {
+              color: theme.palette.offWhite.main
+            }
+          },
+          day: {
+            sx: {
+              color: theme.palette.offWhite.main,
+              "&.MuiPickersDay-today": {
+                borderColor: theme.palette.offWhite.main
+              }
+            }
+          },
+          layout: {
+            sx: {
+              display: "flex",
+              flexDirection: "column"
+            }
+          }
+        }}
+      />
+    </LocalizationProvider>
+  );
+};
 
 export const SwDatePicker = ({
   control,

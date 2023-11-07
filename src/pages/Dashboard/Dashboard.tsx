@@ -31,6 +31,7 @@ import { ReactComponent as EditIcon } from "@assets/actions/edit.svg";
 import { Link } from "react-router-dom";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import ArchetypePieChart from "./ArchetypePieChart";
+import { NovaArchetype } from "@aut-labs/sdk/dist/models/nova";
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -61,7 +62,7 @@ const Dashboard = () => {
     selectFromResult: ({ data, isLoading, isFetching }) => ({
       isLoading,
       isFetching,
-      archetype: data
+      archetype: data?.archetype
     })
   });
 
@@ -310,37 +311,42 @@ const Dashboard = () => {
               }}
             >
               <ArchetypePieChart archetype={archetype} />
-              <Button
-                sx={{
-                  zIndex: 1,
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: "200px",
-                  height: "80px",
-                  textAlign: "center"
-                }}
-                component={Link}
-                to={`your-archetype`}
-                type="button"
-                color="secondary"
-                variant="contained"
-                size="medium"
-              >
-                Set your <br /> archetype
-              </Button>
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  backgroundColor: "transparent",
-                  backdropFilter: "blur(25px)"
-                }}
-              />
+              {/* @ts-ignore */}
+              {archetype?.archetype === NovaArchetype.NONE && (
+                <>
+                  <Button
+                    sx={{
+                      zIndex: 1,
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "200px",
+                      height: "80px",
+                      textAlign: "center"
+                    }}
+                    component={Link}
+                    to={`your-archetype`}
+                    type="button"
+                    color="secondary"
+                    variant="contained"
+                    size="medium"
+                  >
+                    Set your <br /> archetype
+                  </Button>
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      backgroundColor: "transparent",
+                      backdropFilter: "blur(25px)"
+                    }}
+                  />
+                </>
+              )}
             </Box>
           </Box>
         </Grid>

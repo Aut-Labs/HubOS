@@ -277,8 +277,7 @@ const OwnerFinalizeContent = ({
   const { isLoading: isLoadingTasks } = useGetAllTasksQuery(
     {
       userAddress,
-      isAdmin,
-      novaAddress: searchParams.get(RequiredQueryParams.DaoAddress)
+      isAdmin
     },
     {
       selectFromResult: ({ isLoading, isFetching }) => ({
@@ -889,8 +888,7 @@ const OpenTask = ({ plugin }: PluginParams) => {
   const { task, submission } = useGetAllTasksQuery(
     {
       userAddress,
-      isAdmin,
-      novaAddress: searchParams.get(RequiredQueryParams.DaoAddress)
+      isAdmin
     },
     {
       selectFromResult: ({ data, isLoading, isFetching }) => ({
