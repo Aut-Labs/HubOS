@@ -112,7 +112,7 @@ const TaskCard = ({
           questId: +params.questId,
           pluginTokenId: plugin.tokenId,
           pluginAddress: plugin.pluginAddress,
-          novaAddress: searchParams.get(RequiredQueryParams.DaoAddress)
+          novaAddress: searchParams.get(RequiredQueryParams.NovaAddress)
         });
       }
     });

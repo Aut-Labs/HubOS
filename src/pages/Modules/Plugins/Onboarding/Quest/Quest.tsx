@@ -90,7 +90,7 @@ We are now onboarding ${quest?.metadata?.name} - take a quest, prove yourself, &
     // hashtags: ["Āut", "DAO", "Blockchain"]
     url: communityData?.properties?.address
       ? // keep this bizarre formatting otherwise the tweet won't have the correct new lines and alignment
-        `${urls.showcase}?daoAddress=${communityData?.properties?.address}`
+        `${urls.showcase}?novaAddress=${communityData?.properties?.address}`
       : "https://Aut.id/"
   };
 

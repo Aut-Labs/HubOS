@@ -395,7 +395,7 @@ const Dashboard = () => {
                     key={`table-row-${index}`}
                     row={row}
                     questId={row.role.toString()}
-                    daoAddress={onboardingProgress.daoAddress}
+                    novaAddress={onboardingProgress.novaAddress}
                     onboardingQuestAddress={questOnboarding.pluginAddress}
                   />
                 ))}

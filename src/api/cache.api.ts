@@ -9,7 +9,7 @@ export enum CacheTypes {
 export interface CacheModel {
   cacheKey: string;
   address: string;
-  daoAddress: string;
+  novaAddress: string;
   onboardingQuestAddress: string;
   questId: number;
   list: any[];

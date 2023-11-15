@@ -51,7 +51,6 @@ function Web3DautConnect({
       daoTypesAddress: network.contracts.daoTypesAddress,
       novaRegistryAddress: network.contracts.novaRegistryAddress,
       autIDAddress: network.contracts.autIDAddress,
-      daoExpanderRegistryAddress: network.contracts.daoExpanderRegistryAddress,
       pluginRegistryAddress: network.contracts.pluginRegistryAddress,
       moduleRegistryAddress: network.contracts.moduleRegistryAddress,
       allowListAddress: network.contracts.allowListAddress,
@@ -210,7 +209,7 @@ function Web3DautConnect({
         }}
         use-dev={environment.env == EnvMode.Development}
         flow-config='{"mode" : "tryAut", "customCongratsMessage": ""}'
-        dao-expander={"0xb7947C6F1674129A383639e3977DDFE5189C66DF"}
+        nova-address={"0xb7947C6F1674129A383639e3977DDFE5189C66DF"}
         id="d-aut"
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
         button-type="simple"

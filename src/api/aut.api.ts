@@ -41,9 +41,9 @@ export const getAutAddress = (): Promise<string> => {
     .then((res) => res.data.AutAddress);
 };
 
-export const getDAOProgress = (daoAddress: string): Promise<CacheModel[]> => {
+export const getDAOProgress = (novaAddress: string): Promise<CacheModel[]> => {
   return axios
-    .get(`${environment.apiUrl}/autID/cache/getDAOData/${daoAddress}`, {})
+    .get(`${environment.apiUrl}/autID/cache/getDAOData/${novaAddress}`, {})
     .then((res) => res.data);
 };
 

@@ -136,11 +136,11 @@ export const QuestListItem = memo(
   ({
     row,
     pluginAddress,
-    daoAddress,
+    novaAddress,
     isAdmin
   }: {
     row: Quest;
-    daoAddress: string;
+    novaAddress: string;
     pluginAddress: string;
     isAdmin: boolean;
   }) => {
@@ -193,7 +193,7 @@ export const QuestListItem = memo(
                         pathname: `${row.questId}`,
                         search: new URLSearchParams({
                           questId: `${row.questId}`,
-                          daoAddress: daoAddress,
+                          novaAddress: novaAddress,
                           onboardingQuestAddress: pluginAddress
                         }).toString()
                       })
@@ -214,7 +214,7 @@ export const QuestListItem = memo(
                       pathname: `${row.questId}`,
                       search: new URLSearchParams({
                         questId: `${row.questId}`,
-                        daoAddress: daoAddress,
+                        novaAddress: novaAddress,
                         onboardingQuestAddress: pluginAddress
                       }).toString()
                     })
@@ -232,7 +232,7 @@ export const QuestListItem = memo(
                   <EditIcon />
                 </IconButton>
                 {/* <CopyLink
-                  link={`${window?.location.origin}/quest/?questId=${row.questId}&onboardingQuestAddress=${pluginAddress}&daoAddress=${daoAddress}`}
+                  link={`${window?.location.origin}/quest/?questId=${row.questId}&onboardingQuestAddress=${pluginAddress}&novaAddress=${novaAddress}`}
                 /> */}
               </Badge>
             </Box>

@@ -55,46 +55,29 @@ const renderCustomizedLabel = ({
   );
 };
 
+const archetypeLimits = {
+  [NovaArchetype.SIZE]: { min: 40, max: 60 },
+  [NovaArchetype.GROWTH]: { min: 40, max: 60 },
+  [NovaArchetype.PERFORMANCE]: { min: 40, max: 60 },
+  [NovaArchetype.REPUTATION]: { min: 40, max: 60 },
+  [NovaArchetype.CONVICTION]: { min: 40, max: 60 }
+};
+
 export const archetypeChartValues = (archetype: NovaArchetypeParameters) => {
+  const { min: sizeMin, max: sizeMax } = archetypeLimits[NovaArchetype.SIZE];
   return {
     [NovaArchetype.SIZE]: {
       type: NovaArchetype.SIZE,
       title: "Size",
       description: "how many members",
       logo: Size,
-      value: archetype.size,
+      value: archetype?.size,
+      min: sizeMin,
+      max: sizeMax,
       defaults: {
         [NovaArchetype.SIZE]: 60,
         [NovaArchetype.GROWTH]: 10,
         [NovaArchetype.PERFORMANCE]: 10,
-        [NovaArchetype.REPUTATION]: 10,
-        [NovaArchetype.CONVICTION]: 10
-      }
-    },
-    [NovaArchetype.GROWTH]: {
-      type: NovaArchetype.GROWTH,
-      title: "Growth",
-      description: "% of member’s growth respect to previous period",
-      logo: Growth,
-      value: archetype.growth,
-      defaults: {
-        [NovaArchetype.SIZE]: 20,
-        [NovaArchetype.GROWTH]: 40,
-        [NovaArchetype.PERFORMANCE]: 20,
-        [NovaArchetype.REPUTATION]: 10,
-        [NovaArchetype.CONVICTION]: 10
-      }
-    },
-    [NovaArchetype.PERFORMANCE]: {
-      type: NovaArchetype.PERFORMANCE,
-      title: "Performance",
-      description: "ratio between Created Points and Completed Points",
-      logo: Performance,
-      value: archetype.performance,
-      defaults: {
-        [NovaArchetype.SIZE]: 20,
-        [NovaArchetype.GROWTH]: 20,
-        [NovaArchetype.PERFORMANCE]: 40,
         [NovaArchetype.REPUTATION]: 10,
         [NovaArchetype.CONVICTION]: 10
       }
@@ -104,7 +87,9 @@ export const archetypeChartValues = (archetype: NovaArchetypeParameters) => {
       title: "Reputation",
       description: "avg. reputation of members",
       logo: Reputation,
-      value: archetype.reputation,
+      value: archetype?.reputation,
+      min: sizeMin,
+      max: sizeMax,
       defaults: {
         [NovaArchetype.SIZE]: 10,
         [NovaArchetype.GROWTH]: 10,
@@ -118,13 +103,47 @@ export const archetypeChartValues = (archetype: NovaArchetypeParameters) => {
       title: "Conviction",
       description: "avg. commitment level of members",
       logo: Conviction,
-      value: archetype.conviction,
+      value: archetype?.conviction,
+      min: sizeMin,
+      max: sizeMax,
       defaults: {
         [NovaArchetype.SIZE]: 10,
         [NovaArchetype.GROWTH]: 10,
         [NovaArchetype.PERFORMANCE]: 10,
         [NovaArchetype.REPUTATION]: 10,
         [NovaArchetype.CONVICTION]: 60
+      }
+    },
+    [NovaArchetype.PERFORMANCE]: {
+      type: NovaArchetype.PERFORMANCE,
+      title: "Performance",
+      description: "ratio between Created Points and Completed Points",
+      logo: Performance,
+      value: archetype?.performance,
+      min: sizeMin,
+      max: sizeMax,
+      defaults: {
+        [NovaArchetype.SIZE]: 10,
+        [NovaArchetype.GROWTH]: 10,
+        [NovaArchetype.PERFORMANCE]: 60,
+        [NovaArchetype.REPUTATION]: 10,
+        [NovaArchetype.CONVICTION]: 10
+      }
+    },
+    [NovaArchetype.GROWTH]: {
+      type: NovaArchetype.GROWTH,
+      title: "Growth",
+      description: "% of member’s growth respect to previous period",
+      logo: Growth,
+      value: archetype?.growth,
+      min: sizeMin,
+      max: sizeMax,
+      defaults: {
+        [NovaArchetype.SIZE]: 10,
+        [NovaArchetype.GROWTH]: 60,
+        [NovaArchetype.PERFORMANCE]: 10,
+        [NovaArchetype.REPUTATION]: 10,
+        [NovaArchetype.CONVICTION]: 10
       }
     }
   };
