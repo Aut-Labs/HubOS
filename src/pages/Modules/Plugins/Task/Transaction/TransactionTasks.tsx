@@ -165,11 +165,9 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
 
   useEffect(() => {
     if (isSuccess) {
-      // @TODO go to tasks
-      // navigate({
-      //   pathname: `/${communityData?.name}/modules/OnboardingStrategy/QuestOnboardingPlugin`,
-      //   search: searchParams.toString()
-      // });
+      navigate({
+        pathname: `/${communityData?.name}/tasks`
+      });
     }
   }, [isSuccess, communityData]);
 

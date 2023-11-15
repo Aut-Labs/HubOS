@@ -12,7 +12,7 @@ import {
   styled,
   Typography
 } from "@mui/material";
-import { IsAdmin } from "@store/Community/community.reducer";
+import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
 import { memo, useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
@@ -77,7 +77,6 @@ const Answers = memo(({ control, questionIndex, answers, isDisabled }: any) => {
                     required: !values?.some((v) => v.correct)
                   }}
                   render={({ field: { name, value, onChange } }) => {
-                    console.log(value, "value");
                     return (
                       <Checkbox
                         name={name}
@@ -105,7 +104,6 @@ const Answers = memo(({ control, questionIndex, answers, isDisabled }: any) => {
 });
 
 const QuizTask = ({ plugin }: PluginParams) => {
-  const [searchParams] = useSearchParams();
   const isAdmin = useSelector(IsAdmin);
   const { address: userAddress } = useAccount();
   const params = useParams();
@@ -114,8 +112,7 @@ const QuizTask = ({ plugin }: PluginParams) => {
   const { task } = useGetAllTasksQuery(
     {
       userAddress,
-      isAdmin,
-      novaAddress: searchParams.get(RequiredQueryParams.DaoAddress)
+      isAdmin
     },
     {
       selectFromResult: ({ data, isLoading, isFetching }) => ({

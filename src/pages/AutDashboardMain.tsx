@@ -28,11 +28,16 @@ import CommunityEdit from "./CommunityEdit/CommunityEdit";
 import { ReactComponent as ManageIcon } from "@assets/manage.svg";
 import Archetype from "./Archetype/Archetype";
 import DAut from "./Modules/Plugins/DAut/DAut";
+<<<<<<< HEAD
 import {
   useGetArchetypeAndStatsQuery,
   useGetCommunityQuery
 } from "@api/community.api";
 import BotPolls from "./Bot/BotPolls";
+=======
+import { useGetArchetypeAndStatsQuery } from "@api/community.api";
+import { AllTasks } from "./Modules/Plugins/Task/Shared/AllTasks";
+>>>>>>> main
 
 const AutDashboardMain = () => {
   const communityData = useSelector(CommunityData);
@@ -109,6 +114,12 @@ const AutDashboardMain = () => {
             exact: true,
             icon: StackIcon,
             children: menuItems
+          },
+          {
+            title: "Tasks",
+            route: "tasks",
+            exact: true,
+            icon: StackIcon
           }
         ]
       },
@@ -165,6 +176,7 @@ const AutDashboardMain = () => {
               <Route path="edit-community" element={<CommunityEdit />} />
               <Route path="your-archetype" element={<Archetype />} />
               <Route path="modules/dAut" element={<DAut />} />
+              <Route path="tasks" element={<AllTasks />} />
               {/* {modulesRoutes?.routes?.length && (
                 <Route
                   path="quest-submissions"

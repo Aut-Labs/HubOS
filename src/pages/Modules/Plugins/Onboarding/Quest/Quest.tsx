@@ -399,7 +399,7 @@ We are now onboarding ${quest?.metadata?.name} - take a quest, prove yourself, &
             />
           )}
 
-          {!isAdmin && (
+          {/* {!isAdmin && (
             <Tasks
               canAdd={!quest?.active}
               questId={quest?.questId}
@@ -409,7 +409,7 @@ We are now onboarding ${quest?.metadata?.name} - take a quest, prove yourself, &
               isLoading={isLoading}
               tasks={tasks}
             />
-          )}
+          )} */}
         </>
       )}
     </Container>

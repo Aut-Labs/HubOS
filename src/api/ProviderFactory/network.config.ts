@@ -17,6 +17,7 @@ export interface NetworkContracts {
   questOpenTaskFactory: string;
   questOffchainTaskFactory: string;
   allowListAddress: string;
+  localReputationAddress: string;
 }
 
 export interface NetworkConfig {

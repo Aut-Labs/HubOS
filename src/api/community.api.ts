@@ -4,13 +4,19 @@ import { Community, CommunityDomains, findRoleName } from "./community.model";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
 import { ipfsCIDToHttpUrl, isValidUrl } from "./storage.api";
 import { AutID, DAOMember } from "./aut.model";
-import AutSDK, { Allowlist, Nova, fetchMetadata } from "@aut-labs/sdk";
+import AutSDK, {
+  Allowlist,
+  LocalReputation,
+  Nova,
+  fetchMetadata
+} from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { base64toFile } from "@utils/to-base-64";
 import { environment } from "./environment";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ethers } from "ethers";
 import { NovaArchetypeParameters } from "@aut-labs/sdk/dist/models/dao";
+import { NovaReputationStats } from "@aut-labs/sdk/dist/models/nova";
 
 const communityExtensionThunkProvider = Web3ThunkProviderFactory(
   "CommunityExtension",
@@ -666,10 +672,18 @@ export const getArchetypeAndStats = async (body, api: BaseQueryApi) => {
 
   const address = (api.getState() as any)?.community?.selectedCommunityAddress;
   const nova: Nova = sdk.initService<Nova>(Nova, address);
+  const localReputation: LocalReputation = sdk.localReputation;
+
   try {
     const response = await nova.contract.getArchetype();
+    const stats = await localReputation.contract.getNovaLocalReputationStats(
+      address
+    );
     return {
-      data: response?.data
+      data: {
+        archetype: response.data,
+        stats: stats?.data
+      }
     };
   } catch (error) {
     return {
@@ -747,7 +761,13 @@ export const communityApi = createApi({
         };
       }
     }),
-    getArchetypeAndStats: builder.query<NovaArchetypeParameters, void>({
+    getArchetypeAndStats: builder.query<
+      {
+        archetype: NovaArchetypeParameters;
+        stats: NovaReputationStats;
+      },
+      void
+    >({
       providesTags: ["Archetype"],
       query: (body) => {
         return {

@@ -26,8 +26,6 @@ const nameShortcut = {
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF"];
 const RADIAN = Math.PI / 180;
 
-const DEFAULT_VALUE = 20;
-
 const renderCustomizedLabel = ({
   cx,
   cy,
@@ -58,42 +56,76 @@ const renderCustomizedLabel = ({
 };
 
 export const archetypeChartValues = (archetype: NovaArchetypeParameters) => {
-  const dValue = archetype?.archetype ? 0 : DEFAULT_VALUE;
   return {
-    size: {
+    [NovaArchetype.SIZE]: {
       type: NovaArchetype.SIZE,
       title: "Size",
       description: "how many members",
       logo: Size,
-      value: archetype.size || dValue // initial value
+      value: archetype.size,
+      defaults: {
+        [NovaArchetype.SIZE]: 60,
+        [NovaArchetype.GROWTH]: 10,
+        [NovaArchetype.PERFORMANCE]: 10,
+        [NovaArchetype.REPUTATION]: 10,
+        [NovaArchetype.CONVICTION]: 10
+      }
     },
-    growth: {
+    [NovaArchetype.GROWTH]: {
       type: NovaArchetype.GROWTH,
       title: "Growth",
       description: "% of member’s growth respect to previous period",
       logo: Growth,
-      value: archetype.growth || dValue // initial value
+      value: archetype.growth,
+      defaults: {
+        [NovaArchetype.SIZE]: 20,
+        [NovaArchetype.GROWTH]: 40,
+        [NovaArchetype.PERFORMANCE]: 20,
+        [NovaArchetype.REPUTATION]: 10,
+        [NovaArchetype.CONVICTION]: 10
+      }
     },
-    performance: {
+    [NovaArchetype.PERFORMANCE]: {
       type: NovaArchetype.PERFORMANCE,
       title: "Performance",
       description: "ratio between Created Points and Completed Points",
       logo: Performance,
-      value: archetype.performance || dValue // initial value
+      value: archetype.performance,
+      defaults: {
+        [NovaArchetype.SIZE]: 20,
+        [NovaArchetype.GROWTH]: 20,
+        [NovaArchetype.PERFORMANCE]: 40,
+        [NovaArchetype.REPUTATION]: 10,
+        [NovaArchetype.CONVICTION]: 10
+      }
     },
-    reputation: {
+    [NovaArchetype.REPUTATION]: {
       type: NovaArchetype.REPUTATION,
       title: "Reputation",
       description: "avg. reputation of members",
       logo: Reputation,
-      value: archetype.reputation || dValue // initial value
+      value: archetype.reputation,
+      defaults: {
+        [NovaArchetype.SIZE]: 10,
+        [NovaArchetype.GROWTH]: 10,
+        [NovaArchetype.PERFORMANCE]: 10,
+        [NovaArchetype.REPUTATION]: 60,
+        [NovaArchetype.CONVICTION]: 10
+      }
     },
-    conviction: {
+    [NovaArchetype.CONVICTION]: {
       type: NovaArchetype.CONVICTION,
       title: "Conviction",
       description: "avg. commitment level of members",
       logo: Conviction,
-      value: archetype.conviction || dValue // initial value
+      value: archetype.conviction,
+      defaults: {
+        [NovaArchetype.SIZE]: 10,
+        [NovaArchetype.GROWTH]: 10,
+        [NovaArchetype.PERFORMANCE]: 10,
+        [NovaArchetype.REPUTATION]: 10,
+        [NovaArchetype.CONVICTION]: 60
+      }
     }
   };
 };

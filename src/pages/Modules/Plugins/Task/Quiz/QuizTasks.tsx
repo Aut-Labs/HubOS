@@ -3,9 +3,17 @@ import { useCreateQuizTaskMutation } from "@api/onboarding.api";
 import { PluginDefinition, Task } from "@aut-labs/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
-import { FormHelperText } from "@components/Fields";
+import { AutDatepicker, FormHelperText } from "@components/Fields";
 import { StepperButton } from "@components/Stepper";
-import { Box, Button, Container, Grid, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  Grid,
+  Slider,
+  Stack,
+  Typography
+} from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
 import { memo, useEffect, useMemo, useState } from "react";
@@ -13,18 +21,18 @@ import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { dateToUnix } from "@utils/date-format";
 import AddIcon from "@mui/icons-material/Add";
-import QuestionsAndAnswers, {
-  emptyMultipleQuestion
-} from "./QuestionsAndAnswers";
+import QuestionsAndAnswers from "./QuestionsAndAnswers";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
 import { CommunityData, allRoles } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
 import addMinutes from "date-fns/addMinutes";
 import { useAccount } from "wagmi";
+import { FormContainer } from "../Shared/FormContainer";
+
+// import "./ScrollbarStyles.scss";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -113,6 +121,8 @@ addMinutes(endDatetime, 45);
 
 const QuizTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
+
+  console.log(plugin);
   const navigate = useNavigate();
   const { address: account } = useAccount();
   const roles = useSelector(allRoles);
@@ -131,13 +141,15 @@ const QuizTasks = ({ plugin }: PluginParams) => {
     reValidateMode: "onChange",
     defaultValues: {
       title: "",
+      startDate: new Date(),
+      endDate: null,
       description: "",
       questions: [],
-      weight: ""
+      weight: 0
     }
   });
 
-  const allValues = watch();
+  const values = watch();
 
   const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
     useCreateQuizTaskMutation();
@@ -163,11 +175,12 @@ const QuizTasks = ({ plugin }: PluginParams) => {
       userAddress: account,
       isAdmin: true,
       novaAddress: communityData.properties.address,
-      pluginTokenId: plugin.tokenId,
+      pluginTokenId: plugin.pluginDefinitionId,
       pluginAddress: plugin.pluginAddress,
       allQuestions: values.questions,
       task: {
         role: 1,
+        weight: values.weight,
         metadata: {
           name: values.title,
           description: values.description,
@@ -175,8 +188,8 @@ const QuizTasks = ({ plugin }: PluginParams) => {
             questions: questionsWithoutAnswers
           }
         },
-        startDate: dateToUnix(new Date()),
-        endDate: dateToUnix(endDatetime)
+        startDate: dateToUnix(values.startDate),
+        endDate: dateToUnix(values.endDate)
       } as unknown as Task
     });
   };
@@ -187,22 +200,14 @@ const QuizTasks = ({ plugin }: PluginParams) => {
 
   useEffect(() => {
     if (isSuccess) {
-      // @TODO go to tasks
-      // navigate({
-      //   pathname: `/${communityData?.name}/modules/OnboardingStrategy/QuestOnboardingPlugin`,
-      //   search: searchParams.toString()
-      // });
+      navigate({
+        pathname: `/${communityData?.name}/tasks`
+      });
     }
   }, [isSuccess, communityData]);
 
   return (
-    <Container
-      sx={{ py: "20px", display: "flex", flexDirection: "column" }}
-      maxWidth="lg"
-      component="form"
-      autoComplete="off"
-      onSubmit={handleSubmit(onSubmit)}
-    >
+    <FormContainer onSubmit={handleSubmit(onSubmit)}>
       <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
       <LoadingDialog open={isLoading} message="Creating task..." />
 
@@ -229,10 +234,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
                 sm: "0"
               }
             }}
-            to={{
-              pathname: searchParams.get("returnUrl"),
-              search: searchParams.toString()
-            }}
+            to={`/${communityData?.name}/modules/Task`}
             component={Link}
           >
             {/* {searchParams.get("returnUrlLinkName") || "Back"} */}
@@ -327,37 +329,111 @@ const QuizTasks = ({ plugin }: PluginParams) => {
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
-                  <AutTextField
-                    variant="standard"
-                    color="offWhite"
-                    required
-                    type="number"
+                  <Box
                     sx={{
-                      width: "100%"
+                      marginTop: "10px"
                     }}
-                    autoFocus
-                    name={name}
-                    value={value || ""}
-                    onChange={onChange}
-                    placeholder="Weight"
-                    helperText={
-                      <FormHelperText
-                        errorTypes={errorTypes}
-                        value={value}
-                        name={name}
-                        errors={formState.errors}
-                      >
-                        <Typography color="white" variant="caption">
-                          Between 1 - 10
-                        </Typography>
-                      </FormHelperText>
-                    }
-                  />
+                    gap={2}
+                  >
+                    <Slider
+                      step={1}
+                      name={name}
+                      min={1}
+                      max={10}
+                      sx={{
+                        width: "100%",
+                        height: "20px",
+                        ".MuiSlider-thumb": {
+                          display: "none"
+                        }
+                      }}
+                      onChange={onChange}
+                      placeholder="Weight"
+                      value={+(value || 0)}
+                    />
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        minWidth: "40px"
+                      }}
+                    >
+                      <Typography color="white" variant="caption">
+                        Weight (1-10)
+                      </Typography>
+                      <Typography color="white" variant="caption">
+                        {value}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  // <AutTextField
+                  //   variant="standard"
+                  //   color="offWhite"
+                  //   required
+                  //   type="number"
+                  //   sx={{
+                  //     width: "100%"
+                  //   }}
+                  //   autoFocus
+                  //   name={name}
+                  //   value={value || ""}
+                  //   onChange={onChange}
+                  //   placeholder="Weight"
+                  //   helperText={
+                  //     <FormHelperText
+                  //       errorTypes={errorTypes}
+                  //       value={value}
+                  //       name={name}
+                  //       errors={formState.errors}
+                  //     >
+                  //       <Typography color="white" variant="caption">
+                  //         Between 1 - 10
+                  //       </Typography>
+                  //     </FormHelperText>
+                  //   }
+                  // />
                 );
               }}
             />
           </Grid>
         </Grid>
+
+        <Stack direction="row" gap={4}>
+          <Controller
+            name="startDate"
+            control={control}
+            rules={{
+              required: true
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <AutDatepicker
+                  placeholder="Start date"
+                  minDateTime={values.startDate}
+                  value={value}
+                  onChange={onChange}
+                />
+              );
+            }}
+          />
+          <Controller
+            name="endDate"
+            control={control}
+            rules={{
+              required: true
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <AutDatepicker
+                  placeholder="End date"
+                  value={value}
+                  onChange={onChange}
+                />
+              );
+            }}
+          />
+        </Stack>
         <Controller
           name="description"
           control={control}
@@ -425,12 +501,12 @@ const QuizTasks = ({ plugin }: PluginParams) => {
         >
           <StepperButton
             label="Confirm"
-            disabled={!formState.isValid || !allValues?.questions?.length}
+            disabled={!formState.isValid || !values?.questions?.length}
             sx={{ width: "250px" }}
           />
         </Box>
       </Stack>
-    </Container>
+    </FormContainer>
   );
 };
 

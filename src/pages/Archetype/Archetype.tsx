@@ -15,7 +15,9 @@ import {
   Slider,
   IconButton,
   SvgIcon,
-  Tooltip
+  Tooltip,
+  alpha,
+  useTheme
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArchetypePieChart, {
@@ -30,6 +32,7 @@ import {
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { NovaArchetypeParameters } from "@aut-labs/sdk/dist/models/dao";
+import { NovaArchetype } from "@aut-labs/sdk/dist/models/nova";
 
 const GridCard = styled(Card)(({ theme }) => {
   return {
@@ -94,7 +97,15 @@ const Overlay = styled("div", {
   transition: theme.transitions.create("background")
 }));
 
-const ArchetypeCard = ({ title, description, logo, type, onSelect }) => {
+const ArchetypeCard = ({
+  title,
+  description,
+  logo,
+  type,
+  onSelect,
+  activeArchetype
+}) => {
+  const theme = useTheme();
   const [isHovered, setIsHovered] = React.useState(false);
   return (
     <GridCard
@@ -109,7 +120,13 @@ const ArchetypeCard = ({ title, description, logo, type, onSelect }) => {
         })
       }
       sx={{
-        bgcolor: "nightBlack.main",
+        ...(!activeArchetype
+          ? {
+              bgcolor: "nightBlack.main"
+            }
+          : {
+              bgcolor: alpha(theme.palette.primary.main, 0.3)
+            }),
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -167,7 +184,7 @@ const ArchetypeCard = ({ title, description, logo, type, onSelect }) => {
           size="large"
           isHovered={isHovered}
         >
-          Choose Archetype
+          {activeArchetype ? "Change archetype" : "Choose Archetype"}
         </ChooseArchetypeBtn>
       </CardContent>
     </GridCard>
@@ -213,13 +230,25 @@ const ChooseYourArchetype = ({ setSelected, archetype }) => {
       <Grid container spacing={3} sx={{ flexGrow: 1 }}>
         {/* Row 1 */}
         <Grid item xs={12} sm={6} md={4}>
-          <ArchetypeCard onSelect={setSelected} {...state.size} />
+          <ArchetypeCard
+            activeArchetype={archetype?.archetype === NovaArchetype.SIZE}
+            onSelect={setSelected}
+            {...state[NovaArchetype.SIZE]}
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
-          <ArchetypeCard onSelect={setSelected} {...state.growth} />
+          <ArchetypeCard
+            activeArchetype={archetype?.archetype === NovaArchetype.GROWTH}
+            onSelect={setSelected}
+            {...state[NovaArchetype.GROWTH]}
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
-          <ArchetypeCard onSelect={setSelected} {...state.performance} />
+          <ArchetypeCard
+            activeArchetype={archetype?.archetype === NovaArchetype.PERFORMANCE}
+            onSelect={setSelected}
+            {...state[NovaArchetype.PERFORMANCE]}
+          />
         </Grid>
 
         {/* Row 2 */}
@@ -234,10 +263,18 @@ const ChooseYourArchetype = ({ setSelected, archetype }) => {
           md={2}
         />
         <Grid item xs={12} sm={6} md={4}>
-          <ArchetypeCard onSelect={setSelected} {...state.reputation} />
+          <ArchetypeCard
+            activeArchetype={archetype?.archetype === NovaArchetype.REPUTATION}
+            onSelect={setSelected}
+            {...state[NovaArchetype.REPUTATION]}
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
-          <ArchetypeCard onSelect={setSelected} {...state.conviction} />
+          <ArchetypeCard
+            activeArchetype={archetype?.archetype === NovaArchetype.CONVICTION}
+            onSelect={setSelected}
+            {...state[NovaArchetype.CONVICTION]}
+          />
         </Grid>
         <Grid
           display={{
@@ -258,6 +295,8 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype }) => {
   const [editMode, setEditMode] = React.useState(
     selectedArchetype?.type != archetype?.archetype
   );
+
+  const theme = useTheme();
   const [state, setState] = React.useState(archetypeChartValues(archetype));
 
   const handleChange = (slider) => (_, newValue) => {
@@ -318,17 +357,33 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype }) => {
     setState(newState);
   };
 
+  const actionName = React.useMemo(() => {
+    if (!archetype?.archetype) {
+      return "Set Archetype";
+    }
+
+    if (selectedArchetype?.type === archetype?.archetype) {
+      return "Confirm";
+    }
+
+    return "Change and Confirm";
+  }, [selectedArchetype, archetype]);
+
+  const minValue = React.useMemo(() => {
+    return state[selectedArchetype.type]?.defaults[selectedArchetype.type];
+  }, [state, selectedArchetype]);
+
   const [setArchetype, { error, isError, isLoading, reset }] =
     useSetArchetypeMutation();
 
   const updateArchetype = () => {
     const updatedArchetype: NovaArchetypeParameters = {
       archetype: selectedArchetype?.type,
-      size: state.size.value,
-      growth: state.growth.value,
-      conviction: state.conviction.value,
-      performance: state.performance.value,
-      reputation: state.reputation.value
+      size: state[NovaArchetype.SIZE].value,
+      growth: state[NovaArchetype.GROWTH].value,
+      conviction: state[NovaArchetype.CONVICTION].value,
+      performance: state[NovaArchetype.PERFORMANCE].value,
+      reputation: state[NovaArchetype.REPUTATION].value
     };
     setArchetype(updatedArchetype);
   };
@@ -485,7 +540,7 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype }) => {
                 {selectedArchetype.description}
               </Typography>
 
-              <Stack mt={4} gap={2}>
+              <Stack mt={4} mb={4} gap={2}>
                 <Box display="flex" gap={2} flexDirection="column">
                   <Typography color="primary" variant="subtitle2">
                     Stats:
@@ -526,23 +581,6 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype }) => {
                   </Stack>
                 </Box>
               </Stack>
-
-              <Box
-                sx={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  gap: 4,
-                  mt: 4
-                }}
-              >
-                <Button color="offWhite" variant="outlined" size="medium">
-                  Change
-                </Button>
-                {/* <Button color="offWhite" variant="outlined" size="medium">
-                  Edit
-                </Button> */}
-              </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -605,13 +643,33 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype }) => {
                         <Slider
                           step={2}
                           sx={{
+                            "& > .MuiSlider-track": {
+                              ...(slider == selectedArchetype?.type && {
+                                background: `${alpha(
+                                  theme.palette.primary.main,
+                                  1
+                                )} !important`
+                              })
+                            },
+
                             width: "100%",
                             height: "20px",
                             ".MuiSlider-thumb": {
                               display: "none"
                             }
                           }}
-                          value={state[slider].value}
+                          // min={
+                          //   slider == selectedArchetype?.type ? minValue : null
+                          // }
+                          // max={
+                          //   slider == selectedArchetype?.type
+                          //     ? 80
+                          //     : minValue - 10
+                          // }
+                          value={
+                            state[slider].value ||
+                            state[selectedArchetype.type]?.defaults[slider]
+                          }
                           onChange={handleChange(slider)}
                         />
                         <Box
@@ -621,7 +679,9 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype }) => {
                           }}
                         >
                           <Typography variant="subtitle2" color="white">
-                            {state[slider].value}%
+                            {state[slider].value ||
+                              state[selectedArchetype.type]?.defaults[slider]}
+                            %
                           </Typography>
                         </Box>
                       </Box>
@@ -642,7 +702,7 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype }) => {
                       variant="outlined"
                       size="medium"
                     >
-                      Confirm selection
+                      {actionName}
                     </Button>
                   </Box>
                 </>
@@ -683,15 +743,29 @@ const Archetypes = () => {
     selectFromResult: ({ data, isLoading, isFetching }) => ({
       isLoading,
       isFetching,
-      archetype: data
+      archetype: data?.archetype
     })
   });
   const [selected, setSelected] = React.useState(null);
+  const archetypeData = React.useMemo(() => {
+    if (archetype?.archetype === selected?.type) {
+      return archetype;
+    }
+    return {
+      archetype: NovaArchetype.NONE,
+      size: 0,
+      reputation: 0,
+      conviction: 0,
+      performance: 0,
+      growth: 0
+    };
+  }, [archetype, selected]);
+
   return (
     <Container maxWidth="lg" sx={{ py: "20px" }}>
       {selected && (
         <YourArchetype
-          archetype={archetype}
+          archetype={archetypeData}
           unselect={() => setSelected(null)}
           selectedArchetype={selected}
         ></YourArchetype>

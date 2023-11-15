@@ -36,7 +36,6 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
 
   const { task } = useGetAllTasksQuery(
     {
-      novaAddress: searchParams.get(RequiredQueryParams.DaoAddress),
       userAddress,
       isAdmin
     },

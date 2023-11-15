@@ -28,8 +28,7 @@ const TransactionTask = ({ plugin }: PluginParams) => {
   const { task } = useGetAllTasksQuery(
     {
       userAddress,
-      isAdmin,
-      novaAddress: searchParams.get(RequiredQueryParams.DaoAddress)
+      isAdmin
     },
     {
       selectFromResult: ({ data, isLoading, isFetching }) => ({
