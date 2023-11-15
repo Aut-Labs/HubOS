@@ -28,16 +28,12 @@ import CommunityEdit from "./CommunityEdit/CommunityEdit";
 import { ReactComponent as ManageIcon } from "@assets/manage.svg";
 import Archetype from "./Archetype/Archetype";
 import DAut from "./Modules/Plugins/DAut/DAut";
-<<<<<<< HEAD
 import {
   useGetArchetypeAndStatsQuery,
   useGetCommunityQuery
 } from "@api/community.api";
 import BotPolls from "./Bot/BotPolls";
-=======
-import { useGetArchetypeAndStatsQuery } from "@api/community.api";
 import { AllTasks } from "./Modules/Plugins/Task/Shared/AllTasks";
->>>>>>> main
 
 const AutDashboardMain = () => {
   const communityData = useSelector(CommunityData);
