@@ -135,6 +135,9 @@ function AutTabs(props: AutTabsParams) {
               sx={{ marginLeft: "auto", borderTopLeftRadius: "16px" }}
               key={props.staticTab.label}
               label={props.staticTab.label}
+              onClick={() => {
+                throw Error();
+              }}
             />
           )}
         </Tabs>

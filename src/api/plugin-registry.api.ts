@@ -3,6 +3,9 @@ import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
 import { NetworkConfig } from "./ProviderFactory/network.config";
+import axios from "axios";
+import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
+import { communityApi } from "./community.api";
 
 const fetch = async (body: any, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
@@ -65,6 +68,33 @@ const add = async (body: PluginDefinition, api: BaseQueryApi) => {
   // );
 
   const { pluginDefinitionId } = body;
+
+  // if (
+  //   pluginDefinitionId === PluginDefinitionType.SocialBotPlugin ||
+  //   pluginDefinitionId === PluginDefinitionType.SocialQuizPlugin
+  // ) {
+  //   const addressResult = await axios.get(
+  //     `${environment.discordBotUrl}/address`
+  //   );
+
+  //   const communityQueryResponse =
+  //     state.communityApi.queries["getCommunity(null)"];
+  //   if (
+  //     !communityQueryResponse.data.admins.find(
+  //       (a) => a.address === addressResult.data
+  //     )
+  //   )
+  //     //check admins list
+  //     try {
+  //       debugger;
+  //       const result = await sdk.nova.addAdmin(addressResult.data.address);
+  //       if (!result.isSuccess) {
+  //         return { error: result.errorMessage };
+  //       }
+  //     } catch (error) {
+  //       return { error: error };
+  //     }
+  // }
 
   const response = await sdk.pluginRegistry.addPluginToDAO(
     pluginDefinitionId,
@@ -154,8 +184,8 @@ export const pluginRegistryApi = createApi({
         } catch (err) {
           console.error(err);
         }
-      }
-      // invalidatesTags: ["Plugins"]
+      },
+      invalidatesTags: ["Plugins"]
     })
   })
 });

@@ -193,15 +193,6 @@ const CreateEvent = () => {
         variant="outlined"
         color="offWhite"
         onClick={() => {
-          navigate(`/${communityData.name}/bot/gathering`);
-        }}
-      >
-        Create Gathering
-      </AutButton>
-      <AutButton
-        variant="outlined"
-        color="offWhite"
-        onClick={() => {
           navigate(`/${communityData.name}/bot/poll/info`);
         }}
       >
@@ -211,7 +202,7 @@ const CreateEvent = () => {
   );
 };
 
-const Bot = () => {
+const BotPolls = () => {
   const theme = useTheme();
   const [botActive, setBotActive] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -300,48 +291,48 @@ const Bot = () => {
     }
   };
 
-  useEffect(() => {
-    const activate = async () => {
-      // await activateDiscordBotPlugin();
-      const apiUrl = `${environment.discordBotUrl}/guild`; // Replace with your API endpoint URL
-      console.log("communityData", communityData);
-      const roles = communityData?.properties.rolesSets[0].roles.map((role) => {
-        return { name: role.roleName, id: role.id };
-      });
-      const requestObject = {
-        daoAddress: communityData?.properties.address,
-        roles: roles,
-        guildId
-      };
-      try {
-        await axios.post(apiUrl, requestObject);
+  // useEffect(() => {
+  //   const activate = async () => {
+  //     // await activateDiscordBotPlugin();
+  //     const apiUrl = `${environment.discordBotUrl}/guild`; // Replace with your API endpoint URL
+  //     console.log("communityData", communityData);
+  //     const roles = communityData?.properties.rolesSets[0].roles.map((role) => {
+  //       return { name: role.roleName, id: role.id };
+  //     });
+  //     const requestObject = {
+  //       daoAddress: communityData?.properties.address,
+  //       roles: roles,
+  //       guildId
+  //     };
+  //     try {
+  //       await axios.post(apiUrl, requestObject);
 
-        const discordBotLink =
-          "https://discord.com/api/oauth2/authorize?client_id=1129037421615529984&permissions=8&scope=bot%20applications.commands";
-        window.open(discordBotLink, "_blank");
-        setLoading(true);
-        intervalRef.current = setInterval(async () => {
-          const botActiveRequest = await axios.get(
-            `${environment.discordBotUrl}/check/${guildId}`
-          );
-          const botActive = botActiveRequest.data.active;
-          if (botActive) {
-            setLoading(false);
-            setBotActive(botActive);
-            clearInterval(intervalRef.current);
-          }
-        }, 2000);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    if (activatedPluginSuccessfully) activate();
-  }, [activatedPluginSuccessfully]);
+  //       const discordBotLink =
+  //         "https://discord.com/api/oauth2/authorize?client_id=1129037421615529984&permissions=8&scope=bot%20applications.commands";
+  //       window.open(discordBotLink, "_blank");
+  //       setLoading(true);
+  //       intervalRef.current = setInterval(async () => {
+  //         const botActiveRequest = await axios.get(
+  //           `${environment.discordBotUrl}/check/${guildId}`
+  //         );
+  //         const botActive = botActiveRequest.data.active;
+  //         if (botActive) {
+  //           setLoading(false);
+  //           setBotActive(botActive);
+  //           clearInterval(intervalRef.current);
+  //         }
+  //       }, 2000);
+  //     } catch (e) {
+  //       console.log(e);
+  //     }
+  //   };
+  //   if (activatedPluginSuccessfully) activate();
+  // }, [activatedPluginSuccessfully]);
 
-  const gatheringsList = useMemo(() => {
-    if (gatheringsSuccess) return gatherings;
-    return null;
-  }, [gatheringsSuccess]);
+  // const gatheringsList = useMemo(() => {
+  //   if (gatheringsSuccess) return gatherings;
+  //   return null;
+  // }, [gatheringsSuccess]);
 
   const pollsList = useMemo(() => {
     if (pollsSuccess) return polls;
@@ -433,18 +424,13 @@ const Bot = () => {
                 // }}
                 tabs={[
                   {
-                    label: "Gatherings",
-                    component: GatheringsList,
-                    props: { gatheringsList }
-                  },
-                  {
                     label: "Polls",
                     component: PollsList,
                     props: { pollsList }
                   }
                 ]}
                 staticTab={{
-                  label: "Create Event",
+                  label: "Create A Poll",
                   component: CreateEvent,
                   props: null
                 }}
@@ -487,4 +473,4 @@ const Bot = () => {
   );
 };
 
-export default Bot;
+export default BotPolls;

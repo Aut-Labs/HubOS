@@ -40,7 +40,7 @@ import {
   useGetGatheringsQuery,
   useGetGuildIdQuery
 } from "@api/discord.api";
-import { updateDiscordSocials } from "@api/community.api";
+import { updateDiscordSocials, useGetCommunityQuery } from "@api/community.api";
 import { useDispatch } from "react-redux";
 import { useAppDispatch } from "@store/store.model";
 import { GridCard } from "../Modules/Shared/PluginCard";
@@ -48,6 +48,17 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { GridBox } from "../Modules/Plugins/Task/Quiz/QuestionsAndAnswers";
 import { environment } from "@api/environment";
+import {
+  useAddPluginToDAOMutation,
+  useGetAllPluginDefinitionsByDAOQuery
+} from "@api/plugin-registry.api";
+import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
+import {
+  PluginDefinitionProperties,
+  PluginDefinitionType
+} from "@aut-labs/sdk/dist/models/plugin";
+import AutSDK from "@aut-labs/sdk";
+import { gridColumnsTotalWidthSelector } from "@mui/x-data-grid";
 
 const BotPluginsPage = () => {
   const theme = useTheme();
@@ -60,6 +71,12 @@ const BotPluginsPage = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [open, setOpen] = useState(!isMobile);
   const [discordDialogOpen, setDiscordDialogOpen] = useState(false);
+
+  const { data: community } = useGetCommunityQuery(null, {
+    refetchOnMountOrArgChange: false,
+    skip: false
+  });
+
   const dispatch = useAppDispatch();
   const {
     data: guildId,
@@ -68,6 +85,24 @@ const BotPluginsPage = () => {
     refetch
   } = useGetGuildIdQuery(null, {
     skip: isDiscordVerified === false
+  });
+
+  const {
+    plugins,
+    isLoading: pluginsLoading,
+    isFetching: pluginsFetching,
+    refetch: refetchPlugins
+  } = useGetAllPluginDefinitionsByDAOQuery(null, {
+    selectFromResult: ({ data }) => ({
+      isLoading,
+      refetch,
+      isFetching,
+      plugins: (data || []).filter(
+        (p) =>
+          p.pluginDefinitionId === PluginDefinitionType.SocialBotPlugin ||
+          p.pluginDefinitionId === PluginDefinitionType.SocialQuizPlugin
+      )
+    })
   });
 
   const [
@@ -136,16 +171,20 @@ const BotPluginsPage = () => {
   };
 
   const BotPluginCard = ({
-    pluginModule,
+    plugin,
     isFetching,
     onActivatePlugin
   }: {
     isFetching: boolean;
-    pluginModule: any;
+    plugin: any;
     onActivatePlugin: any;
   }) => {
     const communityData = useSelector(CommunityData);
     const navigate = useNavigate();
+
+    const [addPlugin, { error, isLoading: isAddingPlugin, isError, reset }] =
+      useAddPluginToDAOMutation();
+
     // const [activateOnboarding, { isLoading }] = useActivateModuleMutation();
     return (
       <GridCard
@@ -176,7 +215,7 @@ const BotPluginsPage = () => {
             color: "white",
             variant: "subtitle1"
           }}
-          title={`${pluginModule?.properties?.title}`}
+          title={`${plugin?.metadata?.properties?.title}`}
         />
         <CardContent
           sx={{
@@ -187,7 +226,7 @@ const BotPluginsPage = () => {
         >
           <Stack flex={1} maxWidth="80%" mx="auto">
             <Typography variant="body" textAlign="center" color="white">
-              {pluginModule?.properties?.shortDescription}
+              {plugin?.metadata?.properties?.shortDescription}
             </Typography>
           </Stack>
           <LoadingButton
@@ -207,33 +246,30 @@ const BotPluginsPage = () => {
                 </Typography>
                 <CircularProgress
                   size="20px"
-                  color={pluginModule.isActivated ? "offWhite" : "primary"}
+                  color={plugin.pluginAddress ? "offWhite" : "primary"}
                 />
               </Stack>
             }
-            {...(pluginModule.isActivated && {
+            {...(plugin.pluginAddress && {
               onClick: () => {
                 console.log(
                   `/${
                     communityData.name
-                  }/bot/${pluginModule?.properties?.title.toLowerCase()}`
+                  }/bot/${plugin?.metadata?.properties?.title.toLowerCase()}`
                 );
                 navigate(
                   `/${
                     communityData.name
-                  }/bot/${pluginModule?.properties?.title.toLowerCase()}`
+                  }/bot/${plugin?.metadata?.properties?.title.toLowerCase()}`
                 );
               }
             })}
-            {...(!pluginModule.isActivated && {
-              onClick: () =>
-                onActivatePlugin({
-                  moduleId: pluginModule.id
-                })
+            {...(!plugin.pluginAddress && {
+              onClick: () => addPlugin(plugin)
             })}
             color="offWhite"
           >
-            {pluginModule.isActivated ? "Go to plugin" : "Activate"}
+            {plugin.pluginAddress ? "Go to plugin" : "Activate"}
           </LoadingButton>
         </CardContent>
       </GridCard>
@@ -259,11 +295,21 @@ const BotPluginsPage = () => {
 
       <Stack mt={7} alignItems="center" justifyContent="center">
         <GridBox sx={{ flexGrow: 1, mt: 4 }}>
-          <BotPluginCard
+          {plugins.map((plugin, index) => (
+            <BotPluginCard
+              onActivatePlugin={handleActivatePlugin}
+              isFetching={isFetching}
+              // isAdmin={isAdmin}
+              key={`plugin-${index}`}
+              plugin={plugin}
+              // hasCopyright={definition?.properties?.type === "Task"}
+            />
+          ))}
+          {/* <BotPluginCard
             onActivatePlugin={handleActivatePlugin}
             isFetching={isFetching}
             // isAdmin={true}
-            key={`modules-plugin-${1}`}
+            key={`plugin-${1}`}
             pluginModule={JSON.parse(
               '{"isActivated": "true","name":"Aut Labs Plugin","properties":{"shortDescription":"This is a description for the gatherings bot plugin.","longDescription":"This is a description for the gatherings bot plugin.","author":"Āut Labs","tags":["Workflow"],"contract":"SocialBotPlugin","module":{"type":"Default","title":"DiscordBot"},"title":"Gatherings","type":"Default"}}'
             )}
@@ -273,12 +319,12 @@ const BotPluginsPage = () => {
             onActivatePlugin={handleActivatePlugin}
             isFetching={isFetching}
             // isAdmin={true}
-            key={`modules-plugin-${2}`}
+            key={`plugin-${2}`}
             pluginModule={JSON.parse(
               '{"isActivated": "true","name":"Aut Labs Plugin","properties":{"shortDescription":"This is a description for the polls bot plugin.","longDescription":"This is a description for the polls bot plugin.","author":"Āut Labs","tags":["Workflow"],"contract":"SocialBotPlugin","module":{"type":"Default","title":"DiscordBot"},"title":"Polls","type":"Default"}}'
             )}
             //   hasCopyright={definition?.properties?.type === "Task"}
-          />
+          /> */}
         </GridBox>
       </Stack>
     </Container>

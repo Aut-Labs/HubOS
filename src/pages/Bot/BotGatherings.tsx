@@ -129,84 +129,6 @@ const GatheringsList = ({ gatheringsList }) => {
   );
 };
 
-const PollsList = ({ pollsList }) => {
-  const theme = useTheme();
-  return (
-    <Box sx={{ display: "flex", justifyContent: "center" }}>
-      {pollsList && pollsList?.length === 0 ? (
-        <>
-          <Typography
-            className="text-secondary"
-            mx="auto"
-            my={2}
-            textAlign="center"
-            color="white"
-            variant="body1"
-          >
-            No polls created yet.
-          </Typography>
-        </>
-      ) : (
-        <TableContainer
-          component={Paper}
-          sx={{
-            backgroundColor: "transparent",
-            boxShadow: "none",
-            borderStyle: "none"
-          }}
-        >
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <GatheringStyledTableCell>Name</GatheringStyledTableCell>
-                <GatheringStyledTableCell align="right">
-                  EndDate
-                </GatheringStyledTableCell>
-                <GatheringStyledTableCell align="right">
-                  Role
-                </GatheringStyledTableCell>
-                <GatheringStyledTableCell align="right"></GatheringStyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {pollsList &&
-                pollsList.map((row) => (
-                  <TableRow
-                    key={row.title}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  >
-                    <GatheringStyledTableCell component="th" scope="row">
-                      <Stack
-                        sx={{
-                          margin: "0 auto",
-                          width: "100%"
-                        }}
-                      >
-                        <Typography variant="h6">{row.title}</Typography>
-                        <Typography variant="caption">
-                          {row.description}
-                        </Typography>
-                      </Stack>
-                    </GatheringStyledTableCell>
-                    <GatheringStyledTableCell align="right">
-                      {row.endDate}
-                    </GatheringStyledTableCell>
-                    <GatheringStyledTableCell align="right">
-                      {row.roles}
-                    </GatheringStyledTableCell>
-                    <GatheringStyledTableCell align="right">
-                      SHARE
-                    </GatheringStyledTableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-    </Box>
-  );
-};
-
 const CreateEvent = () => {
   const communityData = useSelector(CommunityData);
   const navigate = useNavigate();
@@ -245,15 +167,6 @@ const CreateEvent = () => {
         >
           Create Gathering
         </AutButton>
-        <AutButton
-          variant="outlined"
-          color="offWhite"
-          onClick={() => {
-            navigate(`/${communityData.name}/bot/poll/info`);
-          }}
-        >
-          Create Poll
-        </AutButton>
       </Stack>
     </Box>
   );
@@ -285,15 +198,6 @@ const BotGatherings = () => {
     isLoading: gatheringsLoading,
     isSuccess: gatheringsSuccess
   } = useGetGatheringsQuery(guildId, {
-    // refetchOnMountOrArgChange: false,
-    skip: guildId === undefined || botActive === false
-  });
-
-  const {
-    data: polls,
-    isLoading: pollsLoading,
-    isSuccess: pollsSuccess
-  } = useGetPollsQuery(guildId, {
     // refetchOnMountOrArgChange: false,
     skip: guildId === undefined || botActive === false
   });
@@ -348,53 +252,48 @@ const BotGatherings = () => {
     }
   };
 
-  useEffect(() => {
-    const activate = async () => {
-      // await activateDiscordBotPlugin();
-      const apiUrl = `${environment.discordBotUrl}/guild`; // Replace with your API endpoint URL
-      console.log("communityData", communityData);
-      const roles = communityData?.properties.rolesSets[0].roles.map((role) => {
-        return { name: role.roleName, id: role.id };
-      });
-      const requestObject = {
-        daoAddress: communityData?.properties.address,
-        roles: roles,
-        guildId
-      };
-      try {
-        await axios.post(apiUrl, requestObject);
+  // useEffect(() => {
+  //   const activate = async () => {
+  //     // await activateDiscordBotPlugin();
+  //     const apiUrl = `${environment.discordBotUrl}/guild`; // Replace with your API endpoint URL
+  //     console.log("communityData", communityData);
+  //     const roles = communityData?.properties.rolesSets[0].roles.map((role) => {
+  //       return { name: role.roleName, id: role.id };
+  //     });
+  //     const requestObject = {
+  //       daoAddress: communityData?.properties.address,
+  //       roles: roles,
+  //       guildId
+  //     };
+  //     try {
+  //       await axios.post(apiUrl, requestObject);
 
-        const discordBotLink =
-          "https://discord.com/api/oauth2/authorize?client_id=1129037421615529984&permissions=8&scope=bot%20applications.commands";
-        window.open(discordBotLink, "_blank");
-        setLoading(true);
-        intervalRef.current = setInterval(async () => {
-          const botActiveRequest = await axios.get(
-            `${environment.discordBotUrl}/check/${guildId}`
-          );
-          const botActive = botActiveRequest.data.active;
-          if (botActive) {
-            setLoading(false);
-            setBotActive(botActive);
-            clearInterval(intervalRef.current);
-          }
-        }, 2000);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    if (activatedPluginSuccessfully) activate();
-  }, [activatedPluginSuccessfully]);
+  //       const discordBotLink =
+  //         "https://discord.com/api/oauth2/authorize?client_id=1129037421615529984&permissions=8&scope=bot%20applications.commands";
+  //       window.open(discordBotLink, "_blank");
+  //       setLoading(true);
+  //       intervalRef.current = setInterval(async () => {
+  //         const botActiveRequest = await axios.get(
+  //           `${environment.discordBotUrl}/check/${guildId}`
+  //         );
+  //         const botActive = botActiveRequest.data.active;
+  //         if (botActive) {
+  //           setLoading(false);
+  //           setBotActive(botActive);
+  //           clearInterval(intervalRef.current);
+  //         }
+  //       }, 2000);
+  //     } catch (e) {
+  //       console.log(e);
+  //     }
+  //   };
+  //   if (activatedPluginSuccessfully) activate();
+  // }, [activatedPluginSuccessfully]);
 
   const gatheringsList = useMemo(() => {
     if (gatheringsSuccess) return gatherings;
     return null;
   }, [gatheringsSuccess]);
-
-  const pollsList = useMemo(() => {
-    if (pollsSuccess) return polls;
-    return null;
-  }, [pollsSuccess]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -484,11 +383,6 @@ const BotGatherings = () => {
                     label: "Gatherings",
                     component: GatheringsList,
                     props: { gatheringsList }
-                  },
-                  {
-                    label: "Polls",
-                    component: PollsList,
-                    props: { pollsList }
                   }
                 ]}
                 staticTab={{

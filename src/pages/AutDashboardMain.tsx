@@ -28,7 +28,11 @@ import CommunityEdit from "./CommunityEdit/CommunityEdit";
 import { ReactComponent as ManageIcon } from "@assets/manage.svg";
 import Archetype from "./Archetype/Archetype";
 import DAut from "./Modules/Plugins/DAut/DAut";
-import { useGetArchetypeAndStatsQuery } from "@api/community.api";
+import {
+  useGetArchetypeAndStatsQuery,
+  useGetCommunityQuery
+} from "@api/community.api";
+import BotPolls from "./Bot/BotPolls";
 
 const AutDashboardMain = () => {
   const communityData = useSelector(CommunityData);
@@ -131,7 +135,7 @@ const AutDashboardMain = () => {
               {/* <Route path="bot" element={<Bot />} /> */}
               {/* <Route path="bot" element={<BotPluginsPage />} /> */}
               <Route path="bot/plugins" element={<BotPluginsPage />} />
-              <Route path="bot/polls" element={<BotGatherings />} />
+              <Route path="bot/polls" element={<BotPolls />} />
               <Route path="bot/gatherings" element={<BotGatherings />} />
               <Route path="bot/gathering" element={<GatheringInitialStep />} />
               <Route path="bot/poll/info" element={<CreatePollInfoStep />} />
