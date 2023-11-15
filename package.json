@@ -33,13 +33,9 @@
   "dependencies": {
     "@aut-labs/abi-types": "^0.0.58-dev",
     "@aut-labs/d-aut": "^1.0.100-dev",
-<<<<<<< HEAD
-    "@aut-labs/sdk": "^0.0.98-dev",
     "@emoji-mart/data": "^1.1.2",
     "@emoji-mart/react": "^1.1.1",
-=======
     "@aut-labs/sdk": "^0.0.99-dev",
->>>>>>> main
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@leenguyen/react-flip-clock-countdown": "^1.4.0",
