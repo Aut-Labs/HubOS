@@ -16,7 +16,10 @@ import { environment } from "./environment";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ethers } from "ethers";
 import { NovaArchetypeParameters } from "@aut-labs/sdk/dist/models/dao";
-import { NovaReputationStats } from "@aut-labs/sdk/dist/models/nova";
+import {
+  NovaGroupState,
+  NovaReputationStats
+} from "@aut-labs/sdk/dist/models/nova";
 
 const communityExtensionThunkProvider = Web3ThunkProviderFactory(
   "CommunityExtension",
@@ -509,7 +512,7 @@ export const updateAdmins = async (
         `${environment.apiUrl}/autid/user/notes/addresses`,
         {
           data: {
-            daoAddress: address,
+            novaAddress: address,
             admins: [...mapped]
           }
         }
@@ -520,7 +523,7 @@ export const updateAdmins = async (
       const notesResult = await axios.post(
         `${environment.apiUrl}/autid/user/notes/setmany`,
         {
-          daoAddress: address,
+          novaAddress: address,
           admins: [...data.added, ...data.updated]
         }
       );
@@ -622,7 +625,7 @@ export const updateDomains = async (
   }
 };
 
-const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
+const getCommunity = async (novaAddress: string, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
 
   const address = (api.getState() as any)?.community?.selectedCommunityAddress;
@@ -646,8 +649,8 @@ const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
   );
 
   const notes = await axios
-    .post(`https://dev-api.aut.id/api/autid/user/notes/addresses`, {
-      daoAddress: address,
+    .post(`${environment.apiUrl}/autid/user/notes/addresses`, {
+      novaAddress: address,
       admins: filteredEmptyAddresses
     })
     .then((res) => res.data);
@@ -764,7 +767,7 @@ export const communityApi = createApi({
     getArchetypeAndStats: builder.query<
       {
         archetype: NovaArchetypeParameters;
-        stats: NovaReputationStats;
+        stats: NovaGroupState;
       },
       void
     >({

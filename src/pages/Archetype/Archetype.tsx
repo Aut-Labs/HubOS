@@ -33,6 +33,7 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { NovaArchetypeParameters } from "@aut-labs/sdk/dist/models/dao";
 import { NovaArchetype } from "@aut-labs/sdk/dist/models/nova";
+import { calculateAV } from "@utils/av-calculator";
 
 const GridCard = styled(Card)(({ theme }) => {
   return {
@@ -193,6 +194,7 @@ const ArchetypeCard = ({
 
 const ChooseYourArchetype = ({ setSelected, archetype }) => {
   const [state, setState] = React.useState(archetypeChartValues(archetype));
+  console.log("state: ", state);
   return (
     <>
       <Box
@@ -238,16 +240,16 @@ const ChooseYourArchetype = ({ setSelected, archetype }) => {
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <ArchetypeCard
-            activeArchetype={archetype?.archetype === NovaArchetype.GROWTH}
+            activeArchetype={archetype?.archetype === NovaArchetype.REPUTATION}
             onSelect={setSelected}
-            {...state[NovaArchetype.GROWTH]}
+            {...state[NovaArchetype.REPUTATION]}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <ArchetypeCard
-            activeArchetype={archetype?.archetype === NovaArchetype.PERFORMANCE}
+            activeArchetype={archetype?.archetype === NovaArchetype.CONVICTION}
             onSelect={setSelected}
-            {...state[NovaArchetype.PERFORMANCE]}
+            {...state[NovaArchetype.CONVICTION]}
           />
         </Grid>
 
@@ -264,16 +266,16 @@ const ChooseYourArchetype = ({ setSelected, archetype }) => {
         />
         <Grid item xs={12} sm={6} md={4}>
           <ArchetypeCard
-            activeArchetype={archetype?.archetype === NovaArchetype.REPUTATION}
+            activeArchetype={archetype?.archetype === NovaArchetype.PERFORMANCE}
             onSelect={setSelected}
-            {...state[NovaArchetype.REPUTATION]}
+            {...state[NovaArchetype.PERFORMANCE]}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <ArchetypeCard
-            activeArchetype={archetype?.archetype === NovaArchetype.CONVICTION}
+            activeArchetype={archetype?.archetype === NovaArchetype.GROWTH}
             onSelect={setSelected}
-            {...state[NovaArchetype.CONVICTION]}
+            {...state[NovaArchetype.GROWTH]}
           />
         </Grid>
         <Grid
@@ -291,71 +293,87 @@ const ChooseYourArchetype = ({ setSelected, archetype }) => {
   );
 };
 
-const YourArchetype = ({ selectedArchetype, unselect, archetype }) => {
+const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
   const [editMode, setEditMode] = React.useState(
     selectedArchetype?.type != archetype?.archetype
   );
 
+  const [initialValues, setInitialValues] = React.useState(true);
+
   const theme = useTheme();
   const [state, setState] = React.useState(archetypeChartValues(archetype));
 
-  const handleChange = (slider) => (_, newValue) => {
-    const diff = state[slider].value - newValue;
+  const TOTAL_VALUE = 100;
 
-    const numOtherSliders = Object.keys(state).length - 1;
-    const changeForOtherSliders = Math.floor(diff / numOtherSliders);
+  // Calculate the total value of all sliders and the remaining value to allocate
+  const totalValue = Object.keys(state).reduce(
+    (total, key) => total + state[key].value,
+    0
+  );
 
-    const newState = { ...state };
-    newState[slider].value = newValue;
+  const remainingValue = TOTAL_VALUE - totalValue;
+  const showNotification = totalValue !== TOTAL_VALUE;
 
-    let extraDistribution = 0;
+  const handleChange = (sliderId) => (_, newValue) => {
+    let min = 0;
+    let max = 100;
 
-    const otherSliders = Object.keys(state).filter((key) => key !== slider);
-
-    otherSliders.forEach((key) => {
-      const adjustedValue = newState[key].value + changeForOtherSliders;
-      if (adjustedValue < 0) {
-        extraDistribution += newState[key].value;
-        newState[key].value = 0;
-      } else if (adjustedValue > 100) {
-        extraDistribution -= 100 - newState[key].value;
-        newState[key].value = 100;
-      } else {
-        newState[key].value = Math.floor(adjustedValue);
-      }
-    });
-
-    // Re-distribute the extra value
-    if (extraDistribution !== 0) {
-      const extraChangeForOthers = Math.floor(
-        extraDistribution / numOtherSliders
-      );
-      otherSliders.forEach((key) => {
-        const adjustedValue = newState[key].value + extraChangeForOthers;
-        newState[key].value =
-          adjustedValue < 0
-            ? 0
-            : adjustedValue > 100
-            ? 100
-            : Math.floor(adjustedValue);
-      });
+    const activeState = state[selectedArchetype.type];
+    if (+sliderId === selectedArchetype?.type) {
+      min = activeState.min;
+      max = activeState.max;
+    } else {
+      min = 0;
+      max = activeState.min;
     }
 
-    // Check total slider value and adjust if it's less than 100
-    const totalSliderValue = Object.keys(newState).reduce(
-      (sum, key) => sum + newState[key].value,
-      0
-    );
+    console.log(min, max, sliderId, selectedArchetype, activeState);
 
-    if (totalSliderValue < 100) {
-      const sliderWithSmallestValue = otherSliders.reduce((a, b) =>
-        newState[a].value < newState[b].value ? a : b
-      );
-      newState[sliderWithSmallestValue].value += 100 - totalSliderValue;
+    if (newValue >= min && newValue <= max) {
+      setState((prevState) => ({
+        ...prevState,
+        [sliderId]: {
+          ...prevState[sliderId],
+          value: newValue
+        }
+      }));
     }
-
-    setState(newState);
   };
+
+  React.useEffect(() => {
+    if (!initialValues) return;
+
+    const activeState = state[selectedArchetype.type];
+
+    const currentValue = activeState.value;
+    const minValue = activeState.min;
+
+    if (minValue > currentValue && initialValues) {
+      const newState = Object.keys(state).reduce((prev, key) => {
+        prev[key] = {
+          ...state[key],
+          value: activeState.defaults[key]
+        };
+        return prev;
+      }, {} as any);
+
+      console.log(newState, "newState");
+      setState(newState);
+      setInitialValues(false);
+    }
+  }, [selectedArchetype, initialValues, state]);
+
+  const av = React.useMemo(() => {
+    const updatedArchetype = {
+      size: state[NovaArchetype.SIZE].value,
+      reputation: state[NovaArchetype.REPUTATION].value,
+      conviction: state[NovaArchetype.CONVICTION].value,
+      performance: state[NovaArchetype.PERFORMANCE].value,
+      growth: state[NovaArchetype.GROWTH].value
+    };
+
+    return calculateAV(updatedArchetype);
+  }, [state]);
 
   const actionName = React.useMemo(() => {
     if (!archetype?.archetype) {
@@ -368,10 +386,6 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype }) => {
 
     return "Change and Confirm";
   }, [selectedArchetype, archetype]);
-
-  const minValue = React.useMemo(() => {
-    return state[selectedArchetype.type]?.defaults[selectedArchetype.type];
-  }, [state, selectedArchetype]);
 
   const [setArchetype, { error, isError, isLoading, reset }] =
     useSetArchetypeMutation();
@@ -551,7 +565,7 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype }) => {
                         Your Av:
                       </Typography>
                       <Typography color="white" variant="subtitle2">
-                        1.0
+                        {Number(av || 0).toFixed(2)}
                       </Typography>
                     </Box>
                     <Box display="flex" gap={2}>
@@ -559,7 +573,7 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype }) => {
                         Period no.
                       </Typography>
                       <Typography color="white" variant="subtitle2">
-                        #1
+                        #{stats?.lastPeriod}
                       </Typography>
                     </Box>
                     <Box display="flex" gap={2}>
@@ -658,18 +672,9 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype }) => {
                               display: "none"
                             }
                           }}
-                          // min={
-                          //   slider == selectedArchetype?.type ? minValue : null
-                          // }
-                          // max={
-                          //   slider == selectedArchetype?.type
-                          //     ? 80
-                          //     : minValue - 10
-                          // }
-                          value={
-                            state[slider].value ||
-                            state[selectedArchetype.type]?.defaults[slider]
-                          }
+                          min={0}
+                          max={100}
+                          value={state[slider].value}
                           onChange={handleChange(slider)}
                         />
                         <Box
@@ -679,13 +684,25 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype }) => {
                           }}
                         >
                           <Typography variant="subtitle2" color="white">
-                            {state[slider].value ||
-                              state[selectedArchetype.type]?.defaults[slider]}
-                            %
+                            {state[slider].value}%
                           </Typography>
                         </Box>
                       </Box>
                     ))}
+
+                    {showNotification && (
+                      <Box
+                        sx={{
+                          textAlign: "center",
+                          minWidth: "120px",
+                          mt: 2
+                        }}
+                      >
+                        <Typography variant="subtitle2" color="error">
+                          {`Remaining value to allocate: ${remainingValue}%`}
+                        </Typography>
+                      </Box>
+                    )}
                   </Box>
                   <Box
                     sx={{
@@ -693,7 +710,7 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype }) => {
                       display: "flex",
                       justifyContent: "center",
                       gap: 4,
-                      mt: 4
+                      mt: 2
                     }}
                   >
                     <Button
@@ -737,13 +754,15 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype }) => {
 const Archetypes = () => {
   const {
     archetype,
+    stats,
     isLoading: isLoadingArchetype,
     isFetching: isFetchingArchetype
   } = useGetArchetypeAndStatsQuery(null, {
     selectFromResult: ({ data, isLoading, isFetching }) => ({
       isLoading,
       isFetching,
-      archetype: data?.archetype
+      archetype: data?.archetype,
+      stats: data?.stats
     })
   });
   const [selected, setSelected] = React.useState(null);
@@ -761,11 +780,14 @@ const Archetypes = () => {
     };
   }, [archetype, selected]);
 
+  console.log("archetypeData: ", archetypeData, archetype, selected);
+
   return (
     <Container maxWidth="lg" sx={{ py: "20px" }}>
       {selected && (
         <YourArchetype
           archetype={archetypeData}
+          stats={stats}
           unselect={() => setSelected(null)}
           selectedArchetype={selected}
         ></YourArchetype>

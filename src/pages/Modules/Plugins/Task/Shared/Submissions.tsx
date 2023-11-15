@@ -87,12 +87,12 @@ export const taskTypes = {
 export const SubmissionCard = ({
   row,
   questId,
-  daoAddress,
+  novaAddress,
   onboardingQuestAddress
 }: {
   row: Task;
   questId: string;
-  daoAddress: string;
+  novaAddress: string;
   onboardingQuestAddress: string;
 }) => {
   const location = useLocation();
@@ -224,7 +224,7 @@ export const SubmissionCard = ({
                     submitter: row.submitter,
                     questId: questId.toString(),
                     onboardingQuestAddress: onboardingQuestAddress,
-                    daoAddress: daoAddress,
+                    novaAddress: novaAddress,
                     returnUrlLinkName: "Back to quest",
                     returnUrl: `${location?.pathname}`
                   }).toString()
@@ -326,7 +326,7 @@ const Submissions = ({ plugin }: PluginParams) => {
       onboardingQuestAddress: searchParams.get(
         RequiredQueryParams.OnboardingQuestAddress
       ),
-      daoAddress: searchParams.get(RequiredQueryParams.DaoAddress)
+      novaAddress: searchParams.get(RequiredQueryParams.NovaAddress)
     };
   }, [searchParams]);
 
@@ -390,7 +390,7 @@ const Submissions = ({ plugin }: PluginParams) => {
                     row={row}
                     questId={taskParams.questId}
                     onboardingQuestAddress={taskParams.onboardingQuestAddress}
-                    daoAddress={taskParams.daoAddress}
+                    novaAddress={taskParams.novaAddress}
                     {...taskParams}
                   />
                 ))}

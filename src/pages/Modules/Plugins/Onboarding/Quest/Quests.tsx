@@ -64,7 +64,7 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
     // hashtags: ["Āut", "DAO", "Blockchain"]
     url: communityData?.properties?.address
       ? // keep this bizarre formatting otherwise the tweet won't have the correct new lines and alignment
-        `${urls.showcase}?daoAddress=${communityData?.properties?.address}`
+        `${urls.showcase}?novaAddress=${communityData?.properties?.address}`
       : "https://Aut.id/"
   };
 
@@ -406,7 +406,7 @@ We are now onboarding ${roles} - take a quest, prove yourself, & join us as we b
                   {filteredQuests?.map((row, index) => (
                     <QuestListItem
                       isAdmin={isAdmin}
-                      daoAddress={communityData?.properties?.address}
+                      novaAddress={communityData?.properties?.address}
                       pluginAddress={plugin?.pluginAddress}
                       key={`table-row-${index}`}
                       row={row}

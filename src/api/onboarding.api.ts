@@ -75,25 +75,25 @@ const getOnboardingProgress = async (
   }
   return {
     data: {
-      daoAddress: cacheData?.daoAddress,
+      novaAddress: cacheData?.novaAddress,
       onboardingQuestAddress: cacheData?.onboardingQuestAddress,
       daoProgress: daoProgress.filter((c) => c.address !== cache.address),
       quests: [
         {
           questId: 1,
-          daoAddress: cacheData?.daoAddress,
+          novaAddress: cacheData?.novaAddress,
           onboardingQuestAddress: cacheData?.onboardingQuestAddress,
           tasksAndSubmissions: tasksAndSubmissions[0]
         },
         {
           questId: 2,
-          daoAddress: cacheData?.daoAddress,
+          novaAddress: cacheData?.novaAddress,
           onboardingQuestAddress: cacheData?.onboardingQuestAddress,
           tasksAndSubmissions: tasksAndSubmissions[1]
         },
         {
           questId: 3,
-          daoAddress: cacheData?.daoAddress,
+          novaAddress: cacheData?.novaAddress,
           onboardingQuestAddress: cacheData?.onboardingQuestAddress,
           tasksAndSubmissions: tasksAndSubmissions[2]
         }
@@ -143,7 +143,7 @@ const fetchQuestById = async (
   body: {
     questId: number;
     onboardingQuestAddress: string;
-    daoAddress: string;
+    novaAddress: string;
   },
   api: BaseQueryApi
 ) => {
@@ -748,12 +748,12 @@ export const onboardingApi = createApi({
   endpoints: (builder) => ({
     getOnboardingProgress: builder.query<
       {
-        daoAddress: string;
+        novaAddress: string;
         onboardingQuestAddress: string;
         daoProgress: CacheModel[];
         quests: {
           questId: number;
-          daoAddress: string;
+          novaAddress: string;
           onboardingQuestAddress: string;
           tasksAndSubmissions: {
             tasks: Task[];
@@ -787,7 +787,7 @@ export const onboardingApi = createApi({
       {
         questId: number;
         onboardingQuestAddress: string;
-        daoAddress: string;
+        novaAddress: string;
       }
     >({
       query: (body) => {
