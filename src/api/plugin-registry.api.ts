@@ -30,13 +30,6 @@ const fetch = async (body: any, api: BaseQueryApi) => {
         )
       };
 
-      // if (
-      //   pluginData.metadata.properties.module.title === "Onboarding Strategy"
-      // ) {
-      //   pluginData.metadata.properties.module.type = "OnboardingStrategy";
-      //   pluginData.metadata.properties.type = "OnboardingStrategy";
-      // }
-
       // if (pluginData.metadata.properties.module.title === "Task Type") {
       //   pluginData.metadata.properties.module.type = "Task";
       //   pluginData.metadata.properties.type = "Task";

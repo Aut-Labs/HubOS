@@ -67,10 +67,15 @@ const DiscordServerVerificationPopup = ({
             const element = community.properties.socials[i];
             if (element.type === "discord") {
               element.link = values.inviteLink;
+              element.metadata = { serverId: serverDetails.guild.id };
             }
           }
           const communityUpdateResult = await dispatch(
-            updateDiscordSocials({ community, inviteLink })
+            updateDiscordSocials({
+              community,
+              inviteLink,
+              serverId: serverDetails.guild.id
+            })
           );
           if (communityUpdateResult.meta.requestStatus !== "rejected") {
             handleClose();

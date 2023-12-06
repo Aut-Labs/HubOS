@@ -167,7 +167,8 @@ const GatheringInitialStep = () => {
       duration: null,
       role: null,
       allCanAttend: false,
-      channelId: null
+      channelId: null,
+      weight: null
     }
   });
   const values = watch();
@@ -606,6 +607,56 @@ const GatheringInitialStep = () => {
                       </MenuItem>
                     );
                   })}
+              </AutSelectField>
+            );
+          }}
+        />
+
+        <Controller
+          name="weight"
+          control={control}
+          rules={{
+            required: true,
+            validate: {
+              selected: (v) => !!v
+            }
+          }}
+          render={({ field: { name, value, onChange } }) => {
+            return (
+              <AutSelectField
+                variant="standard"
+                color="offWhite"
+                // renderValue={(selected) => {
+                //   if (!selected) {
+                //     return "Role" as any;
+                //   }
+                //   const role = roles.find((t) => t.id === selected);
+                //   return role?.roleName || selected;
+                // }}
+                name={name}
+                value={value || ""}
+                displayEmpty
+                required
+                onChange={onChange}
+                helperText={
+                  <FormHelperText
+                    value={value}
+                    name={name}
+                    errors={formState.errors}
+                  >
+                    Select the gathering weight
+                  </FormHelperText>
+                }
+              >
+                <MenuItem key={`weight-1`} value={2}>
+                  1
+                </MenuItem>
+                <MenuItem key={`weight-2`} value={15}>
+                  2
+                </MenuItem>
+                <MenuItem key={`weight-3`} value={30}>
+                  3
+                </MenuItem>
               </AutSelectField>
             );
           }}

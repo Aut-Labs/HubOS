@@ -24,6 +24,7 @@ export interface HolderData {
 }
 
 export interface AutSocial {
+  metadata?: any;
   type: string;
   link: string;
 }

@@ -37,6 +37,7 @@ import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVeri
 import { AppBar } from "@components/Sidebar/Sidebar";
 import {
   useActivateDiscordBotPluginMutation,
+  useCheckBotActiveQuery,
   useGetGatheringsQuery,
   useGetGuildIdQuery
 } from "@api/discord.api";
@@ -62,7 +63,6 @@ import { gridColumnsTotalWidthSelector } from "@mui/x-data-grid";
 
 const BotPluginsPage = () => {
   const theme = useTheme();
-  const [botActive, setBotActive] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const isDiscordVerified = useSelector(IsDiscordVerified);
@@ -109,62 +109,24 @@ const BotPluginsPage = () => {
     activateDiscordBotPlugin,
     { isLoading: isActivatingBotPlugin, isSuccess: activatedPluginSuccessfully }
   ] = useActivateDiscordBotPluginMutation();
-
-  const intervalRef = useRef<ReturnType<typeof setInterval>>();
-
-  useEffect(() => {
-    const activate = async () => {
-      // await activateDiscordBotPlugin();
-      const apiUrl = `${environment.discordBotUrl}/guild`; // Replace with your API endpoint URL
-      console.log("communityData", communityData);
-      const roles = communityData?.properties.rolesSets[0].roles.map((role) => {
-        return { name: role.roleName, id: role.id };
-      });
-      const requestObject = {
-        daoAddress: communityData?.properties.address,
-        roles: roles,
-        guildId
-      };
-      try {
-        await axios.post(apiUrl, requestObject);
-
-        const discordBotLink =
-          "https://discord.com/api/oauth2/authorize?client_id=1129037421615529984&permissions=8&scope=bot%20applications.commands";
-        window.open(discordBotLink, "_blank");
-        setLoading(true);
-        intervalRef.current = setInterval(async () => {
-          const botActiveRequest = await axios.get(
-            `${environment.discordBotUrl}/check/${guildId}`
-          );
-          const botActive = botActiveRequest.data.active;
-          if (botActive) {
-            setLoading(false);
-            setBotActive(botActive);
-            clearInterval(intervalRef.current);
-          }
-        }, 2000);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    //TODO CHECK if already active
-    if (activatedPluginSuccessfully) activate();
-  }, [activatedPluginSuccessfully]);
-
-  useEffect(() => {
-    const fetch = async () => {
-      if (guildId) {
-        const botActiveRequest = await axios.get(
-          `${environment.discordBotUrl}/check/${guildId}`
-        );
-        const botActive = botActiveRequest.data.active;
-        setBotActive(botActive);
-      }
-      setLoading(false);
-    };
-
-    fetch();
-  }, [guildId]);
+  // Discord link hack
+  // useEffect(() => {
+  //   if (communityData) {
+  //     const community = { ...communityData };
+  //     for (let i = 0; i < community.properties.socials.length; i++) {
+  //       const element = community.properties.socials[i];
+  //       if (element.type === "discord") {
+  //         element.link = "https://discord.gg/TdY5ceD6";
+  //       }
+  //     }
+  //     const communityUpdateResult = dispatch(
+  //       updateDiscordSocials({
+  //         community,
+  //         inviteLink: "https://discord.gg/TdY5ceD6"
+  //       })
+  //     );
+  //   }
+  // }, [communityData]);
 
   const handleActivatePlugin = (moduleId) => {
     activateDiscordBotPlugin({ moduleId });
@@ -172,12 +134,10 @@ const BotPluginsPage = () => {
 
   const BotPluginCard = ({
     plugin,
-    isFetching,
-    onActivatePlugin
+    isFetching
   }: {
     isFetching: boolean;
     plugin: any;
-    onActivatePlugin: any;
   }) => {
     const communityData = useSelector(CommunityData);
     const navigate = useNavigate();
@@ -185,7 +145,6 @@ const BotPluginsPage = () => {
     const [addPlugin, { error, isLoading: isAddingPlugin, isError, reset }] =
       useAddPluginToDAOMutation();
 
-    // const [activateOnboarding, { isLoading }] = useActivateModuleMutation();
     return (
       <GridCard
         sx={{
@@ -230,13 +189,13 @@ const BotPluginsPage = () => {
             </Typography>
           </Stack>
           <LoadingButton
-            loading={isLoading}
+            loading={isAddingPlugin}
             sx={{
               width: "80%",
               mx: "auto",
               my: 6
             }}
-            disabled={isLoading || isFetching}
+            disabled={isAddingPlugin || isFetching}
             variant="outlined"
             size="large"
             loadingIndicator={
@@ -252,16 +211,11 @@ const BotPluginsPage = () => {
             }
             {...(plugin.pluginAddress && {
               onClick: () => {
-                console.log(
-                  `/${
-                    communityData.name
-                  }/bot/${plugin?.metadata?.properties?.title.toLowerCase()}`
-                );
-                navigate(
-                  `/${
-                    communityData.name
-                  }/bot/${plugin?.metadata?.properties?.title.toLowerCase()}`
-                );
+                const page =
+                  plugin?.metadata?.properties?.title === "Social Quiz"
+                    ? "polls"
+                    : "gatherings";
+                navigate(`/${communityData.name}/bot/${page}`);
               }
             })}
             {...(!plugin.pluginAddress && {
@@ -297,8 +251,7 @@ const BotPluginsPage = () => {
         <GridBox sx={{ flexGrow: 1, mt: 4 }}>
           {plugins.map((plugin, index) => (
             <BotPluginCard
-              onActivatePlugin={handleActivatePlugin}
-              isFetching={isFetching}
+              isFetching={pluginsFetching}
               // isAdmin={isAdmin}
               key={`plugin-${index}`}
               plugin={plugin}

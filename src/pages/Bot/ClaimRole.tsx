@@ -38,40 +38,6 @@ const ClaimRole = () => {
   const [searchParams] = useSearchParams();
   // const [error, setError] = useState(false);
 
-  const handleAddBot = async () => {
-    // const apiUrl = "${environment.discordBotUrl}/guild"; // Replace with your API endpoint URL
-    // console.log("communityData", communityData);
-    // const roles = communityData?.properties.rolesSets[0].roles.map((role) => {
-    //   return { name: role.roleName, id: role.id };
-    // });
-    // let discordLink = communityData?.properties.socials.find(
-    //   (l) => l.type === "discord"
-    // ).link;
-    // if (!discordLink) {
-    //   discordLink = "https://discord.gg/4FymGpfA";
-    // }
-    // debugger;
-    // const serverCode = discordLink.match(/discord\.gg\/(.+)/i)[1];
-    // const serverIdResponse = await axios.get(
-    //   `https://discord.com/api/invites/${serverCode}`
-    // );
-    // const guildId = serverIdResponse.data.guild.id;
-    // const requestObject = {
-    //   daoAddress: communityData?.properties.address,
-    //   roles: roles,
-    //   guildId
-    // };
-    // debugger;
-    // try {
-    //   const result = await axios.post(apiUrl, requestObject);
-    //   const discordBotLink =
-    //     "https://discord.com/api/oauth2/authorize?client_id=1129037421615529984&permissions=8&scope=bot%20applications.commands";
-    //   window.open(discordBotLink, "_blank");
-    // } catch (e) {
-    //   console.log(e);
-    // }
-  };
-
   const onAutLogin = async ({ detail }: any) => {
     const profile = JSON.parse(JSON.stringify(detail));
     const autID = new AutID(profile);

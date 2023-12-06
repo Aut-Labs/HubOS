@@ -91,7 +91,7 @@ export const claimDiscordServerRole = createAsyncThunk(
   async (claimRoleData: ClaimRoleData, { rejectWithValue, getState }) => {
     try {
       const result = await axios
-        .post(`${environment.discordBotUrl}/getRole`, claimRoleData)
+        .post(`${environment.discordBotUrl}/guilds/getRole`, claimRoleData)
         .then((res) => res.data);
     } catch (e) {
       return rejectWithValue(`Fail. ${e}`);
@@ -203,38 +203,61 @@ export const postDiscordPoll = (
 };
 
 const getVoiceChannels = async (body: any, api: any) => {
-  const channels = await axios.get(
-    `${environment.discordBotUrl}/guild/voiceChannels/${body.guildId}`
-  );
-  return {
-    data: channels.data
-  };
+  try {
+    const channels = await axios.get(
+      `${environment.discordBotUrl}/guilds/voiceChannels/${body.guildId}`
+    );
+    return {
+      data: channels.data
+    };
+  } catch (error) {
+    return {
+      error
+    };
+  }
 };
 
 const getTextChannels = async (body: any, api: any) => {
-  debugger;
-  const channels = await axios.get(
-    `${environment.discordBotUrl}/guild/textChannels/${body}`
-  );
-  return {
-    data: channels.data
-  };
+  try {
+    const channels = await axios.get(
+      `${environment.discordBotUrl}/guilds/textChannels/${body}`
+    );
+    return {
+      data: channels.data
+    };
+  } catch (error) {
+    return {
+      error
+    };
+  }
 };
 
 const getGatherings = async (body: any, api: any) => {
-  const gatherings = await axios.get(
-    `${environment.discordBotUrl}/gatherings/${body}`
-  );
-  return {
-    data: gatherings.data
-  };
+  try {
+    const gatherings = await axios.get(
+      `${environment.discordBotUrl}/gatherings/${body}`
+    );
+    return {
+      data: gatherings.data
+    };
+  } catch (error) {
+    return {
+      error
+    };
+  }
 };
 
 const getPolls = async (body: any, api: any) => {
-  const polls = await axios.get(`${environment.discordBotUrl}/polls/${body}`);
-  return {
-    data: polls.data
-  };
+  try {
+    const polls = await axios.get(`${environment.discordBotUrl}/polls/${body}`);
+    return {
+      data: polls.data
+    };
+  } catch (error) {
+    return {
+      error
+    };
+  }
 };
 
 const createGathering = async (body: any, api: any) => {
@@ -245,13 +268,20 @@ const createGathering = async (body: any, api: any) => {
   );
   body.endDate = endDate;
   body.roles = [body.role];
-  const result = await axios.post(
-    `${environment.discordBotUrl}/gathering`,
-    body
-  );
-  return {
-    data: null
-  };
+
+  try {
+    const result = await axios.post(
+      `${environment.discordBotUrl}/gatherings`,
+      body
+    );
+    return {
+      data: null
+    };
+  } catch (error) {
+    return {
+      error
+    };
+  }
 };
 
 const getGuildId = async (body: any, api: any) => {
@@ -264,13 +294,20 @@ const getGuildId = async (body: any, api: any) => {
     (l) => l.type === "discord"
   ).link;
   const serverCode = discordLink.match(/discord\.gg\/(.+)/i)[1];
-  const serverIdResponse = await axios.get(
-    `https://discord.com/api/invites/${serverCode}`
-  );
-  const guildId = serverIdResponse.data.guild.id;
-  return {
-    data: guildId
-  };
+
+  try {
+    const serverIdResponse = await axios.get(
+      `https://discord.com/api/invites/${serverCode}`
+    );
+    const guildId = serverIdResponse.data.guild.id;
+    return {
+      data: guildId
+    };
+  } catch (error) {
+    return {
+      error
+    };
+  }
 };
 
 const activateDiscordBotPlugin = async (body: any, api: any) => {
@@ -313,7 +350,6 @@ export const createPoll = async (body: any, api: any) => {
   const state = api.getState();
   const { options, title, description, channelId } = state.poll.pollData;
   // const { community } = state.community;
-  debugger;
   const { guildId, duration, allParticipants, participants, role } = body;
 
   try {
@@ -376,7 +412,6 @@ export const createPoll = async (body: any, api: any) => {
       `${environment.discordBotUrl}/poll`,
       pollRequestModel
     );
-    debugger;
     // const uri = await storeAsBlob(metadata);
 
     // const result = await contract.create(
@@ -415,8 +450,6 @@ export const createPoll = async (body: any, api: any) => {
       data: true
     };
   } catch (e) {
-    debugger;
-    console.log(e);
     return {
       error: e
     };
@@ -427,6 +460,88 @@ export const publishPoll = (poll) => {
   return axios
     .post(`${environment.discordBotUrl}/poll`, poll)
     .then((res) => res);
+};
+
+export const checkBotActive = async (body: any, api: any) => {
+  try {
+    const botActiveRequest = await axios.get(
+      `${environment.discordBotUrl}/guilds/check/${body}`
+    );
+    const botActive = botActiveRequest.data.active;
+    return {
+      data: botActive
+    };
+  } catch (error) {
+    return {
+      error
+    };
+  }
+};
+
+export const activateDiscordBot = async (body: any, api: any) => {
+  try {
+    const state = api.getState();
+
+    const daoAddress = state?.community?.selectedCommunityAddress;
+    const daoData = state?.community.communities.find(
+      (c) => c.properties.address === daoAddress || new Community()
+    );
+    const { serverId: guildId } = daoData.properties.socials.find(
+      (s) => s.type === "discord"
+    ).metadata;
+    debugger;
+    const apiUrl = `${environment.discordBotUrl}/guilds`;
+    const roles = daoData?.properties.rolesSets[0].roles.map((role) => {
+      return { name: role.roleName, id: role.id };
+    });
+    const requestObject = {
+      daoAddress,
+      roles: roles,
+      guildId
+    };
+    await axios.post(apiUrl, requestObject);
+    const discordBotLink =
+      "https://discord.com/api/oauth2/authorize?client_id=1129037421615529984&permissions=8&scope=bot%20applications.commands";
+    window.open(discordBotLink, "_blank");
+    // setLoading(true);
+    // let count = 0;
+    const isActive = await new Promise((resolve, reject) => {
+      let intervalRef;
+      let timeoutCount = 0;
+      try {
+        intervalRef = setInterval(async () => {
+          if (timeoutCount > 10) {
+            reject("Timeout");
+          }
+          const botActiveRequest = await axios.get(
+            `${environment.discordBotUrl}/guilds/check/${guildId}`
+          );
+          const botActive = botActiveRequest.data.active;
+          if (botActive) {
+            // setLoading(false);
+            // setBotActive(botActive);
+            clearInterval(intervalRef);
+            debugger;
+            resolve(botActive);
+          }
+
+          timeoutCount++;
+        }, 2000);
+      } catch (e) {
+        clearInterval(intervalRef);
+        reject(e);
+      }
+    });
+    debugger;
+    return {
+      data: isActive
+    };
+  } catch (error) {
+    debugger;
+    return {
+      error
+    };
+  }
 };
 
 export const botApi = createApi({
@@ -457,11 +572,18 @@ export const botApi = createApi({
     if (url === "createPoll") {
       return createPoll(body, api);
     }
+    if (url === "activateDiscordBot") {
+      debugger;
+      return activateDiscordBot(body, api);
+    }
+    if (url === "checkBotActive") {
+      return checkBotActive(body, api);
+    }
     return {
       data: "Test"
     };
   },
-  tagTypes: ["Discord", "Gatherings", "Polls", "Guild"],
+  tagTypes: ["Discord", "Gatherings", "Polls", "Guild", "BotActive"],
   endpoints: (builder) => ({
     activateDiscordBotPlugin: builder.mutation<void, { moduleId: string }>({
       query: (body) => {
@@ -489,6 +611,15 @@ export const botApi = createApi({
         };
       },
       invalidatesTags: ["Polls"]
+    }),
+    activateDiscordBot: builder.mutation<{ isActive: boolean }, any>({
+      query: (body) => {
+        return {
+          body,
+          url: "activateDiscordBot"
+        };
+      },
+      invalidatesTags: ["BotActive"]
     }),
     getGuildId: builder.query<{ guildId: string }, void>({
       query: (body) => {
@@ -546,6 +677,15 @@ export const botApi = createApi({
         };
       },
       providesTags: ["Polls"]
+    }),
+    checkBotActive: builder.query<{ active: boolean }, { guildId: string }>({
+      query: (body) => {
+        return {
+          body,
+          url: "checkBotActive"
+        };
+      },
+      providesTags: ["BotActive"]
     })
   })
 });
@@ -558,5 +698,7 @@ export const {
   useGetTextChannelsQuery,
   useGetGatheringsQuery,
   useGetPollsQuery,
-  useGetGuildIdQuery
+  useGetGuildIdQuery,
+  useCheckBotActiveQuery,
+  useActivateDiscordBotMutation
 } = botApi;

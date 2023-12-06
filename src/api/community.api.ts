@@ -159,6 +159,7 @@ export const removeAsCoreTeam = communityExtensionThunkProvider(
 interface UpdateDiscordData {
   community: Community;
   inviteLink: string;
+  serverId: string;
 }
 
 export const updateDiscordSocials = createAsyncThunk(
@@ -188,6 +189,7 @@ export const updateDiscordSocials = createAsyncThunk(
             const social = community.properties.socials[i];
             if (social.type === "discord") {
               social.link = args.inviteLink;
+              social.metadata = { serverId: args.serverId };
               foundSocial = true;
               break;
             }

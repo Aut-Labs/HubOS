@@ -93,7 +93,6 @@ export class Community extends BaseNFTModel<CommunityProperties> {
     const market = MarketTemplates.find(
       (v) => v.title === community.properties.market
     );
-    debugger;
     return {
       name: community.name,
       description: community.description,

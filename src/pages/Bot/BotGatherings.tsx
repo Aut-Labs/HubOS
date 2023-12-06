@@ -26,6 +26,7 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import {
   CommunityData,
+  DiscordServerId,
   IsDiscordVerified
 } from "@store/Community/community.reducer";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -34,15 +35,19 @@ import { AutButton } from "@components/buttons";
 import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 import { AppBar } from "@components/Sidebar/Sidebar";
 import {
+  useActivateDiscordBotMutation,
   useActivateDiscordBotPluginMutation,
+  useCheckBotActiveQuery,
   useGetGatheringsQuery,
   useGetGuildIdQuery,
   useGetPollsQuery
 } from "@api/discord.api";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { updateDiscordSocials } from "@api/community.api";
 import { useDispatch } from "react-redux";
 import { useAppDispatch } from "@store/store.model";
 import { environment } from "@api/environment";
+import BotErrorPage from "./BotErrorPage";
 
 const GatheringStyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}, &.${tableCellClasses.body}`]: {
@@ -174,141 +179,61 @@ const CreateEvent = () => {
 
 const BotGatherings = () => {
   const theme = useTheme();
-  const [botActive, setBotActive] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const isDiscordVerified = useSelector(IsDiscordVerified);
+  const discordServerId = useSelector(DiscordServerId);
   const communityData = useSelector(CommunityData);
   const isExtraLarge = useMediaQuery(theme.breakpoints.up("xxl"));
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [open, setOpen] = useState(!isMobile);
   const [discordDialogOpen, setDiscordDialogOpen] = useState(false);
   const dispatch = useAppDispatch();
+
+  const [
+    activateDiscordBot,
+    {
+      data: activatingData,
+      isLoading: isActivatingBot,
+      isSuccess,
+      isError: activateIsError,
+      error: activateErrorData,
+      reset
+    }
+  ] = useActivateDiscordBotMutation();
+
   const {
-    data: guildId,
-    isLoading,
-    isFetching,
-    refetch
-  } = useGetGuildIdQuery(null, {
-    skip: isDiscordVerified === false
-  });
+    data: botActive,
+    refetch,
+    isError: checkIsError,
+    error: checkErrorData
+  } = useCheckBotActiveQuery(discordServerId, { skip: false });
 
   const {
     data: gatherings,
     isLoading: gatheringsLoading,
     isSuccess: gatheringsSuccess
-  } = useGetGatheringsQuery(guildId, {
-    // refetchOnMountOrArgChange: false,
-    skip: guildId === undefined || botActive === false
+  } = useGetGatheringsQuery(discordServerId, {
+    refetchOnMountOrArgChange: false,
+    skip: discordServerId === undefined || !botActive
   });
-
-  const [
-    activateDiscordBotPlugin,
-    { isLoading: isActivatingBotPlugin, isSuccess: activatedPluginSuccessfully }
-  ] = useActivateDiscordBotPluginMutation();
-
-  const drawerWidth = useMemo(() => {
-    return isExtraLarge ? 350 : 300;
-  }, [isExtraLarge]);
-
-  const toolbarHeight = useMemo(() => {
-    return isExtraLarge ? 92 : 72;
-  }, [isExtraLarge]);
-
-  const intervalRef = useRef<ReturnType<typeof setInterval>>();
-
-  const handleAddBot = async () => {
-    // await activateDiscordBotPlugin();
-    const apiUrl = `${environment.discordBotUrl}/guild`; // Replace with your API endpoint URL
-    console.log("communityData", communityData);
-    const roles = communityData?.properties.rolesSets[0].roles.map((role) => {
-      return { name: role.roleName, id: role.id };
-    });
-    const requestObject = {
-      daoAddress: communityData?.properties.address,
-      roles: roles,
-      guildId
-    };
-    try {
-      await axios.post(apiUrl, requestObject);
-
-      const discordBotLink =
-        "https://discord.com/api/oauth2/authorize?client_id=1129037421615529984&permissions=8&scope=bot%20applications.commands";
-      window.open(discordBotLink, "_blank");
-      setLoading(true);
-      intervalRef.current = setInterval(async () => {
-        const botActiveRequest = await axios.get(
-          `${environment.discordBotUrl}/check/${guildId}`
-        );
-        const botActive = botActiveRequest.data.active;
-        if (botActive) {
-          setLoading(false);
-          setBotActive(botActive);
-          clearInterval(intervalRef.current);
-        }
-      }, 2000);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  // useEffect(() => {
-  //   const activate = async () => {
-  //     // await activateDiscordBotPlugin();
-  //     const apiUrl = `${environment.discordBotUrl}/guild`; // Replace with your API endpoint URL
-  //     console.log("communityData", communityData);
-  //     const roles = communityData?.properties.rolesSets[0].roles.map((role) => {
-  //       return { name: role.roleName, id: role.id };
-  //     });
-  //     const requestObject = {
-  //       daoAddress: communityData?.properties.address,
-  //       roles: roles,
-  //       guildId
-  //     };
-  //     try {
-  //       await axios.post(apiUrl, requestObject);
-
-  //       const discordBotLink =
-  //         "https://discord.com/api/oauth2/authorize?client_id=1129037421615529984&permissions=8&scope=bot%20applications.commands";
-  //       window.open(discordBotLink, "_blank");
-  //       setLoading(true);
-  //       intervalRef.current = setInterval(async () => {
-  //         const botActiveRequest = await axios.get(
-  //           `${environment.discordBotUrl}/check/${guildId}`
-  //         );
-  //         const botActive = botActiveRequest.data.active;
-  //         if (botActive) {
-  //           setLoading(false);
-  //           setBotActive(botActive);
-  //           clearInterval(intervalRef.current);
-  //         }
-  //       }, 2000);
-  //     } catch (e) {
-  //       console.log(e);
-  //     }
-  //   };
-  //   if (activatedPluginSuccessfully) activate();
-  // }, [activatedPluginSuccessfully]);
 
   const gatheringsList = useMemo(() => {
     if (gatheringsSuccess) return gatherings;
     return null;
   }, [gatheringsSuccess]);
 
-  useEffect(() => {
-    const fetch = async () => {
-      if (guildId) {
-        const botActiveRequest = await axios.get(
-          `${environment.discordBotUrl}/check/${guildId}`
-        );
-        const botActive = botActiveRequest.data.active;
-        setBotActive(botActive);
-      }
-      setLoading(false);
-    };
+  const handleRetry = () => {
+    reset();
+    refetch();
+  };
 
-    fetch();
-  }, [guildId]);
+  useEffect(() => {
+    if (activateErrorData || checkErrorData) {
+      setOpen(true);
+    }
+  }, [activateErrorData, checkErrorData]);
+
   return (
     <Container maxWidth="md">
       {/* <LoadingDialog open={false} message="Updating admins..." />
@@ -322,105 +247,151 @@ const BotGatherings = () => {
         open={discordDialogOpen}
         handleClose={() => setDiscordDialogOpen(false)}
       ></DiscordServerVerificationPopup>
-      <Typography mt={7} textAlign="center" color="white" variant="h3">
-        Āut Bot
-      </Typography>
 
-      {loading || isActivatingBotPlugin ? (
-        <>
-          {" "}
-          <CircularProgress
-            className="spinner-center"
-            size="60px"
-            style={{ top: "calc(50% - 30px)" }}
-          />{" "}
-        </>
+      <Stack alignItems="center" justifyContent="center">
+        <Button
+          startIcon={<ArrowBackIcon />}
+          color="offWhite"
+          onClick={() => navigate(-1)}
+          sx={{
+            position: {
+              sm: "absolute"
+            },
+            left: {
+              sm: "0"
+            }
+          }}
+        >
+          Back
+        </Button>
+
+        <Typography mt={7} textAlign="center" color="white" variant="h3">
+          Āut Bot Gatherings
+        </Typography>
+      </Stack>
+      {activateErrorData || checkErrorData ? (
+        <BotErrorPage
+          refetch={() => handleRetry()}
+          errorMessage={
+            activateErrorData
+              ? activateErrorData.message
+              : checkErrorData.message
+          }
+        />
       ) : (
         <>
-          {!isDiscordVerified ? (
-            <Stack
-              sx={{
-                margin: "0 auto",
-                width: {
-                  xs: "100%",
-                  sm: "400px",
-                  xxl: "500px"
-                }
-              }}
-            >
-              <Typography
-                className="text-secondary"
-                mx="auto"
-                my={2}
-                textAlign="center"
-                color="white"
-                variant="body1"
-              >
-                Please verify the discord account for your community to unlock
-                Āut Bot features.
-              </Typography>
-              <Button
-                sx={{
-                  textTransform: "uppercase"
-                }}
-                onClick={() => setDiscordDialogOpen(true)}
-                type="button"
-                variant="outlined"
-                size="medium"
-                color="offWhite"
-              >
-                Connect your discord
-              </Button>
-            </Stack>
-          ) : botActive ? (
+          {gatheringsLoading || isActivatingBot || botActive === undefined ? (
             <>
-              <AutTabs
-                // tabStyles={{
-                //   border: "2px solid #439EDD"
-                // }}
-                tabs={[
-                  {
-                    label: "Gatherings",
-                    component: GatheringsList,
-                    props: { gatheringsList }
-                  }
-                ]}
-                staticTab={{
-                  label: "Create Event",
-                  component: CreateEvent,
-                  props: null
-                }}
+              <CircularProgress
+                className="spinner-center"
+                size="60px"
+                style={{ top: "calc(50% - 30px)" }}
               />
             </>
           ) : (
             <>
-              <Stack alignItems="center" justifyContent="center">
-                <Typography
-                  mt={7}
-                  textAlign="center"
-                  color="white"
-                  variant="body"
-                  maxWidth={400}
-                >
-                  Connect your Discord Members to your DAO Roles - directly
-                  on-chain. Create Group Gatherings and Voting Routines to turn
-                  your community into a healthy collaboration engine!
-                </Typography>
-                <Button
+              {!isDiscordVerified ? (
+                <Stack
                   sx={{
-                    my: "40px"
+                    margin: "0 auto",
+                    width: {
+                      xs: "100%",
+                      sm: "400px",
+                      xxl: "500px"
+                    }
                   }}
-                  variant="outlined"
-                  onClick={handleAddBot}
-                  // to={
-                  //   "https://discord.com/api/oauth2/authorize?client_id=1129037421615529984&permissions=8&scope=bot%20applications.commands"
-                  // }
-                  size="small"
-                  color="offWhite"
                 >
-                  Add bot
-                </Button>
-              </Stack>
+                  <Typography
+                    className="text-secondary"
+                    mx="auto"
+                    my={2}
+                    textAlign="center"
+                    color="white"
+                    variant="body1"
+                  >
+                    Please verify the discord account for your community to
+                    unlock Āut Bot features.
+                  </Typography>
+                  <Button
+                    sx={{
+                      textTransform: "uppercase"
+                    }}
+                    onClick={() => setDiscordDialogOpen(true)}
+                    type="button"
+                    variant="outlined"
+                    size="medium"
+                    color="offWhite"
+                  >
+                    Connect your discord
+                  </Button>
+                </Stack>
+              ) : botActive ? (
+                <>
+                  {(() => {
+                    {
+                      console.log(botActive);
+                      debugger;
+                    }
+                  })()}
+                  <AutTabs
+                    // tabStyles={{
+                    //   border: "2px solid #439EDD"
+                    // }}
+                    tabs={[
+                      {
+                        label: "Gatherings",
+                        component: GatheringsList,
+                        props: { gatheringsList }
+                      }
+                    ]}
+                    staticTab={{
+                      label: "Create Gathering",
+                      component: CreateEvent,
+                      props: {
+                        onClick: () => {
+                          navigate(`/${communityData.name}/bot/gathering`);
+                        }
+                      }
+                    }}
+                  />
+                </>
+              ) : (
+                <>
+                  {(() => {
+                    {
+                      console.log(botActive);
+                      debugger;
+                    }
+                  })()}
+                  <Stack alignItems="center" justifyContent="center">
+                    <Typography
+                      mt={7}
+                      textAlign="center"
+                      color="white"
+                      variant="body"
+                      maxWidth={400}
+                    >
+                      Connect your Discord Members to your DAO Roles - directly
+                      on-chain. Create Group Gatherings and Voting Routines to
+                      turn your community into a healthy collaboration engine!
+                    </Typography>
+                    <Button
+                      sx={{
+                        my: "40px"
+                      }}
+                      variant="outlined"
+                      onClick={() => activateDiscordBot(null)}
+                      // to={
+                      //   "https://discord.com/api/oauth2/authorize?client_id=1129037421615529984&permissions=8&scope=bot%20applications.commands"
+                      // }
+                      size="small"
+                      color="offWhite"
+                    >
+                      Add bot
+                    </Button>
+                  </Stack>
+                </>
+              )}
             </>
           )}
         </>

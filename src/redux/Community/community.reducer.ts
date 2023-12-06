@@ -137,6 +137,15 @@ export const DiscordLink = createSelector(
   }
 );
 
+export const DiscordServerId = createSelector(
+  [CommunityData, IsDiscordVerified],
+  (c, isVerified) => {
+    if (!isVerified) return "";
+    return c.properties.socials.find((s) => s.type === "discord")?.metadata
+      ?.serverId;
+  }
+);
+
 export const allRoles = createSelector(CommunityData, (c) => {
   return c.properties?.rolesSets[0]?.roles || [];
 });

@@ -89,7 +89,6 @@ const CreatePollParticipantsStep = () => {
       options,
       emojis
     };
-    debugger;
     await dispatch(pollUpdateData(values));
     await createPoll(metadata);
     // const result = await dispatch(addPoll(metadata));
@@ -99,7 +98,6 @@ const CreatePollParticipantsStep = () => {
   };
 
   useEffect(() => {
-    debugger;
     if (isSuccess) navigate(`/${communityData.name}/bot/poll/success`);
   }, [isSuccess]);
 

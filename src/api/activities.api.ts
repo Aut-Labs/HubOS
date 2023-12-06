@@ -363,7 +363,7 @@ export const addGroupCall = callThunkProvider(
 
 export const publishPoll = (poll) => {
   return axios
-    .post(`${environment.discordBotUrl}/poll`, poll)
+    .post(`${environment.discordBotUrl}/polls`, poll)
     .then((res) => res);
 };
 
@@ -379,7 +379,6 @@ export const addPoll = pollsThunkProvider(
       callData;
     const communities = state.community.communities as Community[];
     const communityAddress = state.community.selectedCommunityAddress as string;
-    debugger;
     // const community = communities.find(
     //   (c) => c.properties.address === communityAddress
     // );

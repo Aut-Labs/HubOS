@@ -31,9 +31,9 @@
     ]
   },
   "dependencies": {
-    "@aut-labs/abi-types": "^0.0.60-dev",
+    "@aut-labs/abi-types": "^0.0.62-dev",
     "@aut-labs/d-aut": "^1.0.102-dev",
-    "@aut-labs/sdk": "^0.0.103-dev",
+    "@aut-labs/sdk": "^0.0.104-dev",
     "@emoji-mart/data": "^1.1.2",
     "@emoji-mart/react": "^1.1.1",
     "@emotion/react": "^11.10.5",

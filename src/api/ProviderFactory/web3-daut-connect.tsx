@@ -108,7 +108,6 @@ function Web3DautConnect({
         selectedNetwork: network
       };
       await dispatch(updateWalletProviderState(itemsToUpdate));
-
       await dispatch(
         communityUpdateState({
           communities: autID.properties.communities,
@@ -189,7 +188,7 @@ function Web3DautConnect({
 
   return (
     <>
-      {/* <d-aut
+      <d-aut
         style={{
           display: "none",
           position: "absolute",
@@ -199,21 +198,21 @@ function Web3DautConnect({
         use-dev={environment.env == EnvMode.Development}
         menu-items='[{"name":"Profile","actionType":"event_emit","eventName":"aut_profile"}]'
         flow-config='{"mode" : "dashboard", "customCongratsMessage": ""}'
-        ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
+        ipfs-gateway="https://dweb.link/ipfs"
         button-type="simple"
-      /> */}
-      <d-aut
+      />
+      {/* <d-aut
         style={{
           position: "absolute",
           zIndex: 99999
         }}
         use-dev={environment.env == EnvMode.Development}
         flow-config='{"mode" : "tryAut", "customCongratsMessage": ""}'
-        nova-address={"0xb7947C6F1674129A383639e3977DDFE5189C66DF"}
+        nova-address={"0x059EC9BFdA7A5DA9eC1041B4b2fadedEbE2A3bE8"}
         id="d-aut"
         ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
         button-type="simple"
-      />
+      /> */}
     </>
   );
 }
