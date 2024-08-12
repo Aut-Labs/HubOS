@@ -39,8 +39,8 @@ import { useSelector } from "react-redux";
 import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CopyAddress from "@components/CopyAddress";
-import differenceInDays from "date-fns/differenceInDays";
 import { useAccount } from "wagmi";
+import { differenceInDays } from "date-fns";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {

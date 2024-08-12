@@ -17,10 +17,14 @@ export const swEnvVariables = {
   autIDAddress: "REACT_APP_AUT_ID_ADDRESS",
   // Networks
   networkEnv: "REACT_APP_NETWORK_ENV",
+  graphApiUrl: "REACT_APP_GRAPH_API_URL",
 
-  // NFT storage
-  nftStorageKey: "REACT_APP_NFT_STORAGE_KEY",
-  nftStorageUrl: "REACT_APP_IPFS_URL",
+  // IPFS storage
+  ipfsApiKey: "REACT_APP_IPFS_API_KEY",
+  ipfsApiSecret: "REACT_APP_IPFS_API_SECRET",
+  ipfsGatewayUrl: "REACT_APP_IPFS_GATEWAY_URL",
+
+  defaultChainId: "REACT_APP_DEFAULT_CHAIN_ID",
 
   // discord
   discordClientId: "REACT_APP_DISCORD_CLIENT_ID",

@@ -23,7 +23,7 @@ import {
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
 import { useNavigation } from "react-router-dom";
-import format from "date-fns/format";
+import { format } from "date-fns";
 
 const StepWrapper = styled("form")({
   textAlign: "center",

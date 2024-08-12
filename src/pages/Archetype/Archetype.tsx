@@ -31,8 +31,10 @@ import {
 } from "@api/community.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
-import { NovaArchetypeParameters } from "@aut-labs/sdk/dist/models/dao";
-import { NovaArchetype } from "@aut-labs/sdk/dist/models/nova";
+import {
+  NovaArchetype,
+  NovaArchetypeParameters
+} from "@aut-labs/sdk/dist/models/nova";
 import { calculateAV } from "@utils/av-calculator";
 
 const GridCard = styled(Card)(({ theme }) => {

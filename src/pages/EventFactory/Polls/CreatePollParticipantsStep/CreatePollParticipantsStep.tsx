@@ -15,7 +15,7 @@ import { useSelector } from "react-redux";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { ResultState } from "@store/result-status";
-import { addPoll } from "@api/activities.api";
+// import { addPoll } from "@api/activities.api";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
 import { allRoles } from "@store/Community/community.reducer";
@@ -70,10 +70,10 @@ const CreatePollParticipantsStep = () => {
     };
 
     await dispatch(pollUpdateData(values));
-    const result = await dispatch(addPoll(metadata));
-    if (result.meta.requestStatus === "fulfilled") {
-      // navigation.push("/aut-dashboard/event-factory/polls/success");
-    }
+    // const result = await dispatch(addPoll(metadata));
+    // if (result.meta.requestStatus === "fulfilled") {
+    //   // navigation.push("/aut-dashboard/event-factory/polls/success");
+    // }
   };
 
   useEffect(() => {

@@ -17,14 +17,13 @@ import {
 } from "./ProviderFactory/deploy-activities";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
 import { Community } from "./community.model";
-import {
-  AsyncThunkConfig,
-  GetThunkAPI
-} from "./ProviderFactory/web3.thunk.type";
+// import {
+//   AsyncThunkConfig,
+//   GetThunkAPI
+// } from "./ProviderFactory/web3.thunk.type";
 import { DiscordMessage } from "./discord.api";
 import { environment } from "./environment";
-import addMinutes from "date-fns/addMinutes";
-import set from "date-fns/set";
+import { addMinutes, set } from "date-fns";
 
 const callThunkProvider = Web3ThunkProviderFactory("Call", {
   provider: null
@@ -38,10 +37,7 @@ const pollsThunkProvider = Web3ThunkProviderFactory("Poll", {
   provider: null
 });
 
-const contractAddress = async (
-  thunkAPI: GetThunkAPI<AsyncThunkConfig>,
-  type: ActivityTypes
-) => {
+const contractAddress = async (thunkAPI: any, type: ActivityTypes) => {
   const state = thunkAPI.getState();
   const communityAddress = state.community.selectedCommunityAddress;
   // const contract = await Web3CommunityExtensionProvider(communityAddress);
@@ -440,10 +436,9 @@ export const getAllTasks = taskThunkProvider(
   {
     type: "aut-dashboard/activities/tasks/getall"
   },
-  (thunkAPI: GetThunkAPI<AsyncThunkConfig>) =>
-    contractAddress(thunkAPI, ActivityTypes.Tasks),
+  (thunkAPI: any) => contractAddress(thunkAPI, ActivityTypes.Tasks),
   async (contract, type: ActivityTypes) => {
-    if (contract.contract.address === ethers.constants.AddressZero) {
+    if (contract.contract.address === ethers.ZeroAddress) {
       return [];
     }
     // const activityIds = await contract.getActivitiesByType(type);

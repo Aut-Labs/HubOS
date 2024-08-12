@@ -1,4 +1,4 @@
-import { addActivityTask } from "@api/activities.api";
+// import { addActivityTask } from "@api/activities.api";
 import { createSlice } from "@reduxjs/toolkit";
 import { CurrentStep } from "@store/model";
 import { ResultState } from "@store/result-status";
@@ -48,16 +48,16 @@ export const taskSlice = createSlice({
     resetActivityTaskState: () => initialState
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(addActivityTask.pending, (state) => {
-        state.status = ResultState.Updating;
-      })
-      .addCase(addActivityTask.fulfilled, (state) => {
-        state.status = ResultState.Idle;
-      })
-      .addCase(addActivityTask.rejected, (state) => {
-        state.status = ResultState.Failed;
-      });
+    // builder
+    //   .addCase(addActivityTask.pending, (state) => {
+    //     state.status = ResultState.Updating;
+    //   })
+    //   .addCase(addActivityTask.fulfilled, (state) => {
+    //     state.status = ResultState.Idle;
+    //   })
+    //   .addCase(addActivityTask.rejected, (state) => {
+    //     state.status = ResultState.Failed;
+    //   });
   }
 });
 

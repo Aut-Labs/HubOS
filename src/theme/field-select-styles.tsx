@@ -25,7 +25,7 @@ const SelectWrapper = styled("div")({
   }
 });
 
-interface AutSelectProps extends Partial<SelectProps> {
+interface AutSelectProps extends Partial<SelectProps & any> {
   helperText?: JSX.Element;
 }
 
@@ -42,7 +42,7 @@ export const AutSelectField = ({
   sx,
   className,
   ...props
-}: AutSelectProps) => {
+}: AutSelectProps & any) => {
   const theme = useTheme();
   return (
     <SelectWrapper sx={sx}>
@@ -117,8 +117,8 @@ export default (theme: Theme) =>
         }, {})
       }
     } as ComponentsOverrides<Theme>["MuiSelect"]
-  } as {
+  }) as {
     defaultProps?: ComponentsProps["MuiSelect"];
     styleOverrides?: ComponentsOverrides<Theme>["MuiSelect"];
     variants?: ComponentsVariants["MuiSelect"];
-  });
+  };

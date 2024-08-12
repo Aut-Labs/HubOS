@@ -5,10 +5,11 @@ import { environment } from "./environment";
 import { NetworkConfig } from "./ProviderFactory/network.config";
 
 const fetch = async (body: any, api: BaseQueryApi) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance(true);
   const state = api.getState() as any;
   const { selectedCommunityAddress } = state.community;
 
+  // @ts-ignore
   const response = await sdk.pluginRegistry.getAllPluginDefinitionsByDAO(
     selectedCommunityAddress
   );
@@ -23,7 +24,7 @@ const fetch = async (body: any, api: BaseQueryApi) => {
         ...def,
         metadata: await fetchMetadata<typeof def.metadata>(
           def.metadataURI,
-          environment.nftStorageUrl
+          environment.ipfsGatewayUrl
         )
       };
 
@@ -51,7 +52,7 @@ const fetch = async (body: any, api: BaseQueryApi) => {
 };
 
 const add = async (body: PluginDefinition, api: BaseQueryApi) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   const state = api.getState() as any;
   const { selectedCommunityAddress } = state.community;
   const { selectedNetwork } = state.walletProvider;
@@ -67,6 +68,7 @@ const add = async (body: PluginDefinition, api: BaseQueryApi) => {
 
   const { pluginDefinitionId } = body;
 
+  // @ts-ignore
   const response = await sdk.pluginRegistry.addPluginToDAO(
     pluginDefinitionId,
     selectedCommunityAddress,

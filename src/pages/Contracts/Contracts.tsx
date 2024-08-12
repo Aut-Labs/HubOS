@@ -122,25 +122,35 @@ const tableColumns = (
               className="textPrimary"
               onClick={handleDeleteClick(id)}
               color="inherit"
+              placeholder=""
+              onPointerEnterCapture={null}
+              onPointerLeaveCapture={null}
+              showInMenu={true}
             />,
             <GridActionsCellItem
               icon={<SaveIcon />}
               label="Save"
               onClick={handleSaveClick(id)}
               color="primary"
+              placeholder=""
+              onPointerEnterCapture={null}
+              onPointerLeaveCapture={null}
+              showInMenu={true}
             />
           ];
         }
 
-        return [
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Edit"
-            className="textPrimary"
-            onClick={handleEditClick(id)}
-            color="inherit"
-          />
-        ];
+        <GridActionsCellItem
+          icon={<EditIcon />}
+          label="Edit"
+          className="textPrimary"
+          onClick={handleEditClick(id)}
+          color="inherit"
+          placeholder=""
+          onPointerEnterCapture={null}
+          onPointerLeaveCapture={null}
+          showInMenu={true}
+        />;
       }
     }
   ];

@@ -1,32 +1,39 @@
 const path = require("path");
 const { alias } = require("react-app-rewire-alias");
 const webpack = require("webpack");
-// const rewireBundleAnalyzer = require("react-app-rewire-bundle-analyzer");
 
 module.exports = {
-  webpack: (config, env) => {
-    // config = rewireBundleAnalyzer(config, env);
-    config.ignoreWarnings = [/Failed to parse source map/];
-
+  webpack: (config) => {
     const fallback = config.resolve.fallback || {};
     Object.assign(fallback, {
+      crypto: false,
       stream: false,
       assert: false,
+      http: false,
       https: false,
-      util: path.resolve(__dirname, "node_modules/util"),
       os: false,
       url: false,
-      http: false
+      zlib: false
     });
+    config.resolve.fallback = fallback;
     config.plugins = (config.plugins || []).concat([
-      // new BundleAnalyzerPlugin(),
       new webpack.ProvidePlugin({
+        process: "process/browser",
         Buffer: ["buffer", "Buffer"]
       })
     ]);
-    config.resolve.fallback = fallback;
+    config.ignoreWarnings = [/Failed to parse source map/];
+    config.module.rules.push({
+      test: /\.(js|mjs|jsx)$/,
+      enforce: "pre",
+      loader: require.resolve("source-map-loader"),
+      resolve: {
+        fullySpecified: false
+      }
+    });
 
     const modifiedConfig = alias({
+      react: path.resolve("./node_modules/react"),
       "@assets": path.resolve(__dirname, "./src/assets"),
       "@auth": path.resolve(__dirname, "./src/auth"),
       "@api": path.resolve(__dirname, "./src/api"),

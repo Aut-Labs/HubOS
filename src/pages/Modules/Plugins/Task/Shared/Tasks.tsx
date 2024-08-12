@@ -29,10 +29,10 @@ import {
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import AddIcon from "@mui/icons-material/Add";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import differenceInDays from "date-fns/differenceInDays";
 import { CommunityData } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
 import { useAccount } from "wagmi";
+import { differenceInDays } from "date-fns";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {

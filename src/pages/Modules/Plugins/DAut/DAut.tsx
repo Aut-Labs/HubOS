@@ -107,12 +107,20 @@ const tableColumns = (
               className="textPrimary"
               onClick={handleCancelClick(id)}
               color="inherit"
+              placeholder=""
+              onPointerEnterCapture={null}
+              onPointerLeaveCapture={null}
+              showInMenu={true}
             />,
             <GridActionsCellItem
               icon={<SaveIcon />}
               label="Save"
               onClick={handleSaveClick(id)}
               color="primary"
+              placeholder=""
+              onPointerEnterCapture={null}
+              onPointerLeaveCapture={null}
+              showInMenu={true}
             />
           ];
         }
@@ -124,6 +132,10 @@ const tableColumns = (
             className="textPrimary"
             onClick={handleEditClick(id)}
             color="secondary"
+            placeholder=""
+            onPointerEnterCapture={null}
+            onPointerLeaveCapture={null}
+            showInMenu={true}
           />,
           <GridActionsCellItem
             icon={<CancelIcon />}
@@ -131,6 +143,10 @@ const tableColumns = (
             className="textPrimary"
             onClick={handleDeleteClick(id)}
             color="inherit"
+            placeholder=""
+            onPointerEnterCapture={null}
+            onPointerLeaveCapture={null}
+            showInMenu={true}
           />
         ];
       }

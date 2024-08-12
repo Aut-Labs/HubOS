@@ -30,9 +30,7 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { autUrls } from "@api/environment";
-import isAfter from "date-fns/isAfter";
-import addDays from "date-fns/addDays";
-import format from "date-fns/format";
+import { addDays, format, isAfter } from "date-fns";
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
@@ -184,6 +182,7 @@ export const QuestListItem = memo(
                 }
               >
                 <Tooltip title="View quest">
+                  {/* @ts-ignore */}
                   <BtnLink
                     component="button"
                     color="primary"
@@ -248,6 +247,7 @@ export const QuestListItem = memo(
         {isAdmin && (
           <QuestStyledTableCell align="right">
             <Tooltip title="View quest">
+              {/* @ts-ignore */}
               <BtnLink
                 component="button"
                 color="primary"

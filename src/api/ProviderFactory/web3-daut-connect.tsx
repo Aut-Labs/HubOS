@@ -1,39 +1,49 @@
 import { memo, useEffect, useLayoutEffect, useRef } from "react";
 import { useAppDispatch } from "@store/store.model";
-import { setAuthenticated } from "@auth/auth.reducer";
 import { AutID } from "@api/aut.model";
 import { Init } from "@aut-labs/d-aut";
-import { communityUpdateState } from "@store/Community/community.reducer";
+import { useSelector } from "react-redux";
 import {
   NetworksConfig,
   updateWalletProviderState
 } from "@store/WalletProvider/WalletProvider";
-import { useSelector } from "react-redux";
-import AutSDK from "@aut-labs/sdk";
-import { NetworkConfig } from "./network.config";
 import { debounce } from "@mui/material";
-import { AUTH_TOKEN_KEY } from "@api/auth.api";
-import { resetState } from "@store/store";
-import { CacheTypes, getCache } from "@api/cache.api";
-import { autUrls } from "@api/environment";
-import { EnvMode, environment } from "@api/environment";
-import { WalletClient, useAccount, useConnect, useDisconnect } from "wagmi";
-import { useEthersSigner, walletClientToSigner } from "./ethers";
+import { EnvMode, autUrls, environment } from "@api/environment";
+import { useConnect } from "wagmi";
+import AutSDK from "@aut-labs/sdk";
 import { MultiSigner } from "@aut-labs/sdk/dist/models/models";
+import { NetworkConfig } from "./network.config";
+import { useAutConnector } from "@aut-labs/connector";
+import { communityUpdateState } from "@store/Community/community.reducer";
+import { getCache, CacheTypes } from "@api/cache.api";
+import { setAuthenticated } from "@auth/auth.reducer";
+import { resetState } from "@store/store";
+import { AUTH_TOKEN_KEY } from "@api/auth.api";
 
 function Web3DautConnect({
   setLoading
 }: {
   setLoading: (loading: boolean) => void;
-  config: any;
 }) {
   const dispatch = useAppDispatch();
-  const abort = useRef<AbortController>();
   const networks = useSelector(NetworksConfig);
-  const { connector, isConnected } = useAccount();
-  const { connectAsync, connectors } = useConnect();
-  const { disconnectAsync } = useDisconnect();
-  const multiSigner = useEthersSigner();
+  const dAutInitialized = useRef<boolean>(false);
+  const { connectors } = useConnect();
+
+  const {
+    isConnected,
+    isConnecting,
+    connect,
+    disconnect,
+    setStateChangeCallback,
+    multiSigner,
+    multiSignerId,
+    chainId,
+    status,
+    address
+  } = useAutConnector({
+    defaultChainId: +environment.defaultChainId
+  });
 
   const onAutInit = async () => {
     const connetectedAlready = localStorage.getItem("aut-data");
@@ -42,70 +52,32 @@ function Web3DautConnect({
     }
   };
 
-  const initialiseSDK = async (
-    network: NetworkConfig,
-    multiSigner: MultiSigner
-  ) => {
-    const sdk = AutSDK.getInstance();
-    return sdk.init(multiSigner, {
-      daoTypesAddress: network.contracts.daoTypesAddress,
-      novaRegistryAddress: network.contracts.novaRegistryAddress,
-      autIDAddress: network.contracts.autIDAddress,
-      pluginRegistryAddress: network.contracts.pluginRegistryAddress,
-      moduleRegistryAddress: network.contracts.moduleRegistryAddress,
-      allowListAddress: network.contracts.allowListAddress,
-      localReputationAddress: network.contracts.localReputationAddress
-    });
-  };
-
-  useEffect(() => {
-    if (connector?.ready && isConnected && multiSigner) {
-      const start = async () => {
-        const [network] = networks.filter((d) => !d.disabled);
-        const itemsToUpdate = {
-          sdkInitialized: true,
-          selectedNetwork: network
-          // signer: multiSigner
-        };
-        await initialiseSDK(network, multiSigner);
-        await dispatch(updateWalletProviderState(itemsToUpdate));
-      };
-      start();
-    }
-  }, [isConnected, connector?.ready, multiSigner]);
-
-  const onAutLogin = async ({ detail }: any) => {
-    const profile = JSON.parse(JSON.stringify(detail));
+  const _parseAutId = async (profile: any): Promise<AutID> => {
     const autID = new AutID(profile);
     autID.properties.communities = autID.properties.communities.filter((c) => {
       return c.properties.userData?.isActive;
     });
+    autID.properties.network =
+      profile.properties.network?.network?.toLowerCase();
 
-    autID.properties.address = profile.address;
-    autID.properties.network = profile.network?.network?.toLowerCase();
+    return autID;
+  };
 
-    if (profile.network) {
-      const walletName = localStorage.getItem("wagmi.wallet").replace(/"/g, "");
-      const [network] = networks.filter((d) => !d.disabled);
-      if (walletName) {
-        const c = connectors.find((c) => c.id === walletName);
-        if (c && !isConnected) {
-          const client = await connectAsync({
-            connector: c,
-            chainId: c.chains[0].id
-          });
+  const onAutLogin = async ({ detail }: any) => {
+    const profile = JSON.parse(JSON.stringify(detail));
+    const autID = await _parseAutId(profile);
 
-          client["transport"] = client["provider"];
-          const temp_signer = walletClientToSigner(
-            client as unknown as WalletClient
-          );
-          await initialiseSDK(network, temp_signer);
-        }
-      }
+    // autID.properties.address = profile.address;
+    // autID.properties.network = profile.network?.network?.toLowerCase();
 
+    if (autID.properties.network) {
+      const selectedNetwork = networks.find(
+        (d) =>
+          d.network.toLowerCase() === autID.properties.network.toLowerCase()
+      );
       const itemsToUpdate = {
         sdkInitialized: true,
-        selectedNetwork: network
+        selectedNetwork
       };
       await dispatch(updateWalletProviderState(itemsToUpdate));
 
@@ -117,75 +89,129 @@ function Web3DautConnect({
         })
       );
 
-      const cache = await getCache(
-        CacheTypes.UserPhases,
-        autID.properties.address
-      );
+      // const cache = await getCache(
+      //   CacheTypes.UserPhases,
+      //   autID.properties.address
+      // );
       await dispatch(
         setAuthenticated({
-          cache,
+          // cache,
           isAuthenticated: true,
           userInfo: autID
         })
       );
 
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
+      setLoading(false);
     }
   };
 
   const onDisconnected = async () => {
-    await disconnectAsync();
     dispatch(resetState);
     localStorage.removeItem(AUTH_TOKEN_KEY);
   };
 
-  const onAutMenuProfile = () => {
+  const onAutMenuProfile = async () => {
     const urls = autUrls();
     const profile = JSON.parse(localStorage.getItem("aut-data"));
     window.open(`${urls.myAut}${profile.name}`, "_blank");
   };
 
-  useEffect(() => {
-    window.addEventListener("aut_profile", onAutMenuProfile);
-    window.addEventListener("aut-Init", onAutInit);
-    window.addEventListener("aut-onConnected", onAutLogin);
-    window.addEventListener("aut-onDisconnected", onDisconnected);
-
-    const config: any = {
-      defaultText: "Connect Wallet",
-      textAlignment: "right",
-      menuTextAlignment: "left",
-      theme: {
-        color: "offWhite",
-        // color: 'nightBlack',
-        // color: colors.amber['500'],
-        // color: '#7b1fa2',
-        type: "main"
-      },
-      // size: "default" // large & extraLarge or see below
-      size: {
-        width: 240,
-        height: 50,
-        padding: 3
-      }
+  const initialiseSDK = async (
+    network: NetworkConfig,
+    multiSigner: MultiSigner
+  ) => {
+    const sdk = await AutSDK.getInstance(false);
+    const itemsToUpdate = {
+      selectedNetwork: network
     };
-
-    Init({
-      config
+    console.log("network", network);
+    await dispatch(updateWalletProviderState(itemsToUpdate));
+    await sdk.init(multiSigner, {
+      novaRegistryAddress: network.contracts.novaRegistryAddress,
+      autIDAddress: network.contracts.autIDAddress,
+      daoExpanderRegistryAddress: network.contracts.daoExpanderRegistryAddress
     });
+  };
+
+  useEffect(() => {
+    if (multiSignerId) {
+      let network = networks.find((d) => d.chainId === chainId);
+      if (!network) {
+        network = networks.filter((d) => !d.disabled)[0];
+      }
+      initialiseSDK(network, multiSigner);
+    }
+  }, [multiSignerId]);
+
+  useEffect(() => {
+    if (!dAutInitialized.current && multiSignerId) {
+      window.addEventListener("aut_profile", onAutMenuProfile);
+      window.addEventListener("aut-Init", onAutInit);
+      window.addEventListener("aut-onConnected", onAutLogin);
+      window.addEventListener("aut-onDisconnected", onDisconnected);
+      dAutInitialized.current = true;
+      const btnConfig = {
+        metaMask: true,
+        walletConnect: true,
+        coinbaseWalletSDK: true,
+        web3auth: true
+      };
+
+      const allowedConnectors = Object.keys(btnConfig)
+        .filter((connector) => btnConfig[connector])
+        .map((connector) => connectors.find((c) => c.id === connector));
+
+      console.log("multiSignerId", multiSignerId);
+      console.log("multiSigner", multiSigner);
+
+      const config = {
+        defaultText: "Connect Wallet",
+        textAlignment: "right",
+        menuTextAlignment: "left",
+        theme: {
+          color: "offWhite",
+          type: "main"
+        },
+        size: {
+          width: 240,
+          height: 50,
+          padding: 3
+        }
+      };
+      Init({
+        config,
+        envConfig: {
+          REACT_APP_API_URL: environment.apiUrl,
+          REACT_APP_GRAPH_API_URL: environment.graphApiUrl,
+          REACT_APP_IPFS_API_KEY: environment.ipfsApiKey,
+          REACT_APP_IPFS_API_SECRET: environment.ipfsApiSecret,
+          REACT_APP_IPFS_GATEWAY_URL: environment.ipfsGatewayUrl
+        },
+        connector: {
+          connect,
+          disconnect,
+          setStateChangeCallback,
+          connectors: allowedConnectors,
+          networks,
+          state: {
+            multiSignerId,
+            multiSigner,
+            isConnected,
+            isConnecting,
+            status,
+            address
+          }
+        }
+      });
+    }
 
     return () => {
       window.removeEventListener("aut_profile", onAutMenuProfile);
       window.removeEventListener("aut-Init", onAutInit);
       window.removeEventListener("aut-onConnected", onAutLogin);
       window.removeEventListener("aut-onDisconnected", onAutLogin);
-      if (abort.current) {
-        abort.current.abort();
-      }
     };
-  }, []);
+  }, [dAutInitialized, multiSignerId]);
 
   return (
     <>
@@ -195,25 +221,12 @@ function Web3DautConnect({
           position: "absolute",
           zIndex: 99999
         }}
-        id="d-aut"
         use-dev={environment.env == EnvMode.Development}
+        id="d-aut"
         menu-items='[{"name":"Profile","actionType":"event_emit","eventName":"aut_profile"}]'
-        flow-config='{"mode" : "dashboard", "customCongratsMessage": ""}'
-        ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
-        button-type="simple"
+        flow-config='{"mode" : "signin", "customCongratsMessage": ""}'
+        ipfs-gateway={environment.ipfsGatewayUrl}
       />
-      {/* <d-aut
-        style={{
-          position: "absolute",
-          zIndex: 99999
-        }}
-        use-dev={environment.env == EnvMode.Development}
-        flow-config='{"mode" : "tryAut", "customCongratsMessage": ""}'
-        nova-address={"0xb7947C6F1674129A383639e3977DDFE5189C66DF"}
-        id="d-aut"
-        ipfs-gateway="https://ipfs.nftstorage.link/ipfs"
-        button-type="simple"
-      /> */}
     </>
   );
 }
@@ -223,6 +236,8 @@ export const DautPlaceholder = memo(() => {
   useLayoutEffect(() => {
     let dautEl: HTMLElement = document.querySelector("#d-aut");
     dautEl.style.display = "none";
+    dautEl.style.left = "0";
+    dautEl.style.top = "0";
     const updateDautPosition = () => {
       if (!dautEl) {
         dautEl = document.querySelector("#d-aut");
@@ -246,7 +261,7 @@ export const DautPlaceholder = memo(() => {
     <div
       ref={ref}
       style={{
-        width: "270px",
+        width: "244px",
         height: "55px",
         position: "relative",
         zIndex: -1
@@ -256,4 +271,4 @@ export const DautPlaceholder = memo(() => {
   );
 });
 
-export default memo(Web3DautConnect);
+export default Web3DautConnect;

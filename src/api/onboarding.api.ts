@@ -17,6 +17,7 @@ import {
 } from "./tasks.api";
 import { v4 as uuidv4 } from "uuid";
 import { getDAOProgress } from "./aut.api";
+// @ts-ignore
 
 const getOnboardingProgress = async (
   pluginAddress: string,
@@ -32,7 +33,7 @@ const getOnboardingProgress = async (
   const state = api.getState() as any;
   const { selectedCommunityAddress } = state.community;
   const { cache } = state.auth;
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   const cacheData: CacheModel = cache;
 
   const questOnboarding = sdk.initService<QuestOnboarding>(
@@ -41,8 +42,11 @@ const getOnboardingProgress = async (
   );
 
   const tasksAndSubmissionsResponse = await Promise.all([
+    // @ts-ignore
     questOnboarding.getAllTasksAndSubmissionsByQuest(1),
+    // @ts-ignore
     questOnboarding.getAllTasksAndSubmissionsByQuest(2),
+    // @ts-ignore
     questOnboarding.getAllTasksAndSubmissionsByQuest(3)
   ]);
 
@@ -57,18 +61,18 @@ const getOnboardingProgress = async (
       const submission = submissions[j];
       submission.submission = await fetchMetadata(
         submission.submitionUrl,
-        environment.nftStorageUrl
+        environment.ipfsGatewayUrl
       );
       submission.metadata = await fetchMetadata(
         submission.metadataUri,
-        environment.nftStorageUrl
+        environment.ipfsGatewayUrl
       );
     }
     for (let j = 0; j < tasks.length; j++) {
       const task = tasks[j];
       task.metadata = await fetchMetadata(
         task.metadataUri,
-        environment.nftStorageUrl
+        environment.ipfsGatewayUrl
       );
     }
     tasksAndSubmissions.push(tasksAndSubmissionsResponse[i].data);
@@ -106,7 +110,7 @@ const getAllOnboardingQuests = async (
   pluginAddress: any,
   api: BaseQueryApi
 ) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   if (!pluginAddress) {
     return {
       data: []
@@ -126,7 +130,7 @@ const getAllOnboardingQuests = async (
         ...def,
         metadata: await fetchMetadata<typeof def.metadata>(
           def.metadataUri,
-          environment.nftStorageUrl
+          environment.ipfsGatewayUrl
         )
       });
     }
@@ -147,7 +151,7 @@ const fetchQuestById = async (
   },
   api: BaseQueryApi
 ) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   const { questId, onboardingQuestAddress } = body;
 
   sdk.questOnboarding = sdk.initService<QuestOnboarding>(
@@ -160,7 +164,7 @@ const fetchQuestById = async (
   if (response?.isSuccess) {
     response.data.metadata = await fetchMetadata<typeof response.data.metadata>(
       response.data.metadataUri,
-      environment.nftStorageUrl
+      environment.ipfsGatewayUrl
     );
     return {
       data: response.data
@@ -175,13 +179,14 @@ const activateQuest = async (
   { questId, pluginAddress, userAddress },
   api: BaseQueryApi
 ) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   sdk.questOnboarding = sdk.initService<QuestOnboarding>(
     QuestOnboarding,
     pluginAddress
   );
 
   const questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  // @ts-ignore
   const response = await questOnboarding.activateQuest(questId);
 
   if (!response.isSuccess) {
@@ -206,13 +211,14 @@ const deactivateQuest = async (
   { questId, pluginAddress, userAddress },
   api: BaseQueryApi
 ) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   sdk.questOnboarding = sdk.initService<QuestOnboarding>(
     QuestOnboarding,
     pluginAddress
   );
 
   const questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  // @ts-ignore
   const response = await questOnboarding.deactivateQuest(questId);
 
   if (!response.isSuccess) {
@@ -237,7 +243,7 @@ const getAllTasksPerQuest = async (
   { pluginAddress, questId, isAdmin, userAddress },
   api: BaseQueryApi
 ) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   sdk.questOnboarding = sdk.initService<QuestOnboarding>(
     QuestOnboarding,
     pluginAddress
@@ -247,9 +253,8 @@ const getAllTasksPerQuest = async (
   let submissions: Task[] = [];
 
   if (isAdmin) {
-    const response = await sdk.questOnboarding.getAllTasksAndSubmissionsByQuest(
-      questId
-    );
+    const response =
+      await sdk.questOnboarding.getAllTasksAndSubmissionsByQuest(questId);
 
     tasks = response.data.tasks;
     submissions = response.data.submissions;
@@ -268,10 +273,13 @@ const getAllTasksPerQuest = async (
     const def = tasks[i];
     tasksWithMetadata.push({
       ...def,
-      metadata: await fetchMetadata(def.metadataUri, environment.nftStorageUrl),
+      metadata: await fetchMetadata(
+        def.metadataUri,
+        environment.ipfsGatewayUrl
+      ),
       submission: await fetchMetadata(
         def.submitionUrl,
-        environment.nftStorageUrl
+        environment.ipfsGatewayUrl
       )
     });
   }
@@ -279,10 +287,13 @@ const getAllTasksPerQuest = async (
     const def = submissions[i];
     submissionsWithMetadata.push({
       ...def,
-      metadata: await fetchMetadata(def.metadataUri, environment.nftStorageUrl),
+      metadata: await fetchMetadata(
+        def.metadataUri,
+        environment.ipfsGatewayUrl
+      ),
       submission: await fetchMetadata(
         def.submitionUrl,
-        environment.nftStorageUrl
+        environment.ipfsGatewayUrl
       )
     });
   }
@@ -295,7 +306,7 @@ const getAllTasksPerQuest = async (
 };
 
 const getAllTasks = async ({ isAdmin, userAddress }, api: BaseQueryApi) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   const state = api.getState() as any;
 
   const { data } =
@@ -316,53 +327,60 @@ const getAllTasks = async ({ isAdmin, userAddress }, api: BaseQueryApi) => {
 
   const taskOnboarding: TaskOnboarding = sdk.taskOnboarding;
 
-  let tasks: Task[] = [];
-  let submissions: Task[] = [];
+  // let tasks: Task[] = [];
+  // let submissions: Task[] = [];
 
-  if (isAdmin) {
-    const response = await taskOnboarding.getAllTasksAndSubmissions(
-      pluginAddresses
-    );
+  // if (isAdmin) {
+  //   // @ts-ignore
+  //   const response =
+  //     await taskOnboarding.getAllTasksAndSubmissions(pluginAddresses);
 
-    tasks = response.data.tasks;
-    submissions = response.data.submissions;
-  } else {
-    const response = await taskOnboarding.getAllTasks(
-      userAddress,
-      pluginAddresses
-    );
-    tasks = response.data;
-  }
+  //   tasks = response.data.tasks;
+  //   submissions = response.data.submissions;
+  // } else {
+  //   // @ts-ignore
+  //   const response = await taskOnboarding.getAllTasks(
+  //     userAddress,
+  //     pluginAddresses
+  //   );
+  //   tasks = response.data;
+  // }
 
-  const tasksWithMetadata: Task[] = [];
-  const submissionsWithMetadata: Task[] = [];
+  // const tasksWithMetadata: Task[] = [];
+  // const submissionsWithMetadata: Task[] = [];
 
-  for (let i = 0; i < tasks.length; i++) {
-    const def = tasks[i];
-    tasksWithMetadata.push({
-      ...def,
-      metadata: await fetchMetadata(def.metadataUri, environment.nftStorageUrl),
-      submission: await fetchMetadata(
-        def.submitionUrl,
-        environment.nftStorageUrl
-      )
-    });
-  }
-  for (let i = 0; i < submissions.length; i++) {
-    const def = submissions[i];
-    submissionsWithMetadata.push({
-      ...def,
-      metadata: await fetchMetadata(def.metadataUri, environment.nftStorageUrl),
-      submission: await fetchMetadata(
-        def.submitionUrl,
-        environment.nftStorageUrl
-      )
-    });
-  }
+  // for (let i = 0; i < tasks.length; i++) {
+  //   const def = tasks[i];
+  //   tasksWithMetadata.push({
+  //     ...def,
+  //     metadata: await fetchMetadata(
+  //       def.metadataUri,
+  //       environment.ipfsGatewayUrl
+  //     ),
+  //     submission: await fetchMetadata(
+  //       def.submitionUrl,
+  //       environment.ipfsGatewayUrl
+  //     )
+  //   });
+  // }
+  // for (let i = 0; i < submissions.length; i++) {
+  //   const def = submissions[i];
+  //   submissionsWithMetadata.push({
+  //     ...def,
+  //     metadata: await fetchMetadata(
+  //       def.metadataUri,
+  //       environment.ipfsGatewayUrl
+  //     ),
+  //     submission: await fetchMetadata(
+  //       def.submitionUrl,
+  //       environment.ipfsGatewayUrl
+  //     )
+  //   });
+  // }
   return {
     data: {
-      tasks: tasksWithMetadata,
-      submissions: submissionsWithMetadata
+      tasks: [],
+      submissions: []
     }
   };
 };
@@ -371,7 +389,7 @@ const createQuest = async (
   body: Quest & { pluginAddress: string },
   api: BaseQueryApi
 ) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   sdk.questOnboarding = sdk.initService<QuestOnboarding>(
     QuestOnboarding,
     body.pluginAddress
@@ -393,7 +411,7 @@ const updateQuest = async (
   body: Quest & { pluginAddress: string },
   api: BaseQueryApi
 ) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   sdk.questOnboarding = sdk.initService<QuestOnboarding>(
     QuestOnboarding,
     body.pluginAddress
@@ -420,7 +438,7 @@ const createTask = async (
   },
   api: BaseQueryApi
 ) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
 
   sdk.taskOnboarding = sdk.initService<TaskOnboarding>(
     TaskOnboarding,
@@ -429,6 +447,7 @@ const createTask = async (
 
   const taskOnboarding: TaskOnboarding = sdk.taskOnboarding;
 
+  // @ts-ignore
   const response = await taskOnboarding.createTask(
     body.task,
     body.pluginAddress,
@@ -456,7 +475,7 @@ const CreateQuizTask = async (
   },
   api: BaseQueryApi
 ) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   const taskOnboarding: TaskOnboarding = sdk.initService<TaskOnboarding>(
     TaskOnboarding,
     body.novaAddress
@@ -477,6 +496,7 @@ const CreateQuizTask = async (
   }
 
   body.task.metadata.properties["uuid"] = uuid;
+  // @ts-ignore
   const response = await taskOnboarding.createTask(
     body.task,
     body.pluginAddress,
@@ -516,7 +536,7 @@ const removeTaskFromQuest = async (
   },
   api: BaseQueryApi
 ) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   sdk.questOnboarding = sdk.initService<QuestOnboarding>(
     QuestOnboarding,
     body.onboardingQuestAddress
@@ -548,7 +568,7 @@ const removeTask = async (
   },
   api: BaseQueryApi
 ) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   sdk.taskOnboarding = sdk.initService<TaskOnboarding>(
     TaskOnboarding,
     body.novaAddress
@@ -583,7 +603,7 @@ const submitOpenTask = async (
   },
   api: BaseQueryApi
 ) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   sdk.questOnboarding = sdk.initService<QuestOnboarding>(
     QuestOnboarding,
     body.onboardingQuestAddress
@@ -640,7 +660,7 @@ const finaliseOpenTask = async (
   },
   api: BaseQueryApi
 ) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   sdk.taskOnboarding = sdk.initService<TaskOnboarding>(
     TaskOnboarding,
     body.pluginAddress
@@ -648,6 +668,7 @@ const finaliseOpenTask = async (
 
   const taskOnboarding: TaskOnboarding = sdk.taskOnboarding;
 
+  // @ts-ignore
   const response = await taskOnboarding.finalizeFor(
     body.task,
     body.pluginAddress,

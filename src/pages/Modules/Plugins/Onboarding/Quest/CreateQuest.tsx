@@ -33,17 +33,9 @@ import {
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { autUrls } from "@api/environment";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { getMemberPhases } from "@utils/beta-phases";
 import "./ScrollbarStyles.scss";
-
-import theme from "@theme/theme";
-import addMinutes from "date-fns/addMinutes";
-import addDays from "date-fns/addDays";
-import format from "date-fns/format";
+import { addMinutes, addDays, format } from "date-fns";
 
 const Strong = styled("strong")(({ theme }) => ({
   // color: theme.palette.primary.main
@@ -240,6 +232,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
   }, [formState]);
 
   return (
+    // @ts-ignore
     <Container
       sx={{ py: "20px", display: "flex", flexDirection: "column" }}
       maxWidth="lg"
@@ -496,6 +489,7 @@ const CreateQuest = ({ plugin }: PluginParams) => {
           you launched.
           <br />
           During the onboarding period, every community will be listed on the{" "}
+          {/* @ts-ignore */}
           <BtnLink
             component="a"
             type="button"

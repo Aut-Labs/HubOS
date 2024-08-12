@@ -258,7 +258,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                         }
                       }}
                       onChange={onChange}
-                      placeholder="Weight"
+                      // placeholder="Weight"
                       value={+(value || 0)}
                     />
                     <Box

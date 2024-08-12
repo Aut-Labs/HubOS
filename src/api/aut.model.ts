@@ -2,7 +2,7 @@ import { AutSocial, HolderData } from "./api.model";
 import { Community } from "./community.model";
 import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
 import { httpUrlToIpfsCID } from "./storage.api";
-import { Role } from "@aut-labs/sdk/dist/models/dao";
+import { Role } from "@aut-labs/sdk/dist/models/nova";
 import { CommitmentMessages } from "@utils/misc";
 
 export const socialUrls = {
@@ -11,23 +11,15 @@ export const socialUrls = {
     placeholder: "inviteLInk",
     prefix: ""
   },
-  github: {
-    prefix: "https://github.com/",
-    placeholder: ""
-  },
-  telegram: {
-    prefix: "https://t.me/",
+  ens: {
+    prefix: "",
     placeholder: ""
   },
   twitter: {
-    prefix: "https://twitter.com/",
+    prefix: "",
     placeholder: ""
   },
-  lensfrens: {
-    prefix: "https://www.lensfrens.xyz/",
-    placeholder: ""
-  },
-  website: {
+  github: {
     prefix: "",
     placeholder: ""
   }
@@ -36,23 +28,23 @@ export const socialUrls = {
 export const DefaultSocials: AutSocial[] = [
   {
     type: "discord",
-    link: ""
+    link: "",
+    metadata: {}
   },
   {
-    type: "github",
-    link: ""
+    type: "ens",
+    link: "",
+    metadata: {}
   },
   {
     type: "twitter",
-    link: ""
+    link: "",
+    metadata: {}
   },
   {
-    type: "telegram",
-    link: ""
-  },
-  {
-    type: "lensfrens",
-    link: ""
+    type: "github",
+    link: "",
+    metadata: {}
   }
 ];
 

@@ -1,4 +1,3 @@
-import { NovaArchetypeParameters } from "@aut-labs/sdk/dist/models/dao";
 import React, { useMemo, useState } from "react";
 import {
   PieChart,
@@ -13,7 +12,10 @@ import Growth from "@assets/archetypes/seed.png";
 import Performance from "@assets/archetypes/growth.png";
 import Reputation from "@assets/archetypes/reputation-management.png";
 import Conviction from "@assets/archetypes/deal.png";
-import { NovaArchetype } from "@aut-labs/sdk/dist/models/dao";
+import {
+  NovaArchetype,
+  NovaArchetypeParameters
+} from "@aut-labs/sdk/dist/models/nova";
 
 const nameShortcut = {
   Size: "S",
@@ -167,6 +169,8 @@ const ArchetypePieChart = ({
       return prev;
     }, []);
   }, [archetype]);
+
+  console.log(mappedData);
 
   const [activeIndex, setActiveIndex] = useState(0);
 

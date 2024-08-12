@@ -7,6 +7,7 @@ import {
 } from "@api/community.api";
 import { createSelector } from "reselect";
 import { Community } from "@api/community.model";
+import { socialUrls } from "@api/aut.model";
 
 export interface CommunityState {
   selectedCommunityAddress: string;
@@ -36,7 +37,7 @@ export const communitySlice = createSlice({
       .addCase(fetchCommunity.pending, (state) => {
         state.status = ResultState.Loading;
       })
-      .addCase(fetchCommunity.fulfilled, (state, action) => {
+      .addCase(fetchCommunity.fulfilled, (state, action: any) => {
         state.communities = state.communities.reduce((prev, curr) => {
           if (curr.properties.address === action.payload.properties.address) {
             prev = [...prev, action.payload];
@@ -58,7 +59,7 @@ export const communitySlice = createSlice({
       .addCase(updateCommunity.pending, (state) => {
         state.status = ResultState.Updating;
       })
-      .addCase(updateCommunity.fulfilled, (state, action) => {
+      .addCase(updateCommunity.fulfilled, (state: any, action) => {
         state.communities = state.communities.map((c) => {
           if (c.properties.address === state.selectedCommunityAddress) {
             return action.payload;
@@ -128,6 +129,22 @@ export const IsDiscordVerified = createSelector(CommunityData, (c) => {
   }
   return false;
 });
+
+export const IsSocialVerified = (type: string) =>
+  createSelector(CommunityData, (c) => {
+    try {
+      const social = c.properties.socials.find((s) => s.type === type);
+      if (
+        typeof social?.link === "string" &&
+        social?.link?.replace(socialUrls[type], "")?.length > 0
+      ) {
+        return true;
+      }
+    } catch (error) {
+      return false;
+    }
+    return false;
+  });
 
 export const DiscordLink = createSelector(
   [CommunityData, IsDiscordVerified],

@@ -1,9 +1,8 @@
-import { addPoll, getPolls } from "@api/activities.api";
+// import { addPoll, getPolls } from "@api/activities.api";
 import { ActivityPoll, ActivityPollData } from "@api/api.model";
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 import { ResultState } from "@store/result-status";
-import addDays from "date-fns/addDays";
-import isBefore from "date-fns/isBefore";
+import { addDays, isBefore } from "date-fns";
 
 export interface PollState {
   status: ResultState;
@@ -51,28 +50,28 @@ export const pollSlice = createSlice({
     resetPollState: () => initialState
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(addPoll.pending, (state) => {
-        state.status = ResultState.Updating;
-      })
-      .addCase(addPoll.fulfilled, (state) => {
-        state.status = ResultState.Idle;
-      })
-      .addCase(addPoll.rejected, (state, action) => {
-        state.status = ResultState.Failed;
-        state.errorMessage = action.payload as string;
-      })
-      .addCase(getPolls.pending, (state) => {
-        state.status = ResultState.Updating;
-      })
-      .addCase(getPolls.fulfilled, (state, action) => {
-        state.polls = action.payload;
-        state.status = ResultState.Idle;
-      })
-      .addCase(getPolls.rejected, (state, action) => {
-        state.status = ResultState.Failed;
-        state.errorMessage = action.payload as string;
-      });
+    // builder
+    //   .addCase(addPoll.pending, (state) => {
+    //     state.status = ResultState.Updating;
+    //   })
+    //   .addCase(addPoll.fulfilled, (state) => {
+    //     state.status = ResultState.Idle;
+    //   })
+    //   .addCase(addPoll.rejected, (state, action) => {
+    //     state.status = ResultState.Failed;
+    //     state.errorMessage = action.payload as string;
+    //   })
+    //   .addCase(getPolls.pending, (state) => {
+    //     state.status = ResultState.Updating;
+    //   })
+    //   .addCase(getPolls.fulfilled, (state, action) => {
+    //     state.polls = action.payload;
+    //     state.status = ResultState.Idle;
+    //   })
+    //   .addCase(getPolls.rejected, (state, action) => {
+    //     state.status = ResultState.Failed;
+    //     state.errorMessage = action.payload as string;
+    //   });
   }
 });
 

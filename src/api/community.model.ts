@@ -1,22 +1,30 @@
 import { CommitmentMessages } from "@utils/misc";
 import { httpUrlToIpfsCID } from "./storage.api";
 import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
-import { NovaProperties, Role, RoleSet } from "@aut-labs/sdk/dist/models/dao";
-import { AutSocial } from "./api.model";
+import { AutSocial, Role, RoleSet } from "./api.model";
 import { socialUrls } from "./aut.model";
+import { NovaProperties } from "@aut-labs/sdk/dist/models/nova";
 
 export const MarketTemplates = [
   {
-    title: "Open-Source & DeFi",
+    title: "Open-Source & Infra",
     market: 1
   },
   {
-    title: "Art, Events & NFTs",
+    title: "DeFi & Payments",
     market: 2
   },
   {
-    title: "Local Projects & DAOs",
+    title: "ReFi & Governance",
     market: 3
+  },
+  {
+    title: "Social, Art & Gaming",
+    market: 4
+  },
+  {
+    title: "Identity & Reputation",
+    market: 5
   }
 ];
 
@@ -104,7 +112,9 @@ export class Community extends BaseNFTModel<CommunityProperties> {
         timestamp: community.properties.timestamp,
         domains: community.properties.domains,
         socials: community.properties.socials.map((social) => {
-          social.link = `${socialUrls[social.type].prefix}${social.link}`;
+          social.link = `${socialUrls[social.type]?.prefix || ""}${
+            social.link
+          }`;
           return social;
         })
       }

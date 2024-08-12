@@ -7,29 +7,33 @@ import { useAppDispatch } from "@store/store.model";
 import SWSnackbar from "./components/snackbar";
 import Web3DautConnect from "@api/ProviderFactory/web3-daut-connect";
 import { environment } from "@api/environment";
-import { setNetworks } from "@store/WalletProvider/WalletProvider";
+import { updateWalletProviderState } from "@store/WalletProvider/WalletProvider";
 import { getAppConfig } from "@api/aut.api";
 import AutSDK from "@aut-labs/sdk";
 import { IsAuthenticated } from "@auth/auth.reducer";
 import GetStarted from "./pages/GetStarted/GetStarted";
 import AutLoading from "@components/AutLoading";
-import ErrorPage from "@components/ErrorPage";
 import Callback from "./pages/Oauth2Callback/Callback";
 import { CommunityData } from "@store/Community/community.reducer";
-import { generateNetworkConfig } from "@api/ProviderFactory/setup.config";
-import { WagmiConfig } from "wagmi";
 
 const AutDashboardMain = lazy(() => import("./pages/AutDashboardMain"));
 
 function App() {
   const dispatch = useAppDispatch();
-  const [isLoading, setLoading] = useState(true);
-  const [config, setConfig] = useState<any>();
-  const [error, setError] = useState(false);
+  const [isAuthenticating, setLoading] = useState(true);
+  const [isInitialized, setInitialized] = useState(false);
   const isAutheticated = useSelector(IsAuthenticated);
   const communityData = useSelector(CommunityData);
   const location = useLocation();
 
+  // const isLoading = useMemo(
+  //   () => !isAuthenticating && isInitialized,
+  //   [isAuthenticating, isInitialized]
+  // );
+
+  console.log(isAuthenticating, "isAuthenticating");
+  console.log(isInitialized, "isInitialized");
+  // console.log(isLoading, "isLoading");
   const returnUrl = useMemo(() => {
     if (!isAutheticated) return "/";
     const shouldGoToDashboard =
@@ -41,66 +45,87 @@ function App() {
     const url = location.state?.from;
     return url || goTo;
   }, [isAutheticated, communityData]);
+  console.log(returnUrl, "returnUrl");
 
   useEffect(() => {
-    getAppConfig()
-      .then(async (res) => {
-        dispatch(setNetworks(res));
-        const [network] = res.filter((d) => !d.disabled);
-        setConfig(generateNetworkConfig(network));
-        new AutSDK({
-          nftStorageApiKey: environment.nftStorageKey
-        });
-      })
-      .catch(() => {
-        setError(true);
+    getAppConfig().then(async (networks) => {
+      dispatch(
+        updateWalletProviderState({
+          networksConfig: networks
+        })
+      );
+
+      const sdk = new AutSDK({
+        ipfs: {
+          apiKey: environment.ipfsApiKey,
+          secretApiKey: environment.ipfsApiSecret,
+          gatewayUrl: environment.ipfsGatewayUrl
+        }
       });
+      // await AutSDK.getInstance(true);
+      setInitialized(true);
+    });
+    // .finally(() => setLoading(false));
   }, []);
+
+  // useEffect(() => {
+  //   getAppConfig()
+  //     .then(async (res) => {
+  //       dispatch(setNetworks(res));
+  //       const [network] = res.filter((d) => !d.disabled);
+  //       setConfig(generateNetworkConfig(network));
+  //       new AutSDK({
+  //         ipfs: {
+  //           apiKey: environment.ipfsApiKey,
+  //           secretApiKey: environment.ipfsApiSecret,
+  //           gatewayUrl: environment.ipfsGatewayUrl
+  //         }
+  //       });
+  //     })
+  //     .catch(() => {
+  //       setError(true);
+  //     });
+  // }, []);
 
   return (
     <>
       <SWSnackbar />
-      {error && <ErrorPage />}
-      {!error && config && (
-        <>
-          <WagmiConfig config={config}>
-            <Web3DautConnect config={config} setLoading={setLoading} />
-            <Box
-              sx={{
-                height: "100%",
-                backgroundColor: "transparent"
-              }}
-              className={isLoading ? "sw-loading" : ""}
-            >
-              {isLoading ? (
-                <AutLoading width="130px" height="130px" />
-              ) : (
-                <Routes>
-                  <Route path="callback" element={<Callback />} />
-                  {!isAutheticated && (
-                    <>
-                      <Route path="/" element={<GetStarted />} />
-                      <Route
-                        path="*"
-                        element={<Navigate to="/" state={{ from: location }} />}
-                      />
-                    </>
-                  )}
-                  {isAutheticated && (
-                    <>
-                      <Route
-                        path={`${communityData?.name}/*`}
-                        element={<AutDashboardMain />}
-                      />
-                      <Route path="*" element={<Navigate to={returnUrl} />} />
-                    </>
-                  )}
-                </Routes>
+      {isInitialized && <Web3DautConnect setLoading={setLoading} />}
+      <Box
+        sx={{
+          height: "100%",
+          backgroundColor: "transparent"
+        }}
+        className={isAuthenticating || !isInitialized ? "sw-loading" : ""}
+      >
+        {isAuthenticating || !isInitialized ? (
+          <AutLoading width="130px" height="130px" />
+        ) : (
+          <>
+            <Routes>
+              <Route path="callback" element={<Callback />} />
+              {!isAutheticated && (
+                <>
+                  <Route path="/" element={<GetStarted />} />
+                  <Route
+                    path="*"
+                    element={<Navigate to="/" state={{ from: location }} />}
+                  />
+                </>
               )}
-            </Box>
-          </WagmiConfig>
-        </>
-      )}
+              {isAutheticated && (
+                <>
+                  <Route
+                    path={`${communityData?.name}/*`}
+                    element={<AutDashboardMain />}
+                  />
+                  <Route path="*" element={<Navigate to={returnUrl} />} />
+                </>
+              )}
+            </Routes>
+          </>
+        )}
+      </Box>
     </>
   );
 }

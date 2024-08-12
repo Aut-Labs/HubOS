@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unstable-nested-components */
 import { Box, Typography } from "@mui/material";
 import { pxToRem } from "@utils/text-size";
 

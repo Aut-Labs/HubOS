@@ -34,9 +34,9 @@ import {
 import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
-import addMinutes from "date-fns/addMinutes";
 import { useAccount } from "wagmi";
 import { FormContainer } from "../Shared/FormContainer";
+import { addMinutes } from "date-fns";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -364,7 +364,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                         }
                       }}
                       onChange={onChange}
-                      placeholder="Weight"
+                      // placeholder="Weight"
                       value={+(value || 0)}
                     />
                     <Box

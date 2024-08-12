@@ -1,4 +1,4 @@
-import { getPolls } from "@api/activities.api";
+// import { getPolls } from "@api/activities.api";
 import { CommunityEventTypes } from "@api/api.model";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
@@ -54,7 +54,7 @@ const EventFactory = () => {
         component: PastEventsList
       }
     ]);
-    dispatch(getPolls(null));
+    // dispatch(getPolls(null));
   }, [dispatch]);
 
   return (

@@ -29,8 +29,8 @@ import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
 import { CommunityData, allRoles } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
-import addMinutes from "date-fns/addMinutes";
 import { useAccount } from "wagmi";
+import { addMinutes } from "date-fns";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -178,6 +178,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
   }, [roles, searchParams]);
 
   return (
+    // @ts-ignore
     <Container
       sx={{ py: "20px", display: "flex", flexDirection: "column" }}
       maxWidth="lg"

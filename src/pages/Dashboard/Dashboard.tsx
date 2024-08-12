@@ -54,6 +54,8 @@ const Dashboard = () => {
     skip: false
   });
 
+  console.log(data, isLoading, isFetching);
+
   const {
     archetype,
     isLoading: isLoadingArchetype,
@@ -65,6 +67,8 @@ const Dashboard = () => {
       archetype: data?.archetype
     })
   });
+
+  console.log(archetype, isLoadingArchetype, isFetchingArchetype);
 
   const membersTableData = {
     totalMembers: 0
@@ -305,9 +309,9 @@ const Dashboard = () => {
             </Box>
             <Box
               sx={{
-                width: "100%",
                 position: "relative",
-                height: "400px"
+                height: "400px",
+                width: "400px"
               }}
             >
               <ArchetypePieChart archetype={archetype} />

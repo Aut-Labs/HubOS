@@ -1,5 +1,4 @@
-import getUnixTime from "date-fns/getUnixTime";
-import parseISO from "date-fns/parseISO";
+import { parseISO, getUnixTime } from "date-fns";
 
 export const timeLeft = ({ isStarted, timeleft, startsIn }) => {
   if (isStarted) {

@@ -10,7 +10,7 @@ import { pluginRoutes } from "./Modules/Shared/routes";
 import Modules from "./Modules/Modules";
 import { useSelector } from "react-redux";
 import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
-import { useGetAllModuleDefinitionsQuery } from "@api/module-registry.api";
+// import { useGetAllModuleDefinitionsQuery } from "@api/module-registry.api";
 import Admins from "./Admins/Admins";
 import CommunityEdit from "./CommunityEdit/CommunityEdit";
 import { ReactComponent as ManageIcon } from "@assets/manage.svg";
@@ -65,11 +65,14 @@ const AutDashboardMain = () => {
   //   return 0;
   // }, [onboardingProgress]);
 
-  const { data: modules, isLoading: isLoadingModules } =
-    useGetAllModuleDefinitionsQuery(null, {
-      refetchOnMountOrArgChange: false,
-      skip: false
-    });
+  const modules = [];
+  const isLoadingModules = false;
+
+  // const { data: modules, isLoading: isLoadingModules } =
+  //   useGetAllModuleDefinitionsQuery(null, {
+  //     refetchOnMountOrArgChange: false,
+  //     skip: false
+  //   });
 
   const modulesRoutes = useMemo(() => {
     const { allRoutes, menuItems } = pluginRoutes(
@@ -113,33 +116,34 @@ const AutDashboardMain = () => {
         <AutLoading width="130px" height="130px" />
       ) : (
         <SidebarDrawer
-          addonMenuItems={
-            modulesRoutes?.routes?.length
-              ? [modulesRoutes.menuItem]
-              : [modulesRoutes.menuItem]
-          }
+          addonMenuItems={[]}
+          // addonMenuItems={
+          //   modulesRoutes?.routes?.length
+          //     ? [modulesRoutes.menuItem]
+          //     : [modulesRoutes.menuItem]
+          // }
         >
           <Suspense fallback={<AutLoading width="130px" height="130px" />}>
             <Routes>
               <Route index element={<Dashboard />} />
-              <Route path="admins" element={<Admins />} />
+              <Route path=" " element={<Admins />} />
               <Route path="community" element={<Members />} />
               <Route path="edit-community" element={<CommunityEdit />} />
               <Route path="your-archetype" element={<Archetype />} />
               <Route path="modules/dAut" element={<DAut />} />
-              <Route path="tasks" element={<AllTasks />} />
+              {/* <Route path="tasks" element={<AllTasks />} /> */}
               {/* {modulesRoutes?.routes?.length && (
                 <Route
                   path="quest-submissions"
                   element={<QuestSubmissions />}
                 />
               )} */}
-              <Route path="modules" element={<Modules />} />
+              {/* <Route path="modules" element={<Modules />} />
               {modulesRoutes.routes.map((r) => r)}
               <Route
                 path="*"
                 element={<Navigate to={`/${communityData.name}`} />}
-              />
+              /> */}
             </Routes>
           </Suspense>
         </SidebarDrawer>

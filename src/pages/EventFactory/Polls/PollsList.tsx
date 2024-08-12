@@ -3,7 +3,7 @@ import { Box, ListItem, Typography } from "@mui/material";
 import { PollStatus, UpcomingPolls } from "@store/Activity/poll.reducer";
 import { ResultState } from "@store/result-status";
 import { pxToRem } from "@utils/text-size";
-import format from "date-fns/format";
+import { format } from "date-fns";
 import { useSelector } from "react-redux";
 
 const PollsList = () => {

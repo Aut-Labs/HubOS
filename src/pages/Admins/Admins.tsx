@@ -150,6 +150,10 @@ const tableColumns = (
                 label="Save"
                 onClick={handleSaveClick(id)}
                 color="primary"
+                placeholder=""
+                onPointerEnterCapture={null}
+                onPointerLeaveCapture={null}
+                showInMenu={true}
               />
             ];
           }
@@ -160,27 +164,37 @@ const tableColumns = (
               className="textPrimary"
               onClick={handleDeleteClick(id)}
               color="inherit"
+              placeholder=""
+              onPointerEnterCapture={null}
+              onPointerLeaveCapture={null}
+              showInMenu={true}
             />,
             <GridActionsCellItem
               icon={<SaveIcon />}
               label="Save"
               onClick={handleSaveClick(id)}
               color="primary"
+              placeholder=""
+              onPointerEnterCapture={null}
+              onPointerLeaveCapture={null}
+              showInMenu={true}
             />
           ];
         }
 
         // if (id === 0) return [];
 
-        return [
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Edit"
-            className="textPrimary"
-            onClick={handleEditClick(id)}
-            color="secondary"
-          />
-        ];
+        <GridActionsCellItem
+          icon={<EditIcon />}
+          label="Edit"
+          className="textPrimary"
+          onClick={handleEditClick(id)}
+          color="secondary"
+          placeholder=""
+          onPointerEnterCapture={null}
+          onPointerLeaveCapture={null}
+          showInMenu={true}
+        />;
       }
     }
   ];
@@ -199,6 +213,8 @@ const Admins = () => {
   const { status, errorMessage } = useSelector(
     (state: RootState) => state.dashboard
   );
+
+  debugger;
   const { data, isLoading, isFetching, refetch } = useGetCommunityQuery(null, {
     refetchOnMountOrArgChange: true,
     skip: false

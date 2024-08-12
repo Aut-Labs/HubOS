@@ -1,4 +1,4 @@
-import { addGroupCall } from "@api/activities.api";
+// import { addGroupCall } from "@api/activities.api";
 import { createSlice } from "@reduxjs/toolkit";
 import { ResultState } from "@store/result-status";
 
@@ -46,17 +46,17 @@ export const callSlice = createSlice({
     resetActivityGroupCall: () => initialState
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(addGroupCall.pending, (state) => {
-        state.status = ResultState.Updating;
-      })
-      .addCase(addGroupCall.fulfilled, (state) => {
-        state.status = ResultState.Idle;
-      })
-      .addCase(addGroupCall.rejected, (state, action) => {
-        state.status = ResultState.Failed;
-        state.errorMessage = action.payload as string;
-      });
+    // builder
+    //   .addCase(addGroupCall.pending, (state) => {
+    //     state.status = ResultState.Updating;
+    //   })
+    //   .addCase(addGroupCall.fulfilled, (state) => {
+    //     state.status = ResultState.Idle;
+    //   })
+    //   .addCase(addGroupCall.rejected, (state, action) => {
+    //     state.status = ResultState.Failed;
+    //     state.errorMessage = action.payload as string;
+    //   });
   }
 });
 

@@ -26,6 +26,7 @@ export interface HolderData {
 export interface AutSocial {
   type: string;
   link: string;
+  metadata: any;
 }
 
 export interface ActivityTask {

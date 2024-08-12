@@ -14,7 +14,7 @@ export const deployPolls = async (
   discordBotAddress: string
 ) => {
   // await EnableAndChangeNetwork();
-  const webProvider = new ethers.providers.Web3Provider(window.ethereum);
+  const webProvider = new ethers.BrowserProvider(window.ethereum as any);
 
   const signer = webProvider.getSigner();
   // const Contract = new ethers.ContractFactory(
@@ -33,7 +33,7 @@ export const deployGatherings = async (
   discordBotAddress: string
 ) => {
   // await EnableAndChangeNetwork();
-  const webProvider = new ethers.providers.Web3Provider(window.ethereum);
+  const webProvider = new ethers.BrowserProvider(window.ethereum as any);
 
   const signer = webProvider.getSigner();
   // const Contract = new ethers.ContractFactory(
@@ -52,7 +52,7 @@ export const deployTasks = async (
   discordBotAddress: string
 ) => {
   // await EnableAndChangeNetwork();
-  const webProvider = new ethers.providers.Web3Provider(window.ethereum);
+  const webProvider = new ethers.BrowserProvider(window.ethereum as any);
 
   // const signer = webProvider.getSigner();
   // const Contract = new ethers.ContractFactory(

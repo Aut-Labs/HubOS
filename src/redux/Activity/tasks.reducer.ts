@@ -1,10 +1,10 @@
-import {
-  finalizeActivityTask,
-  getAllTasks,
-  getTaskById,
-  submitActivityTask,
-  takeActivityTask
-} from "@api/activities.api";
+// import {
+//   finalizeActivityTask,
+//   getAllTasks,
+//   getTaskById,
+//   submitActivityTask,
+//   takeActivityTask
+// } from "@api/activities.api";
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 import { GroupTask, Task, TaskStatus, TaskTypes } from "@store/model";
 import { ResultState } from "@store/result-status";
@@ -41,106 +41,104 @@ export const tasksSlice = createSlice({
     resetTasksState: () => initialState
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(getAllTasks.pending, (state) => {
-        if (state.tasks.length) {
-          state.refreshingStatus = ResultState.Loading;
-        } else {
-          state.status = ResultState.Loading;
-        }
-      })
-      .addCase(getAllTasks.fulfilled, (state, action) => {
-        if (state.tasks.length) {
-          state.refreshingStatus = ResultState.Idle;
-        } else {
-          state.status = ResultState.Idle;
-        }
-        state.tasks = [...action.payload];
-      })
-      .addCase(getAllTasks.rejected, (state) => {
-        state.refreshingStatus = ResultState.Idle;
-        state.status = ResultState.Failed;
-      })
-      .addCase(getTaskById.pending, (state) => {
-        state.status = ResultState.Loading;
-      })
-      .addCase(getTaskById.fulfilled, (state, action) => {
-        state.status = ResultState.Idle;
-        const { task, taker } = action.payload;
-
-        const selectedTask = {
-          ...task,
-          owner: taker
-        };
-
-        state.selectedTask = selectedTask;
-        state.tasks = state.tasks.map((t) => {
-          if (t.activityId === task.activityId) {
-            return selectedTask;
-          }
-          return t;
-        });
-      })
-      .addCase(getTaskById.rejected, (state) => {
-        state.status = ResultState.Failed;
-      })
-      .addCase(takeActivityTask.pending, (state) => {
-        state.status = ResultState.Updating;
-      })
-      .addCase(takeActivityTask.fulfilled, (state, action) => {
-        state.status = ResultState.Idle;
-        state.tasks = state.tasks.map((task) => {
-          if (task.activityId === action.payload.activityId) {
-            return action.payload;
-          }
-          return task;
-        });
-      })
-      .addCase(takeActivityTask.rejected, (state) => {
-        state.status = ResultState.Failed;
-      })
-      .addCase(finalizeActivityTask.pending, (state) => {
-        state.status = ResultState.Updating;
-      })
-      .addCase(finalizeActivityTask.fulfilled, (state, action) => {
-        state.status = ResultState.Success;
-        state.selectedTask = action.payload;
-        state.selectedTabIndex = TaskTypes.Closed;
-        state.tasks = state.tasks.map((task) => {
-          if (task.activityId === action.payload.activityId) {
-            return action.payload;
-          }
-          return task;
-        });
-      })
-      .addCase(finalizeActivityTask.rejected, (state, action) => {
-        state.status = ResultState.Failed;
-        state.errorMessage = action.payload as string;
-      })
-      .addCase(submitActivityTask.pending, (state) => {
-        state.status = ResultState.Updating;
-      })
-      .addCase(submitActivityTask.fulfilled, (state, action) => {
-        state.status = ResultState.Success;
-        state.selectedTask = action.payload;
-        state.selectedTabIndex = TaskTypes.Closed;
-        state.tasks = state.tasks.map((task) => {
-          if (task.activityId === action.payload.activityId) {
-            return action.payload;
-          }
-          return task;
-        });
-      })
-      .addCase(submitActivityTask.rejected, (state, action) => {
-        state.status = ResultState.Failed;
-        state.errorMessage = action.payload as string;
-      });
+    // builder
+    //   .addCase(getAllTasks.pending, (state) => {
+    //     if (state.tasks.length) {
+    //       state.refreshingStatus = ResultState.Loading;
+    //     } else {
+    //       state.status = ResultState.Loading;
+    //     }
+    //   })
+    //   .addCase(getAllTasks.fulfilled, (state, action) => {
+    //     if (state.tasks.length) {
+    //       state.refreshingStatus = ResultState.Idle;
+    //     } else {
+    //       state.status = ResultState.Idle;
+    //     }
+    //     state.tasks = [...action.payload];
+    //   })
+    //   .addCase(getAllTasks.rejected, (state) => {
+    //     state.refreshingStatus = ResultState.Idle;
+    //     state.status = ResultState.Failed;
+    //   })
+    //   .addCase(getTaskById.pending, (state) => {
+    //     state.status = ResultState.Loading;
+    //   })
+    //   .addCase(getTaskById.fulfilled, (state, action) => {
+    //     state.status = ResultState.Idle;
+    //     const { task, taker } = action.payload;
+    //     const selectedTask = {
+    //       ...task,
+    //       owner: taker
+    //     };
+    //     state.selectedTask = selectedTask;
+    //     state.tasks = state.tasks.map((t) => {
+    //       if (t.activityId === task.activityId) {
+    //         return selectedTask;
+    //       }
+    //       return t;
+    //     });
+    //   })
+    //   .addCase(getTaskById.rejected, (state) => {
+    //     state.status = ResultState.Failed;
+    //   })
+    //   .addCase(takeActivityTask.pending, (state) => {
+    //     state.status = ResultState.Updating;
+    //   })
+    //   .addCase(takeActivityTask.fulfilled, (state, action) => {
+    //     state.status = ResultState.Idle;
+    //     state.tasks = state.tasks.map((task) => {
+    //       if (task.activityId === action.payload.activityId) {
+    //         return action.payload;
+    //       }
+    //       return task;
+    //     });
+    //   })
+    //   .addCase(takeActivityTask.rejected, (state) => {
+    //     state.status = ResultState.Failed;
+    //   })
+    //   .addCase(finalizeActivityTask.pending, (state) => {
+    //     state.status = ResultState.Updating;
+    //   })
+    //   .addCase(finalizeActivityTask.fulfilled, (state, action) => {
+    //     state.status = ResultState.Success;
+    //     state.selectedTask = action.payload;
+    //     state.selectedTabIndex = TaskTypes.Closed;
+    //     state.tasks = state.tasks.map((task) => {
+    //       if (task.activityId === action.payload.activityId) {
+    //         return action.payload;
+    //       }
+    //       return task;
+    //     });
+    //   })
+    //   .addCase(finalizeActivityTask.rejected, (state, action) => {
+    //     state.status = ResultState.Failed;
+    //     state.errorMessage = action.payload as string;
+    //   })
+    //   .addCase(submitActivityTask.pending, (state) => {
+    //     state.status = ResultState.Updating;
+    //   })
+    //   .addCase(submitActivityTask.fulfilled, (state, action) => {
+    //     state.status = ResultState.Success;
+    //     state.selectedTask = action.payload;
+    //     state.selectedTabIndex = TaskTypes.Closed;
+    //     state.tasks = state.tasks.map((task) => {
+    //       if (task.activityId === action.payload.activityId) {
+    //         return action.payload;
+    //       }
+    //       return task;
+    //     });
+    //   })
+    //   .addCase(submitActivityTask.rejected, (state, action) => {
+    //     state.status = ResultState.Failed;
+    //     state.errorMessage = action.payload as string;
+    //   });
   }
 });
 
 export const { tasksUpdateStatus, tasksUpdateSelectedTab } = tasksSlice.actions;
 
-const NotTaken = ethers.constants.AddressZero;
+const NotTaken = ethers.ZeroAddress;
 
 export const Tasks = (state: any) => state.tasks.tasks as Task[];
 export const TasksSelectedTab = (state: any) =>

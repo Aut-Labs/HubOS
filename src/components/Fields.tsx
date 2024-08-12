@@ -1,6 +1,6 @@
 import { DatePicker, DateTimePickerProps } from "@mui/lab";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import {
   Box,
@@ -224,7 +224,7 @@ function ActionList(props: PickersActionBarProps) {
 
 export const AutDatepicker = ({ value, onChange, placeholder, ...props }) => {
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <LocalizationProvider>
       <DateTimePicker
         value={value || ""}
         disablePast
@@ -589,7 +589,7 @@ const SelectWrapper = styled("div")({
   }
 });
 
-interface AutSelectProps extends Partial<SelectProps> {
+interface AutSelectProps extends Partial<SelectProps & any> {
   width: string;
   helperText?: JSX.Element;
 }

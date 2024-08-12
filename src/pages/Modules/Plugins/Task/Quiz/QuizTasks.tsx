@@ -28,9 +28,9 @@ import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
 import { CommunityData, allRoles } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
-import addMinutes from "date-fns/addMinutes";
 import { useAccount } from "wagmi";
 import { FormContainer } from "../Shared/FormContainer";
+import { addMinutes } from "date-fns";
 
 // import "./ScrollbarStyles.scss";
 
@@ -348,7 +348,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
                         }
                       }}
                       onChange={onChange}
-                      placeholder="Weight"
+                      // placeholder="Weight"
                       value={+(value || 0)}
                     />
                     <Box

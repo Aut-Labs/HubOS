@@ -6,7 +6,7 @@ import { environment } from "./environment";
 import { ModuleDefinition } from "@aut-labs/sdk/dist/models/plugin";
 
 const fetch = async (body: any, api: BaseQueryApi) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   const state = api.getState() as any;
   const { selectedCommunityAddress } = state.community;
 
@@ -25,7 +25,7 @@ const fetch = async (body: any, api: BaseQueryApi) => {
         isActivated: isActivatedResponse.data,
         metadata: await fetchMetadata<typeof def.metadata>(
           def.metadataURI,
-          environment.nftStorageUrl
+          environment.ipfsGatewayUrl
         )
       };
       moduleData.metadata.properties.type =
@@ -72,7 +72,7 @@ const fetch = async (body: any, api: BaseQueryApi) => {
 };
 
 const activateModule = async ({ moduleId = 1 }, api: BaseQueryApi) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   const state = api.getState() as any;
   const { selectedCommunityAddress } = state.community;
 

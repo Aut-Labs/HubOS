@@ -113,6 +113,7 @@ export const AutExists = async () => {
 
     if (window.ethereum.selectedAddress) {
       const { selectedAddress } = window.ethereum;
+      // @ts-ignore
       const tokenId = await contract.getAutIDByOwner(selectedAddress);
       if (tokenId) {
         return true;
