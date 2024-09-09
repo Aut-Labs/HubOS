@@ -32,7 +32,7 @@ const Datatable = ({
     <div
       className="sw-datatable"
       style={{
-        // border: `3px solid ${theme.palette.offWhite.main}`,DAO Members
+        border: `qpx solid ${theme.palette.offWhite.main}`,
         padding: "35px"
       }}
     >
@@ -56,10 +56,11 @@ const Datatable = ({
         density="compact"
         sx={{
           border: "none",
+          backgroundColor: "transparent",
           flexDirection: "column-reverse",
           color: "offWhite.main",
           ".MuiInputBase-input": {
-            color: "offWhite.contrastText",
+            color: "offWhite.main",
             fontSize: "16px",
             textAlign: "center"
           },

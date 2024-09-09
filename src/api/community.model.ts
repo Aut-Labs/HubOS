@@ -1,30 +1,35 @@
-import { CommitmentMessages } from "@utils/misc";
-import { httpUrlToIpfsCID } from "./storage.api";
-import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
-import { AutSocial, Role, RoleSet } from "./api.model";
-import { socialUrls } from "./aut.model";
-import { NovaProperties } from "@aut-labs/sdk/dist/models/nova";
+import { Role, RoleSet } from "./api.model";
+import { ReactComponent as OpenSource } from "@assets/icons/opensource.svg";
+import { ReactComponent as Defi } from "@assets/icons/defi.svg";
+import { ReactComponent as Social } from "@assets/icons/social.svg";
+import { ReactComponent as Refi } from "@assets/icons/refi.svg";
+import { ReactComponent as Identity } from "@assets/icons/identity.svg";
 
 export const MarketTemplates = [
   {
     title: "Open-Source & Infra",
-    market: 1
+    market: 1,
+    icon: OpenSource
   },
   {
     title: "DeFi & Payments",
-    market: 2
+    market: 2,
+    icon: Defi
   },
   {
     title: "ReFi & Governance",
-    market: 3
+    market: 3,
+    icon: Refi
   },
   {
     title: "Social, Art & Gaming",
-    market: 4
+    market: 4,
+    icon: Social
   },
   {
     title: "Identity & Reputation",
-    market: 5
+    market: 5,
+    icon: Identity
   }
 ];
 
@@ -41,90 +46,6 @@ export const findRoleName = (roleId: string, rolesSets: RoleSet[]) => {
 export interface CommunityDomains {
   note: string;
   domain: string;
-}
-
-export class CommunityProperties extends NovaProperties {
-  address?: string;
-
-  socials: AutSocial[];
-
-  userData?: {
-    role: string;
-    roleName?: string;
-    commitment: string;
-    isAdmin: boolean;
-    commitmentDescription?: string;
-    isActive?: boolean;
-  };
-
-  domains: CommunityDomains[];
-
-  additionalProps?: any;
-
-  constructor(data: CommunityProperties) {
-    super(data);
-    if (!data) {
-      this.rolesSets = [];
-    } else {
-      this.market = MarketTemplates[data.market]?.title;
-      this.commitment = data.commitment;
-      this.rolesSets = data.rolesSets;
-      this.address = data.address;
-      this.socials = data.socials;
-      this.domains = data.domains || [];
-      this.additionalProps = data.additionalProps;
-      this.userData =
-        JSON.parse(JSON.stringify(data?.userData || {})) ||
-        ({} as typeof this.userData);
-
-      if (this.userData?.role) {
-        this.userData.roleName = findRoleName(
-          this.userData.role,
-          this.rolesSets
-        );
-      }
-
-      if (this.userData?.commitment) {
-        this.userData.commitmentDescription = CommitmentMessages(
-          +this.userData.commitment
-        );
-      }
-      // @TODO - Tao to fix
-      this.userData.isAdmin = (data as any).isAdmin;
-    }
-  }
-}
-
-export class Community extends BaseNFTModel<CommunityProperties> {
-  static updateCommunity(updatedCommunity: Community): Partial<Community> {
-    const community = new Community(updatedCommunity);
-    const market = MarketTemplates.find(
-      (v) => v.title === community.properties.market
-    );
-    return {
-      name: community.name,
-      description: community.description,
-      image: httpUrlToIpfsCID(community.image as string),
-      properties: {
-        market: market?.title || 0,
-        commitment: community.properties.commitment,
-        rolesSets: community.properties.rolesSets,
-        timestamp: community.properties.timestamp,
-        domains: community.properties.domains,
-        socials: community.properties.socials.map((social) => {
-          social.link = `${socialUrls[social.type]?.prefix || ""}${
-            social.link
-          }`;
-          return social;
-        })
-      }
-    } as Partial<Community>;
-  }
-
-  constructor(data: Community = {} as Community) {
-    super(data);
-    this.properties = new CommunityProperties(data.properties);
-  }
 }
 
 export const DefaultRoles: Role[] = [

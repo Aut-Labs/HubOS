@@ -26,7 +26,7 @@ export const getCache = async (
   // }
   // const token = localStorage.getItem(AUTH_TOKEN_KEY);
   const res = await axios.get(
-    `${environment.apiUrl}/autID/cache/getCache/${cacheKey}?address=${address}`
+    `${environment.apiUrl}/aut/cache/getCache/${cacheKey}?address=${address}`
     // {
     //   headers: {
     //     Authorization: token
@@ -41,7 +41,7 @@ export const updateCache = async (
 ): Promise<CacheModel> => {
   // const token = localStorage.getItem(AUTH_TOKEN_KEY);
   const res = await axios.post(
-    `${environment.apiUrl}/autID/cache/addOrUpdateCache/${cache.cacheKey}`,
+    `${environment.apiUrl}/aut/cache/addOrUpdateCache/${cache.cacheKey}`,
     cache
     // {
     //   headers: {
@@ -58,7 +58,7 @@ export const deleteCache = async (
 ): Promise<void> => {
   // const token = localStorage.getItem(AUTH_TOKEN_KEY);
   const res = await axios.delete(
-    `${environment.apiUrl}/autID/cache/deleteCache/${cacheKey}?address=${address}`
+    `${environment.apiUrl}/aut/cache/deleteCache/${cacheKey}?address=${address}`
     // {
     //   headers: {
     //     Authorization: token

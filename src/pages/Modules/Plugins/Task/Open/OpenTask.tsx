@@ -341,11 +341,7 @@ const OwnerFinalizeContent = ({
                 variant="body"
                 color="white"
               >
-                Submitter:{" "}
-                <CopyAddress
-                  color={theme.palette.primary.main}
-                  address={submission.submitter}
-                />
+                Submitter: <CopyAddress address={submission.submitter} />
               </Typography>
               <Chip
                 sx={{

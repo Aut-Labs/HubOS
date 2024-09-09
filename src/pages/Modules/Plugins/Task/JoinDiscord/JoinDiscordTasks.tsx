@@ -12,7 +12,9 @@ import {
   Grid,
   Slider,
   Stack,
-  Typography
+  styled,
+  Typography,
+  useTheme
 } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
@@ -37,6 +39,14 @@ import { countWords } from "@utils/helpers";
 import { useAccount } from "wagmi";
 import { FormContainer } from "../Shared/FormContainer";
 import { addMinutes } from "date-fns";
+import { AutOsButton } from "@components/buttons";
+import {
+  CommitmentSliderWrapper,
+  SliderFieldWrapper,
+  StyledTextField,
+  TextFieldWrapper
+} from "../Shared/StyledFields";
+import { AutOSSlider } from "@theme/commitment-slider-styles";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -120,6 +130,7 @@ const endDatetime = new Date();
 addMinutes(endDatetime, 45);
 
 const JoinDiscordTasks = ({ plugin }: PluginParams) => {
+  const theme = useTheme();
   const isDiscordVerified = useSelector(IsDiscordVerified);
   const inviteLink = useSelector(DiscordLink);
   const roles = useSelector(allRoles);
@@ -201,7 +212,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
         }}
       >
         <Stack alignItems="center" justifyContent="center">
-          <Button
+          {/* <Button
             startIcon={<ArrowBackIosNewIcon />}
             color="offWhite"
             sx={{
@@ -218,17 +229,21 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
             <Typography color="white" variant="body">
               Back
             </Typography>
-          </Button>
-          <Typography textAlign="center" color="white" variant="h3">
+          </Button> */}
+          <Typography
+            variant="subtitle1"
+            fontSize={{
+              xs: "14px",
+              md: "20px"
+            }}
+            color="offWhite.main"
+            fontWeight="bold"
+          >
             Join Discord for {selectedRole?.roleName}
           </Typography>
         </Stack>
 
         <Typography
-          mt={2}
-          mx="auto"
-          textAlign="center"
-          color="white"
           sx={{
             width: {
               xs: "100%",
@@ -236,14 +251,18 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
               xxl: "1000px"
             }
           }}
-          variant="body"
+          mt={2}
+          mx="auto"
+          textAlign="center"
+          color="offWhite.main"
+          fontSize="16px"
         >
           Ask your community to Join your Discord Community.
         </Typography>
       </Box>
       <Stack
         direction="column"
-        gap={8}
+        gap={4}
         sx={{
           margin: "0 auto",
           width: {
@@ -257,6 +276,10 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
           <Stack
             sx={{
               margin: "0 auto",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
               width: {
                 xs: "100%",
                 sm: "400px",
@@ -274,26 +297,48 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
             >
               Please verify the discord account for your community.
             </Typography> */}
-            <Button
-              sx={{
-                textTransform: "uppercase"
-              }}
+            <AutOsButton
               onClick={() => setDiscordDialogOpen(true)}
               type="button"
+              textTransform="uppercase"
+              color="primary"
+              disabled={!formState.isValid}
               variant="outlined"
-              size="medium"
-              color="offWhite"
+              sx={{
+                width: "250px"
+              }}
             >
-              Connect your discord
-            </Button>
+              <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
+                Connect Your Discord
+              </Typography>
+            </AutOsButton>
           </Stack>
         )}
 
         {isDiscordVerified && (
           <Chip icon={<DoneIcon />} color="success" label="Discord Verified" />
         )}
-        <Grid container spacing={2}>
-          <Grid item xs={8}>
+
+        <Stack
+          direction="column"
+          gap={4}
+          sx={{
+            margin: "0 auto",
+            width: {
+              xs: "100%",
+              sm: "650px",
+              xxl: "800px"
+            }
+          }}
+        >
+          <TextFieldWrapper>
+            <Typography
+              variant="caption"
+              color="offWhite.main"
+              mb={theme.spacing(1)}
+            >
+              Title
+            </Typography>
             <Controller
               name="title"
               control={control}
@@ -305,18 +350,21 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
-                  <AutTextField
-                    variant="standard"
+                  <StyledTextField
                     color="offWhite"
                     required
                     sx={{
-                      width: "100%"
+                      // ".MuiInputBase-input": {
+                      //   height: "48px"
+                      // },
+                      width: "100%",
+                      height: "48px"
                     }}
                     autoFocus
                     name={name}
                     value={value || ""}
                     onChange={onChange}
-                    placeholder="Title"
+                    placeholder="Choose a title for your task"
                     helperText={
                       <FormHelperText
                         errorTypes={errorTypes}
@@ -324,7 +372,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                         name={name}
                         errors={formState.errors}
                       >
-                        <Typography color="white" variant="caption">
+                        <Typography variant="caption" color="white">
                           {6 - countWords(value)} Words left
                         </Typography>
                       </FormHelperText>
@@ -333,87 +381,115 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                 );
               }}
             />
-          </Grid>
-          <Grid item xs={4}>
+          </TextFieldWrapper>
+          <TextFieldWrapper>
+            <Typography
+              variant="caption"
+              color="offWhite.main"
+              mb={theme.spacing(1)}
+            >
+              Description
+            </Typography>
             <Controller
-              name="weight"
+              name="description"
               control={control}
               rules={{
                 required: true,
-                min: 1,
-                max: 10
+                maxLength: 257
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
-                  <Box
-                    sx={{
-                      marginTop: "10px"
-                    }}
-                    gap={2}
-                  >
-                    <Slider
-                      step={1}
-                      name={name}
-                      min={1}
-                      max={10}
-                      sx={{
-                        width: "100%",
-                        height: "20px",
-                        ".MuiSlider-thumb": {
-                          display: "none"
-                        }
-                      }}
-                      onChange={onChange}
-                      // placeholder="Weight"
-                      value={+(value || 0)}
-                    />
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        minWidth: "40px"
-                      }}
-                    >
-                      <Typography color="white" variant="caption">
-                        Weight (1-10)
-                      </Typography>
-                      <Typography color="white" variant="caption">
-                        {value}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  // <AutTextField
-                  //   variant="standard"
-                  //   color="offWhite"
-                  //   required
-                  //   type="number"
-                  //   sx={{
-                  //     width: "100%"
-                  //   }}
-                  //   autoFocus
-                  //   name={name}
-                  //   value={value || ""}
-                  //   onChange={onChange}
-                  //   placeholder="Weight"
-                  //   helperText={
-                  //     <FormHelperText
-                  //       errorTypes={errorTypes}
-                  //       value={value}
-                  //       name={name}
-                  //       errors={formState.errors}
-                  //     >
-                  //       <Typography color="white" variant="caption">
-                  //         Between 1 - 10
-                  //       </Typography>
-                  //     </FormHelperText>
-                  //   }
-                  // />
+                  <StyledTextField
+                    name={name}
+                    value={value || ""}
+                    color="offWhite"
+                    rows="5"
+                    multiline
+                    onChange={onChange}
+                    placeholder="Write a personalised message to your community asking them to join your community."
+                    helperText={
+                      <FormHelperText
+                        errorTypes={errorTypes}
+                        value={value}
+                        name={name}
+                        errors={formState.errors}
+                      >
+                        <Typography variant="caption" color="white">
+                          {257 - (value?.length || 0)} of 257 characters left
+                        </Typography>
+                      </FormHelperText>
+                    }
+                  />
                 );
               }}
             />
-          </Grid>
-        </Grid>
+          </TextFieldWrapper>
+          <SliderFieldWrapper>
+            <Typography
+              variant="caption"
+              color="offWhite.main"
+              mb={theme.spacing(1)}
+            >
+              Weight (1-10)
+            </Typography>
+            <CommitmentSliderWrapper>
+              <Controller
+                name="weight"
+                control={control}
+                rules={{
+                  required: true,
+                  min: 1,
+                  max: 10
+                }}
+                render={({ field: { name, value, onChange } }) => {
+                  return (
+                    <Box
+                      sx={{
+                        marginTop: "10px",
+                        marginLeft: {
+                          sm: "-24px",
+                          xxl: "-44px"
+                        }
+                      }}
+                      gap={2}
+                    >
+                      <AutOSSlider
+                        value={value}
+                        name={name}
+                        errors={null}
+                        sliderProps={{
+                          defaultValue: 1,
+                          step: 1,
+                          marks: true,
+                          name,
+                          value: (value as any) || 0,
+                          onChange,
+                          min: 0,
+                          max: 10
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                          width: {
+                            xs: "100%",
+                            sm: "620px",
+                            xxl: "840px"
+                          }
+                        }}
+                      >
+                        <Typography variant="caption" color="offWhite.dark">
+                          {value}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  );
+                }}
+              />
+            </CommitmentSliderWrapper>
+          </SliderFieldWrapper>
+        </Stack>
 
         <Stack direction="row" gap={4}>
           <Controller
@@ -451,41 +527,6 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
           />
         </Stack>
 
-        <Controller
-          name="description"
-          control={control}
-          rules={{
-            required: true
-          }}
-          render={({ field: { name, value, onChange } }) => {
-            return (
-              <AutTextField
-                name={name}
-                value={value || ""}
-                onChange={onChange}
-                variant="outlined"
-                color="offWhite"
-                required
-                multiline
-                rows={5}
-                placeholder="Write a personalised message to your community asking them to join your community."
-                helperText={
-                  <FormHelperText
-                    errorTypes={errorTypes}
-                    value={value}
-                    name={name}
-                    errors={formState.errors}
-                  >
-                    <Typography color="white" variant="caption">
-                      {257 - (value?.length || 0)} of 257 characters left
-                    </Typography>
-                  </FormHelperText>
-                }
-              />
-            );
-          }}
-        />
-
         {/* <Controller
         name="inviteUrl"
         control={control}
@@ -515,6 +556,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
           );
         }}
       /> */}
+
         <Box
           sx={{
             width: "100%",
@@ -526,11 +568,19 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
             }
           }}
         >
-          <StepperButton
-            label="Confirm"
+          <AutOsButton
+            type="button"
+            color="primary"
             disabled={!formState.isValid || !inviteLink}
-            sx={{ width: "250px" }}
-          />
+            variant="outlined"
+            sx={{
+              width: "100px"
+            }}
+          >
+            <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
+              Confirm
+            </Typography>
+          </AutOsButton>
         </Box>
       </Stack>
     </FormContainer>

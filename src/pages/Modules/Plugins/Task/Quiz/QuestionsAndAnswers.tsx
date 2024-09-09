@@ -13,7 +13,8 @@ import {
   Checkbox,
   Popover,
   RadioGroup,
-  InputAdornment
+  InputAdornment,
+  useTheme
 } from "@mui/material";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
@@ -27,10 +28,13 @@ import {
   useFormState,
   useForm
 } from "react-hook-form";
-import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { FormHelperText } from "@components/Fields";
 import React, { useState } from "react";
+import { SubtitleWithInfo } from "@components/SubtitleWithInfoIcon";
+
+import { ReactComponent as DeleteIcon } from "@assets/hubos/delete-icon.svg";
+import { AutOsButton, AutOsTabButton } from "@components/buttons";
 
 const errorTypes = {
   uniqueQuestion: `Question should be unique`
@@ -42,6 +46,34 @@ interface AnswersParams {
   updateForm: (...args) => any;
   getFormValues: (...args) => any;
 }
+
+const StyledTextField = styled(AutTextField)(({ theme }) => ({
+  width: "100%",
+  ".MuiInputBase-input": {
+    fontSize: "16px",
+    color: theme.palette.offWhite.main,
+    "&::placeholder": {
+      color: theme.palette.offWhite.main,
+      opacity: 0.5
+    },
+    "&.Mui-disabled": {
+      color: "#7C879D",
+      textFillColor: "#7C879D"
+    }
+  },
+  ".MuiInputBase-root": {
+    caretColor: theme.palette.primary.main,
+    fieldset: {
+      border: "1.5px solid #576176 !important",
+      borderRadius: "6px"
+    },
+    borderRadius: "6px",
+    background: "transparent"
+  },
+  ".MuiInputLabel-root": {
+    color: "#7C879D"
+  }
+}));
 
 const MultipleAnswerType = ({ questionIndex, index, control }) => {
   const formState = useFormState({
@@ -64,7 +96,7 @@ const MultipleAnswerType = ({ questionIndex, index, control }) => {
         }}
         render={({ field: { name, value, onChange } }) => {
           return (
-            <AutTextField
+            <StyledTextField
               variant="standard"
               color="offWhite"
               sx={{
@@ -72,7 +104,7 @@ const MultipleAnswerType = ({ questionIndex, index, control }) => {
               }}
               InputProps={{
                 startAdornment: (
-                  <Typography mr={1} color="white" variant="subtitle2">
+                  <Typography mr={1} color="white" variant="body1">
                     {answers[index]}
                   </Typography>
                 )
@@ -111,7 +143,7 @@ const MultipleAnswerType = ({ questionIndex, index, control }) => {
               onChange={onChange}
               sx={{
                 ".MuiSvgIcon-root": {
-                  color: !value ? "offWhite.main" : "primary.main"
+                  color: !value ? "offWhite.main" : "secondary.main"
                 }
               }}
             />
@@ -154,7 +186,7 @@ const RadioType = ({
               ? {
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Typography mr={1} color="white" variant="subtitle2">
+                      <Typography mr={1} color="white" variant="body1">
                         {yesNoAnswers[index]}
                       </Typography>
                     </InputAdornment>
@@ -163,14 +195,14 @@ const RadioType = ({
               : {
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Typography mr={1} color="white" variant="subtitle2">
+                      <Typography mr={1} color="white" variant="body1">
                         {answers[index]}
                       </Typography>
                     </InputAdornment>
                   )
                 };
           return (
-            <AutTextField
+            <StyledTextField
               variant="standard"
               color="offWhite"
               sx={{
@@ -413,6 +445,7 @@ const QuestionsAndAnswers = ({ control, updateForm, getFormValues }) => {
   };
 
   const open = Boolean(anchorEl);
+  const theme = useTheme();
   const id = open ? "simple-popover" : undefined;
 
   const values = useWatch({
@@ -439,10 +472,17 @@ const QuestionsAndAnswers = ({ control, updateForm, getFormValues }) => {
           <Card
             key={`questions[${index}].question`}
             sx={{
-              bgcolor: "nightBlack.main",
-              borderColor: "divider",
-              borderRadius: "16px",
-              boxShadow: 3
+              border: "1px solid",
+              borderColor: theme.palette.offWhite.dark,
+              // backgroundColor: "rgba(255, 255, 255, 0.16)",
+              // backgroundColor: "rgba(255, 255, 255, 0.08)",
+              backgroundColor: "transparent",
+              // borderRadius: "10px",
+              transition: theme.transitions.create(["border-color"]),
+              ":hover": {
+                // borderColor: "#14ECEC"
+                borderColor: "white"
+              }
             }}
           >
             <CardHeader
@@ -458,8 +498,9 @@ const QuestionsAndAnswers = ({ control, updateForm, getFormValues }) => {
               titleTypographyProps={{
                 fontFamily: "FractulAltBold",
                 fontWeight: 900,
-                color: "white",
-                variant: "subtitle1"
+                fontSize: "16px",
+                color: theme.palette.offWhite.main,
+                variant: "subtitle2"
               }}
               title={`Question ${index + 1}`}
             />
@@ -486,7 +527,7 @@ const QuestionsAndAnswers = ({ control, updateForm, getFormValues }) => {
                 }}
                 render={({ formState, field: { name, value, onChange } }) => {
                   return (
-                    <AutTextField
+                    <StyledTextField
                       variant="standard"
                       color="offWhite"
                       sx={{
@@ -539,7 +580,7 @@ const QuestionsAndAnswers = ({ control, updateForm, getFormValues }) => {
                   <Typography
                     mt={2}
                     textAlign="end"
-                    color="white"
+                    color="offWhite.dark"
                     variant="caption"
                   >
                     Tick the box next to the correct answer(s)
@@ -548,7 +589,7 @@ const QuestionsAndAnswers = ({ control, updateForm, getFormValues }) => {
                   <Typography
                     mt={2}
                     textAlign="end"
-                    color="white"
+                    color="offWhite.dark"
                     variant="caption"
                   >
                     Select the radio button next to the correct answer
@@ -566,7 +607,7 @@ const QuestionsAndAnswers = ({ control, updateForm, getFormValues }) => {
           justifyContent: "flex-end"
         }}
       >
-        <Button
+        <AutOsTabButton
           startIcon={<AddIcon />}
           variant="outlined"
           size="medium"
@@ -575,7 +616,7 @@ const QuestionsAndAnswers = ({ control, updateForm, getFormValues }) => {
           // onClick={() => append(emptyMultipleQuestion)}
         >
           Add question
-        </Button>
+        </AutOsTabButton>
         <Popover
           id={id}
           open={open}
@@ -585,10 +626,16 @@ const QuestionsAndAnswers = ({ control, updateForm, getFormValues }) => {
             vertical: "bottom",
             horizontal: "left"
           }}
+          sx={{
+            ".MuiPopover-paper": {
+              backgroundColor: "rgba(255, 255, 255, 0.16)",
+              borderRadius: "8px"
+            }
+          }}
         >
           <Box
             sx={{
-              bgcolor: "nightBlack.main",
+              bgcolor: "transparent",
               display: "flex",
               flexDirection: "column",
               padding: "10px"

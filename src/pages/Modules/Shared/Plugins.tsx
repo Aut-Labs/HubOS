@@ -17,8 +17,6 @@ import LoadingProgressBar from "@components/LoadingProgressBar";
 import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
 import { PluginDefinitionProperties } from "@aut-labs/sdk/dist/models/plugin";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { useSelector } from "react-redux";
-import { IsAdmin } from "@store/Community/community.reducer";
 import { Link, useSearchParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AutLoading from "@components/AutLoading";
@@ -45,7 +43,7 @@ interface StackParams {
 }
 
 const Plugins = ({ definition }: StackParams) => {
-  const isAdmin = useSelector(IsAdmin);
+  // const isAdmin = useSelector(IsAdmin);
   const [searchParams] = useSearchParams();
   const [showInstalled, setToggleInstalled] = useState(false);
   const { plugins, isLoading, isFetching, refetch } =
@@ -177,7 +175,7 @@ const Plugins = ({ definition }: StackParams) => {
               {filteredPlugins.map((plugin, index) => (
                 <PluginCard
                   isFetching={isFetching}
-                  isAdmin={isAdmin}
+                  isAdmin={false}
                   key={`modules-plugin-${index}`}
                   plugin={plugin}
                   hasCopyright={definition?.properties?.type === "Task"}

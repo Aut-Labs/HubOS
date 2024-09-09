@@ -20,9 +20,7 @@ import {
   useTheme
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ArchetypePieChart, {
-  archetypeChartValues
-} from "../Dashboard/ArchetypePieChart";
+import ArchetypePieChart, { archetypeChartValues } from "./ArchetypePieChart";
 import { ReactComponent as EditIcon } from "@assets/actions/edit.svg";
 import CloseIcon from "@mui/icons-material/Close";
 import {
@@ -36,6 +34,10 @@ import {
   NovaArchetypeParameters
 } from "@aut-labs/sdk/dist/models/nova";
 import { calculateAV } from "@utils/av-calculator";
+import {
+  HubArchetype,
+  HubArchetypeParameters
+} from "@aut-labs/sdk/dist/models/hub";
 
 const GridCard = styled(Card)(({ theme }) => {
   return {
@@ -393,13 +395,13 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
     useSetArchetypeMutation();
 
   const updateArchetype = () => {
-    const updatedArchetype: NovaArchetypeParameters = {
+    const updatedArchetype: HubArchetypeParameters = {
       archetype: selectedArchetype?.type,
-      size: state[NovaArchetype.SIZE].value,
-      growth: state[NovaArchetype.GROWTH].value,
-      conviction: state[NovaArchetype.CONVICTION].value,
-      performance: state[NovaArchetype.PERFORMANCE].value,
-      reputation: state[NovaArchetype.REPUTATION].value
+      size: state[HubArchetype.SIZE].value,
+      growth: state[HubArchetype.GROWTH].value,
+      conviction: state[HubArchetype.CONVICTION].value,
+      performance: state[HubArchetype.PERFORMANCE].value,
+      reputation: state[HubArchetype.REPUTATION].value
     };
     setArchetype(updatedArchetype);
   };
@@ -444,7 +446,7 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
               Back
             </Button>
 
-            <Typography textAlign="center" color="white" variant="h3">
+            <Typography variant="h3" color="offWhite.main" fontWeight="bold">
               Your Archetype
             </Typography>
           </Stack>

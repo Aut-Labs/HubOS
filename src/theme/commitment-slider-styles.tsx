@@ -45,6 +45,40 @@ const SliderWrapper = styled("div")({
   position: "relative"
 });
 
+export const AutOSSlider = ({
+  value,
+  name,
+  errors,
+  sx,
+  sliderProps,
+  ...props
+}: AutSliderProps) => {
+  return (
+    <SliderWrapper sx={sx} className="swiper-no-swiping">
+      <div style={{ position: "relative" }}>
+        <Slider
+          {...sliderProps}
+          sx={{
+            "&.MuiSlider-root": {
+              [`span[data-index="${value}"].MuiSlider-mark`]: {
+                borderTop: "2px solid #14ECEC",
+                borderBottom: "2px solid #14ECEC"
+              }
+            }
+          }}
+        />
+      </div>
+      <div
+        style={{
+          marginTop: "-3px",
+          display: "flex",
+          justifyContent: "flex-end"
+        }}
+      ></div>
+    </SliderWrapper>
+  );
+};
+
 export const AutCommitmentSlider = ({
   value,
   name,
@@ -103,35 +137,87 @@ export default (theme: Theme) =>
     ...theme.components.MuiSelect,
     styleOverrides: {
       root: {
-        "&.MuiSlider-colorPrimary": generateColors(theme.palette.offWhite),
-        width: pxToRem(600),
-        height: pxToRem(65),
-        borderRadius: "0",
-        borderWidth: "2px",
-        borderStyle: "solid",
-        padding: "0",
-
-        'span[data-index="10"].MuiSlider-mark': {
-          display: "none"
+        width: "354px",
+        padding: "0 !important",
+        marginLeft: "-34px",
+        border: "none",
+        "&.MuiSlider-colorPrimary": {
+          color: "#14ECEC",
+          "&.MuiSlider-rail": {
+            display: "none"
+          },
+          ".MuiSlider-track": {
+            display: "none"
+            // marginLeft: "34px",
+            // boxShadow:
+            //   "0px 16px 80px 0px #2E90FA, 0px 16px 64px 0px rgba(20, 200, 236, 0.64), 0px 8px 32px 0px rgba(20, 200, 236, 0.32), 0px 16px 80px 0px #2E90FA, 0px 16px 64px 0px rgba(20, 200, 236, 0.64), 0px 8px 32px 0px rgba(20, 200, 236, 0.32)",
+            // background: "transparent",
+            // height: "6px",
+            // border: "none",
+            // borderRadius: 0
+          },
+          ".MuiTypography-root": {
+            color: theme.palette.offWhite.main
+          }
         },
+        minWidth: "354px",
+        height: "20px",
+
+        [theme.breakpoints.up("sm")]: {
+          minWidth: "600px"
+        },
+        [theme.breakpoints.up("md")]: {
+          minWidth: "600px",
+          ".MuiSlider-thumb": {
+            display: "none"
+          }
+        },
+        [theme.breakpoints.up("xxl")]: {
+          minWidth: "800px",
+          ".MuiSlider-thumb": {
+            display: "none"
+          }
+        },
+
         'span[data-index="0"].MuiSlider-mark': {
           display: "none"
         },
-        ".MuiSlider-thumb": {
-          width: "45px",
-          height: "45px"
-        },
+
         ".MuiSlider-mark": {
-          background: "transparent",
-          width: "5px",
-          height: "5px",
-          borderRadius: "50%",
-          borderStyle: "solid",
-          borderWidth: "1px",
+          background: "#818CA2",
+          opacity: 1,
+          width: "32px",
+          height: "6px",
+          marginRight: "2px",
+
+          [theme.breakpoints.up("sm")]: {
+            width: "52px",
+            height: "9px"
+          },
+          [theme.breakpoints.up("md")]: {
+            width: "52px",
+            height: "9px"
+          },
+          [theme.breakpoints.up("xxl")]: {
+            width: "70px",
+            height: "12px"
+          },
 
           "&.MuiSlider-markActive": {
-            border: "none"
+            background: "#14ECEC",
+            boxShadow: `
+            0px 8px 20px 0px rgba(46, 144, 250, 0.25),
+            0px 4px 16px 0px rgba(20, 200, 236, 0.22),
+            0px 2px 8px 0px rgba(20, 200, 236, 0.18)
+          `,
+            // boxShadow:
+            //   "0px 16px 80px 0px #2E90FA, 0px 16px 64px 0px rgba(20, 200, 236, 0.64), 0px 8px 32px 0px rgba(20, 200, 236, 0.32), 0px 16px 80px 0px #2E90FA, 0px 16px 64px 0px rgba(20, 200, 236, 0.64), 0px 8px 32px 0px rgba(20, 200, 236, 0.32)",
+
+            overflow: "hidden"
           }
+        },
+        ".MuiSlider-thumb": {
+          display: "none"
         },
         ".MuiSlider-track": {
           borderRight: "0"

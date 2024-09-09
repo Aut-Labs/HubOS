@@ -1,6 +1,5 @@
 import { memo, useEffect, useState } from "react";
 import { Box, Container } from "@mui/material";
-import { Community } from "@api/community.model";
 import { useSelector } from "react-redux";
 import { pxToRem } from "@utils/text-size";
 import {
@@ -20,6 +19,7 @@ import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
 import { setTitle } from "@store/ui-reducer";
 import AutLoading from "@components/AutLoading";
+import { DAutHub } from "@aut-labs/d-aut";
 
 const errorTypes = {
   maxLength: `Characters cannot be more than 280`
@@ -52,7 +52,7 @@ const Roles = () => {
 
   const onSubmit = async (data: typeof values) => {
     community.properties.rolesSets[0].roles = data.roles;
-    const promise = dispatch(updateCommunity(new Community(community)));
+    const promise = dispatch(updateCommunity(new DAutHub(community)));
     setPromises([promise]);
   };
 

@@ -28,6 +28,8 @@ import {
 import { UserInfo } from "@auth/auth.reducer";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
 import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
+import { SubtitleWithInfo } from "@components/SubtitleWithInfoIcon";
+import { ReactComponent as HubOsLogo } from "@assets/hubos/hubos-logo.svg";
 
 const Main = styled("main", {
   shouldForwardProp: (prop) =>
@@ -119,15 +121,27 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
     setOpen(!open);
   };
 
+  const userRole = useMemo(() => {
+    if (!community || !userInfo) return null;
+    const userState = userInfo.properties.joinedHubs.find(
+      (h) =>
+        h.hubAddress?.toLowerCase() ===
+        community?.properties?.address?.toLowerCase()
+    );
+    const roles = community.properties.rolesSets[0].roles;
+    return roles.find((r) => +r.id === +userState.role);
+  }, [community, userInfo]);
+
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
+    <Box sx={{ display: "flex", height: "100vh", width: "100%" }}>
       <DiscordServerVerificationPopup
         open={discordDialogOpen}
         handleClose={() => setDiscordDialogOpen(false)}
       ></DiscordServerVerificationPopup>
       <AppBar
         sx={{
-          boxShadow: 2
+          boxShadow: 2,
+          background: "transparent"
         }}
         toolbarHeight={toolbarHeight}
         drawerWidth={drawerWidth}
@@ -137,7 +151,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
         <Toolbar
           sx={{
             minHeight: `${toolbarHeight}px`,
-            backgroundColor: "nightBlack.main",
+            background: "transparent",
             border: 0
           }}
         >
@@ -226,7 +240,10 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
           height: "100vh",
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            backgroundColor: "nightBlack.main",
+            backgroundColor: isMobile
+              ? "rgba(87, 97, 118, 0.3)"
+              : "rgba(87, 97, 118, 0.2)",
+            backdropFilter: isMobile ? "blur(30px)" : "blur(20px)",
             borderTop: 0,
             borderBottom: 0,
             borderLeft: 0,
@@ -242,7 +259,12 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             minHeight: `${toolbarHeight}px !important`
           }}
         >
-          <DashboardTitle variant="subtitle1" />
+          {/* <DashboardTitle variant="subtitle1" /> */}
+          <HubOsLogo
+            height="50px"
+            width="150px"
+            style={{ marginLeft: "-6px" }}
+          ></HubOsLogo>
         </DrawerHeader>
         <Divider />
         <Box
@@ -255,7 +277,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
           }}
         >
           <Stack direction="column">
-            <Typography
+            {/* <Typography
               fontFamily="FractulRegular"
               color="primary"
               variant="subtitle2"
@@ -264,19 +286,25 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             </Typography>
             <Typography variant="caption" color="offWhite.main">
               Network
-            </Typography>
+            </Typography> */}
           </Stack>
           <Stack direction="column">
             <Typography
-              fontFamily="FractulRegular"
-              color="primary"
               variant="subtitle2"
+              fontSize="18px"
+              color="offWhite.main"
+              fontWeight="bold"
             >
               {community?.name}
             </Typography>
-            <Typography variant="caption" color="offWhite.main">
-              Nova
-            </Typography>
+            <SubtitleWithInfo
+              title="hub"
+              description={
+                network
+                  ? `This is your hub. It exists on the ${network?.name} network.`
+                  : null
+              }
+            ></SubtitleWithInfo>
           </Stack>
           <Box
             sx={{
@@ -286,28 +314,32 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
           >
             <Stack direction="column">
               <Typography
-                fontFamily="FractulRegular"
-                color="primary"
                 variant="subtitle2"
-                maxWidth="120px"
+                fontSize="18px"
+                color="offWhite.main"
+                fontWeight="bold"
               >
                 {userInfo?.name}
               </Typography>
-              <Typography variant="caption" color="offWhite.main">
-                Your ĀutID
-              </Typography>
+              <SubtitleWithInfo
+                title="your ĀutID"
+                description={null}
+              ></SubtitleWithInfo>
             </Stack>
             <Stack direction="column">
               <Typography
-                fontFamily="FractulRegular"
-                color="primary"
                 variant="subtitle2"
+                fontSize="18px"
+                color="offWhite.main"
+                fontWeight="bold"
               >
-                {community?.properties?.userData?.roleName}
+                {userRole?.roleName}
               </Typography>
-              <Typography variant="caption" color="offWhite.main">
-                Nova Role
-              </Typography>
+
+              <SubtitleWithInfo
+                title="role"
+                description={`This is your role in the ${community?.name} hub.`}
+              ></SubtitleWithInfo>
             </Stack>
           </Box>
         </Box>

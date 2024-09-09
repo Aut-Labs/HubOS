@@ -16,8 +16,6 @@ import {
 } from "@mui/material";
 import { setTitle } from "@store/ui-reducer";
 import { useGetAllMembersQuery } from "@api/community.api";
-import { DAOMember } from "@api/aut.model";
-import IosShareIcon from "@mui/icons-material/IosShare";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import AutLoading from "@components/AutLoading";
@@ -25,8 +23,9 @@ import { autUrls } from "@api/environment";
 import AutTabs from "@components/AutTabs/AutTabs";
 import { useSelector } from "react-redux";
 import { CommunityData } from "@store/Community/community.reducer";
+import { DAutAutID } from "@aut-labs/d-aut";
 
-const generateMemberTabs = (members: { [role: string]: DAOMember[] }) => {
+const generateMemberTabs = (members: { [role: string]: DAutAutID[] }) => {
   return Object.keys(members || []).reduce((prev, curr) => {
     const item = members[curr];
     if (Array.isArray(item)) {
@@ -93,15 +92,15 @@ const MemberType = styled(Chip)(({ theme }) => {
 });
 
 const MemberCard = memo(
-  ({ member, isFetching }: { member: DAOMember; isFetching: boolean }) => {
+  ({ member, isFetching }: { member: DAutAutID; isFetching: boolean }) => {
     const urls = autUrls();
     return (
       <>
         <GridCardWrapper>
-          <MemberType
+          {/* <MemberType
             label={member.properties?.isAdmin ? "Admin" : "Member"}
             color="primary"
-          />
+          /> */}
           <GridCard
             sx={{
               bgcolor: "nightBlack.main",
@@ -158,7 +157,7 @@ const MemberCard = memo(
                   color="offWhite.main"
                   variant="subtitle2"
                 >
-                  {member?.properties.role?.roleName}
+                  {/* {member?.properties.role?.roleName} */}
                 </Typography>
                 <Typography variant="caption" color="primary">
                   DAO Role
@@ -170,9 +169,9 @@ const MemberCard = memo(
                   color="offWhite.main"
                   variant="subtitle2"
                 >
-                  {`${member?.properties?.commitment || 0} - ${
+                  {/* {`${member?.properties?.commitment || 0} - ${
                     member?.properties?.commitmentDescription
-                  }`}
+                  }`} */}
                 </Typography>
                 <Typography variant="caption" color="primary">
                   Commitment level
@@ -203,7 +202,7 @@ const MemberCard = memo(
   }
 );
 
-const MembersList = ({ members = [] }: { members: DAOMember[] }) => {
+const MembersList = ({ members = [] }: { members: DAutAutID[] }) => {
   return (
     <>
       {members.length ? (
@@ -260,11 +259,11 @@ function Members() {
 
   const tabs = useMemo(() => {
     const groupedMembers = data?.reduce((group, member) => {
-      const key = member.properties.role.roleName;
-      if (!group[key]) {
-        group[key] = [];
-      }
-      group[key].push(member);
+      // const key = member.properties.role.roleName;
+      // if (!group[key]) {
+      //   group[key] = [];
+      // }
+      // group[key].push(member);
       return group;
     }, initializedTabs);
 

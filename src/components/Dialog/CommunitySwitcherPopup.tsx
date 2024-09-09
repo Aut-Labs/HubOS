@@ -7,10 +7,10 @@ import {
 import { pxToRem } from "@utils/text-size";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "@store/store.model";
-import { Community } from "@api/community.model";
 import CopyAddress from "@components/CopyAddress";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import DialogWrapper from "./DialogWrapper";
+import { DAutHub } from "@aut-labs/d-aut";
 
 const CommunityItem = styled("div")({
   width: "100%",
@@ -40,7 +40,7 @@ const CommunitySwitcherPopup = ({ open, onClose }: any) => {
   const dispatch = useAppDispatch();
   const communities = useSelector(Communities);
 
-  const selectCommunity = (community: Community) => {
+  const selectCommunity = (community: DAutHub) => {
     dispatch(
       communityUpdateState({
         selectedCommunityAddress: community.properties.address

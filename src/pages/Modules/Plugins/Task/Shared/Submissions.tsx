@@ -176,11 +176,7 @@ export const SubmissionCard = ({
               variant="body"
               color="white"
             >
-              Submitter:{" "}
-              <CopyAddress
-                color={theme.palette.primary.main}
-                address={row.submitter}
-              />
+              Submitter: <CopyAddress address={row.submitter} />
             </Typography>
             <Typography variant="body" color="white">
               Task type:{" "}

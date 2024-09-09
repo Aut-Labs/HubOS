@@ -14,7 +14,6 @@ import { ReactComponent as GitHubIcon } from "@assets/SocialIcons/GitHubIcon.svg
 import { ReactComponent as LeafIcon } from "@assets/SocialIcons/LeafIcon.svg";
 import { ReactComponent as TelegramIcon } from "@assets/SocialIcons/TelegramIcon.svg";
 import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.svg";
-import { AutID } from "@api/aut.model";
 import { AutButton } from "@components/buttons";
 import { useAppDispatch } from "@store/store.model";
 import { setAsCoreTeam, removeAsCoreTeam } from "@api/community.api";
@@ -28,6 +27,7 @@ import { ResultState } from "@store/result-status";
 import { useSelector } from "react-redux";
 import CopyAddress from "@components/CopyAddress";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
+import { DAutAutID } from "@aut-labs/d-aut";
 
 const IconContainer = styled("div")(({ theme }) => ({
   paddingTop: pxToRem(40),
@@ -89,16 +89,16 @@ const AutCard = styled(Card)(({ theme }) => ({
   }
 }));
 
-const LeftProfile = ({ member }: { member: AutID }) => {
+const LeftProfile = ({ member }: { member: DAutAutID }) => {
   const dispatch = useAppDispatch();
   const status = useSelector(CommunityStatus);
 
   const addOrRemoveAsCoreTeam = () => {
-    if (member.properties.isAdmin) {
-      dispatch(removeAsCoreTeam(member.properties.address));
-    } else {
-      dispatch(setAsCoreTeam(member.properties.address));
-    }
+    // if (member.properties.isAdmin) {
+    //   dispatch(removeAsCoreTeam(member.properties.address));
+    // } else {
+    //   dispatch(setAsCoreTeam(member.properties.address));
+    // }
   };
 
   const handleDialogClose = () => {
@@ -270,7 +270,7 @@ const LeftProfile = ({ member }: { member: AutID }) => {
             color="primary"
             variant="outlined"
           >
-            {member?.properties?.isAdmin ? "Remove as Admin" : "Set as Admin"}
+            {/* {member?.properties?.isAdmin ? "Remove as Admin" : "Set as Admin"} */}
           </AutButton>
         )}
       </Box>

@@ -18,6 +18,17 @@ import Archetype from "./Archetype/Archetype";
 import DAut from "./Modules/Plugins/DAut/DAut";
 import { useGetArchetypeAndStatsQuery } from "@api/community.api";
 import { AllTasks } from "./Modules/Plugins/Task/Shared/AllTasks";
+import { styled } from "@mui/material";
+import backgroundImage from "@assets/hubos/bg-main.png";
+
+const AutContainer = styled("div")(() => ({
+  display: "flex",
+  height: "100%",
+  backgroundImage: `url(${backgroundImage})`,
+  backgroundBlendMode: "hard-light",
+  backgroundSize: "cover",
+  backgroundRepeat: "repeat-y"
+}));
 
 const AutDashboardMain = () => {
   const communityData = useSelector(CommunityData);
@@ -112,42 +123,44 @@ const AutDashboardMain = () => {
 
   return (
     <>
-      {isLoading || isLoadingModules ? (
-        <AutLoading width="130px" height="130px" />
-      ) : (
-        <SidebarDrawer
-          addonMenuItems={[]}
-          // addonMenuItems={
-          //   modulesRoutes?.routes?.length
-          //     ? [modulesRoutes.menuItem]
-          //     : [modulesRoutes.menuItem]
-          // }
-        >
-          <Suspense fallback={<AutLoading width="130px" height="130px" />}>
-            <Routes>
-              <Route index element={<Dashboard />} />
-              <Route path=" " element={<Admins />} />
-              <Route path="community" element={<Members />} />
-              <Route path="edit-community" element={<CommunityEdit />} />
-              <Route path="your-archetype" element={<Archetype />} />
-              <Route path="modules/dAut" element={<DAut />} />
-              {/* <Route path="tasks" element={<AllTasks />} /> */}
-              {/* {modulesRoutes?.routes?.length && (
+      <AutContainer>
+        {isLoading || isLoadingModules ? (
+          <AutLoading width="130px" height="130px" />
+        ) : (
+          <SidebarDrawer
+            addonMenuItems={[]}
+            // addonMenuItems={
+            //   modulesRoutes?.routes?.length
+            //     ? [modulesRoutes.menuItem]
+            //     : [modulesRoutes.menuItem]
+            // }
+          >
+            <Suspense fallback={<AutLoading width="130px" height="130px" />}>
+              <Routes>
+                <Route index element={<Dashboard />} />
+                <Route path="admins" element={<Admins />} />
+                <Route path="community" element={<Members />} />
+                <Route path="edit-community" element={<CommunityEdit />} />
+                <Route path="your-archetype" element={<Archetype />} />
+                <Route path="modules/dAut" element={<DAut />} />
+                {/* <Route path="tasks" element={<AllTasks />} /> */}
+                {/* {modulesRoutes?.routes?.length && (
                 <Route
                   path="quest-submissions"
                   element={<QuestSubmissions />}
                 />
               )} */}
-              {/* <Route path="modules" element={<Modules />} />
+                {/* <Route path="modules" element={<Modules />} />
               {modulesRoutes.routes.map((r) => r)}
               <Route
                 path="*"
                 element={<Navigate to={`/${communityData.name}`} />}
               /> */}
-            </Routes>
-          </Suspense>
-        </SidebarDrawer>
-      )}
+              </Routes>
+            </Suspense>
+          </SidebarDrawer>
+        )}
+      </AutContainer>
     </>
   );
 };

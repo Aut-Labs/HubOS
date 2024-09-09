@@ -54,7 +54,7 @@ export const useOAuth = () => {
             onFailure(error);
           } else {
             const response = await axios.post(
-              `${environment.apiUrl}/autID/config/oauth2AccessToken`,
+              `${environment.apiUrl}/aut/config/oauth2AccessToken`,
               {
                 code: message.data.payload.code,
                 callbackUrl

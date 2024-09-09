@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import AutSDK, { Nova, fetchMetadata } from "@aut-labs/sdk";
+import AutSDK, { Hub, fetchMetadata } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
@@ -10,7 +10,7 @@ const fetch = async (body: any, api: BaseQueryApi) => {
   const state = api.getState() as any;
   const { selectedCommunityAddress } = state.community;
 
-  const nova: Nova = sdk.initService<Nova>(Nova, selectedCommunityAddress);
+  const hub: Hub = sdk.initService<Hub>(Hub, selectedCommunityAddress);
 
   const response = await sdk.moduleRegistry.getModuleDefinitions();
 
@@ -18,7 +18,7 @@ const fetch = async (body: any, api: BaseQueryApi) => {
     const definitionsWithMetadata: ModuleDefinition[] = [];
     for (let i = 1; i < response.data.length; i++) {
       const def = response.data[i];
-      const isActivatedResponse = await nova.isModuleActivated(i);
+      const isActivatedResponse = await hub.isModuleActivated(i);
 
       const moduleData = {
         ...def,
@@ -76,8 +76,8 @@ const activateModule = async ({ moduleId = 1 }, api: BaseQueryApi) => {
   const state = api.getState() as any;
   const { selectedCommunityAddress } = state.community;
 
-  const nova: Nova = sdk.initService<Nova>(Nova, selectedCommunityAddress);
-  const response = await nova.activateModule(moduleId);
+  const hub: Hub = sdk.initService<Hub>(Hub, selectedCommunityAddress);
+  const response = await hub.activateModule(moduleId);
 
   if (response.isSuccess) {
     return {

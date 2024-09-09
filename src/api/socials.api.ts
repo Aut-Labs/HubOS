@@ -1,7 +1,7 @@
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
-import { Community } from "./community.model";
-import AutSDK, { Nova, SDKContractGenericResponse } from "@aut-labs/sdk";
+import AutSDK, { Hub, SDKContractGenericResponse } from "@aut-labs/sdk";
 import { ipfsCIDToHttpUrl } from "./storage.api";
+import { DAutHub } from "@aut-labs/d-aut";
 
 const updateCommunitySocial = async (
   api: BaseQueryApi,
@@ -10,7 +10,7 @@ const updateCommunitySocial = async (
 ): Promise<SDKContractGenericResponse<void>> => {
   const sdk = await AutSDK.getInstance();
   const communityState: {
-    communities: Community[];
+    communities: DAutHub[];
     selectedCommunityAddress: string;
   } = (api.getState() as any)?.community;
 
@@ -18,7 +18,7 @@ const updateCommunitySocial = async (
     (c) => c.properties.address === communityState.selectedCommunityAddress
   );
 
-  sdk.nova = sdk.initService<Nova>(Nova, community.properties.address);
+  sdk.hub = sdk.initService<Hub>(Hub, community.properties.address);
 
   for (let i = 0; i < community.properties.socials.length; i++) {
     const element = community.properties.socials[i];
@@ -28,10 +28,10 @@ const updateCommunitySocial = async (
     }
   }
 
-  const updatedCommunity = Community.updateCommunity(community);
+  const updatedCommunity = DAutHub.updateHubNFT(community as any);
   const uri = await sdk.client.sendJSONToIPFS(updatedCommunity as any);
   console.log("New metadata: ->", ipfsCIDToHttpUrl(uri));
-  const response = await sdk.nova.contract.metadata.setMetadataUri(uri);
+  const response = await sdk.hub.contract.metadata.setMetadataUri(uri);
 
   if (response.isSuccess) {
     const autIdData = JSON.parse(window.localStorage.getItem("aut-data"));
@@ -40,7 +40,7 @@ const updateCommunitySocial = async (
       if (foundSocial) {
         break;
       }
-      const community: Community = autIdData.properties.communities[i];
+      const community: DAutHub = autIdData.properties.communities[i];
       if (community.name === community.name) {
         for (let i = 0; i < community.properties.socials.length; i++) {
           const social = community.properties.socials[i];

@@ -1,6 +1,6 @@
 import { updateCommunity } from "@api/community.api";
-import { Community } from "@api/community.model";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
+import { DAutHub } from "@aut-labs/d-aut";
 import { AutButton } from "@components/buttons";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
@@ -52,10 +52,10 @@ const CommunityEdit = () => {
   const onSubmit = async (data: typeof community) => {
     const promise = dispatch(
       updateCommunity(
-        new Community({
+        new DAutHub({
           ...community,
           ...data
-        })
+        } as DAutHub)
       )
     );
     setPromises([promise]);

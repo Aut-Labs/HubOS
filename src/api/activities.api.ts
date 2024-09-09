@@ -16,7 +16,6 @@ import {
   deployTasks
 } from "./ProviderFactory/deploy-activities";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
-import { Community } from "./community.model";
 // import {
 //   AsyncThunkConfig,
 //   GetThunkAPI
@@ -24,6 +23,7 @@ import { Community } from "./community.model";
 import { DiscordMessage } from "./discord.api";
 import { environment } from "./environment";
 import { addMinutes, set } from "date-fns";
+import { DAutHub } from "@aut-labs/d-aut";
 
 const callThunkProvider = Web3ThunkProviderFactory("Call", {
   provider: null
@@ -157,7 +157,7 @@ export const addActivityTask = taskThunkProvider(
       description,
       title
     } = task;
-    const communities = state.community.communities as Community[];
+    const communities = state.community.communities as DAutHub[];
     const communityAddress = state.community.selectedCommunityAddress as string;
     // const community = communities.find(
     //   (c) => c.properties.address === communityAddress
@@ -279,7 +279,7 @@ export const addGroupCall = callThunkProvider(
       role
     } = callData;
 
-    const communities = state.community.communities as Community[];
+    const communities = state.community.communities as DAutHub[];
     const communityAddress = state.community.selectedCommunityAddress as string;
     // const community = communities.find(
     //   (c) => c.properties.address === communityAddress
@@ -373,7 +373,7 @@ export const addPoll = pollsThunkProvider(
     const state = getState();
     const { title, description, duration, options, emojis, role, allRoles } =
       callData;
-    const communities = state.community.communities as Community[];
+    const communities = state.community.communities as DAutHub[];
     const communityAddress = state.community.selectedCommunityAddress as string;
     // const community = communities.find(
     //   (c) => c.properties.address === communityAddress

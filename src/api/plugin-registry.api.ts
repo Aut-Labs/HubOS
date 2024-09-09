@@ -9,46 +9,49 @@ const fetch = async (body: any, api: BaseQueryApi) => {
   const state = api.getState() as any;
   const { selectedCommunityAddress } = state.community;
 
-  // @ts-ignore
-  const response = await sdk.pluginRegistry.getAllPluginDefinitionsByDAO(
-    selectedCommunityAddress
-  );
+  // const response = await sdk.pluginRegistry.getAllPluginDefinitionsByDAO(
+  //   selectedCommunityAddress
+  // );
 
-  if (response?.isSuccess) {
-    const definitionsWithMetadata: PluginDefinition[] = [];
-
-    for (let i = 0; i < response.data.length; i++) {
-      const def = response.data[i];
-
-      const pluginData = {
-        ...def,
-        metadata: await fetchMetadata<typeof def.metadata>(
-          def.metadataURI,
-          environment.ipfsGatewayUrl
-        )
-      };
-
-      // if (
-      //   pluginData.metadata.properties.module.title === "Onboarding Strategy"
-      // ) {
-      //   pluginData.metadata.properties.module.type = "OnboardingStrategy";
-      //   pluginData.metadata.properties.type = "OnboardingStrategy";
-      // }
-
-      // if (pluginData.metadata.properties.module.title === "Task Type") {
-      //   pluginData.metadata.properties.module.type = "Task";
-      //   pluginData.metadata.properties.type = "Task";
-      // }
-
-      definitionsWithMetadata.push(pluginData as any);
-    }
-    return {
-      data: definitionsWithMetadata
-    };
-  }
   return {
-    error: response.errorMessage
+    data: []
   };
+
+  // if (response?.isSuccess) {
+  //   const definitionsWithMetadata: PluginDefinition[] = [];
+
+  //   for (let i = 0; i < response.data.length; i++) {
+  //     const def = response.data[i];
+
+  //     const pluginData = {
+  //       ...def,
+  //       metadata: await fetchMetadata<typeof def.metadata>(
+  //         def.metadataURI,
+  //         environment.ipfsGatewayUrl
+  //       )
+  //     };
+
+  //     // if (
+  //     //   pluginData.metadata.properties.module.title === "Onboarding Strategy"
+  //     // ) {
+  //     //   pluginData.metadata.properties.module.type = "OnboardingStrategy";
+  //     //   pluginData.metadata.properties.type = "OnboardingStrategy";
+  //     // }
+
+  //     // if (pluginData.metadata.properties.module.title === "Task Type") {
+  //     //   pluginData.metadata.properties.module.type = "Task";
+  //     //   pluginData.metadata.properties.type = "Task";
+  //     // }
+
+  //     definitionsWithMetadata.push(pluginData as any);
+  //   }
+  //   return {
+  //     data: definitionsWithMetadata
+  //   };
+  // }
+  // return {
+  //   error: response.errorMessage
+  // };
 };
 
 const add = async (body: PluginDefinition, api: BaseQueryApi) => {
@@ -69,22 +72,21 @@ const add = async (body: PluginDefinition, api: BaseQueryApi) => {
   const { pluginDefinitionId } = body;
 
   // @ts-ignore
-  const response = await sdk.pluginRegistry.addPluginToDAO(
-    pluginDefinitionId,
-    selectedCommunityAddress,
-    null,
-    network.contracts.offchainVerifierAddress
-  );
+  // const response = await sdk.pluginRegistry.addPluginToDAO(
+  //   pluginDefinitionId,
+  //   selectedCommunityAddress,
+  //   null,
+  //   network.contracts.offchainVerifierAddress
+  // );
 
   if (!response.isSuccess) {
     return {
-      error: response.errorMessage
+      error: null
     };
   }
   return {
     data: {
-      ...body,
-      ...response.data
+      ...body
     }
   };
 };

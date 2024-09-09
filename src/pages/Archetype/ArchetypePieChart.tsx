@@ -26,6 +26,16 @@ const nameShortcut = {
 };
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF"];
+// const MUTED_COLORS = ["#124b7e", "#12685e", "#7f6b14", "#7f4021", "#58127e"];
+// const MUTED_COLORS = ["#468189", "#37509b", "#6a0dad", "#662d91", "#800020"];
+const MUTED_COLORS = ["#7692FF", "#297373", "#8BB174", "#A54657", "#BEB2C8"];
+const MORE_MUTED_COLORS = [
+  "#5f70cc",
+  "#214d4d",
+  "#6d8d5b",
+  "#804044",
+  "#968fa3"
+];
 const RADIAN = Math.PI / 180;
 
 const renderCustomizedLabel = ({
@@ -196,6 +206,62 @@ const ArchetypePieChart = ({
         >
           {mappedData.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          ))}
+        </Pie>
+        <Tooltip />
+      </PieChart>
+    </ResponsiveContainer>
+  );
+};
+
+export const ArchetypePieChartDesign = ({
+  archetype
+}: {
+  archetype: NovaArchetypeParameters;
+}) => {
+  const mappedData = useMemo(() => {
+    const data = archetypeChartValues(archetype);
+    return Object.keys(data || {}).reduce((prev, curr) => {
+      prev = [
+        ...prev,
+        {
+          ...data[curr],
+          name: data[curr].title
+        }
+      ];
+      return prev;
+    }, []);
+  }, [archetype]);
+
+  console.log(mappedData);
+
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const onPieEnter = (_data, index) => {
+    setActiveIndex(index);
+  };
+
+  return (
+    <ResponsiveContainer>
+      <PieChart>
+        <Pie
+          activeIndex={activeIndex}
+          activeShape={renderActiveShape}
+          data={mappedData}
+          cx="50%"
+          cy="50%"
+          labelLine={false}
+          label={renderCustomizedLabel}
+          outerRadius={200} // Increased the chart size
+          fill="#8884d8"
+          onMouseEnter={onPieEnter}
+          dataKey="value"
+        >
+          {mappedData.map((entry, index) => (
+            <Cell
+              key={`cell-${index}`}
+              fill={MORE_MUTED_COLORS[index % COLORS.length]}
+            />
           ))}
         </Pie>
         <Tooltip />

@@ -6,12 +6,12 @@ import {
   updateDiscordSocials
 } from "@api/community.api";
 import { createSelector } from "reselect";
-import { Community } from "@api/community.model";
 import { socialUrls } from "@api/aut.model";
+import { DAutHub } from "@aut-labs/d-aut";
 
 export interface CommunityState {
   selectedCommunityAddress: string;
-  communities: Community[];
+  communities: DAutHub[];
   status: ResultState;
 }
 
@@ -100,17 +100,16 @@ export const communitySlice = createSlice({
 export const { communityUpdateState } = communitySlice.actions;
 
 export const CommunityStatus = (state) => state.community.status as ResultState;
-export const Communities = (state) =>
-  state.community.communities as Community[];
+export const Communities = (state) => state.community.communities as DAutHub[];
 const CommunityAddress = (state) =>
   state.community.selectedCommunityAddress as string;
 export const CommunityData = createSelector(
   Communities,
   CommunityAddress,
   (communities, address) => {
+    console.log(communities, address);
     return (
-      communities.find((c) => c.properties.address === address) ||
-      new Community()
+      communities.find((c) => c.properties.address === address) || new DAutHub()
     );
   }
 );
@@ -158,9 +157,6 @@ export const allRoles = createSelector(CommunityData, (c) => {
   return c.properties?.rolesSets[0]?.roles || [];
 });
 
-export const IsAdmin = createSelector(
-  [CommunityData],
-  (a) => !!a?.properties?.userData?.isAdmin
-);
+export const IsAdmin = createSelector([CommunityData], (a) => false);
 
 export default communitySlice.reducer;

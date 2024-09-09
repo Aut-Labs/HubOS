@@ -1,8 +1,8 @@
 import { styled, SvgIcon, Typography, useMediaQuery } from "@mui/material";
 import { ReactComponent as ShareIcon } from "@assets/ShareIcon.svg";
 import { pxToRem } from "@utils/text-size";
-import { AutID } from "@api/aut.model";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
+import { DAutAutID } from "@aut-labs/d-aut";
 
 const CardTilt = styled("div")(({ theme }) => ({
   borderRadius: 0,
@@ -83,7 +83,7 @@ const AutIdCard = ({ avatar }) => {
   );
 };
 
-const RightProfile = ({ member }: { member: AutID }) => {
+const RightProfile = ({ member }: { member: DAutAutID }) => {
   const desktop = useMediaQuery("(min-width:769px)");
 
   return (

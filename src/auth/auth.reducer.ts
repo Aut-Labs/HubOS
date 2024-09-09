@@ -1,11 +1,11 @@
-import { AutID } from "@api/aut.model";
 import { CacheModel } from "@api/cache.api";
+import { DAutAutID } from "@aut-labs/d-aut";
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 import { getMemberPhases } from "@utils/beta-phases";
 
 export interface AuthState {
   isAuthenticated: boolean;
-  userInfo: any;
+  userInfo: DAutAutID;
   userAddress: string;
   cache: CacheModel;
 }
@@ -37,7 +37,7 @@ export const authSlice = createSlice({
 export const { setAuthenticated, setUserAddress, resetAuthState } =
   authSlice.actions;
 
-export const userInfo = (state) => state.auth.userInfo as AutID;
+export const userInfo = (state) => state.auth.userInfo as DAutAutID;
 export const sdkInitialized = (state) =>
   state.walletProvider.sdkInitialized as boolean;
 export const UserInfo = createSelector([userInfo], (a) => a);

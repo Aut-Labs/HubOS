@@ -69,12 +69,12 @@ const DiscordServerVerificationPopup = ({
               element.link = values.inviteLink;
             }
           }
-          const communityUpdateResult = await dispatch(
-            updateDiscordSocials({ community, inviteLink })
-          );
-          if (communityUpdateResult.meta.requestStatus !== "rejected") {
-            handleClose();
-          }
+          // const communityUpdateResult = await dispatch(
+          //   updateDiscordSocials({ community, inviteLink })
+          // );
+          // if (communityUpdateResult.meta.requestStatus !== "rejected") {
+          //   handleClose();
+          // }
           setLoading(false);
         }
       },

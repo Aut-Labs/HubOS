@@ -43,7 +43,7 @@ export const getAutAddress = (): Promise<string> => {
 
 export const getDAOProgress = (novaAddress: string): Promise<CacheModel[]> => {
   return axios
-    .get(`${environment.apiUrl}/autID/cache/getDAOData/${novaAddress}`, {})
+    .get(`${environment.apiUrl}/aut/cache/getDAOData/${novaAddress}`, {})
     .then((res) => res.data);
 };
 
@@ -131,6 +131,6 @@ const autIDThunkProvider = Web3ThunkProviderFactory("AutID", {
 
 export const getAppConfig = (): Promise<NetworkConfig[]> => {
   return axios
-    .get(`${environment.apiUrl}/autid/config/network/${environment.networkEnv}`)
+    .get(`${environment.apiUrl}/aut/config/network/${environment.networkEnv}`)
     .then((r) => r.data);
 };

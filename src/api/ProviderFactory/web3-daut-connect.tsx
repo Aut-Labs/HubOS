@@ -1,7 +1,6 @@
 import { memo, useEffect, useLayoutEffect, useRef } from "react";
 import { useAppDispatch } from "@store/store.model";
-import { AutID } from "@api/aut.model";
-import { Init } from "@aut-labs/d-aut";
+import { DAutAutID, Init } from "@aut-labs/d-aut";
 import { useSelector } from "react-redux";
 import {
   NetworksConfig,
@@ -52,14 +51,13 @@ function Web3DautConnect({
     }
   };
 
-  const _parseAutId = async (profile: any): Promise<AutID> => {
-    const autID = new AutID(profile);
-    autID.properties.communities = autID.properties.communities.filter((c) => {
-      return c.properties.userData?.isActive;
-    });
-    autID.properties.network =
-      profile.properties.network?.network?.toLowerCase();
-
+  const _parseAutId = async (profile: DAutAutID): Promise<DAutAutID> => {
+    const autID = new DAutAutID(profile);
+    // autID.properties.communities = autID.properties.communities.filter((c) => {
+    //   return c.properties.userData?.isActive;
+    // });
+    // autID.properties.network =
+    //   profile.properties.network?.network?.toLowerCase();
     return autID;
   };
 
@@ -73,7 +71,8 @@ function Web3DautConnect({
     if (autID.properties.network) {
       const selectedNetwork = networks.find(
         (d) =>
-          d.network.toLowerCase() === autID.properties.network.toLowerCase()
+          d.network.toLowerCase() ===
+          autID.properties.network.network.toLowerCase()
       );
       const itemsToUpdate = {
         sdkInitialized: true,
@@ -83,9 +82,9 @@ function Web3DautConnect({
 
       await dispatch(
         communityUpdateState({
-          communities: autID.properties.communities,
-          selectedCommunityAddress:
-            autID.properties.communities[0].properties?.address
+          communities: autID.properties.hubs,
+          //TODO: to change
+          selectedCommunityAddress: autID.properties.hubs[0].properties?.address
         })
       );
 
@@ -127,7 +126,7 @@ function Web3DautConnect({
     console.log("network", network);
     await dispatch(updateWalletProviderState(itemsToUpdate));
     await sdk.init(multiSigner, {
-      novaRegistryAddress: network.contracts.novaRegistryAddress,
+      hubRegistryAddress: network.contracts.novaRegistryAddress,
       autIDAddress: network.contracts.autIDAddress,
       daoExpanderRegistryAddress: network.contracts.daoExpanderRegistryAddress
     });
@@ -151,20 +150,29 @@ function Web3DautConnect({
       window.addEventListener("aut-onDisconnected", onDisconnected);
       dAutInitialized.current = true;
       const btnConfig = {
-        metaMask: true,
+        metaMaskSDK: true,
         walletConnect: true,
         coinbaseWalletSDK: true,
         web3auth: true
       };
 
+      console.log("connectors", connectors);
+
       const allowedConnectors = Object.keys(btnConfig)
         .filter((connector) => btnConfig[connector])
-        .map((connector) => connectors.find((c) => c.id === connector));
+        .map((connector) => {
+          const c = connectors.find((c) => c.id === connector);
+          if (c.name == "MetaMask") {
+            // @ts-ignore
+            c.id = "metaMask";
+          }
+          return c;
+        });
 
       console.log("multiSignerId", multiSignerId);
-      console.log("multiSigner", multiSigner);
+      console.log("allowedConnectors", allowedConnectors);
 
-      const config = {
+      const config: any = {
         defaultText: "Connect Wallet",
         textAlignment: "right",
         menuTextAlignment: "left",
@@ -185,7 +193,8 @@ function Web3DautConnect({
           REACT_APP_GRAPH_API_URL: environment.graphApiUrl,
           REACT_APP_IPFS_API_KEY: environment.ipfsApiKey,
           REACT_APP_IPFS_API_SECRET: environment.ipfsApiSecret,
-          REACT_APP_IPFS_GATEWAY_URL: environment.ipfsGatewayUrl
+          REACT_APP_IPFS_GATEWAY_URL: environment.ipfsGatewayUrl,
+          REACT_APP_ENV: environment.env as EnvMode
         },
         connector: {
           connect,
@@ -194,6 +203,7 @@ function Web3DautConnect({
           connectors: allowedConnectors,
           networks,
           state: {
+            chainId,
             multiSignerId,
             multiSigner,
             isConnected,

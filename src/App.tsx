@@ -103,7 +103,7 @@ function App() {
         ) : (
           <>
             <Routes>
-              <Route path="callback" element={<Callback />} />
+              {/* <Route path="callback" element={<Callback />} /> */}
               {!isAutheticated && (
                 <>
                   <Route path="/" element={<GetStarted />} />

@@ -1,4 +1,3 @@
-import { Community } from "@api/community.model";
 import {
   DiscordMessage,
   DiscordPollInput,
@@ -6,6 +5,7 @@ import {
   postDiscordNotification as sendNotification,
   postDiscordPoll
 } from "@api/discord.api";
+import { DAutHub } from "@aut-labs/d-aut";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export const sendDiscordNotification = createAsyncThunk(
@@ -13,7 +13,7 @@ export const sendDiscordNotification = createAsyncThunk(
   async (message: DiscordMessage, { dispatch, getState }) => {
     try {
       const state: any = getState();
-      const communities = state.community.communities as Community[];
+      const communities = state.community.communities as DAutHub[];
       const communityAddress = state.community
         .selectedCommunityAddress as string;
       const community = communities.find(
@@ -45,7 +45,7 @@ export const sendDiscordPoll = createAsyncThunk(
   async (input: DiscordPollInput, { dispatch, getState }) => {
     try {
       const state = getState() as any;
-      const communities = state.community.communities as Community[];
+      const communities = state.community.communities as DAutHub[];
       const communityAddress = state.community
         .selectedCommunityAddress as string;
       const community = communities.find(

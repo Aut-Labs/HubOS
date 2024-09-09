@@ -17,7 +17,6 @@ import {
 import { memo, useMemo } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddIcon from "@mui/icons-material/Add";
-import LoadingButton from "@mui/lab/LoadingButton";
 import { useSelector } from "react-redux";
 import { SelectedNetwork } from "@store/WalletProvider/WalletProvider";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
@@ -27,6 +26,7 @@ import {
 } from "@aut-labs/sdk/dist/models/plugin";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { useActivateModuleMutation } from "@api/module-registry.api";
+import { LoadingButton } from "@mui/lab";
 
 const GridCard = styled(Card)(({ theme }) => {
   return {

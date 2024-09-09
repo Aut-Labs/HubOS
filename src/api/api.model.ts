@@ -1,7 +1,5 @@
 import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
 import { CommunityMembershipDetails } from "@aut-labs/sdk/dist/models/holder";
-import { Community } from "./community.model";
-import { httpUrlToIpfsCID } from "./storage.api";
 
 /* eslint-disable no-shadow */
 export enum ActivityTypes {

@@ -13,7 +13,9 @@ import {
   MenuItem,
   Slider,
   Stack,
-  Typography
+  styled,
+  Typography,
+  useTheme
 } from "@mui/material";
 import { AutSelectField } from "@theme/field-select-styles";
 import { AutTextField } from "@theme/field-text-styles";
@@ -27,7 +29,16 @@ import { countWords } from "@utils/helpers";
 import { CommunityData, allRoles } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
 
-import { FormContainer } from "../Shared/FormContainer";
+import { FormContainerHubOs } from "../Shared/FormContainer";
+import { AutOSSlider } from "@theme/commitment-slider-styles";
+import { max } from "date-fns";
+import { AutOsButton } from "@components/buttons";
+import {
+  CommitmentSliderWrapper,
+  SliderFieldWrapper,
+  StyledTextField,
+  TextFieldWrapper
+} from "../Shared/StyledFields";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -53,10 +64,39 @@ interface PluginParams {
   plugin: PluginDefinition;
 }
 
+// const StyledTextField = styled(AutTextField)(({ theme }) => ({
+//   width: "100%",
+//   ".MuiInputBase-input": {
+//     fontSize: "16px",
+//     color: theme.palette.offWhite.main,
+//     "&::placeholder": {
+//       color: theme.palette.offWhite.main,
+//       opacity: 0.5
+//     },
+//     "&.Mui-disabled": {
+//       color: "#7C879D",
+//       textFillColor: "#7C879D"
+//     }
+//   },
+//   ".MuiInputBase-root": {
+//     caretColor: theme.palette.primary.main,
+//     fieldset: {
+//       border: "1.5px solid #576176 !important",
+//       borderRadius: "6px"
+//     },
+//     borderRadius: "6px",
+//     background: "transparent"
+//   },
+//   ".MuiInputLabel-root": {
+//     color: "#7C879D"
+//   }
+// }));
+
 const OpenTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const roles = useSelector(allRoles);
+  const theme = useTheme();
   const communityData = useSelector(CommunityData);
   const { control, handleSubmit, getValues, formState, watch } = useForm({
     mode: "onChange",
@@ -78,27 +118,28 @@ const OpenTasks = ({ plugin }: PluginParams) => {
     useCreateTaskMutation();
 
   const onSubmit = async () => {
-    const values = getValues();
-    createTask({
-      novaAddress: communityData.properties.address,
-      pluginTokenId: plugin.tokenId,
-      pluginAddress: plugin.pluginAddress,
-      task: {
-        role: 1,
-        weight: values.weight,
-        metadata: {
-          name: values.title,
-          description: values.description,
-          properties: {
-            attachmentRequired: values.attachmentRequired,
-            textRequired: values.textRequired,
-            attachmentType: values.attachmentType
-          }
-        },
-        startDate: dateToUnix(values.startDate),
-        endDate: dateToUnix(values.endDate)
-      } as unknown as Task
-    });
+    return null;
+    // const values = getValues();
+    // createTask({
+    //   novaAddress: communityData.properties.address,
+    //   pluginTokenId: plugin.tokenId,
+    //   pluginAddress: plugin.pluginAddress,
+    //   task: {
+    //     role: 1,
+    //     weight: values.weight,
+    //     metadata: {
+    //       name: values.title,
+    //       description: values.description,
+    //       properties: {
+    //         attachmentRequired: values.attachmentRequired,
+    //         textRequired: values.textRequired,
+    //         attachmentType: values.attachmentType
+    //       }
+    //     },
+    //     startDate: dateToUnix(values.startDate),
+    //     endDate: dateToUnix(values.endDate)
+    //   } as unknown as Task
+    // });
   };
 
   useEffect(() => {
@@ -116,7 +157,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
   }, [roles, searchParams]);
 
   return (
-    <FormContainer onSubmit={handleSubmit(onSubmit)}>
+    <FormContainerHubOs onSubmit={handleSubmit(onSubmit)}>
       <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
       <LoadingDialog open={isLoading} message="Creating task..." />
 
@@ -132,26 +173,15 @@ const OpenTasks = ({ plugin }: PluginParams) => {
         }}
       >
         <Stack alignItems="center" justifyContent="center">
-          <Button
-            startIcon={<ArrowBackIosNewIcon />}
-            color="offWhite"
-            sx={{
-              position: {
-                sm: "absolute"
-              },
-              left: {
-                sm: "0"
-              }
+          <Typography
+            variant="subtitle1"
+            fontSize={{
+              xs: "14px",
+              md: "20px"
             }}
-            to={`/${communityData?.name}/modules/Task`}
-            component={Link}
+            color="offWhite.main"
+            fontWeight="bold"
           >
-            {/* {searchParams.get("returnUrlLinkName") || "Back"} */}
-            <Typography color="white" variant="body">
-              Back
-            </Typography>
-          </Button>
-          <Typography textAlign="center" color="white" variant="h3">
             Open Task for {selectedRole?.roleName}
           </Typography>
         </Stack>
@@ -166,8 +196,8 @@ const OpenTasks = ({ plugin }: PluginParams) => {
           mt={2}
           mx="auto"
           textAlign="center"
-          color="white"
-          variant="body"
+          color="offWhite.main"
+          fontSize="16px"
         >
           Create an Open Task which will require you to approve or dismiss
           submissions. <br /> This Task type is designed to give you <br />{" "}
@@ -176,7 +206,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
       </Box>
       <Stack
         direction="column"
-        gap={8}
+        gap={4}
         sx={{
           margin: "0 auto",
           width: {
@@ -186,49 +216,108 @@ const OpenTasks = ({ plugin }: PluginParams) => {
           }
         }}
       >
-        <Grid container spacing={2}>
-          <Grid item xs={8}>
-            <Controller
-              name="title"
-              control={control}
-              rules={{
-                required: true,
-                validate: {
-                  maxWords: (v: string) => countWords(v) <= 6
-                }
-              }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
-                    variant="standard"
-                    color="offWhite"
-                    required
-                    sx={{
-                      width: "100%"
-                    }}
-                    autoFocus
-                    name={name}
-                    value={value || ""}
-                    onChange={onChange}
-                    placeholder="Title"
-                    helperText={
-                      <FormHelperText
-                        errorTypes={errorTypes}
-                        value={value}
-                        name={name}
-                        errors={formState.errors}
-                      >
-                        <Typography color="white" variant="caption">
-                          {6 - countWords(value)} Words left
-                        </Typography>
-                      </FormHelperText>
-                    }
-                  />
-                );
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
+        <TextFieldWrapper>
+          <Typography
+            variant="caption"
+            color="offWhite.main"
+            mb={theme.spacing(1)}
+          >
+            Title
+          </Typography>
+          <Controller
+            name="title"
+            control={control}
+            rules={{
+              required: true,
+              validate: {
+                maxWords: (v: string) => countWords(v) <= 6
+              }
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <StyledTextField
+                  color="offWhite"
+                  required
+                  sx={{
+                    // ".MuiInputBase-input": {
+                    //   height: "48px"
+                    // },
+                    width: "100%",
+                    height: "48px"
+                  }}
+                  autoFocus
+                  name={name}
+                  value={value || ""}
+                  onChange={onChange}
+                  placeholder="Choose a title for your task"
+                  helperText={
+                    <FormHelperText
+                      errorTypes={errorTypes}
+                      value={value}
+                      name={name}
+                      errors={formState.errors}
+                    >
+                      <Typography variant="caption" color="white">
+                        {6 - countWords(value)} Words left
+                      </Typography>
+                    </FormHelperText>
+                  }
+                />
+              );
+            }}
+          />
+        </TextFieldWrapper>
+        <TextFieldWrapper>
+          <Typography
+            variant="caption"
+            color="offWhite.main"
+            mb={theme.spacing(1)}
+          >
+            Description
+          </Typography>
+          <Controller
+            name="description"
+            control={control}
+            rules={{
+              required: true,
+              maxLength: 257
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <StyledTextField
+                  name={name}
+                  value={value || ""}
+                  color="offWhite"
+                  rows="5"
+                  multiline
+                  onChange={onChange}
+                  placeholder="Describe the requirements of the task including instructions on what to submit. I.e. a link to an artwork or plain text."
+                  helperText={
+                    <FormHelperText
+                      errorTypes={errorTypes}
+                      value={value}
+                      name={name}
+                      errors={formState.errors}
+                    >
+                      <Typography variant="caption" color="white">
+                        {257 - (value?.length || 0)} of 257 characters left
+                      </Typography>
+                    </FormHelperText>
+                  }
+                />
+              );
+            }}
+          />
+        </TextFieldWrapper>
+        <SliderFieldWrapper>
+          <Typography
+            variant="caption"
+            color="offWhite.main"
+            mb={theme.spacing(1)}
+          >
+            Weight (1-10)
+          </Typography>
+          <CommitmentSliderWrapper>
             <Controller
               name="weight"
               control={control}
@@ -241,37 +330,41 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                 return (
                   <Box
                     sx={{
-                      marginTop: "10px"
+                      marginTop: "10px",
+                      marginLeft: {
+                        sm: "-24px",
+                        xxl: "-44px"
+                      }
                     }}
                     gap={2}
                   >
-                    <Slider
-                      step={1}
+                    <AutOSSlider
+                      value={value}
                       name={name}
-                      min={1}
-                      max={10}
-                      sx={{
-                        width: "100%",
-                        height: "20px",
-                        ".MuiSlider-thumb": {
-                          display: "none"
-                        }
+                      errors={null}
+                      sliderProps={{
+                        defaultValue: 1,
+                        step: 1,
+                        marks: true,
+                        name,
+                        value: (value as any) || 0,
+                        onChange,
+                        min: 0,
+                        max: 10
                       }}
-                      onChange={onChange}
-                      // placeholder="Weight"
-                      value={+(value || 0)}
                     />
                     <Box
                       sx={{
                         display: "flex",
-                        justifyContent: "space-between",
-                        minWidth: "40px"
+                        justifyContent: "flex-end",
+                        width: {
+                          xs: "100%",
+                          sm: "620px",
+                          xxl: "840px"
+                        }
                       }}
                     >
-                      <Typography color="white" variant="caption">
-                        Weight (1-10)
-                      </Typography>
-                      <Typography color="white" variant="caption">
+                      <Typography variant="caption" color="offWhite.dark">
                         {value}
                       </Typography>
                     </Box>
@@ -306,8 +399,8 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                 );
               }}
             />
-          </Grid>
-        </Grid>
+          </CommitmentSliderWrapper>
+        </SliderFieldWrapper>
 
         <Stack direction="row" gap={4}>
           <Controller
@@ -345,41 +438,6 @@ const OpenTasks = ({ plugin }: PluginParams) => {
           />
         </Stack>
 
-        <Controller
-          name="description"
-          control={control}
-          rules={{
-            required: true,
-            maxLength: 257
-          }}
-          render={({ field: { name, value, onChange } }) => {
-            return (
-              <AutTextField
-                name={name}
-                value={value || ""}
-                onChange={onChange}
-                variant="outlined"
-                color="offWhite"
-                required
-                multiline
-                rows={5}
-                placeholder="Describe the requirements of the task including instructions on what to submit. I.e. a link to an artwork or plain text."
-                helperText={
-                  <FormHelperText
-                    errorTypes={errorTypes}
-                    value={value}
-                    name={name}
-                    errors={formState.errors}
-                  >
-                    <Typography color="white" variant="caption">
-                      {257 - (value?.length || 0)} of 257 characters left
-                    </Typography>
-                  </FormHelperText>
-                }
-              />
-            );
-          }}
-        />
         <Stack
           direction="column"
           gap={2}
@@ -397,10 +455,9 @@ const OpenTasks = ({ plugin }: PluginParams) => {
         >
           <Stack direction="column">
             <Typography
-              color="white"
-              variant="body"
-              component="div"
-              sx={{ mb: "5px" }}
+              variant="caption"
+              color="offWhite.main"
+              mb={theme.spacing(1)}
             >
               Choose whether contributors need to complete a text input, attach
               a file, or both. At least one of the options must be selected.
@@ -439,7 +496,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                 alignItems: "center"
               }}
             >
-              <Typography color="white" variant="body" component="div">
+              <Typography color="white" variant="caption" component="div">
                 Text
               </Typography>
               <Controller
@@ -457,7 +514,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                       onChange={onChange}
                       sx={{
                         ".MuiSvgIcon-root": {
-                          color: !value ? "offWhite.main" : "primary.main"
+                          color: !value ? "offWhite.main" : "secondary.main"
                         }
                       }}
                     />
@@ -487,7 +544,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                   alignItems: "center"
                 }}
               >
-                <Typography color="white" variant="body" component="div">
+                <Typography color="white" variant="caption" component="div">
                   Attachment
                 </Typography>
 
@@ -506,7 +563,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
                         onChange={onChange}
                         sx={{
                           ".MuiSvgIcon-root": {
-                            color: !value ? "offWhite.main" : "primary.main"
+                            color: !value ? "offWhite.main" : "secondary.main"
                           }
                         }}
                       />
@@ -607,14 +664,22 @@ const OpenTasks = ({ plugin }: PluginParams) => {
             }
           }}
         >
-          <StepperButton
-            label="Confirm"
+          <AutOsButton
+            type="button"
+            color="primary"
             disabled={!formState.isValid}
-            sx={{ width: "250px" }}
-          />
+            variant="outlined"
+            sx={{
+              width: "100px"
+            }}
+          >
+            <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
+              Confirm
+            </Typography>
+          </AutOsButton>
         </Box>
       </Stack>
-    </FormContainer>
+    </FormContainerHubOs>
   );
 };
 

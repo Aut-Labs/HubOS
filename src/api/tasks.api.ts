@@ -10,7 +10,7 @@ export const saveQestions = async (
 ): Promise<void> => {
   // const token = localStorage.getItem(AUTH_TOKEN_KEY);
   const res = await axios.post(
-    `${environment.apiUrl}/autID/quiz`,
+    `${environment.apiUrl}/aut/quiz`,
     {
       address: userAddress,
       taskAddress,
@@ -34,7 +34,7 @@ export const deleteQestions = async (
 ): Promise<void> => {
   // const token = localStorage.getItem(AUTH_TOKEN_KEY);
   const res = await axios.post(
-    `${environment.apiUrl}/autID/removeQuiz`,
+    `${environment.apiUrl}/aut/removeQuiz`,
     {
       address: userAddress,
       taskAddress,
@@ -53,7 +53,7 @@ export const deleteQestions = async (
 export const getQestions = async (taskAddress: string): Promise<any[]> => {
   // const token = localStorage.getItem(AUTH_TOKEN_KEY);
   const res = await axios.get(
-    `${environment.apiUrl}/autID/quiz/all`
+    `${environment.apiUrl}/aut/quiz/all`
 
     // {
     //   headers: {

@@ -169,23 +169,23 @@ const DAut = () => {
     useUpdateDomainsMutation();
 
   const DomainsMap = useMemo(() => {
-    const domains = data?.community?.properties?.domains || [];
-    let mapped = [];
+    // const domains = data?.community?.properties?.domains || [];
+    const mapped = [];
 
-    if (domains.length) {
-      mapped = domains.map((x, i) => {
-        return { id: i, domain: x.domain, note: x.note };
-      });
-    } else {
-      mapped = [
-        {
-          id: 0,
-          domain: "",
-          note: ""
-        }
-      ];
-    }
-    setInitialData(mapped);
+    // if (domains.length) {
+    //   mapped = domains.map((x, i) => {
+    //     return { id: i, domain: x.domain, note: x.note };
+    //   });
+    // } else {
+    //   mapped = [
+    //     {
+    //       id: 0,
+    //       domain: "",
+    //       note: ""
+    //     }
+    //   ];
+    // }
+    // setInitialData(mapped);
     return mapped;
   }, [data]);
 

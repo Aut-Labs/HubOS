@@ -13,16 +13,21 @@ import {
   SvgIcon,
   Badge,
   Tooltip,
-  Button
+  Button,
+  styled,
+  useTheme
 } from "@mui/material";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+
 import { allRoles, CommunityData } from "@store/Community/community.reducer";
 import { useDispatch, useSelector } from "react-redux";
 import { setTitle } from "@store/ui-reducer";
-import { memo, useEffect } from "react";
+import { memo, useEffect, useMemo } from "react";
 import { UserInfo } from "@auth/auth.reducer";
 import CopyAddress from "@components/CopyAddress";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import {
+  ArchetypeTypes,
   useGetAllMembersQuery,
   useGetArchetypeAndStatsQuery
 } from "@api/community.api";
@@ -30,8 +35,14 @@ import LoadingProgressBar from "@components/LoadingProgressBar";
 import { ReactComponent as EditIcon } from "@assets/actions/edit.svg";
 import { Link } from "react-router-dom";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import ArchetypePieChart from "./ArchetypePieChart";
 import { NovaArchetype } from "@aut-labs/sdk/dist/models/nova";
+import { SubtitleWithInfo } from "@components/SubtitleWithInfoIcon";
+import AutIconLabel from "@components/AutIconLabel";
+import { MarketTemplates } from "@api/community.model";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import HubRoleTabs from "../Roles/HubRolesTabs";
+import { ArchetypePieChartDesign } from "../Archetype/ArchetypePieChart";
+import ArchetypeTabs from "../Archetype/ArchetypeTabs";
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -43,9 +54,100 @@ const getGreeting = () => {
   return welcomeText;
 };
 
+const FollowWrapper = styled("div")(() => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start",
+  width: "150px",
+  justifyContent: "center"
+}));
+
+const AutContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  height: "100%",
+  paddingTop: "32px",
+  gap: "30px",
+  flexDirection: "row",
+  [theme.breakpoints.down("md")]: {
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "20px",
+    width: "100%"
+  }
+
+  // backgroundImage: `url(${backgroundImage})`,
+  // backgroundBlendMode: "hard-light",
+  // backgroundSize: "cover",
+  // backgroundRepeat: "repeat-y"
+}));
+
+const LeftWrapper = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  height: "fit-content",
+  width: "100%",
+  maxWidth: "480px",
+  backdropFilter: "blur(12px)",
+  backgroundColor: "rgba(128, 128, 128, 0.06)",
+  boxShadow: "0px 3px 6px #00000029",
+  borderRadius: "24px",
+  padding: "32px 16px",
+  marginLeft: "24px",
+  [theme.breakpoints.down("md")]: {
+    width: "90%",
+    maxWidth: "unset",
+    marginLeft: 0,
+    marginRight: 0
+  }
+}));
+
+const RightWrapper = styled(Box)(({ theme }) => ({
+  alignSelf: "flex-start",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "flex-start",
+  px: "30px",
+  marginRight: "25px",
+  marginLeft: "25px",
+  height: "100%",
+  position: "relative",
+  // width: "70%",
+  flex: 1,
+  [theme.breakpoints.down("md")]: {
+    width: "100%",
+    marginLeft: 0,
+    marginRight: 0
+  }
+}));
+const calculateFontSize = (name: string) => {
+  const words = name.split(" ");
+  const longestWordLength = Math.max(...words.map((word) => word.length));
+  if (longestWordLength >= 22) {
+    return "0.85rem !important";
+  } else if (longestWordLength >= 20) {
+    return "0.95rem !important";
+  } else if (longestWordLength >= 18) {
+    return "1.05rem !important";
+  } else if (longestWordLength >= 16) {
+    return "1.15rem !important";
+  } else if (longestWordLength >= 14) {
+    return "1.25rem !important";
+  } else if (longestWordLength >= 12) {
+    return "1.35rem !important";
+  } else if (longestWordLength >= 10) {
+    return "1.45rem !important";
+  } else {
+    return "";
+  }
+};
+
 const Dashboard = () => {
   const dispatch = useDispatch();
   const userInfo = useSelector(UserInfo);
+  console.log("userInfo", userInfo);
   const community = useSelector(CommunityData);
   const roles = useSelector(allRoles);
 
@@ -68,30 +170,47 @@ const Dashboard = () => {
     })
   });
 
-  console.log(archetype, isLoadingArchetype, isFetchingArchetype);
+  //TODO: Remove this when the data is available
+  // community.properties.market = "Social, Art & Gaming";
+  // community.properties.prestige = 100;
+  // community.properties.members = 1;
+
+  const marketTemplate = useMemo(() => {
+    const marketName = community?.properties?.market;
+    return MarketTemplates.find(
+      (v) => v.title === marketName || v.market === +marketName
+    );
+  }, [community]);
+  const selectedArchetype = useMemo(() => {
+    if (!community?.properties?.archetype?.default) {
+      return null;
+    }
+    return ArchetypeTypes[community?.properties?.archetype?.default];
+  }, [community]);
 
   const membersTableData = {
     totalMembers: 0
   };
 
-  let averageCommitment = 0;
+  const averageCommitment = 0;
+  const blockExplorer = "https://etherscan.io";
+  const theme = useTheme();
 
   if (data && roles && data?.length) {
     membersTableData.totalMembers = data.length;
     roles.forEach((role) => {
-      const membersByRole = data.reduce(function (n, member) {
-        return n + +(member?.properties?.role.id == role.id);
-      }, 0);
-
-      membersTableData[role.id] = membersByRole;
+      // const membersByRole = data.reduce(function (n, member) {
+      //   return n + +(member?.properties?.role.id == role.id);
+      // }, 0);
+      // membersTableData[role.id] = membersByRole;
     });
 
-    const commitmentSum = data.reduce(
-      (prev, curr) => prev + +curr.properties.commitment,
-      0
-    );
+    // const commitmentSum = data.reduce(
+    //   (prev, curr) => prev + +curr.properties.commitment,
+    //   0
+    // );
 
-    averageCommitment = Math.round(commitmentSum / data.length);
+    // averageCommitment = Math.round(commitmentSum / data.length);
   }
 
   useEffect(() => {
@@ -104,12 +223,14 @@ const Dashboard = () => {
     );
   }, [dispatch, userInfo]);
 
+  console.log("rolSets", community.properties.rolesSets[0]);
+
   return (
     <Container
       sx={{
         flexGrow: 1,
         display: "flex",
-        alignItems: "center",
+        gap: "30px",
         maxWidth: {
           xs: "sm",
           sm: "100%"
@@ -118,243 +239,285 @@ const Dashboard = () => {
     >
       <LoadingProgressBar isLoading={isFetching} />
 
-      <Grid container spacing={4} mt={0}>
-        <Grid item sm={12} md={6}>
-          <Card
-            sx={{
-              borderColor: "divider",
-              borderRadius: "16px",
-              boxShadow: 7,
-              width: "100%",
-              margin: "0 auto",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "flex-start",
-              background: "transparent",
-              maxWidth: {
-                xs: "100%",
-                sm: "90%",
-                md: "80%",
-                xxl: "65%"
-              }
-            }}
-          >
-            <CardHeader
-              avatar={
-                <Avatar
+      <LeftWrapper>
+        <Stack
+          sx={{
+            width: "100%",
+            maxWidth: "400px",
+            px: "24px"
+          }}
+        >
+          <AutContainer>
+            <Stack
+              sx={{
+                width: "100%",
+                maxWidth: "400px"
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "12px",
+                  justifyContent: "center"
+                }}
+              >
+                <Box
                   sx={{
+                    flex: "1",
+                    height: {
+                      xs: "120px",
+                      sm: "120px",
+                      md: "120px",
+                      xxl: "130px"
+                    },
                     width: {
                       xs: "120px",
-                      xxl: "300px"
+                      sm: "120px",
+                      md: "120px",
+                      xxl: "130px"
                     },
-                    height: "100%"
+                    "@media (max-width: 370px)": {
+                      height: "100px",
+                      width: "100px"
+                    },
+                    minWidth: "120px",
+                    position: "relative"
                   }}
-                  variant="square"
-                  srcSet={ipfsCIDToHttpUrl(community?.image as string)}
-                />
-              }
-              sx={{
-                px: 4,
-                pt: 4,
-                alignItems: "flex-start",
-                flexDirection: {
-                  xs: "column",
-                  md: "row"
-                },
-                maxWidth: {
-                  xs: "100%",
-                  sm: "400px",
-                  md: "600px",
-                  xxl: "800px"
-                },
+                >
+                  <Avatar
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: "0",
+                      background: "transparent"
+                    }}
+                    aria-label="avatar"
+                  >
+                    <img
+                      src={ipfsCIDToHttpUrl(community?.image as string)}
+                      style={{
+                        objectFit: "contain",
+                        width: "100%",
+                        height: "100%"
+                      }}
+                    />
+                  </Avatar>
+                </Box>
 
-                ".MuiCardContent-root": {
-                  width: "100%",
-                  padding: "0px 16px"
-                },
-
-                width: "100%",
-                ".MuiAvatar-root": {
-                  backgroundColor: "transparent"
-                }
-              }}
-              title={
-                <>
+                <div
+                  style={{
+                    flex: "1",
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "column",
+                    justifyContent: "center"
+                  }}
+                >
+                  <Typography
+                    color="offWhite.main"
+                    textAlign="center"
+                    lineHeight={1}
+                    variant="h3"
+                    marginBottom={2}
+                    fontSize={calculateFontSize(community?.name as string)}
+                  >
+                    {community?.name}
+                    {community.properties.domain && (
+                      <SvgIcon
+                        component={CheckCircleIcon}
+                        sx={{
+                          fontSize: "0.8em",
+                          marginLeft: "4px",
+                          verticalAlign: "middle",
+                          color: theme.palette.success.main
+                        }}
+                      />
+                    )}
+                  </Typography>
+                  <CopyAddress address={community?.properties.address} />
+                  {/* Add domain information here */}
+                  <Typography
+                    color="offWhite.main"
+                    textAlign="center"
+                    variant="body2"
+                    marginTop={1}
+                  >
+                    {community.properties.domain
+                      ? community.properties.domain
+                      : "Domain not registered"}
+                  </Typography>
+                </div>
+              </Box>
+              <Stack
+                direction="row"
+                sx={{
+                  marginTop: 3
+                }}
+              >
+                <Stack
+                  width="100%"
+                  direction="column"
+                  justifyContent="space-around"
+                  sx={{
+                    marginTop: theme.spacing(2)
+                  }}
+                >
                   <Box
                     sx={{
                       display: "flex",
-                      gridGap: "4px"
+                      marginRight: "16px",
+                      mb: "8px",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center"
                     }}
                   >
-                    <Typography variant="subtitle1" color="white">
-                      {community.name}
-                    </Typography>
-                    <IconButton component={Link} to={`edit-community`}>
-                      <SvgIcon component={EditIcon} />
-                    </IconButton>
-                  </Box>
-                  <CopyAddress address={community.properties.address} />
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <Typography
-                      color="white"
-                      variant="body"
-                      sx={{ mb: "20px" }}
+                      fontWeight="bold"
+                      fontFamily="FractulAltBold"
+                      variant="subtitle1"
+                      sx={{
+                        mb: "0px",
+                        color: "#FFF"
+                      }}
                     >
-                      {community.properties.market}
+                      {/* {community?.properties.members} */}
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulRegular"
+                      variant="caption"
+                      sx={{
+                        mb: "0px",
+                        color: "#A7B1C4"
+                      }}
+                    >
+                      members
                     </Typography>
                   </Box>
-                </>
-              }
-            />
-            <CardContent
-              sx={{
-                pt: 0,
-                flex: 1,
-                px: 4,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between"
-              }}
-            >
-              <Typography color="white" variant="body">
-                {community.description}
-              </Typography>
-
-              <Stack mt={4} gap={2}>
-                <Box display="flex" gap={2}>
-                  <Typography color="primary" variant="subtitle2">
-                    Market:
-                  </Typography>
-                  <Typography color="primary" variant="subtitle2">
-                    {community.properties.market}
-                  </Typography>
-                </Box>
-                <Box display="flex" gap={2}>
-                  <Typography color="primary" variant="subtitle2">
-                    Your AV:
-                  </Typography>
-                  <Typography color="primary" variant="subtitle2">
-                    1.0
-                  </Typography>
-                </Box>
-                <Box display="flex" gap={2} flexDirection="column">
-                  <Typography color="primary" variant="subtitle2">
-                    Your Roles:
-                  </Typography>
-                  <Stack ml={4} gap={2}>
-                    <Box display="flex" gap={2}>
-                      <Typography color="white" variant="subtitle2">
-                        Role 1:
-                      </Typography>
-                      <Typography color="white" variant="subtitle2">
-                        60%
-                      </Typography>
-                    </Box>
-                    <Box display="flex" gap={2}>
-                      <Typography color="white" variant="subtitle2">
-                        Role 2:
-                      </Typography>
-                      <Typography color="white" variant="subtitle2">
-                        30%
-                      </Typography>
-                    </Box>
-                    <Box display="flex" gap={2}>
-                      <Typography color="white" variant="subtitle2">
-                        Role 3:
-                      </Typography>
-                      <Typography color="white" variant="subtitle2">
-                        10%
-                      </Typography>
-                    </Box>
-                  </Stack>
-                </Box>
-                <Box display="flex" gap={2}>
-                  <Typography color="primary" variant="subtitle2">
-                    Health balance:
-                  </Typography>
-                  <Typography color="primary" variant="subtitle2">
-                    30%
-                  </Typography>
-                </Box>
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item sm={12} md={6}>
-          <Box
-            sx={{
-              p: 4,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              margin: "0 auto"
-            }}
-          >
-            <Box mb={4} textAlign="center">
-              <Badge
-                badgeContent={
-                  <Tooltip title="During beta there is a maximum of 3 quests, one for each role.">
-                    <HelpOutlineIcon
-                      sx={{ width: "16px", ml: 1, color: "white" }}
-                    />
-                  </Tooltip>
-                }
-              >
-                <Typography variant="subtitle1" color="white">
-                  Your Archetype:
-                </Typography>
-              </Badge>
-            </Box>
-            <Box
-              sx={{
-                position: "relative",
-                height: "400px",
-                width: "400px"
-              }}
-            >
-              <ArchetypePieChart archetype={archetype} />
-              {/* @ts-ignore */}
-              {archetype?.archetype === NovaArchetype.NONE && (
-                <>
-                  <Button
+                  <Box
                     sx={{
-                      zIndex: 1,
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      width: "200px",
-                      height: "80px",
-                      textAlign: "center"
+                      display: "flex",
+                      marginRight: "16px",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center"
                     }}
-                    component={Link}
-                    to={`your-archetype`}
-                    type="button"
-                    color="secondary"
-                    variant="contained"
-                    size="medium"
                   >
-                    Set your <br /> archetype
-                  </Button>
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      backgroundColor: "transparent",
-                      backdropFilter: "blur(25px)"
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulAltBold"
+                      variant="subtitle1"
+                      sx={{
+                        mb: "0px",
+                        color: "#FFF"
+                      }}
+                    >
+                      {/* {community?.properties.prestige} */}
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulRegular"
+                      variant="caption"
+                      sx={{
+                        mb: "0px",
+                        color: "#A7B1C4"
+                      }}
+                    >
+                      prestige
+                    </Typography>
+                  </Box>
+                </Stack>
+
+                <Stack
+                  width="100%"
+                  justifyContent="space-around"
+                  sx={{
+                    marginTop: theme.spacing(2),
+                    gap: 2
+                  }}
+                >
+                  <AutIconLabel
+                    textColor="#FFF"
+                    sx={{
+                      border: "1px solid #707070",
+                      minHeight: "42px",
+                      minWidth: "165px"
                     }}
-                  />
-                </>
-              )}
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
+                    icon={
+                      <SvgIcon
+                        sx={{
+                          width: "16px"
+                        }}
+                        inheritViewBox
+                        component={marketTemplate?.icon}
+                      ></SvgIcon>
+                    }
+                    label={marketTemplate?.title}
+                  ></AutIconLabel>
+                  <AutIconLabel
+                    textColor="#FFF"
+                    sx={{
+                      border: "1px solid #707070",
+                      minHeight: "42px",
+                      minWidth: "165px",
+                      ...(!selectedArchetype?.archetype && {
+                        ".MuiSvgIcon-root": {
+                          display: "none"
+                        }
+                      })
+                      // flex: "1"
+                      // marginTop: theme.spacing(2)
+                    }}
+                    icon={
+                      <SvgIcon
+                        sx={{
+                          width: "16px"
+                        }}
+                        inheritViewBox
+                        component={selectedArchetype?.logo}
+                      ></SvgIcon>
+                    }
+                    label={selectedArchetype?.title ?? "N/A"}
+                  ></AutIconLabel>
+                </Stack>
+              </Stack>
+              <Box
+                sx={{
+                  marginTop: theme.spacing(2)
+                }}
+              >
+                <Box sx={{ padding: "8px 0px" }}>
+                  <Typography
+                    sx={{ flex: "1" }}
+                    color="offWhite.main"
+                    textAlign="left"
+                    variant="body"
+                  >
+                    {community?.description || "No description yet..."}
+                  </Typography>
+                </Box>
+              </Box>
+              <Box
+                marginTop={theme.spacing(2)}
+                sx={{
+                  display: "flex",
+                  marginTop: theme.spacing(2),
+                  flexDirection: "row",
+                  gap: "12px",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              ></Box>
+            </Stack>
+          </AutContainer>
+        </Stack>
+      </LeftWrapper>
+      <RightWrapper>
+        <HubRoleTabs roles={community?.properties?.rolesSets[0]?.roles} />
+        {/* <ArchetypeTabs archetype={archetype} /> */}
+      </RightWrapper>
     </Container>
   );
 };
