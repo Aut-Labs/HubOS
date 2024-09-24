@@ -1,25 +1,19 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import SidebarDrawer from "@components/Sidebar/Sidebar";
 import Dashboard from "./Dashboard/Dashboard";
-import Members from "./Members/Members";
-import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
-import { Suspense, memo, useMemo } from "react";
-import { ReactComponent as StackIcon } from "@assets/aut/stack.svg";
+import { Suspense, memo } from "react";
 import AutLoading from "@components/AutLoading";
-import { pluginRoutes } from "./Modules/Shared/routes";
-import Modules from "./Modules/Modules";
+// import { pluginRoutes } from "./Modules/Shared/routes";
 import { useSelector } from "react-redux";
-import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
-// import { useGetAllModuleDefinitionsQuery } from "@api/module-registry.api";
+import { HubData } from "@store/Hub/hub.reducer";
 import Admins from "./Admins/Admins";
-import CommunityEdit from "./CommunityEdit/CommunityEdit";
-import { ReactComponent as ManageIcon } from "@assets/manage.svg";
 import Archetype from "./Archetype/Archetype";
 import DAut from "./Modules/Plugins/DAut/DAut";
-import { useGetArchetypeAndStatsQuery } from "@api/community.api";
-import { AllTasks } from "./Modules/Plugins/Task/Shared/AllTasks";
+import { useGetArchetypeAndStatsQuery } from "@api/hub.api";
 import { styled } from "@mui/material";
 import backgroundImage from "@assets/hubos/bg-main.png";
+import HubEdit from "./HubEdit/HubEdit";
+import Members from "./Members/Members";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -31,15 +25,14 @@ const AutContainer = styled("div")(() => ({
 }));
 
 const AutDashboardMain = () => {
-  const communityData = useSelector(CommunityData);
-  const isAdmin = useSelector(IsAdmin);
-  const { data: plugins, isLoading } = useGetAllPluginDefinitionsByDAOQuery(
-    null,
-    {
-      refetchOnMountOrArgChange: false,
-      skip: false
-    }
-  );
+  const hubData = useSelector(HubData);
+  // const { data: plugins, isLoading } = useGetAllPluginDefinitionsByDAOQuery(
+  //   null,
+  //   {
+  //     refetchOnMountOrArgChange: false,
+  //     skip: false
+  //   }
+  // );
 
   const { data: archetype } = useGetArchetypeAndStatsQuery(null, {
     refetchOnMountOrArgChange: false,
@@ -85,46 +78,46 @@ const AutDashboardMain = () => {
   //     skip: false
   //   });
 
-  const modulesRoutes = useMemo(() => {
-    const { allRoutes, menuItems } = pluginRoutes(
-      plugins || [],
-      modules || [],
-      isAdmin,
-      0,
-      ""
-    );
+  // const modulesRoutes = useMemo(() => {
+  //   const { allRoutes, menuItems } = pluginRoutes(
+  //     plugins || [],
+  //     modules || [],
+  //     isAdmin,
+  //     0,
+  //     ""
+  //   );
 
-    console.log(allRoutes, menuItems, "allRoutes");
+  //   console.log(allRoutes, menuItems, "allRoutes");
 
-    return {
-      menuItem: {
-        title: "Community",
-        icon: ManageIcon,
-        route: `community`,
-        children: [
-          {
-            title: "Onboard new members",
-            route: "modules",
-            exact: true,
-            icon: StackIcon,
-            children: menuItems
-          },
-          {
-            title: "Tasks",
-            route: "tasks",
-            exact: true,
-            icon: StackIcon
-          }
-        ]
-      },
-      routes: allRoutes
-    };
-  }, [plugins, modules, isAdmin]);
+  //   return {
+  //     menuItem: {
+  //       title: "Hub",
+  //       icon: ManageIcon,
+  //       route: `hub`,
+  //       children: [
+  //         {
+  //           title: "Onboard new members",
+  //           route: "modules",
+  //           exact: true,
+  //           icon: StackIcon,
+  //           children: menuItems
+  //         },
+  //         {
+  //           title: "Tasks",
+  //           route: "tasks",
+  //           exact: true,
+  //           icon: StackIcon
+  //         }
+  //       ]
+  //     },
+  //     routes: allRoutes
+  //   };
+  // }, [plugins, modules, isAdmin]);
 
   return (
     <>
       <AutContainer>
-        {isLoading || isLoadingModules ? (
+        {isLoadingModules ? (
           <AutLoading width="130px" height="130px" />
         ) : (
           <SidebarDrawer
@@ -139,10 +132,11 @@ const AutDashboardMain = () => {
               <Routes>
                 <Route index element={<Dashboard />} />
                 <Route path="admins" element={<Admins />} />
-                <Route path="community" element={<Members />} />
-                <Route path="edit-community" element={<CommunityEdit />} />
+                {/* <Route path="hub" element={<Members />} /> */}
+                <Route path="edit-hub" element={<HubEdit />} />
                 <Route path="your-archetype" element={<Archetype />} />
                 <Route path="modules/dAut" element={<DAut />} />
+                <Route path="members" element={<Members />} />
                 {/* <Route path="tasks" element={<AllTasks />} /> */}
                 {/* {modulesRoutes?.routes?.length && (
                 <Route
@@ -154,7 +148,7 @@ const AutDashboardMain = () => {
               {modulesRoutes.routes.map((r) => r)}
               <Route
                 path="*"
-                element={<Navigate to={`/${communityData.name}`} />}
+                element={<Navigate to={`/${hubData.name}`} />}
               /> */}
               </Routes>
             </Suspense>

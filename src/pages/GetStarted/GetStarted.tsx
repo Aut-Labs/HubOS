@@ -1,11 +1,7 @@
 import { Box, Container, styled, Typography } from "@mui/material";
-import AppTitle from "@components/AppTitle";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
-import BubbleTopRight from "@assets/bubble.svg";
-import BubbleBottomLeft from "@assets/bubble2.svg";
-import TryFoldImage from "@assets/tryfold.png";
 import backgroundImage from "@assets/hubos/bg-blue-web.png";
-import { ReactComponent as HubOsLogo } from "@assets/hubos/hubos-logo.svg";
+import HubOsLogo from "@assets/hubos/hubos-logo.svg?react";
 
 const Content = styled("div")(({ theme }) => {
   return {
@@ -60,8 +56,8 @@ const GetStarted = () => {
             textAlign="center"
             letterSpacing="1.33px"
           >
-            There is no community like yours - create your own Standard. <br />
-            Do more with your DAO.
+            There is no hub like yours - create your own Standard. <br />
+            Do more with your Hub.
           </Typography>
 
           <Box sx={{ marginTop: "20px" }}>
@@ -78,7 +74,7 @@ const GetStarted = () => {
             variant="subtitle2"
             fontWeight="normal"
           >
-            Use your Dashboard to Manage your Nova. Experiment with
+            Use your Dashboard to Manage your Hub. Experiment with
             Integrations, and add custom Modules - such as Role-sets &
             on-boarding strategies.
           </Typography> */}
@@ -102,7 +98,7 @@ const GetStarted = () => {
             variant="subtitle2"
             fontWeight="normal"
           >
-            There is no community like yours - create your own Standard.
+            There is no hub like yours - create your own Standard.
           </Typography> */}
       </Content>
       {/* <ImageWrapper>

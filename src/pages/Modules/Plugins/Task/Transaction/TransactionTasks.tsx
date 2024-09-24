@@ -1,6 +1,6 @@
-/* eslint-disable max-len */
+
 import { useCreateTaskMutation } from "@api/onboarding.api";
-import { PluginDefinition, Task } from "@aut-labs/sdk";
+import { TaskContributionNFT } from "@aut-labs/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { FormHelperText } from "@components/Fields";
@@ -28,7 +28,7 @@ import { AutSelectField } from "@theme/field-select-styles";
 import { InteractionNetworks } from "@utils/transaction-networks";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
-import { CommunityData, allRoles } from "@store/Community/community.reducer";
+import { HubData, allRoles } from "@store/Hub/hub.reducer";
 import { useSelector } from "react-redux";
 import { useAccount } from "wagmi";
 import { addMinutes } from "date-fns";
@@ -42,13 +42,13 @@ const errorTypes = {
 };
 
 interface PluginParams {
-  plugin: PluginDefinition;
+  plugin: any;
 }
 
 const TaskSuccess = ({ pluginId, reset }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const communityData = useSelector(CommunityData);
+  const hubData = useSelector(HubData);
 
   return (
     <Container
@@ -86,7 +86,7 @@ const TaskSuccess = ({ pluginId, reset }) => {
             }}
             size="medium"
             color="offWhite"
-            to={`/${communityData?.name}/modules/Task`}
+            to={`/${hubData?.name}/modules/Task`}
             preserveParams
             component={LinkWithQuery}
           >
@@ -127,7 +127,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
   const navigate = useNavigate();
   const roles = useSelector(allRoles);
   const { address: account } = useAccount();
-  const communityData = useSelector(CommunityData);
+  const hubData = useSelector(HubData);
   const { control, handleSubmit, getValues, formState } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -146,7 +146,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
   const onSubmit = async () => {
     const values = getValues();
     createTask({
-      novaAddress: communityData.properties.address,
+      hubAddress: hubData.properties.address,
       pluginTokenId: plugin.tokenId,
       pluginAddress: plugin.pluginAddress,
       task: {
@@ -163,17 +163,17 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
         },
         startDate: dateToUnix(new Date()),
         endDate: dateToUnix(endDatetime)
-      } as unknown as Task
+      } as unknown as TaskContributionNFT
     });
   };
 
   useEffect(() => {
     if (isSuccess) {
       navigate({
-        pathname: `/${communityData?.name}/tasks`
+        pathname: `/${hubData?.name}/tasks`
       });
     }
-  }, [isSuccess, communityData]);
+  }, [isSuccess, hubData]);
 
   const selectedRole = useMemo(() => {
     return roles.find(
@@ -341,7 +341,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
                   rows="5"
                   multiline
                   onChange={onChange}
-                  placeholder="Write a description of the task for your community"
+                  placeholder="Write a description of the task for your hub"
                   helperText={
                     <FormHelperText
                       errorTypes={errorTypes}

@@ -1,5 +1,5 @@
 import { styled, SvgIcon, Typography, useMediaQuery } from "@mui/material";
-import { ReactComponent as ShareIcon } from "@assets/ShareIcon.svg";
+import ShareIcon from "@assets/ShareIcon.svg?react";
 import { pxToRem } from "@utils/text-size";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import { DAutAutID } from "@aut-labs/d-aut";

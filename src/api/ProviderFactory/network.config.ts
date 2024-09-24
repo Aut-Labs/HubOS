@@ -5,20 +5,8 @@ export enum NetworkConfigEnv {
 
 export interface NetworkContracts {
   autIDAddress: string;
-  daoExpanderRegistryAddress: string;
-  daoExpanderFactoryAddress: string;
-  novaRegistryAddress: string;
-  novaAddress: string;
-  offchainVerifierAddress: string;
-  novaFactoryAddress: string;
-  hackerDaoAddress: string;
-  daoTypesAddress: string;
-  pluginRegistryAddress: string;
-  moduleRegistryAddress: string;
-  questOpenTaskFactory: string;
-  questOffchainTaskFactory: string;
-  allowListAddress: string;
-  localReputationAddress: string;
+  hubRegistryAddress: string;
+  taskRegistryAddress: string;
 }
 
 export interface NetworkConfig {

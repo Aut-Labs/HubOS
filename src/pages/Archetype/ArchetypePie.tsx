@@ -1,13 +1,8 @@
-/* eslint-disable max-len */
+ 
 import { Box, Button, Link, Typography, useTheme } from "@mui/material";
 import { ArchetypePieChartDesign } from "./ArchetypePieChart";
-import { NovaArchetype } from "@api/community.api";
-import QuestionsAndAnswers from "../Modules/Plugins/Task/Quiz/QuestionsAndAnswers";
 import { useForm } from "react-hook-form";
-import OpenTasks from "../Modules/Plugins/Task/Open/OpenTasks";
-import { PluginDefinition } from "@aut-labs/sdk";
 import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
-import { PluginDefinitionProperties } from "@aut-labs/sdk/dist/models/plugin";
 import JoinDiscordTasks from "../Modules/Plugins/Task/JoinDiscord/JoinDiscordTasks";
 import TransactionTasks from "../Modules/Plugins/Task/Transaction/TransactionTasks";
 
@@ -35,10 +30,10 @@ export const ArchetypePie = ({ archetype }) => {
     }
   });
 
-  const mockedPlugin: PluginDefinition = {
+  const mockedPlugin = {
     metadataURI: "",
     price: 0,
-    metadata: {} as BaseNFTModel<PluginDefinitionProperties>,
+    metadata: {} as BaseNFTModel<any>,
     creator: "",
     tokenId: 0,
     active: false,
@@ -50,7 +45,7 @@ export const ArchetypePie = ({ archetype }) => {
     <>
       <ArchetypePieChartDesign archetype={archetype} />
       {/* @ts-ignore */}
-      {/* {archetype?.archetype === NovaArchetype.NONE && (
+      {/* {archetype?.archetype === HubArchetype.NONE && (
         <>
           <Button
             sx={{

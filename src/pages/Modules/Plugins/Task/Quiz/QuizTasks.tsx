@@ -1,6 +1,5 @@
-/* eslint-disable max-len */
+
 import { useCreateQuizTaskMutation } from "@api/onboarding.api";
-import { PluginDefinition, Task } from "@aut-labs/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { AutDatepicker, FormHelperText } from "@components/Fields";
@@ -26,11 +25,12 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
-import { CommunityData, allRoles } from "@store/Community/community.reducer";
+import { HubData, allRoles } from "@store/Hub/hub.reducer";
 import { useSelector } from "react-redux";
 import { useAccount } from "wagmi";
 import { FormContainer } from "../Shared/FormContainer";
 import { addMinutes } from "date-fns";
+import { TaskContributionNFT } from "@aut-labs/sdk";
 
 // import "./ScrollbarStyles.scss";
 
@@ -41,13 +41,13 @@ const errorTypes = {
 };
 
 interface PluginParams {
-  plugin: PluginDefinition;
+  plugin: any;
 }
 
 const TaskSuccess = ({ pluginId, reset }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const communityData = useSelector(CommunityData);
+  const hubData = useSelector(HubData);
 
   return (
     <Container
@@ -84,7 +84,7 @@ const TaskSuccess = ({ pluginId, reset }) => {
             }}
             size="medium"
             color="offWhite"
-            to={`/${communityData?.name}/modules/Task`}
+            to={`/${hubData?.name}/modules/Task`}
             preserveParams
             component={LinkWithQuery}
           >
@@ -126,7 +126,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
   const navigate = useNavigate();
   const { address: account } = useAccount();
   const roles = useSelector(allRoles);
-  const communityData = useSelector(CommunityData);
+  const hubData = useSelector(HubData);
   const [answersSaved, setAnswersSaved] = useState(false);
   const {
     control,
@@ -174,7 +174,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
     createTask({
       userAddress: account,
       isAdmin: true,
-      novaAddress: communityData.properties.address,
+      hubAddress: hubData.properties.address,
       pluginTokenId: plugin.pluginDefinitionId,
       pluginAddress: plugin.pluginAddress,
       allQuestions: values.questions,
@@ -190,7 +190,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
         },
         startDate: dateToUnix(values.startDate),
         endDate: dateToUnix(values.endDate)
-      } as unknown as Task
+      } as unknown as TaskContributionNFT
     });
   };
 
@@ -201,10 +201,10 @@ const QuizTasks = ({ plugin }: PluginParams) => {
   useEffect(() => {
     if (isSuccess) {
       navigate({
-        pathname: `/${communityData?.name}/tasks`
+        pathname: `/${hubData?.name}/tasks`
       });
     }
-  }, [isSuccess, communityData]);
+  }, [isSuccess, hubData]);
 
   return (
     <FormContainer onSubmit={handleSubmit(onSubmit)}>
@@ -234,7 +234,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
                 sm: "0"
               }
             }}
-            to={`/${communityData?.name}/modules/Task`}
+            to={`/${hubData?.name}/modules/Task`}
             component={Link}
           >
             {/* {searchParams.get("returnUrlLinkName") || "Back"} */}
@@ -260,7 +260,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
           color="white"
           variant="body"
         >
-          Test your community’s knowledge with a series of multiple-choice
+          Test your hub’s knowledge with a series of multiple-choice
           question(s).
         </Typography>
       </Box>
@@ -452,7 +452,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
                 required
                 multiline
                 rows={5}
-                placeholder="Describe the Quiz to your community"
+                placeholder="Describe the Quiz to your hub"
                 helperText={
                   <FormHelperText
                     errorTypes={errorTypes}

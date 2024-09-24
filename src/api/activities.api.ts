@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 // import {
-//   CommunityCallContractEventType,
+//   HubCallContractEventType,
 //   PollsContractEventType,
 //   TasksContractEventType
 // } from "@aut-labs/abi-types";
@@ -10,11 +10,6 @@ import { dateToUnix } from "@utils/date-format";
 import { sendDiscordNotification } from "@store/ui-reducer";
 import { ActivityPoll, ActivityTypes } from "./api.model";
 import { ipfsCIDToHttpUrl } from "./storage.api";
-import {
-  deployGatherings,
-  deployPolls,
-  deployTasks
-} from "./ProviderFactory/deploy-activities";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
 // import {
 //   AsyncThunkConfig,
@@ -23,7 +18,7 @@ import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider"
 import { DiscordMessage } from "./discord.api";
 import { environment } from "./environment";
 import { addMinutes, set } from "date-fns";
-import { DAutHub } from "@aut-labs/d-aut";
+import { HubOSHub } from "./hub.model";
 
 const callThunkProvider = Web3ThunkProviderFactory("Call", {
   provider: null
@@ -39,40 +34,41 @@ const pollsThunkProvider = Web3ThunkProviderFactory("Poll", {
 
 const contractAddress = async (thunkAPI: any, type: ActivityTypes) => {
   const state = thunkAPI.getState();
-  const communityAddress = state.community.selectedCommunityAddress;
-  // const contract = await Web3CommunityExtensionProvider(communityAddress);
+  const hubAddress = state.hub.selectedHubAddress;
+  // const contract = await Web3HubExtensionProvider(hubAddress);
   // const activities = (await contract.getActivitiesWhitelist()) as any[];
   const activities = [];
-  let { actAddr } =
-    (activities || []).find(
-      ({ actType }) => Number(actType.toString()) === type
-    ) || {};
-  if (!actAddr) {
-    switch (type) {
-      case ActivityTypes.Polls:
-        actAddr = await deployPolls(
-          communityAddress,
-          environment.discordBotAddress
-        );
-        break;
-      case ActivityTypes.Gatherings:
-        actAddr = await deployGatherings(
-          communityAddress,
-          environment.discordBotAddress
-        );
-        break;
-      case ActivityTypes.Tasks:
-        actAddr = await deployTasks(
-          communityAddress,
-          environment.discordBotAddress
-        );
-        break;
-      default:
-        throw new Error("Activity type does not exist");
-    }
+  // let { actAddr } =
+  //   (activities || []).find(
+  //     ({ actType }) => Number(actType.toString()) === type
+  //   ) || {};
+  // if (!actAddr) {
+  //   switch (type) {
+  //     case ActivityTypes.Polls:
+  //       actAddr = await deployPolls(
+  //         hubAddress,
+  //         environment.discordBotAddress
+  //       );
+  //       break;
+  //     case ActivityTypes.Gatherings:
+  //       actAddr = await deployGatherings(
+  //         hubAddress,
+  //         environment.discordBotAddress
+  //       );
+  //       break;
+  //     case ActivityTypes.Tasks:
+  //       actAddr = await deployTasks(
+  //         hubAddress,
+  //         environment.discordBotAddress
+  //       );
+  //       break;
+  //     default:
+  //       throw new Error("Activity type does not exist");
+  //   }
     // await contract.addActivitiesAddress(actAddr, type);
-  }
-  return Promise.resolve(actAddr);
+  // }
+  // return Promise.resolve(actAddr);
+  return '';
 };
 
 export const getPolls = pollsThunkProvider(
@@ -157,13 +153,13 @@ export const addActivityTask = taskThunkProvider(
       description,
       title
     } = task;
-    const communities = state.community.communities as DAutHub[];
-    const communityAddress = state.community.selectedCommunityAddress as string;
-    // const community = communities.find(
-    //   (c) => c.properties.address === communityAddress
+    const hubs = state.hub.hubs as HubOSHub[];
+    const hubAddress = state.hub.selectedHubAddress as string;
+    // const hub = communities.find(
+    //   (c) => c.properties.address === hubAddress
     // );
 
-    // const selectedRole = community.properties.skills.roles.find(({ roleName }) => roleName === role);
+    // const selectedRole = hub.properties.skills.roles.find(({ roleName }) => roleName === role);
 
     const selectedRole = null;
     if (!selectedRole) {
@@ -173,7 +169,7 @@ export const addActivityTask = taskThunkProvider(
     // const metadata = {
     //   name: title,
     //   description,
-    //   image: community.image,
+    //   image: hub.image,
     //   properties: {
     //     creator: userInfo.nickname,
     //     creatorAutId: window.ethereum.selectedAddress,
@@ -189,7 +185,7 @@ export const addActivityTask = taskThunkProvider(
     // const uri = await storeMetadata(metadata);
     // const result = await contract.create(selectedRole.id, uri);
     const discordMessage: DiscordMessage = {
-      title: `New Community Task`,
+      title: `New Hub Task`,
       description: `${allParticipants ? "All" : participants} **${
         selectedRole.roleName
       }** participants can claim the task`,
@@ -265,7 +261,7 @@ export const submitActivityTask = taskThunkProvider(
 export const addGroupCall = callThunkProvider(
   {
     type: "aut-dashboard/activities/group-call/add"
-    // event: CommunityCallContractEventType.CommunityCallCreated
+    // event: HubCallContractEventType.HubCallCreated
   },
   (thunkApi) => contractAddress(thunkApi, ActivityTypes.Gatherings),
   async (contract, callData, { getState, dispatch }) => {
@@ -279,12 +275,12 @@ export const addGroupCall = callThunkProvider(
       role
     } = callData;
 
-    const communities = state.community.communities as DAutHub[];
-    const communityAddress = state.community.selectedCommunityAddress as string;
-    // const community = communities.find(
-    //   (c) => c.properties.address === communityAddress
+    const hubs = state.hub.hubs as HubOSHub[];
+    const hubAddress = state.hub.selectedHubAddress as string;
+    // const hub = communities.find(
+    //   (c) => c.properties.address === hubAddress
     // );
-    // const selectedRole = community.properties.rolesSets[0].roles.find(
+    // const selectedRole = hub.properties.rolesSets[0].roles.find(
     //   ({ roleName }) => roleName === role
     // );
 
@@ -330,7 +326,7 @@ export const addGroupCall = callThunkProvider(
     // );
 
     // const discordMessage: DiscordMessage = {
-    //   title: "New Community Call",
+    //   title: "New Hub Call",
     //   // description: `${allParticipants ? "All" : participants} **${
     //   //   selectedRole.roleName
     //   // }** participants can join the call`,
@@ -373,12 +369,12 @@ export const addPoll = pollsThunkProvider(
     const state = getState();
     const { title, description, duration, options, emojis, role, allRoles } =
       callData;
-    const communities = state.community.communities as DAutHub[];
-    const communityAddress = state.community.selectedCommunityAddress as string;
-    // const community = communities.find(
-    //   (c) => c.properties.address === communityAddress
+    const hubs = state.hub.hubs as HubOSHub[];
+    const hubAddress = state.hub.selectedHubAddress as string;
+    // const hub = communities.find(
+    //   (c) => c.properties.address === hubAddress
     // );
-    // const selectedRole = community.properties.rolesSets[0].roles.find(
+    // const selectedRole = hub.properties.rolesSets[0].roles.find(
     //   ({ roleName }) => roleName === role
     // );
     // let roleId = 0;

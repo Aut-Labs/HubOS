@@ -2,7 +2,7 @@ import { Box, Container, Stack, Typography } from "@mui/material";
 import { useMemo, useState } from "react";
 import Tasks from "../../Task/Shared/Tasks";
 import { useGetAllTasksQuery } from "@api/onboarding.api";
-import { IsAdmin } from "@store/Community/community.reducer";
+import { IsAdmin } from "@store/Hub/hub.reducer";
 import { useSelector } from "react-redux";
 import { useAccount } from "wagmi";
 import AutLoading from "@components/AutLoading";
@@ -58,7 +58,7 @@ export const AllTasks = () => {
                   }
                 }}
                 to={{
-                  pathname: `/${communityData?.name}/modules/OnboardingStrategy/QuestOnboardingPlugin`,
+                  pathname: `/${hubData?.name}/modules/OnboardingStrategy/QuestOnboardingPlugin`,
                   search: searchParams.toString()
                 }}
                 component={Link}

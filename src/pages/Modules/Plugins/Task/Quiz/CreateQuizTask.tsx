@@ -1,8 +1,7 @@
-import { PluginDefinition } from "@aut-labs/sdk";
 import { Container, Box, Typography } from "@mui/material";
 
 interface PluginParams {
-  plugin: PluginDefinition;
+  plugin: any;
 }
 
 const CreateQuizTasks = ({ plugin }: PluginParams) => {

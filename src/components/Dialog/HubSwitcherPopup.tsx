@@ -1,18 +1,18 @@
-/* eslint-disable max-len */
+
 import { Avatar, styled, Typography } from "@mui/material";
 import {
-  Communities,
-  communityUpdateState
-} from "@store/Community/community.reducer";
+  Hubs,
+  hubUpdateState
+} from "@store/Hub/hub.reducer";
 import { pxToRem } from "@utils/text-size";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "@store/store.model";
 import CopyAddress from "@components/CopyAddress";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import DialogWrapper from "./DialogWrapper";
-import { DAutHub } from "@aut-labs/d-aut";
+import { HubOSHub } from "@api/hub.model";
 
-const CommunityItem = styled("div")({
+const HubItem = styled("div")({
   width: "100%",
   borderStyle: "solid",
   borderWidth: "1px",
@@ -30,20 +30,20 @@ const CommunityItem = styled("div")({
   }
 });
 
-const CommunityItemWrapper = styled("div")({
+const HubItemWrapper = styled("div")({
   width: "100%",
   flex: 1,
   marginTop: "20px"
 });
 
-const CommunitySwitcherPopup = ({ open, onClose }: any) => {
+const HubSwitcherPopup = ({ open, onClose }: any) => {
   const dispatch = useAppDispatch();
-  const communities = useSelector(Communities);
+  const hubs = useSelector(Hubs);
 
-  const selectCommunity = (community: DAutHub) => {
+  const selectHub = (hub: HubOSHub) => {
     dispatch(
-      communityUpdateState({
-        selectedCommunityAddress: community.properties.address
+      hubUpdateState({
+        selectedHubAddress: hub.properties.address
       })
     );
     onClose();
@@ -62,23 +62,23 @@ const CommunitySwitcherPopup = ({ open, onClose }: any) => {
         }}
       >
         <Typography color="white" variant="subtitle1">
-          Community Swicher
+          Hub Swicher
         </Typography>
         <Typography color="white" mb="4" variant="body">
-          Pick the Community you wish to work with.
+          Pick the Hub you wish to work with.
         </Typography>
-        <CommunityItemWrapper
+        <HubItemWrapper
           sx={{
             height: {
               md: "60px"
             }
           }}
         >
-          {communities.map((community) => (
-            <CommunityItem
-              key={`community-select-item-${community.name}`}
+          {hubs.map((hub) => (
+            <HubItem
+              key={`hub-select-item-${hub.name}`}
               className="stat"
-              onClick={() => selectCommunity(community)}
+              onClick={() => selectHub(hub)}
             >
               <Avatar
                 variant="square"
@@ -89,26 +89,26 @@ const CommunitySwitcherPopup = ({ open, onClose }: any) => {
                   backgroundColor: "white",
                   mr: pxToRem(50)
                 }}
-                src={ipfsCIDToHttpUrl(community.image as string)}
+                src={ipfsCIDToHttpUrl(hub.image as string)}
               />
               <div>
                 <Typography
                   sx={{ color: "white", fontSize: pxToRem(21), mb: "3px" }}
                   component="div"
                 >
-                  {community.name}
+                  {hub.name}
                 </Typography>
                 <CopyAddress
-                  address={community.properties.address}
+                  address={hub.properties.address}
                   variant="body1"
                 />
               </div>
-            </CommunityItem>
+            </HubItem>
           ))}
-        </CommunityItemWrapper>
+        </HubItemWrapper>
       </div>
     </DialogWrapper>
   );
 };
 
-export default CommunitySwitcherPopup;
+export default HubSwitcherPopup;

@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+
 import { lazy, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
@@ -10,11 +10,9 @@ import { environment } from "@api/environment";
 import { updateWalletProviderState } from "@store/WalletProvider/WalletProvider";
 import { getAppConfig } from "@api/aut.api";
 import AutSDK from "@aut-labs/sdk";
-import { IsAuthenticated } from "@auth/auth.reducer";
 import GetStarted from "./pages/GetStarted/GetStarted";
 import AutLoading from "@components/AutLoading";
-import Callback from "./pages/Oauth2Callback/Callback";
-import { CommunityData } from "@store/Community/community.reducer";
+import { HubData } from "@store/Hub/hub.reducer";
 
 const AutDashboardMain = lazy(() => import("./pages/AutDashboardMain"));
 
@@ -22,8 +20,7 @@ function App() {
   const dispatch = useAppDispatch();
   const [isAuthenticating, setLoading] = useState(true);
   const [isInitialized, setInitialized] = useState(false);
-  const isAutheticated = useSelector(IsAuthenticated);
-  const communityData = useSelector(CommunityData);
+  const hubData = useSelector(HubData);
   const location = useLocation();
 
   // const isLoading = useMemo(
@@ -35,16 +32,16 @@ function App() {
   console.log(isInitialized, "isInitialized");
   // console.log(isLoading, "isLoading");
   const returnUrl = useMemo(() => {
-    if (!isAutheticated) return "/";
+    if (!hubData) return "/";
     const shouldGoToDashboard =
       location.pathname === "/" ||
-      !location.pathname.includes(communityData?.name);
+      !location.pathname.includes(hubData?.name);
     const goTo = shouldGoToDashboard
-      ? `/${communityData?.name}`
+      ? `/${hubData?.name}`
       : location.pathname;
     const url = location.state?.from;
     return url || goTo;
-  }, [isAutheticated, communityData]);
+  }, [hubData]);
   console.log(returnUrl, "returnUrl");
 
   useEffect(() => {
@@ -90,7 +87,7 @@ function App() {
   return (
     <>
       <SWSnackbar />
-      {isInitialized && <Web3DautConnect setLoading={setLoading} />}
+      <Web3DautConnect setLoading={setLoading} />
       <Box
         sx={{
           height: "100%",
@@ -104,7 +101,7 @@ function App() {
           <>
             <Routes>
               {/* <Route path="callback" element={<Callback />} /> */}
-              {!isAutheticated && (
+              {!hubData && (
                 <>
                   <Route path="/" element={<GetStarted />} />
                   <Route
@@ -113,10 +110,10 @@ function App() {
                   />
                 </>
               )}
-              {isAutheticated && (
+              {hubData && (
                 <>
                   <Route
-                    path={`${communityData?.name}/*`}
+                    path={`${hubData?.name}/*`}
                     element={<AutDashboardMain />}
                   />
                   <Route path="*" element={<Navigate to={returnUrl} />} />

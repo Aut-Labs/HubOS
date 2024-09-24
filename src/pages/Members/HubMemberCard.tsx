@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+ 
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import CopyAddress from "@components/CopyAddress";
 import {

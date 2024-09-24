@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+
 import {
   Box,
   Container,
@@ -12,15 +12,14 @@ import {
   MenuItem,
   debounce
 } from "@mui/material";
-import { allRoles } from "@store/Community/community.reducer";
+import { allRoles } from "@store/Hub/hub.reducer";
 import { useSelector } from "react-redux";
 import { memo, useMemo, useState } from "react";
 import { useGetOnboardingProgressQuery } from "@api/onboarding.api";
-import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import AutLoading from "@components/AutLoading";
 import { AutSelectField } from "@theme/field-select-styles";
-import { Task } from "@aut-labs/sdk";
+import { TaskContributionNFT } from "@aut-labs/sdk";
 import {
   SubmissionCard,
   SubmissionsGridBox
@@ -156,7 +155,7 @@ const Dashboard = () => {
     }
   );
 
-  const filteredSubmissions: Task[] = useMemo(() => {
+  const filteredSubmissions: TaskContributionNFT[] = useMemo(() => {
     if (!onboardingProgress?.quests?.length) return [];
     if (!search?.role) {
       return [
@@ -394,8 +393,8 @@ const Dashboard = () => {
                   <SubmissionCard
                     key={`table-row-${index}`}
                     row={row}
-                    questId={row.role.toString()}
-                    novaAddress={onboardingProgress.novaAddress}
+                    questId={"2"}
+                    hubAddress={onboardingProgress.hubAddress}
                     onboardingQuestAddress={questOnboarding.pluginAddress}
                   />
                 ))}

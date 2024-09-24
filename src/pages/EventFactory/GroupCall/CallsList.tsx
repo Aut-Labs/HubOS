@@ -23,7 +23,7 @@ const CallsList = () => {
             fontSize: pxToRem(30)
           }}
         >
-          No Community Gatherings yet!
+          No Hub Gatherings yet!
         </Typography>
       </Box>
     </div>

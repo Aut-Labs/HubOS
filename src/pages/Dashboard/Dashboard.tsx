@@ -1,48 +1,24 @@
-/* eslint-disable max-len */
 import {
   Avatar,
   Box,
-  Card,
-  CardContent,
-  CardHeader,
   Container,
   Typography,
   Stack,
-  Grid,
-  IconButton,
   SvgIcon,
-  Badge,
-  Tooltip,
-  Button,
   styled,
   useTheme
 } from "@mui/material";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-
-import { allRoles, CommunityData } from "@store/Community/community.reducer";
 import { useDispatch, useSelector } from "react-redux";
 import { setTitle } from "@store/ui-reducer";
 import { memo, useEffect, useMemo } from "react";
-import { UserInfo } from "@auth/auth.reducer";
 import CopyAddress from "@components/CopyAddress";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
-import {
-  ArchetypeTypes,
-  useGetAllMembersQuery,
-  useGetArchetypeAndStatsQuery
-} from "@api/community.api";
-import LoadingProgressBar from "@components/LoadingProgressBar";
-import { ReactComponent as EditIcon } from "@assets/actions/edit.svg";
-import { Link } from "react-router-dom";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import { NovaArchetype } from "@aut-labs/sdk/dist/models/nova";
-import { SubtitleWithInfo } from "@components/SubtitleWithInfoIcon";
+import { ArchetypeTypes } from "@api/hub.api";
 import AutIconLabel from "@components/AutIconLabel";
-import { MarketTemplates } from "@api/community.model";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import HubRoleTabs from "../Roles/HubRolesTabs";
-import { ArchetypePieChartDesign } from "../Archetype/ArchetypePieChart";
-import ArchetypeTabs from "../Archetype/ArchetypeTabs";
+import { AutIDData, HubData } from "@store/Hub/hub.reducer";
+import Members from "../Members/Members";
+import { ArchetypePie } from "../Archetype/ArchetypePie";
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -146,84 +122,26 @@ const calculateFontSize = (name: string) => {
 
 const Dashboard = () => {
   const dispatch = useDispatch();
-  const userInfo = useSelector(UserInfo);
-  console.log("userInfo", userInfo);
-  const community = useSelector(CommunityData);
-  const roles = useSelector(allRoles);
+  const autIDData = useSelector(AutIDData);
+  const theme = useTheme();
+  const hubData = useSelector(HubData);
 
-  const { data, isLoading, isFetching } = useGetAllMembersQuery(null, {
-    refetchOnMountOrArgChange: true,
-    skip: false
-  });
-
-  console.log(data, isLoading, isFetching);
-
-  const {
-    archetype,
-    isLoading: isLoadingArchetype,
-    isFetching: isFetchingArchetype
-  } = useGetArchetypeAndStatsQuery(null, {
-    selectFromResult: ({ data, isLoading, isFetching }) => ({
-      isLoading,
-      isFetching,
-      archetype: data?.archetype
-    })
-  });
-
-  //TODO: Remove this when the data is available
-  // community.properties.market = "Social, Art & Gaming";
-  // community.properties.prestige = 100;
-  // community.properties.members = 1;
-
-  const marketTemplate = useMemo(() => {
-    const marketName = community?.properties?.market;
-    return MarketTemplates.find(
-      (v) => v.title === marketName || v.market === +marketName
-    );
-  }, [community]);
   const selectedArchetype = useMemo(() => {
-    if (!community?.properties?.archetype?.default) {
+    if (!hubData?.properties?.archetype?.default) {
       return null;
     }
-    return ArchetypeTypes[community?.properties?.archetype?.default];
-  }, [community]);
-
-  const membersTableData = {
-    totalMembers: 0
-  };
-
-  const averageCommitment = 0;
-  const blockExplorer = "https://etherscan.io";
-  const theme = useTheme();
-
-  if (data && roles && data?.length) {
-    membersTableData.totalMembers = data.length;
-    roles.forEach((role) => {
-      // const membersByRole = data.reduce(function (n, member) {
-      //   return n + +(member?.properties?.role.id == role.id);
-      // }, 0);
-      // membersTableData[role.id] = membersByRole;
-    });
-
-    // const commitmentSum = data.reduce(
-    //   (prev, curr) => prev + +curr.properties.commitment,
-    //   0
-    // );
-
-    // averageCommitment = Math.round(commitmentSum / data.length);
-  }
+    return ArchetypeTypes[hubData?.properties?.archetype?.default];
+  }, [hubData]);
 
   useEffect(() => {
     dispatch(
       setTitle(
-        userInfo?.name
-          ? `${getGreeting()}, ${userInfo?.name}`
+        autIDData?.name
+          ? `${getGreeting()}, ${autIDData?.name}`
           : `${getGreeting()}`
       )
     );
-  }, [dispatch, userInfo]);
-
-  console.log("rolSets", community.properties.rolesSets[0]);
+  }, [dispatch, autIDData]);
 
   return (
     <Container
@@ -237,8 +155,6 @@ const Dashboard = () => {
         }
       }}
     >
-      <LoadingProgressBar isLoading={isFetching} />
-
       <LeftWrapper>
         <Stack
           sx={{
@@ -295,7 +211,7 @@ const Dashboard = () => {
                     aria-label="avatar"
                   >
                     <img
-                      src={ipfsCIDToHttpUrl(community?.image as string)}
+                      src={ipfsCIDToHttpUrl(hubData?.image as string)}
                       style={{
                         objectFit: "contain",
                         width: "100%",
@@ -320,10 +236,10 @@ const Dashboard = () => {
                     lineHeight={1}
                     variant="h3"
                     marginBottom={2}
-                    fontSize={calculateFontSize(community?.name as string)}
+                    fontSize={calculateFontSize(hubData?.name as string)}
                   >
-                    {community?.name}
-                    {community.properties.domain && (
+                    {hubData?.name}
+                    {hubData.properties.domain && (
                       <SvgIcon
                         component={CheckCircleIcon}
                         sx={{
@@ -335,7 +251,7 @@ const Dashboard = () => {
                       />
                     )}
                   </Typography>
-                  <CopyAddress address={community?.properties.address} />
+                  <CopyAddress address={hubData?.properties.address} />
                   {/* Add domain information here */}
                   <Typography
                     color="offWhite.main"
@@ -343,8 +259,8 @@ const Dashboard = () => {
                     variant="body2"
                     marginTop={1}
                   >
-                    {community.properties.domain
-                      ? community.properties.domain
+                    {hubData.properties.domain
+                      ? hubData.properties.domain
                       : "Domain not registered"}
                   </Typography>
                 </div>
@@ -382,7 +298,7 @@ const Dashboard = () => {
                         color: "#FFF"
                       }}
                     >
-                      {/* {community?.properties.members} */}
+                      {/* {hub?.properties.members} */}
                     </Typography>
                     <Typography
                       fontWeight="bold"
@@ -414,7 +330,7 @@ const Dashboard = () => {
                         color: "#FFF"
                       }}
                     >
-                      {/* {community?.properties.prestige} */}
+                      {/* {hub?.properties.prestige} */}
                     </Typography>
                     <Typography
                       fontWeight="bold"
@@ -451,10 +367,10 @@ const Dashboard = () => {
                           width: "16px"
                         }}
                         inheritViewBox
-                        component={marketTemplate?.icon}
+                        component={hubData.marketTemplate?.icon}
                       ></SvgIcon>
                     }
-                    label={marketTemplate?.title}
+                    label={hubData.marketTemplate?.title}
                   ></AutIconLabel>
                   <AutIconLabel
                     textColor="#FFF"
@@ -495,7 +411,7 @@ const Dashboard = () => {
                     textAlign="left"
                     variant="body"
                   >
-                    {community?.description || "No description yet..."}
+                    {hubData?.description || "No description yet..."}
                   </Typography>
                 </Box>
               </Box>
@@ -515,8 +431,7 @@ const Dashboard = () => {
         </Stack>
       </LeftWrapper>
       <RightWrapper>
-        <HubRoleTabs roles={community?.properties?.rolesSets[0]?.roles} />
-        {/* <ArchetypeTabs archetype={archetype} /> */}
+        <ArchetypePie archetype={selectedArchetype} />
       </RightWrapper>
     </Container>
   );

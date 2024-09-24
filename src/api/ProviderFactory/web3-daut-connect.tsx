@@ -1,6 +1,6 @@
 import { memo, useEffect, useLayoutEffect, useRef } from "react";
 import { useAppDispatch } from "@store/store.model";
-import { DAutAutID, Init } from "@aut-labs/d-aut";
+import { Init } from "@aut-labs/d-aut";
 import { useSelector } from "react-redux";
 import {
   NetworksConfig,
@@ -8,16 +8,14 @@ import {
 } from "@store/WalletProvider/WalletProvider";
 import { debounce } from "@mui/material";
 import { EnvMode, autUrls, environment } from "@api/environment";
-import { useConnect } from "wagmi";
 import AutSDK from "@aut-labs/sdk";
 import { MultiSigner } from "@aut-labs/sdk/dist/models/models";
 import { NetworkConfig } from "./network.config";
 import { useAutConnector } from "@aut-labs/connector";
-import { communityUpdateState } from "@store/Community/community.reducer";
-import { getCache, CacheTypes } from "@api/cache.api";
-import { setAuthenticated } from "@auth/auth.reducer";
+import { hubUpdateState } from "@store/Hub/hub.reducer";
 import { resetState } from "@store/store";
 import { AUTH_TOKEN_KEY } from "@api/auth.api";
+import { HubOSAutID } from "@api/aut.model";
 
 function Web3DautConnect({
   setLoading
@@ -27,7 +25,6 @@ function Web3DautConnect({
   const dispatch = useAppDispatch();
   const networks = useSelector(NetworksConfig);
   const dAutInitialized = useRef<boolean>(false);
-  const { connectors } = useConnect();
 
   const {
     isConnected,
@@ -35,14 +32,13 @@ function Web3DautConnect({
     connect,
     disconnect,
     setStateChangeCallback,
+    connectors,
     multiSigner,
     multiSignerId,
     chainId,
     status,
     address
-  } = useAutConnector({
-    defaultChainId: +environment.defaultChainId
-  });
+  } = useAutConnector();
 
   const onAutInit = async () => {
     const connetectedAlready = localStorage.getItem("aut-data");
@@ -51,22 +47,9 @@ function Web3DautConnect({
     }
   };
 
-  const _parseAutId = async (profile: DAutAutID): Promise<DAutAutID> => {
-    const autID = new DAutAutID(profile);
-    // autID.properties.communities = autID.properties.communities.filter((c) => {
-    //   return c.properties.userData?.isActive;
-    // });
-    // autID.properties.network =
-    //   profile.properties.network?.network?.toLowerCase();
-    return autID;
-  };
-
   const onAutLogin = async ({ detail }: any) => {
     const profile = JSON.parse(JSON.stringify(detail));
-    const autID = await _parseAutId(profile);
-
-    // autID.properties.address = profile.address;
-    // autID.properties.network = profile.network?.network?.toLowerCase();
+    const autID = new HubOSAutID(profile);
 
     if (autID.properties.network) {
       const selectedNetwork = networks.find(
@@ -81,22 +64,10 @@ function Web3DautConnect({
       await dispatch(updateWalletProviderState(itemsToUpdate));
 
       await dispatch(
-        communityUpdateState({
-          communities: autID.properties.hubs,
-          //TODO: to change
-          selectedCommunityAddress: autID.properties.hubs[0].properties?.address
-        })
-      );
-
-      // const cache = await getCache(
-      //   CacheTypes.UserPhases,
-      //   autID.properties.address
-      // );
-      await dispatch(
-        setAuthenticated({
-          // cache,
-          isAuthenticated: true,
-          userInfo: autID
+        hubUpdateState({
+          autID,
+          hubs: autID.properties.hubs,
+          selectedHubAddress: autID.properties.hubs[0].properties?.address
         })
       );
 
@@ -120,57 +91,38 @@ function Web3DautConnect({
     multiSigner: MultiSigner
   ) => {
     const sdk = await AutSDK.getInstance(false);
-    const itemsToUpdate = {
-      selectedNetwork: network
-    };
-    console.log("network", network);
-    await dispatch(updateWalletProviderState(itemsToUpdate));
     await sdk.init(multiSigner, {
-      hubRegistryAddress: network.contracts.novaRegistryAddress,
+      hubRegistryAddress: network.contracts.hubRegistryAddress,
       autIDAddress: network.contracts.autIDAddress,
-      daoExpanderRegistryAddress: network.contracts.daoExpanderRegistryAddress
+      taskRegistryAddress: network.contracts.taskRegistryAddress
     });
   };
 
   useEffect(() => {
-    if (multiSignerId) {
+    const start = async () => {
       let network = networks.find((d) => d.chainId === chainId);
       if (!network) {
         network = networks.filter((d) => !d.disabled)[0];
       }
-      initialiseSDK(network, multiSigner);
+      await initialiseSDK(network, multiSigner);
+      await dispatch(
+        updateWalletProviderState({
+          selectedNetwork: network
+        })
+      );
+    };
+    if (multiSignerId) {
+      start();
     }
   }, [multiSignerId]);
 
   useEffect(() => {
+    window.addEventListener("aut_profile", onAutMenuProfile);
+    window.addEventListener("aut-Init", onAutInit);
+    window.addEventListener("aut-onConnected", onAutLogin);
+    window.addEventListener("aut-onDisconnected", onDisconnected);
     if (!dAutInitialized.current && multiSignerId) {
-      window.addEventListener("aut_profile", onAutMenuProfile);
-      window.addEventListener("aut-Init", onAutInit);
-      window.addEventListener("aut-onConnected", onAutLogin);
-      window.addEventListener("aut-onDisconnected", onDisconnected);
       dAutInitialized.current = true;
-      const btnConfig = {
-        metaMaskSDK: true,
-        walletConnect: true,
-        coinbaseWalletSDK: true,
-        web3auth: true
-      };
-
-      console.log("connectors", connectors);
-
-      const allowedConnectors = Object.keys(btnConfig)
-        .filter((connector) => btnConfig[connector])
-        .map((connector) => {
-          const c = connectors.find((c) => c.id === connector);
-          if (c.name == "MetaMask") {
-            // @ts-ignore
-            c.id = "metaMask";
-          }
-          return c;
-        });
-
-      console.log("multiSignerId", multiSignerId);
-      console.log("allowedConnectors", allowedConnectors);
 
       const config: any = {
         defaultText: "Connect Wallet",
@@ -189,18 +141,18 @@ function Web3DautConnect({
       Init({
         config,
         envConfig: {
-          REACT_APP_API_URL: environment.apiUrl,
-          REACT_APP_GRAPH_API_URL: environment.graphApiUrl,
-          REACT_APP_IPFS_API_KEY: environment.ipfsApiKey,
-          REACT_APP_IPFS_API_SECRET: environment.ipfsApiSecret,
-          REACT_APP_IPFS_GATEWAY_URL: environment.ipfsGatewayUrl,
-          REACT_APP_ENV: environment.env as EnvMode
+          API_URL: environment.apiUrl,
+          GRAPH_API_URL: environment.graphApiUrl,
+          IPFS_API_KEY: environment.ipfsApiKey,
+          IPFS_API_SECRET: environment.ipfsApiSecret,
+          IPFS_GATEWAY_URL: environment.ipfsGatewayUrl,
+          ENV: environment.env as EnvMode
         },
         connector: {
           connect,
           disconnect,
           setStateChangeCallback,
-          connectors: allowedConnectors,
+          connectors,
           networks,
           state: {
             chainId,

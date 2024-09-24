@@ -1,11 +1,3 @@
-/* eslint-disable max-len */
-import {
-  useFinaliseOpenTaskMutation,
-  useGetAllTasksPerQuestQuery,
-  useGetAllTasksQuery,
-  useSubmitOpenTaskMutation
-} from "@api/onboarding.api";
-import { PluginDefinition, Task } from "@aut-labs/sdk";
 import AutLoading from "@components/AutLoading";
 import { base64toFile } from "@utils/to-base-64";
 import { StepperButton } from "@components/Stepper";
@@ -21,7 +13,6 @@ import {
   Typography,
   useTheme
 } from "@mui/material";
-import { IsAdmin } from "@store/Community/community.reducer";
 import { AutTextField } from "@theme/field-text-styles";
 import { memo, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -29,45 +20,43 @@ import { useSelector } from "react-redux";
 import { useSearchParams, useParams } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
-import { TaskStatus } from "@aut-labs/sdk/dist/models/task";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import CopyAddress from "@components/CopyAddress";
-import IosShareIcon from "@mui/icons-material/IosShare";
 import axios from "axios";
 import { useAccount } from "wagmi";
+import { TaskContributionNFT } from "@aut-labs/sdk";
 
 interface PluginParams {
-  plugin: PluginDefinition;
+  plugin: any;
 }
 
 interface UserSubmitContentProps {
-  task: Task;
+  task: TaskContributionNFT;
   userAddress: string;
-  submission?: Task;
-  plugin: PluginDefinition;
+  submission?: TaskContributionNFT;
+  plugin: any;
 }
 
 export const taskStatuses: any = {
-  [TaskStatus.Created]: {
-    label: "To Do",
-    color: "info"
-  },
-  [TaskStatus.Finished]: {
-    label: "Approved",
-    color: "success"
-  },
-  [TaskStatus.Submitted]: {
-    label: "Pending",
-    color: "warning"
-  },
-  [TaskStatus.Taken]: {
-    label: "Taken",
-    color: "info"
-  }
+  // [TaskStatus.Created]: {
+  //   label: "To Do",
+  //   color: "info"
+  // },
+  // [TaskStatus.Finished]: {
+  //   label: "Approved",
+  //   color: "success"
+  // },
+  // [TaskStatus.Submitted]: {
+  //   label: "Pending",
+  //   color: "warning"
+  // },
+  // [TaskStatus.Taken]: {
+  //   label: "Taken",
+  //   color: "info"
+  // }
 };
 
 const UserSubmitContent = ({
@@ -86,7 +75,7 @@ const UserSubmitContent = ({
 
   useEffect(() => {
     if (!initialized && task) {
-      setValue("openTask", task.submission?.description);
+      // setValue("openTask", task.submission?.description);
       setInitialized(true);
     }
   }, [initialized, task]);
@@ -133,7 +122,7 @@ const UserSubmitContent = ({
       <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
       <LoadingDialog open={isLoading} message="Submitting task..." />
 
-      {task?.status === TaskStatus.Created ||
+      {/* {task?.status === TaskStatus.Created ||
       task?.status === TaskStatus.Taken ? (
         <Card
           sx={{
@@ -236,7 +225,7 @@ const UserSubmitContent = ({
             </Stack>
           </CardContent>
         </Card>
-      )}
+      )} */}
 
       <Stack
         sx={{
@@ -248,14 +237,14 @@ const UserSubmitContent = ({
           }
         }}
       >
-        {(task?.status === TaskStatus.Created ||
+        {/* {(task?.status === TaskStatus.Created ||
           task?.status === TaskStatus.Taken) && (
           <StepperButton
             label="Submit"
             onClick={handleSubmit(onSubmit)}
             disabled={!formState.isValid}
           />
-        )}
+        )} */}
       </Stack>
     </Stack>
   );
@@ -341,23 +330,23 @@ const OwnerFinalizeContent = ({
                 variant="body"
                 color="white"
               >
-                Submitter: <CopyAddress address={submission.submitter} />
+                {/* Submitter: <CopyAddress address={submission.submitter} /> */}
               </Typography>
-              <Chip
+              {/* <Chip
                 sx={{
                   ml: 1
                 }}
                 label={taskStatuses[submission?.status].label}
                 color={taskStatuses[submission?.status].color}
                 size="small"
-              />
+              /> */}
             </Stack>
           )}
 
           {!submission && (
             <>
               <Stack direction="column" alignItems="center">
-                {task?.metadata?.properties.attachmentType === "url" && (
+                {/* {task?.properties.attachmentType === "url" && (
                   <Box
                     sx={{
                       display: "grid",
@@ -491,7 +480,7 @@ const OwnerFinalizeContent = ({
                       </Typography>
                     </Stack>
                   </Box>
-                )}
+                )} */}
               </Stack>
               {/* <Stack direction="column" alignItems="center">
                 <Box
@@ -518,7 +507,7 @@ const OwnerFinalizeContent = ({
             </>
           )}
 
-          {submission && (
+          {/* {submission && (
             <Stack direction="column" alignItems="center">
               {submission?.metadata?.properties.attachmentType === "url" && (
                 <Box
@@ -636,36 +625,6 @@ const OwnerFinalizeContent = ({
                       Attachment type
                     </Typography>
                   </Stack>
-                  {/* <Stack
-                    direction="column"
-                    justifyContent="center"
-                    alignItems="center"
-                    gap={0.5}
-                  >
-                    <Typography
-                      fontFamily="FractulRegular"
-                      color="primary"
-                      variant="subtitle2"
-                    >
-                      <Link
-                        color="primary"
-                        sx={{
-                          mt: 1,
-                          cursor: "pointer"
-                        }}
-                        variant="body"
-                        target="_blank"
-                        href={ipfsCIDToHttpUrl(
-                          submission?.submission?.properties["fileUri"]
-                        )}
-                      >
-                        Download
-                      </Link>
-                    </Typography>
-                    <Typography variant="caption" className="text-secondary">
-                      Action
-                    </Typography>
-                  </Stack> */}
                   <Stack
                     direction="column"
                     justifyContent="center"
@@ -749,36 +708,6 @@ const OwnerFinalizeContent = ({
                       Attachment type
                     </Typography>
                   </Stack>
-                  {/* <Stack
-                    direction="column"
-                    justifyContent="center"
-                    alignItems="center"
-                    gap={0.5}
-                  >
-                    <Typography
-                      fontFamily="FractulRegular"
-                      color="primary"
-                      variant="subtitle2"
-                    >
-                      <Link
-                        color="primary"
-                        sx={{
-                          mt: 1,
-                          cursor: "pointer"
-                        }}
-                        variant="body"
-                        target="_blank"
-                        href={ipfsCIDToHttpUrl(
-                          submission?.submission?.properties["fileUri"]
-                        )}
-                      >
-                        Download
-                      </Link>
-                    </Typography>
-                    <Typography variant="caption" className="text-secondary">
-                      Action
-                    </Typography>
-                  </Stack> */}
                   <Stack
                     direction="column"
                     justifyContent="center"
@@ -803,34 +732,11 @@ const OwnerFinalizeContent = ({
                         alt="Submission Image"
                       />
                     </Card>
-                    {/* <Typography
-                      fontFamily="FractulRegular"
-                      color="primary"
-                      variant="subtitle2"
-                    >
-                      <Link
-                        color="primary"
-                        sx={{
-                          mt: 1,
-                          cursor: "pointer"
-                        }}
-                        variant="body"
-                        target="_blank"
-                        href={ipfsCIDToHttpUrl(
-                          submission?.submission?.properties["fileUri"]
-                        )}
-                      >
-                        View in IPFS
-                      </Link>
-                    </Typography>
-                    <Typography variant="caption" className="text-secondary">
-                      Source
-                    </Typography> */}
                   </Stack>
                 </Box>
               )}
             </Stack>
-          )}
+          )} */}
 
           {submission && (
             <Stack direction="column" alignItems="center">
@@ -840,7 +746,7 @@ const OwnerFinalizeContent = ({
                 textAlign="center"
                 p="5px"
               >
-                {submission?.submission?.description || "No description"}
+                {/* {submission?.submission?.description || "No description"} */}
               </Typography>
               <Typography variant="caption" className="text-secondary">
                 Submission description
@@ -862,13 +768,13 @@ const OwnerFinalizeContent = ({
           }
         }}
       >
-        {submission?.status === TaskStatus.Submitted && (
+        {/* {submission?.status === TaskStatus.Submitted && (
           <StepperButton
             disabled={isLoadingTasks}
             label="Finalize"
             onClick={onSubmit}
           />
-        )}
+        )} */}
       </Stack>
     </Stack>
   );
@@ -893,17 +799,17 @@ const OpenTask = ({ plugin }: PluginParams) => {
           const [pluginType] = location.pathname.split("/").splice(-2);
           return (
             t.submitter === searchParams.get("submitter") &&
-            t.taskId === +params?.taskId &&
-            PluginDefinitionType[pluginType] ===
-              taskTypes[t.taskType].pluginType
+            t.taskId === +params?.taskId
+            // PluginDefinitionType[pluginType] ===
+            //   taskTypes[t.taskType].pluginType
           );
         }),
         task: (data?.tasks || []).find((t) => {
           const [pluginType] = location.pathname.split("/").splice(-2);
           return (
-            t.taskId === +params?.taskId &&
-            PluginDefinitionType[pluginType] ===
-              taskTypes[t.taskType].pluginType
+            t.taskId === +params?.taskId
+            // PluginDefinitionType[pluginType] ===
+            //   taskTypes[t.taskType].pluginType
           );
         })
       })

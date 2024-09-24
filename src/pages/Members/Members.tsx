@@ -12,18 +12,21 @@ import {
   Container,
   Stack,
   Typography,
-  styled
+  styled,
+  useTheme
 } from "@mui/material";
 import { setTitle } from "@store/ui-reducer";
-import { useGetAllMembersQuery } from "@api/community.api";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import AutLoading from "@components/AutLoading";
 import { autUrls } from "@api/environment";
 import AutTabs from "@components/AutTabs/AutTabs";
 import { useSelector } from "react-redux";
-import { CommunityData } from "@store/Community/community.reducer";
+import { HubData } from "@store/Hub/hub.reducer";
 import { DAutAutID } from "@aut-labs/d-aut";
+import useQueryHubMembers from "@hooks/useQueryHubMembers";
+import HubOsTabs from "@components/HubOsTabs";
+import HubMemberCard from "./HubMemberCard";
 
 const generateMemberTabs = (members: { [role: string]: DAutAutID[] }) => {
   return Object.keys(members || []).reduce((prev, curr) => {
@@ -82,25 +85,12 @@ const GridCardWrapper = styled("div")(({ theme }) => {
   };
 });
 
-const MemberType = styled(Chip)(({ theme }) => {
-  return {
-    position: "absolute",
-    top: "-14px",
-    minWidth: "120px",
-    height: "28px"
-  };
-});
-
 const MemberCard = memo(
   ({ member, isFetching }: { member: DAutAutID; isFetching: boolean }) => {
     const urls = autUrls();
     return (
       <>
         <GridCardWrapper>
-          {/* <MemberType
-            label={member.properties?.isAdmin ? "Admin" : "Member"}
-            color="primary"
-          /> */}
           <GridCard
             sx={{
               bgcolor: "nightBlack.main",
@@ -160,7 +150,7 @@ const MemberCard = memo(
                   {/* {member?.properties.role?.roleName} */}
                 </Typography>
                 <Typography variant="caption" color="primary">
-                  DAO Role
+                  Hub Role
                 </Typography>
               </Stack>
               <Stack direction="column">
@@ -203,77 +193,115 @@ const MemberCard = memo(
 );
 
 const MembersList = ({ members = [] }: { members: DAutAutID[] }) => {
+  const theme = useTheme();
   return (
-    <>
-      {members.length ? (
-        <GridBox sx={{ flexGrow: 1, mt: 6 }}>
-          {members.map((member, index) => (
-            <MemberCard
-              key={`member-plugin-${index}`}
-              member={member}
-              isFetching={false}
-            />
-          ))}
-        </GridBox>
-      ) : (
-        <Box
-          sx={{
-            display: "flex",
-            p: "10px 30px 30px 30px",
-            mt: "48px",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          <Typography color="rgb(107, 114, 128)" variant="subtitle2">
-            There are no contributors with this role yet...
-          </Typography>
-        </Box>
-      )}
-    </>
+    <Box
+      sx={{
+        marginTop: theme.spacing(3),
+        display: "grid",
+        gridTemplateColumns: {
+          xs: "1fr",
+          sm: "1fr 1fr",
+          md: "1fr 1fr",
+          xl: "1fr 1fr 1fr",
+          xxl: "1fr 1fr 1fr"
+        },
+        ml: {
+          xs: theme.spacing(3),
+          md: 0
+        },
+        mr: {
+          xs: theme.spacing(3),
+          md: theme.spacing(2)
+        },
+        gap: {
+          xs: theme.spacing(2),
+          md: theme.spacing(3),
+          xl: theme.spacing(4),
+          xxl: theme.spacing(4)
+        }
+      }}
+    >
+      {members?.map((member, index) => (
+        <HubMemberCard key={`role-item-${member?.name}`} member={member} />
+      ))}
+    </Box>
+    // <>
+    //   {members.length ? (
+    //     <GridBox sx={{ flexGrow: 1, mt: 6 }}>
+    //       {members.map((member, index) => (
+    //         <MemberCard
+    //           key={`member-plugin-${index}`}
+    //           member={member}
+    //           isFetching={false}
+    //         />
+    //       ))}
+    //     </GridBox>
+    //   ) : (
+    //     <Box
+    //       sx={{
+    //         display: "flex",
+    //         p: "10px 30px 30px 30px",
+    //         mt: "48px",
+    //         flexDirection: "column",
+    //         alignItems: "center",
+    //         justifyContent: "center"
+    //       }}
+    //     >
+    //       <Typography color="rgb(107, 114, 128)" variant="subtitle2">
+    //         There are no contributors with this role yet...
+    //       </Typography>
+    //     </Box>
+    //   )}
+    // </>
   );
 };
 
 function Members() {
   const dispatch = useAppDispatch();
 
-  const { data, isLoading, isFetching } = useGetAllMembersQuery(null, {
-    refetchOnMountOrArgChange: true,
-    skip: false
-  });
-
   useEffect(() => {
-    dispatch(setTitle(`DAO - Members & Roles in your Community.`));
+    dispatch(setTitle(`Hub - Members & Roles in your Hub.`));
   }, [dispatch]);
 
-  const community = useSelector(CommunityData);
-  const initializedTabs = community?.properties.rolesSets[0].roles.reduce(
-    (tab, role) => {
+  const hubData = useSelector(HubData);
+  const { data, loading: isLoading } = useQueryHubMembers({
+    skip: !hubData?.properties?.address,
+    variables: {
+      skip: 0,
+      take: 1000,
+      where: {
+        joinedHubs_: {
+          hubAddress: hubData.properties.address
+        }
+      }
+    }
+  });
+
+  const tabs = useMemo(() => {
+    const roles = hubData.roles;
+    const initializedTabs = roles.reduce((tab, role) => {
       const key = role.roleName;
       tab[key] = [];
       return tab;
-    },
-    {}
-  );
+    }, {});
 
-  const tabs = useMemo(() => {
     const groupedMembers = data?.reduce((group, member) => {
-      // const key = member.properties.role.roleName;
-      // if (!group[key]) {
-      //   group[key] = [];
-      // }
-      // group[key].push(member);
+      const joinedHub = member.joinedHub(hubData.properties.address);
+      const roleName = hubData.roleName(+joinedHub?.role);
+      if (!group[roleName]) {
+        group[roleName] = [];
+      }
+      group[roleName].push(member);
       return group;
     }, initializedTabs);
-
     return generateMemberTabs(groupedMembers);
-  }, [data]);
+  }, [hubData, data]);
 
   return (
     <Container maxWidth="lg" sx={{ py: "20px" }}>
-      <LoadingProgressBar isLoading={isFetching} />
-      <Box
+      <LoadingProgressBar isLoading={isLoading} />
+      {/* <Box
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -282,7 +310,7 @@ function Members() {
         }}
       >
         <Typography textAlign="center" color="white" variant="h3">
-          DAO Members
+          Hub Members
         </Typography>
         <Box
           sx={{
@@ -292,18 +320,10 @@ function Members() {
             justifyContent: "flex-end"
           }}
         >
-          {/* <Button
-            startIcon={<IosShareIcon />}
-            variant="outlined"
-            size="medium"
-            color="offWhite"
-          >
-            Invite contributors
-          </Button> */}
         </Box>
-      </Box>
+      </Box> */}
 
-      {/* {!isLoading && !data?.length && (
+      {!isLoading && !data?.length && (
         <Box
           sx={{
             display: "flex",
@@ -315,20 +335,15 @@ function Members() {
           }}
         >
           <Typography color="rgb(107, 114, 128)" variant="subtitle2">
-            There are no contributors in this community yet...
+            There are no contributors in this hub yet...
           </Typography>
         </Box>
-      )} */}
+      )}
 
       {isLoading ? (
         <AutLoading width="130px" height="130px" />
       ) : (
-        <AutTabs
-          // tabStyles={{
-          //   border: "2px solid #439EDD"
-          // }}
-          tabs={tabs}
-        />
+        <HubOsTabs tabs={tabs} />
       )}
     </Container>
   );

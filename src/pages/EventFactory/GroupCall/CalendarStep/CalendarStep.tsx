@@ -68,7 +68,7 @@ const CalendarStep = () => {
         subtitle={
           <>
             Hello friend I’m your Web3 scheduling assistant <br />
-            Set a date and time for your Community Call & let’s make it
+            Set a date and time for your Hub Call & let’s make it
             official.
           </>
         }

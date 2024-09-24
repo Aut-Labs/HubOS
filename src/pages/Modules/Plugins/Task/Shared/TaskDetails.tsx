@@ -1,4 +1,4 @@
-import { Task } from "@aut-labs/sdk";
+import { TaskContributionNFT } from "@aut-labs/sdk";
 import {
   Box,
   Button,
@@ -10,14 +10,14 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { memo } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { CommunityData } from "@store/Community/community.reducer";
+import { HubData } from "@store/Hub/hub.reducer";
 
 interface TaskDetailsParams {
-  task: Task;
+  task: TaskContributionNFT;
 }
 
 const TaskDetails = ({ task }: TaskDetailsParams) => {
-  const communityData = useSelector(CommunityData);
+  const hubData = useSelector(HubData);
   const isLoading = false;
 
   return (
@@ -47,7 +47,7 @@ const TaskDetails = ({ task }: TaskDetailsParams) => {
                   sm: "0"
                 }
               }}
-              to={`/${communityData?.name}/tasks`}
+              to={`/${hubData?.name}/tasks`}
               component={Link}
             >
               {/* {searchParams.get("returnUrlLinkName") || "Back"} */}
@@ -56,7 +56,7 @@ const TaskDetails = ({ task }: TaskDetailsParams) => {
               </Typography>
             </Button>
             <Typography textAlign="center" color="white" variant="h3">
-              {task?.metadata?.name}
+              {task?.name}
             </Typography>
           </Stack>
 
@@ -74,7 +74,7 @@ const TaskDetails = ({ task }: TaskDetailsParams) => {
             }}
             variant="body"
           >
-            {task?.metadata?.description}
+            {task?.description}
           </Typography>
 
           {/* <OverflowTooltip

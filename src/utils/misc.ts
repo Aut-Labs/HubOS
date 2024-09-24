@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+
 export const MarketTemplates = [
   {
     title: "Infra, Defi & DAO Tooling",

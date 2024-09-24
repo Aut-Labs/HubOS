@@ -1,5 +1,4 @@
 import { useGetAllTasksQuery } from "@api/onboarding.api";
-import { PluginDefinition } from "@aut-labs/sdk";
 import AutLoading from "@components/AutLoading";
 import {
   Box,
@@ -12,21 +11,19 @@ import {
   styled,
   Typography
 } from "@mui/material";
-import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
+import { HubData, IsAdmin } from "@store/Hub/hub.reducer";
 import { memo, useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
 import { GridBox } from "./QuestionsAndAnswers";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import { getQestions } from "@api/tasks.api";
 import { useAccount } from "wagmi";
 
 interface PluginParams {
-  plugin: PluginDefinition;
+  plugin: any;
 }
 
 const GridRow = styled(Box)({
@@ -117,14 +114,7 @@ const QuizTask = ({ plugin }: PluginParams) => {
     {
       selectFromResult: ({ data, isLoading, isFetching }) => ({
         isLoading: isLoading || isFetching,
-        task: (data?.tasks || []).find((t) => {
-          const [pluginType] = location.pathname.split("/").splice(-2);
-          return (
-            t.taskId === +params?.taskId &&
-            PluginDefinitionType[pluginType] ===
-              taskTypes[t.taskType].pluginType
-          );
-        })
+        task: (data?.tasks || [])[0]
       })
     }
   );

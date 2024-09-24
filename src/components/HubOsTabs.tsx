@@ -1,8 +1,8 @@
-import * as React from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import { SxProps, useTheme } from "@mui/material";
+import { useState, memo } from "react";
 
 interface HubOsTabParams {
   label: string | any;
@@ -16,8 +16,8 @@ interface HubOsTabParams {
 interface HubOsParams {
   tabs: HubOsTabParams[];
   selectedTabIndex?: number;
-  selectedTab?: (value: any, event: React.SyntheticEvent) => void;
-  tabStyles?: React.CSSProperties | SxProps<any>;
+  selectedTab?: (value: any, event: SyntheticEvent) => void;
+  tabStyles?: CSSProperties | SxProps<any>;
 }
 
 function TabPanel(props: any) {
@@ -58,12 +58,12 @@ function TabPanel(props: any) {
 }
 
 function HubOsTabs(props: HubOsParams) {
-  const [value, setSelectedIndex] = React.useState(props.selectedTabIndex || 0);
+  const [value, setSelectedIndex] = useState(props.selectedTabIndex || 0);
   const theme = useTheme();
 
   console.log("HubOsTabs", props);
 
-  const handleChange = (event: React.SyntheticEvent, index: number) => {
+  const handleChange = (event: SyntheticEvent, index: number) => {
     setSelectedIndex(index);
     props.selectedTab && props.selectedTab(index, event);
   };
@@ -163,4 +163,4 @@ function HubOsTabs(props: HubOsParams) {
   );
 }
 
-export default React.memo(HubOsTabs);
+export default memo(HubOsTabs);

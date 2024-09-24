@@ -1,72 +1,7 @@
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
-import AutSDK, { Hub, SDKContractGenericResponse } from "@aut-labs/sdk";
-import { ipfsCIDToHttpUrl } from "./storage.api";
-import { DAutHub } from "@aut-labs/d-aut";
-
-const updateCommunitySocial = async (
-  api: BaseQueryApi,
-  type: string,
-  value: string
-): Promise<SDKContractGenericResponse<void>> => {
-  const sdk = await AutSDK.getInstance();
-  const communityState: {
-    communities: DAutHub[];
-    selectedCommunityAddress: string;
-  } = (api.getState() as any)?.community;
-
-  const community = communityState.communities.find(
-    (c) => c.properties.address === communityState.selectedCommunityAddress
-  );
-
-  sdk.hub = sdk.initService<Hub>(Hub, community.properties.address);
-
-  for (let i = 0; i < community.properties.socials.length; i++) {
-    const element = community.properties.socials[i];
-    if (element.type === type) {
-      element.link = value;
-      break;
-    }
-  }
-
-  const updatedCommunity = DAutHub.updateHubNFT(community as any);
-  const uri = await sdk.client.sendJSONToIPFS(updatedCommunity as any);
-  console.log("New metadata: ->", ipfsCIDToHttpUrl(uri));
-  const response = await sdk.hub.contract.metadata.setMetadataUri(uri);
-
-  if (response.isSuccess) {
-    const autIdData = JSON.parse(window.localStorage.getItem("aut-data"));
-    let foundSocial = false;
-    for (let i = 0; i < autIdData.properties.communities.length; i++) {
-      if (foundSocial) {
-        break;
-      }
-      const community: DAutHub = autIdData.properties.communities[i];
-      if (community.name === community.name) {
-        for (let i = 0; i < community.properties.socials.length; i++) {
-          const social = community.properties.socials[i];
-          if (social.type === type) {
-            social.link = value;
-            foundSocial = true;
-            break;
-          }
-        }
-      }
-    }
-    window.localStorage.setItem("aut-data", JSON.stringify(autIdData));
-  }
-
-  return response;
-};
 
 export const verifyENS = async (address: any, api: BaseQueryApi) => {
   try {
-    // await signMessage({
-    //   message: "Allow Aut to verify you ENS name"
-    // });
-    // const name = await fetchEnsName({
-    //   address: address
-    // });
-    // // await updateCommunitySocial(api, "ens", "tao.eth");
     return {
       data: "name"
     };

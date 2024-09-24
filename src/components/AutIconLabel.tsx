@@ -1,6 +1,6 @@
 import { Paper, SxProps, Typography, styled } from "@mui/material";
 import { ReactNode } from "react";
-import { ReactComponent as Social } from "@assets/icons/social.svg";
+import Social from "@assets/icons/social.svg?react";
 
 interface AutIconLabelProps {
   icon: ReactNode;

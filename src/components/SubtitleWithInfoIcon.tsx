@@ -1,5 +1,5 @@
 import { Typography, Tooltip, SvgIcon, Box, useTheme } from "@mui/material";
-import { ReactComponent as InfoIcon } from "@assets/hubos/info-icon.svg";
+import InfoIcon from "@assets/hubos/info-icon.svg?react";
 
 export const SubtitleWithInfo = ({ title, description }) => {
   const theme = useTheme();

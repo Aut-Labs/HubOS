@@ -30,10 +30,10 @@ import {
 } from "react-hook-form";
 import AddIcon from "@mui/icons-material/Add";
 import { FormHelperText } from "@components/Fields";
-import React, { useState } from "react";
+import { useState } from "react";
 import { SubtitleWithInfo } from "@components/SubtitleWithInfoIcon";
 
-import { ReactComponent as DeleteIcon } from "@assets/hubos/delete-icon.svg";
+import DeleteIcon from "@assets/hubos/delete-icon.svg?react";
 import { AutOsButton, AutOsTabButton } from "@components/buttons";
 
 const errorTypes = {
@@ -299,7 +299,7 @@ const RadioTypeAnswers = ({
   const [selectedIndex, setSelectedIndex] = useState(null);
 
   const handleChange = (
-    _: React.ChangeEvent<HTMLInputElement>,
+    _: ChangeEvent<HTMLInputElement>,
     index: number
   ) => {
     const formValues = getFormValues();
@@ -432,11 +432,11 @@ const QuestionsAndAnswers = ({ control, updateForm, getFormValues }) => {
     name: "questions"
   });
 
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(
     null
   );
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 

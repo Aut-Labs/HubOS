@@ -16,20 +16,16 @@ import {
   GetDatatableItems,
   GetDatatableChangedItems
 } from "@components/datatable/DatatableHelpers";
-import { ReactComponent as SaveIcon } from "@assets/actions/confirm.svg";
-import { ReactComponent as CancelIcon } from "@assets/actions/cancel.svg";
-import { ReactComponent as DeleteIcon } from "@assets/actions/cancel.svg";
-import { ReactComponent as EditIcon } from "@assets/actions/edit.svg";
+import SaveIcon from "@assets/actions/confirm.svg?react";
+import CancelIcon from "@assets/actions/cancel.svg?react";
+import DeleteIcon from "@assets/actions/cancel.svg?react";
+import EditIcon from "@assets/actions/edit.svg?react";
 import { useSelector } from "react-redux";
 import { RootState } from "@store/store.model";
 import { ResultState } from "@store/result-status";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
-import {
-  useGetCommunityQuery,
-  useUpdateAdminsMutation,
-  useUpdateDomainsMutation
-} from "@api/community.api";
+import { HubData } from "@store/Hub/hub.reducer";
 
 const tableColumns = (
   getRef: () => MutableRefObject<GridEditRowApi & GridRowApi>
@@ -159,17 +155,13 @@ const DAut = () => {
   const [initialData, setInitialData] = useState([]);
   const [isDisabled, setIsDisabled] = useState(true);
   const [open, setOpen] = useState(false);
-  const { status } = useSelector((state: RootState) => state.dashboard);
-  const { data, isLoading, refetch } = useGetCommunityQuery(null, {
-    refetchOnMountOrArgChange: true,
-    skip: false
-  });
+  const hubData = useSelector(HubData);
 
-  const [updateDomains, { error, isLoading: domainsUpdating, isError, reset }] =
-    useUpdateDomainsMutation();
+  // const [updateDomains, { error, isLoading: domainsUpdating, isError, reset }] =
+  //   useUpdateDomainsMutation();
 
   const DomainsMap = useMemo(() => {
-    // const domains = data?.community?.properties?.domains || [];
+    // const domains = data?.properties?.domains || [];
     const mapped = [];
 
     // if (domains.length) {
@@ -187,14 +179,14 @@ const DAut = () => {
     // }
     // setInitialData(mapped);
     return mapped;
-  }, [data]);
+  }, [hubData]);
 
   const handleClose = () => {
     setOpen(false);
   };
 
   const handleError = () => {
-    reset();
+    // reset();
   };
 
   const submit = async () => {
@@ -213,26 +205,26 @@ const DAut = () => {
       return;
     }
 
-    await updateDomains({
-      community: data.community,
-      domains: allItems,
-      refetch: refetch
-    });
+    // await updateDomains({
+    //   hub: hubData,
+    //   domains: allItems,
+    //   refetch: refetch
+    // });
   };
 
   return (
     <Container maxWidth="md" className="sw-core-team">
-      <LoadingDialog open={domainsUpdating} message="Updating domains..." />
+      {/* <LoadingDialog open={domainsUpdating} message="Updating domains..." /> */}
       <ErrorDialog
         open={open}
         handleClose={handleClose}
         message=" No new domains were added!"
       />
-      <ErrorDialog open={isError} handleClose={handleError} message={error} />
+      {/* <ErrorDialog open={isError} handleClose={handleError} message={error} /> */}
       <Typography mt={7} textAlign="center" color="white" variant="h3">
         Domains
       </Typography>
-      {isLoading ? (
+      {/* {isLoading ? (
         <CircularProgress
           className="spinner-center"
           size="60px"
@@ -240,7 +232,7 @@ const DAut = () => {
         />
       ) : (
         <>
-          {data && data.community && (
+          {data && data.hub && (
             <AutDatatable
               apiRef={apiRef}
               columns={columns}
@@ -277,7 +269,7 @@ const DAut = () => {
             />
           )}
         </>
-      )}
+      )} */}
     </Container>
   );
 };

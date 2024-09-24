@@ -34,7 +34,7 @@ const StepWrapper = styled("form")({
   flexDirection: "column"
 });
 
-const NovaSocials = () => {
+const HubSocials = () => {
   return (
     <StepWrapper>
       <GridBox sx={{ flexGrow: 1 }}>
@@ -46,4 +46,4 @@ const NovaSocials = () => {
   );
 };
 
-export default NovaSocials;
+export default HubSocials;

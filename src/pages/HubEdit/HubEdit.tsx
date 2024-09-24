@@ -1,17 +1,13 @@
-import { updateCommunity } from "@api/community.api";
+import { updateHub } from "@api/hub.api";
+import { HubOSHub } from "@api/hub.model";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
-import { DAutHub } from "@aut-labs/d-aut";
 import { AutButton } from "@components/buttons";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { AutTextField, FormHelperText } from "@components/Fields";
 import AFileUpload from "@components/FileUpload";
 import { styled } from "@mui/material";
-import {
-  CommunityData,
-  CommunityStatus,
-  communityUpdateState
-} from "@store/Community/community.reducer";
+import { HubData, HubStatus, hubUpdateState } from "@store/Hub/hub.reducer";
 import { ResultState } from "@store/result-status";
 import { useAppDispatch } from "@store/store.model";
 import { countWords } from "@utils/helpers";
@@ -35,27 +31,27 @@ const StepWrapper = styled("form")({
   height: "100%"
 });
 
-const CommunityEdit = () => {
+const HubEdit = () => {
   const dispatch = useAppDispatch();
-  const community = useSelector(CommunityData);
-  const status = useSelector(CommunityStatus);
+  const hubData = useSelector(HubData);
+  const status = useSelector(HubStatus);
   const [promises, setPromises] = useState([]);
   const { control, handleSubmit, formState, reset } = useForm({
     mode: "onChange",
     defaultValues: {
-      name: community.name,
-      image: community.image,
-      description: community.description
+      name: hubData.name,
+      image: hubData.image,
+      description: hubData.description
     }
   });
 
-  const onSubmit = async (data: typeof community) => {
+  const onSubmit = async (data: typeof hubData) => {
     const promise = dispatch(
-      updateCommunity(
-        new DAutHub({
-          ...community,
+      updateHub(
+        new HubOSHub({
+          ...hubData,
           ...data
-        } as DAutHub)
+        } as HubOSHub)
       )
     );
     setPromises([promise]);
@@ -63,7 +59,7 @@ const CommunityEdit = () => {
 
   const handleDialogClose = () => {
     dispatch(
-      communityUpdateState({
+      hubUpdateState({
         status: ResultState.Idle
       })
     );
@@ -71,11 +67,11 @@ const CommunityEdit = () => {
 
   useEffect(() => {
     reset({
-      name: community.name,
-      image: community.image,
-      description: community.description
+      name: hubData.name,
+      image: hubData.image,
+      description: hubData.description
     });
-  }, [dispatch, community?.properties?.address]);
+  }, [dispatch, hubData?.properties?.address]);
 
   useEffect(() => {
     return () => {
@@ -93,7 +89,7 @@ const CommunityEdit = () => {
       <LoadingDialog
         handleClose={handleDialogClose}
         open={status === ResultState.Updating}
-        message="Updating community..."
+        message="Updating hub..."
       />
       <Controller
         name="image"
@@ -107,7 +103,7 @@ const CommunityEdit = () => {
               }}
             >
               <AFileUpload
-                initialPreviewUrl={ipfsCIDToHttpUrl(community.image as string)}
+                initialPreviewUrl={ipfsCIDToHttpUrl(hubData.image as string)}
                 color="offWhite"
                 fileChange={async (file) => {
                   if (file) {
@@ -140,7 +136,7 @@ const CommunityEdit = () => {
               name={name}
               value={value || ""}
               onChange={onChange}
-              placeholder="Community Name"
+              placeholder="Hub Name"
               sx={{
                 mt: pxToRem(45)
               }}
@@ -176,7 +172,7 @@ const CommunityEdit = () => {
               sx={{
                 mt: pxToRem(45)
               }}
-              placeholder="Introduce your community to the world. It can be a one-liner, common values, goals, or even the story behind it!"
+              placeholder="Introduce your hub to the world. It can be a one-liner, common values, goals, or even the story behind it!"
               helperText={
                 <FormHelperText
                   errorTypes={errorTypes}
@@ -209,4 +205,4 @@ const CommunityEdit = () => {
   );
 };
 
-export default CommunityEdit;
+export default HubEdit;

@@ -26,9 +26,8 @@ export const walletProviderSlice = createSlice({
 
 export const { updateWalletProviderState } = walletProviderSlice.actions;
 
-export const networksConfig = (state: any) =>
+export const NetworksConfig = (state: any) =>
   state.walletProvider.networksConfig as NetworkConfig[];
-export const NetworksConfig = createSelector([networksConfig], (a) => a);
 
 export const selectedNetwork = (state: any) =>
   state.walletProvider.selectedNetwork as NetworkConfig;

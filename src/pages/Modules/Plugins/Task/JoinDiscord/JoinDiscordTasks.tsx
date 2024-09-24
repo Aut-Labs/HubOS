@@ -1,5 +1,3 @@
-import { useCreateTaskMutation } from "@api/onboarding.api";
-import { PluginDefinition, Task } from "@aut-labs/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { AutDatepicker, FormHelperText } from "@components/Fields";
@@ -16,23 +14,15 @@ import {
   Typography,
   useTheme
 } from "@mui/material";
-import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
 import { memo, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { dateToUnix } from "@utils/date-format";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useSelector } from "react-redux";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import DoneIcon from "@mui/icons-material/Done";
-import {
-  CommunityData,
-  DiscordLink,
-  IsDiscordVerified,
-  allRoles
-} from "@store/Community/community.reducer";
+import { HubData } from "@store/Hub/hub.reducer";
 import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
@@ -47,6 +37,7 @@ import {
   TextFieldWrapper
 } from "../Shared/StyledFields";
 import { AutOSSlider } from "@theme/commitment-slider-styles";
+import { TaskContributionNFT } from "@aut-labs/sdk";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -55,12 +46,12 @@ const errorTypes = {
 };
 
 interface PluginParams {
-  plugin: PluginDefinition;
+  plugin: any;
 }
 
 const TaskSuccess = ({ pluginId, reset }) => {
   const [searchParams] = useSearchParams();
-  const communityData = useSelector(CommunityData);
+  const hubData = useSelector(HubData);
   const navigate = useNavigate();
 
   return (
@@ -99,7 +90,7 @@ const TaskSuccess = ({ pluginId, reset }) => {
             }}
             size="medium"
             color="offWhite"
-            to={`/${communityData?.name}/modules/Task`}
+            to={`/${hubData?.name}/modules/Task`}
             preserveParams
             component={LinkWithQuery}
           >
@@ -131,12 +122,7 @@ addMinutes(endDatetime, 45);
 
 const JoinDiscordTasks = ({ plugin }: PluginParams) => {
   const theme = useTheme();
-  const isDiscordVerified = useSelector(IsDiscordVerified);
-  const inviteLink = useSelector(DiscordLink);
-  const roles = useSelector(allRoles);
-  const communityData = useSelector(CommunityData);
-  const { address: account } = useAccount();
-  const [searchParams] = useSearchParams();
+  const hubData = useSelector(HubData);
   const navigate = useNavigate();
   const [discordDialogOpen, setDiscordDialogOpen] = useState(false);
   const { control, handleSubmit, getValues, formState, watch } = useForm({
@@ -146,51 +132,78 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
       startDate: new Date(),
       endDate: null,
       weight: 0,
-      // inviteUrl: inviteLink || "",
       description: ""
     }
   });
 
+  const isDiscordVerified = useMemo(() => {
+    try {
+      const social = hubData.properties.socials.find(
+        (s) => s.type === "discord"
+      );
+      if (
+        typeof social?.link === "string" &&
+        social?.link?.replace("https://discord.gg/", "")?.length > 0
+      ) {
+        return true;
+      }
+    } catch (error) {
+      return false;
+    }
+    return false;
+  }, [hubData]);
+
+  const inviteLink = useMemo(() => {
+    try {
+      const social = hubData.properties.socials.find(
+        (s) => s.type === "discord"
+      );
+      if (
+        typeof social?.link === "string" &&
+        social?.link?.replace("https://discord.gg/", "")?.length > 0
+      ) {
+        return social.link;
+      }
+    } catch (error) {
+      return "";
+    }
+    return "";
+  }, [hubData]);
+
   const values = watch();
 
-  const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
-    useCreateTaskMutation();
+  // const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
+  //   useCreateTaskMutation();
 
   const onSubmit = async () => {
     const values = getValues();
-    createTask({
-      novaAddress: communityData.properties.address,
-      pluginTokenId: plugin.tokenId,
-      pluginAddress: plugin.pluginAddress,
-      task: {
-        role: 1,
-        weight: values.weight,
-        metadata: {
-          name: values.title,
-          description: values.description,
-          properties: {
-            inviteUrl: inviteLink
-          }
-        },
-        startDate: dateToUnix(values.startDate),
-        endDate: dateToUnix(values.endDate)
-      } as unknown as Task
-    });
+    // createTask({
+    //   hubAddress: hubData.properties.address,
+    //   pluginTokenId: plugin.tokenId,
+    //   pluginAddress: plugin.pluginAddress,
+    //   task: {
+    //     role: 1,
+    //     weight: values.weight,
+    //     metadata: {
+    //       name: values.title,
+    //       description: values.description,
+    //       properties: {
+    //         inviteUrl: inviteLink
+    //       }
+    //     },
+    //     startDate: dateToUnix(values.startDate),
+    //     endDate: dateToUnix(values.endDate)
+    //   } as unknown as TaskContributionNFT
+    // });
   };
 
-  const selectedRole = useMemo(() => {
-    return roles.find(
-      (r) => r.id === +searchParams.get(RequiredQueryParams.QuestId)
-    );
-  }, [roles, searchParams]);
-
-  useEffect(() => {
-    if (isSuccess) {
-      navigate({
-        pathname: `/${communityData?.name}/tasks`
-      });
-    }
-  }, [isSuccess, communityData]);
+  // useEffect(() => {
+  //   if (isSuccess) {
+  //     navigate({
+  //       pathname: `/${hubData?.name}/tasks`
+  //     });
+  //   }
+  // }, [isSuccess, hubData]);
 
   return (
     <FormContainer onSubmit={handleSubmit(onSubmit)}>
@@ -198,8 +211,8 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
         open={discordDialogOpen}
         handleClose={() => setDiscordDialogOpen(false)}
       ></DiscordServerVerificationPopup>
-      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
-      <LoadingDialog open={isLoading} message="Creating task..." />
+      {/* <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <LoadingDialog open={isLoading} message="Creating task..." /> */}
 
       <Box
         sx={{
@@ -223,7 +236,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                 sm: "0"
               }
             }}
-            to={`/${communityData?.name}/modules/Task`}
+            to={`/${hubData?.name}/modules/Task`}
             component={Link}
           >
             <Typography color="white" variant="body">
@@ -239,7 +252,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
             color="offWhite.main"
             fontWeight="bold"
           >
-            Join Discord for {selectedRole?.roleName}
+            Join Discord
           </Typography>
         </Stack>
 
@@ -257,7 +270,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
           color="offWhite.main"
           fontSize="16px"
         >
-          Ask your community to Join your Discord Community.
+          Ask your hub to Join your Discord Hub.
         </Typography>
       </Box>
       <Stack
@@ -295,7 +308,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
               color="white"
               variant="body1"
             >
-              Please verify the discord account for your community.
+              Please verify the discord account for your hub.
             </Typography> */}
             <AutOsButton
               onClick={() => setDiscordDialogOpen(true)}
@@ -406,7 +419,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
                     rows="5"
                     multiline
                     onChange={onChange}
-                    placeholder="Write a personalised message to your community asking them to join your community."
+                    placeholder="Write a personalised message to your hub asking them to join your hub."
                     helperText={
                       <FormHelperText
                         errorTypes={errorTypes}

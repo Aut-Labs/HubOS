@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+
 import Card from "@mui/material/Card";
 import {
   CardActionArea,
@@ -10,9 +10,9 @@ import {
   useTheme
 } from "@mui/material";
 import { memo, useEffect } from "react";
-import { ReactComponent as SwAuthIcon } from "@assets/sw-auth.svg";
-import { ReactComponent as DiscordBotIcon } from "@assets/discord-bot.svg";
-import { ReactComponent as ContractIcon } from "@assets/contract.svg";
+import SwAuthIcon from "@assets/sw-auth.svg?react";
+import DiscordBotIcon from "@assets/discord-bot.svg?react";
+import ContractIcon from "@assets/contract.svg?react";
 import { pxToRem } from "@utils/text-size";
 import { useAppDispatch } from "@store/store.model";
 import { setTitle } from "@store/ui-reducer";
@@ -22,14 +22,14 @@ const IntegrationCards = [
   {
     icon: SwAuthIcon,
     title: "dAut",
-    description: `This is where your DAO lives.  Add the URL where you’ll be integrating our Decentralized Authentication System using  your Community Address.`,
-    route: "/aut-dashboard/integrations-and-contracts/dao-integration",
-    routeDesc: "Set your DAO URL"
+    description: `This is where your Hub lives.  Add the URL where you’ll be integrating our Decentralized Authentication System using  your Hub Address.`,
+    route: "/aut-dashboard/integrations-and-contracts/hub-integration",
+    routeDesc: "Set your Hub URL"
   },
   {
     icon: DiscordBotIcon,
     title: "Discord Bot",
-    description: `Track the Roles and IDs of  your Members, create tasks, and turn your community into a healthy, motivated  collaboration engine!`,
+    description: `Track the Roles and IDs of  your Members, create tasks, and turn your hub into a healthy, motivated  collaboration engine!`,
     route: "/aut-dashboard/integrations-and-contracts/discord-integration",
     routeDesc: "Integrate on Discord"
   },
@@ -51,7 +51,7 @@ const Integrations = () => {
 
   useEffect(() => {
     dispatch(
-      setTitle(`Intergrations & Contracts - The Operating System for your DAO`)
+      setTitle(`Intergrations & Contracts - The Operating System for your Hub`)
     );
   }, [dispatch]);
 

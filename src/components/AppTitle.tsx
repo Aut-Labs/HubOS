@@ -21,7 +21,7 @@ const AppTitle = (props: TypographyProps) => {
       }}
       {...(props as any)}
     >
-      Nova
+      Hub
       <strong
         style={{
           fontFamily: "FractulAltBold"

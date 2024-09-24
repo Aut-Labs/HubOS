@@ -1,8 +1,8 @@
-import { ReactComponent as DiscordIcon } from "@assets/SocialIcons/DiscordIcon.svg";
-import { ReactComponent as GitHubIcon } from "@assets/SocialIcons/GitHubIcon.svg";
-import { ReactComponent as LensfrensIcon } from "@assets/SocialIcons/LensfrensIcon.svg";
-import { ReactComponent as TelegramIcon } from "@assets/SocialIcons/TelegramIcon.svg";
-import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.svg";
+import DiscordIcon from "@assets/SocialIcons/DiscordIcon.svg?react";
+import GitHubIcon from "@assets/SocialIcons/GitHubIcon.svg?react";
+import LensfrensIcon from "@assets/SocialIcons/LensfrensIcon.svg?react";
+import TelegramIcon from "@assets/SocialIcons/TelegramIcon.svg?react";
+import TwitterIcon from "@assets/SocialIcons/TwitterIcon.svg?react";
 import { styled } from "@mui/material";
 
 export const socialIcons = {

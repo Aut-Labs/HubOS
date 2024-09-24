@@ -1,6 +1,5 @@
-/* eslint-disable max-len */
+
 import { useCreateTaskMutation } from "@api/onboarding.api";
-import { PluginDefinition, Task } from "@aut-labs/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { AutDatepicker, FormHelperText } from "@components/Fields";
@@ -26,7 +25,7 @@ import { dateToUnix } from "@utils/date-format";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { countWords } from "@utils/helpers";
-import { CommunityData, allRoles } from "@store/Community/community.reducer";
+import { HubData, allRoles } from "@store/Hub/hub.reducer";
 import { useSelector } from "react-redux";
 
 import { FormContainerHubOs } from "../Shared/FormContainer";
@@ -61,7 +60,7 @@ const AttachmentTypes = [
   }
 ];
 interface PluginParams {
-  plugin: PluginDefinition;
+  plugin: any;
 }
 
 // const StyledTextField = styled(AutTextField)(({ theme }) => ({
@@ -97,7 +96,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
   const navigate = useNavigate();
   const roles = useSelector(allRoles);
   const theme = useTheme();
-  const communityData = useSelector(CommunityData);
+  const hubData = useSelector(HubData);
   const { control, handleSubmit, getValues, formState, watch } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -121,7 +120,7 @@ const OpenTasks = ({ plugin }: PluginParams) => {
     return null;
     // const values = getValues();
     // createTask({
-    //   novaAddress: communityData.properties.address,
+    //   hubAddress: hubData.properties.address,
     //   pluginTokenId: plugin.tokenId,
     //   pluginAddress: plugin.pluginAddress,
     //   task: {
@@ -145,10 +144,10 @@ const OpenTasks = ({ plugin }: PluginParams) => {
   useEffect(() => {
     if (isSuccess) {
       navigate({
-        pathname: `/${communityData?.name}/tasks`
+        pathname: `/${hubData?.name}/tasks`
       });
     }
-  }, [isSuccess, communityData]);
+  }, [isSuccess, hubData]);
 
   const selectedRole = useMemo(() => {
     return roles.find(

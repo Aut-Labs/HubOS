@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import {
@@ -16,20 +15,15 @@ import MenuItems from "./MenuItems";
 import { memo, useMemo, useState } from "react";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import MenuIcon from "@mui/icons-material/Menu";
-import DashboardTitle from "@components/AppTitle";
-import { ReactComponent as AutWhiteIcon } from "@assets/aut/aut-white.svg";
+import AutWhiteIcon from "@assets/aut/aut-white.svg?react";
 import { useSelector } from "react-redux";
 import { AppTitle } from "@store/ui-reducer";
 import { SelectedNetwork } from "@store/WalletProvider/WalletProvider";
-import {
-  CommunityData,
-  IsDiscordVerified
-} from "@store/Community/community.reducer";
-import { UserInfo } from "@auth/auth.reducer";
+import { AutIDData, HubData } from "@store/Hub/hub.reducer";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
 import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 import { SubtitleWithInfo } from "@components/SubtitleWithInfoIcon";
-import { ReactComponent as HubOsLogo } from "@assets/hubos/hubos-logo.svg";
+import HubOsLogo from "@assets/hubos/hubos-logo.svg?react";
 
 const Main = styled("main", {
   shouldForwardProp: (prop) =>
@@ -101,8 +95,8 @@ const AppBar = styled(MuiAppBar, {
 
 const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
   const theme = useTheme();
-  const community = useSelector(CommunityData);
-  const userInfo = useSelector(UserInfo);
+  const hubData = useSelector(HubData);
+  const autIDData = useSelector(AutIDData);
   const network = useSelector(SelectedNetwork);
   const appTitle = useSelector(AppTitle);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -122,15 +116,15 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
   };
 
   const userRole = useMemo(() => {
-    if (!community || !userInfo) return null;
-    const userState = userInfo.properties.joinedHubs.find(
+    if (!hubData || !autIDData) return null;
+    const userState = autIDData.properties.joinedHubs.find(
       (h) =>
         h.hubAddress?.toLowerCase() ===
-        community?.properties?.address?.toLowerCase()
+        hubData?.properties?.address?.toLowerCase()
     );
-    const roles = community.properties.rolesSets[0].roles;
+    const roles = hubData.properties.rolesSets[0].roles;
     return roles.find((r) => +r.id === +userState.role);
-  }, [community, userInfo]);
+  }, [hubData, autIDData]);
 
   return (
     <Box sx={{ display: "flex", height: "100vh", width: "100%" }}>
@@ -208,7 +202,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
             }}
           >
             <Typography variant="body" noWrap color="white">
-              Please verify the discord account for your community.
+              Please verify the discord account for your hub.
             </Typography>
             <Button
               onClick={() => setDiscordDialogOpen(true)}
@@ -295,7 +289,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
               color="offWhite.main"
               fontWeight="bold"
             >
-              {community?.name}
+              {hubData?.name}
             </Typography>
             <SubtitleWithInfo
               title="hub"
@@ -319,7 +313,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
                 color="offWhite.main"
                 fontWeight="bold"
               >
-                {userInfo?.name}
+                {autIDData?.name}
               </Typography>
               <SubtitleWithInfo
                 title="your ĀutID"
@@ -338,7 +332,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
 
               <SubtitleWithInfo
                 title="role"
-                description={`This is your role in the ${community?.name} hub.`}
+                description={`This is your role in the ${hubData?.name} hub.`}
               ></SubtitleWithInfo>
             </Stack>
           </Box>
@@ -346,7 +340,7 @@ const SidebarDrawer = ({ children, addonMenuItems = [] }) => {
         <Divider />
         <MenuItems
           addonMenuItems={addonMenuItems}
-          communityName={community?.name}
+          hubName={hubData?.name}
         />
         <Box
           sx={{

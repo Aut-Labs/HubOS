@@ -1,6 +1,6 @@
-/* eslint-disable max-len */
+
 import { Box, useTheme } from "@mui/material";
-import MemberCard from "./HubMemberCard";
+import MemberCard from "../Members/HubMemberCard";
 
 export const placehoderMembers = [
   {

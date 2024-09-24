@@ -1,4 +1,3 @@
-import * as React from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
@@ -21,23 +20,17 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArchetypePieChart, { archetypeChartValues } from "./ArchetypePieChart";
-import { ReactComponent as EditIcon } from "@assets/actions/edit.svg";
+import EditIcon from "@assets/actions/edit.svg?react";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   useGetArchetypeAndStatsQuery,
   useSetArchetypeMutation
-} from "@api/community.api";
+} from "@api/hub.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
-import {
-  NovaArchetype,
-  NovaArchetypeParameters
-} from "@aut-labs/sdk/dist/models/nova";
 import { calculateAV } from "@utils/av-calculator";
-import {
-  HubArchetype,
-  HubArchetypeParameters
-} from "@aut-labs/sdk/dist/models/hub";
+import { HubArchetype, HubArchetypeParameters } from "@aut-labs/sdk";
+import { useState, useEffect, useMemo } from "react";
 
 const GridCard = styled(Card)(({ theme }) => {
   return {
@@ -111,7 +104,7 @@ const ArchetypeCard = ({
   activeArchetype
 }) => {
   const theme = useTheme();
-  const [isHovered, setIsHovered] = React.useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   return (
     <GridCard
       onMouseEnter={() => setIsHovered(true)}
@@ -197,7 +190,7 @@ const ArchetypeCard = ({
 };
 
 const ChooseYourArchetype = ({ setSelected, archetype }) => {
-  const [state, setState] = React.useState(archetypeChartValues(archetype));
+  const [state, setState] = useState(archetypeChartValues(archetype));
   console.log("state: ", state);
   return (
     <>
@@ -227,9 +220,9 @@ const ChooseYourArchetype = ({ setSelected, archetype }) => {
           }}
           variant="body"
         >
-          The archetype represents the KPI, the driver of your community. Set up
-          your community values, deliver, and thrive. The better you perform,
-          the more your community credibility will grow. Read more about
+          The archetype represents the KPI, the driver of your hub. Set up
+          your hub values, deliver, and thrive. The better you perform,
+          the more your hub credibility will grow. Read more about
           Archetypes
         </Typography>
       </Box>
@@ -237,23 +230,23 @@ const ChooseYourArchetype = ({ setSelected, archetype }) => {
         {/* Row 1 */}
         <Grid item xs={12} sm={6} md={4}>
           <ArchetypeCard
-            activeArchetype={archetype?.archetype === NovaArchetype.SIZE}
+            activeArchetype={archetype?.archetype === HubArchetype.SIZE}
             onSelect={setSelected}
-            {...state[NovaArchetype.SIZE]}
+            {...state[HubArchetype.SIZE]}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <ArchetypeCard
-            activeArchetype={archetype?.archetype === NovaArchetype.REPUTATION}
+            activeArchetype={archetype?.archetype === HubArchetype.REPUTATION}
             onSelect={setSelected}
-            {...state[NovaArchetype.REPUTATION]}
+            {...state[HubArchetype.REPUTATION]}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <ArchetypeCard
-            activeArchetype={archetype?.archetype === NovaArchetype.CONVICTION}
+            activeArchetype={archetype?.archetype === HubArchetype.CONVICTION}
             onSelect={setSelected}
-            {...state[NovaArchetype.CONVICTION]}
+            {...state[HubArchetype.CONVICTION]}
           />
         </Grid>
 
@@ -270,16 +263,16 @@ const ChooseYourArchetype = ({ setSelected, archetype }) => {
         />
         <Grid item xs={12} sm={6} md={4}>
           <ArchetypeCard
-            activeArchetype={archetype?.archetype === NovaArchetype.PERFORMANCE}
+            activeArchetype={archetype?.archetype === HubArchetype.PERFORMANCE}
             onSelect={setSelected}
-            {...state[NovaArchetype.PERFORMANCE]}
+            {...state[HubArchetype.PERFORMANCE]}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <ArchetypeCard
-            activeArchetype={archetype?.archetype === NovaArchetype.GROWTH}
+            activeArchetype={archetype?.archetype === HubArchetype.GROWTH}
             onSelect={setSelected}
-            {...state[NovaArchetype.GROWTH]}
+            {...state[HubArchetype.GROWTH]}
           />
         </Grid>
         <Grid
@@ -298,14 +291,14 @@ const ChooseYourArchetype = ({ setSelected, archetype }) => {
 };
 
 const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
-  const [editMode, setEditMode] = React.useState(
+  const [editMode, setEditMode] = useState(
     selectedArchetype?.type != archetype?.archetype
   );
 
-  const [initialValues, setInitialValues] = React.useState(true);
+  const [initialValues, setInitialValues] = useState(true);
 
   const theme = useTheme();
-  const [state, setState] = React.useState(archetypeChartValues(archetype));
+  const [state, setState] = useState(archetypeChartValues(archetype));
 
   const TOTAL_VALUE = 100;
 
@@ -344,7 +337,7 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!initialValues) return;
 
     const activeState = state[selectedArchetype.type];
@@ -367,19 +360,19 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
     }
   }, [selectedArchetype, initialValues, state]);
 
-  const av = React.useMemo(() => {
+  const av = useMemo(() => {
     const updatedArchetype = {
-      size: state[NovaArchetype.SIZE].value,
-      reputation: state[NovaArchetype.REPUTATION].value,
-      conviction: state[NovaArchetype.CONVICTION].value,
-      performance: state[NovaArchetype.PERFORMANCE].value,
-      growth: state[NovaArchetype.GROWTH].value
+      size: state[HubArchetype.SIZE].value,
+      reputation: state[HubArchetype.REPUTATION].value,
+      conviction: state[HubArchetype.CONVICTION].value,
+      performance: state[HubArchetype.PERFORMANCE].value,
+      growth: state[HubArchetype.GROWTH].value
     };
 
     return calculateAV(updatedArchetype);
   }, [state]);
 
-  const actionName = React.useMemo(() => {
+  const actionName = useMemo(() => {
     if (!archetype?.archetype) {
       return "Set Archetype";
     }
@@ -465,7 +458,7 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
           }}
           variant="body"
         >
-          The archetype represents the KPI, the driver of your community.
+          The archetype represents the KPI, the driver of your hub.
         </Typography>
       </Box>
       <Grid container spacing={4} mt={0}>
@@ -769,13 +762,13 @@ const Archetypes = () => {
       stats: data?.stats
     })
   });
-  const [selected, setSelected] = React.useState(null);
-  const archetypeData = React.useMemo(() => {
+  const [selected, setSelected] = useState(null);
+  const archetypeData = useMemo(() => {
     if (archetype?.archetype === selected?.type) {
       return archetype;
     }
     return {
-      archetype: NovaArchetype.NONE,
+      archetype: HubArchetype.NONE,
       size: 0,
       reputation: 0,
       conviction: 0,

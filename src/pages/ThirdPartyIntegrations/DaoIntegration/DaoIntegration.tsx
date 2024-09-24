@@ -13,7 +13,7 @@ import { pxToRem } from "@utils/text-size";
 import { AutTextField } from "@components/Fields";
 import { AutButton } from "@components/buttons";
 import { AutHeader } from "@components/AutHeader";
-import { addPAUrl, getPAUrl } from "@api/community.api";
+import { addPAUrl, getPAUrl } from "@api/hub.api";
 
 function AlertDialog({ handleClose, open }) {
   return (
@@ -105,9 +105,9 @@ const DaoIntegration = () => {
         title="Your dāut"
         subtitle={
           <>
-            This is where your DAO lives. Add the URL where you’ll be
+            This is where your Hub lives. Add the URL where you’ll be
             integrating <br />
-            dAut’s Decentralized Authentication System using your Community
+            dAut’s Decentralized Authentication System using your Hub
             Address.
           </>
         }

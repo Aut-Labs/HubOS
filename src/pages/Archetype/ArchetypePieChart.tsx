@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   PieChart,
   Pie,
@@ -12,10 +12,7 @@ import Growth from "@assets/archetypes/seed.png";
 import Performance from "@assets/archetypes/growth.png";
 import Reputation from "@assets/archetypes/reputation-management.png";
 import Conviction from "@assets/archetypes/deal.png";
-import {
-  NovaArchetype,
-  NovaArchetypeParameters
-} from "@aut-labs/sdk/dist/models/nova";
+import { HubArchetype, HubArchetypeParameters } from "@aut-labs/sdk";
 
 const nameShortcut = {
   Size: "S",
@@ -68,18 +65,18 @@ const renderCustomizedLabel = ({
 };
 
 const archetypeLimits = {
-  [NovaArchetype.SIZE]: { min: 40, max: 60 },
-  [NovaArchetype.GROWTH]: { min: 40, max: 60 },
-  [NovaArchetype.PERFORMANCE]: { min: 40, max: 60 },
-  [NovaArchetype.REPUTATION]: { min: 40, max: 60 },
-  [NovaArchetype.CONVICTION]: { min: 40, max: 60 }
+  [HubArchetype.SIZE]: { min: 40, max: 60 },
+  [HubArchetype.GROWTH]: { min: 40, max: 60 },
+  [HubArchetype.PERFORMANCE]: { min: 40, max: 60 },
+  [HubArchetype.REPUTATION]: { min: 40, max: 60 },
+  [HubArchetype.CONVICTION]: { min: 40, max: 60 }
 };
 
-export const archetypeChartValues = (archetype: NovaArchetypeParameters) => {
-  const { min: sizeMin, max: sizeMax } = archetypeLimits[NovaArchetype.SIZE];
+export const archetypeChartValues = (archetype: HubArchetypeParameters) => {
+  const { min: sizeMin, max: sizeMax } = archetypeLimits[HubArchetype.SIZE];
   return {
-    [NovaArchetype.SIZE]: {
-      type: NovaArchetype.SIZE,
+    [HubArchetype.SIZE]: {
+      type: HubArchetype.SIZE,
       title: "Size",
       description: "how many members",
       logo: Size,
@@ -87,15 +84,15 @@ export const archetypeChartValues = (archetype: NovaArchetypeParameters) => {
       min: sizeMin,
       max: sizeMax,
       defaults: {
-        [NovaArchetype.SIZE]: 60,
-        [NovaArchetype.GROWTH]: 10,
-        [NovaArchetype.PERFORMANCE]: 10,
-        [NovaArchetype.REPUTATION]: 10,
-        [NovaArchetype.CONVICTION]: 10
+        [HubArchetype.SIZE]: 60,
+        [HubArchetype.GROWTH]: 10,
+        [HubArchetype.PERFORMANCE]: 10,
+        [HubArchetype.REPUTATION]: 10,
+        [HubArchetype.CONVICTION]: 10
       }
     },
-    [NovaArchetype.REPUTATION]: {
-      type: NovaArchetype.REPUTATION,
+    [HubArchetype.REPUTATION]: {
+      type: HubArchetype.REPUTATION,
       title: "Reputation",
       description: "avg. reputation of members",
       logo: Reputation,
@@ -103,15 +100,15 @@ export const archetypeChartValues = (archetype: NovaArchetypeParameters) => {
       min: sizeMin,
       max: sizeMax,
       defaults: {
-        [NovaArchetype.SIZE]: 10,
-        [NovaArchetype.GROWTH]: 10,
-        [NovaArchetype.PERFORMANCE]: 10,
-        [NovaArchetype.REPUTATION]: 60,
-        [NovaArchetype.CONVICTION]: 10
+        [HubArchetype.SIZE]: 10,
+        [HubArchetype.GROWTH]: 10,
+        [HubArchetype.PERFORMANCE]: 10,
+        [HubArchetype.REPUTATION]: 60,
+        [HubArchetype.CONVICTION]: 10
       }
     },
-    [NovaArchetype.CONVICTION]: {
-      type: NovaArchetype.CONVICTION,
+    [HubArchetype.CONVICTION]: {
+      type: HubArchetype.CONVICTION,
       title: "Conviction",
       description: "avg. commitment level of members",
       logo: Conviction,
@@ -119,15 +116,15 @@ export const archetypeChartValues = (archetype: NovaArchetypeParameters) => {
       min: sizeMin,
       max: sizeMax,
       defaults: {
-        [NovaArchetype.SIZE]: 10,
-        [NovaArchetype.GROWTH]: 10,
-        [NovaArchetype.PERFORMANCE]: 10,
-        [NovaArchetype.REPUTATION]: 10,
-        [NovaArchetype.CONVICTION]: 60
+        [HubArchetype.SIZE]: 10,
+        [HubArchetype.GROWTH]: 10,
+        [HubArchetype.PERFORMANCE]: 10,
+        [HubArchetype.REPUTATION]: 10,
+        [HubArchetype.CONVICTION]: 60
       }
     },
-    [NovaArchetype.PERFORMANCE]: {
-      type: NovaArchetype.PERFORMANCE,
+    [HubArchetype.PERFORMANCE]: {
+      type: HubArchetype.PERFORMANCE,
       title: "Performance",
       description: "ratio between Created Points and Completed Points",
       logo: Performance,
@@ -135,15 +132,15 @@ export const archetypeChartValues = (archetype: NovaArchetypeParameters) => {
       min: sizeMin,
       max: sizeMax,
       defaults: {
-        [NovaArchetype.SIZE]: 10,
-        [NovaArchetype.GROWTH]: 10,
-        [NovaArchetype.PERFORMANCE]: 60,
-        [NovaArchetype.REPUTATION]: 10,
-        [NovaArchetype.CONVICTION]: 10
+        [HubArchetype.SIZE]: 10,
+        [HubArchetype.GROWTH]: 10,
+        [HubArchetype.PERFORMANCE]: 60,
+        [HubArchetype.REPUTATION]: 10,
+        [HubArchetype.CONVICTION]: 10
       }
     },
-    [NovaArchetype.GROWTH]: {
-      type: NovaArchetype.GROWTH,
+    [HubArchetype.GROWTH]: {
+      type: HubArchetype.GROWTH,
       title: "Growth",
       description: "% of member’s growth respect to previous period",
       logo: Growth,
@@ -151,11 +148,11 @@ export const archetypeChartValues = (archetype: NovaArchetypeParameters) => {
       min: sizeMin,
       max: sizeMax,
       defaults: {
-        [NovaArchetype.SIZE]: 10,
-        [NovaArchetype.GROWTH]: 60,
-        [NovaArchetype.PERFORMANCE]: 10,
-        [NovaArchetype.REPUTATION]: 10,
-        [NovaArchetype.CONVICTION]: 10
+        [HubArchetype.SIZE]: 10,
+        [HubArchetype.GROWTH]: 60,
+        [HubArchetype.PERFORMANCE]: 10,
+        [HubArchetype.REPUTATION]: 10,
+        [HubArchetype.CONVICTION]: 10
       }
     }
   };
@@ -164,7 +161,7 @@ export const archetypeChartValues = (archetype: NovaArchetypeParameters) => {
 const ArchetypePieChart = ({
   archetype
 }: {
-  archetype: NovaArchetypeParameters;
+  archetype: HubArchetypeParameters;
 }) => {
   const mappedData = useMemo(() => {
     const data = archetypeChartValues(archetype);
@@ -217,7 +214,7 @@ const ArchetypePieChart = ({
 export const ArchetypePieChartDesign = ({
   archetype
 }: {
-  archetype: NovaArchetypeParameters;
+  archetype: HubArchetypeParameters;
 }) => {
   const mappedData = useMemo(() => {
     const data = archetypeChartValues(archetype);

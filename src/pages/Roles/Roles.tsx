@@ -4,12 +4,12 @@ import { useSelector } from "react-redux";
 import { pxToRem } from "@utils/text-size";
 import {
   allRoles,
-  CommunityData,
-  CommunityStatus,
-  communityUpdateState
-} from "@store/Community/community.reducer";
+  HubData,
+  HubStatus,
+  hubUpdateState
+} from "@store/Hub/hub.reducer";
 import { useAppDispatch } from "@store/store.model";
-import { updateCommunity } from "@api/community.api";
+import { updateHub } from "@api/hub.api";
 import { ResultState } from "@store/result-status";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
@@ -28,8 +28,8 @@ const errorTypes = {
 const Roles = () => {
   const dispatch = useAppDispatch();
   const [promises, setPromises] = useState([]);
-  const community = useSelector(CommunityData);
-  const status = useSelector(CommunityStatus);
+  const hub = useSelector(HubData);
+  const status = useSelector(HubStatus);
   const roles = useSelector(allRoles);
 
   const {
@@ -51,21 +51,21 @@ const Roles = () => {
   });
 
   const onSubmit = async (data: typeof values) => {
-    community.properties.rolesSets[0].roles = data.roles;
-    const promise = dispatch(updateCommunity(new DAutHub(community)));
+    hub.properties.rolesSets[0].roles = data.roles;
+    const promise = dispatch(updateHub(new DAutHub(hub)));
     setPromises([promise]);
   };
 
   const handleDialogClose = () => {
     dispatch(
-      communityUpdateState({
+      hubUpdateState({
         status: ResultState.Idle
       })
     );
   };
 
   useEffect(() => {
-    dispatch(setTitle(`DAO Management - Members & Roles in your Community.`));
+    dispatch(setTitle(`Hub Management - Members & Roles in your Hub.`));
   }, [dispatch]);
 
   useEffect(() => {
@@ -93,7 +93,7 @@ const Roles = () => {
       <LoadingDialog
         handleClose={handleDialogClose}
         open={status === ResultState.Updating}
-        message="Updating community roles..."
+        message="Updating hub roles..."
       />
       <Container
         className="sw-roles-wrapper"

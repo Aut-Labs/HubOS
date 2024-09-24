@@ -1,16 +1,9 @@
-import { PluginDefinition } from "@aut-labs/sdk";
-import React, { lazy } from "react";
+import { lazy } from "react";
 import { Route } from "react-router-dom";
 import { SidebarMenuItem } from "@components/Sidebar/MenuItems";
 import ExtensionIcon from "@mui/icons-material/Extension";
-import {
-  ModuleDefinition,
-  PluginDefinitionType
-} from "@aut-labs/sdk/dist/models/plugin";
-import { ReactComponent as SubStackIcon } from "@assets/aut/sub-stack.svg";
+import SubStackIcon from "@assets/aut/sub-stack.svg?react";
 import Submissions from "../Plugins/Task/Shared/Submissions";
-import PeopleIcon from "@mui/icons-material/People";
-import QuestSubmissions from "../../QuestSubmissions/QuestSubmissions";
 
 const Plugins = lazy(() => import("./Plugins"));
 
@@ -55,14 +48,14 @@ const CreateTransactionTask = lazy(
 );
 
 export const pluginRoutes = (
-  plugins: PluginDefinition[],
-  modules: ModuleDefinition[],
+  plugins: any[],
+  modules: any[],
   isAdmin: boolean,
   totalSubmissions: number,
-  communityName: string
+  hubName: string
 ): {
   menuItems: SidebarMenuItem[];
-  allRoutes: React.ReactElement[];
+  allRoutes: ReactElement[];
 } => {
   if (!modules.length || !plugins.length) {
     return {
@@ -121,9 +114,7 @@ export const pluginRoutes = (
 
       if (plugin.pluginAddress) {
         const mainMenu = prev.taskTypesMainMenu[moduleType];
-        const path = `${modulePath}/${
-          PluginDefinitionType[plugin.pluginDefinitionId]
-        }`;
+        const path = ``;
 
         if (mainMenu) {
           const childMenuItem: SidebarMenuItem = {
@@ -136,7 +127,7 @@ export const pluginRoutes = (
           // if (!questSubmissionsAdded && moduleDefinition.id === 1) {
           //   const questSubmissionsItem: SidebarMenuItem = {
           //     title: "Quest Submissions",
-          //     route: `/${communityName}/quest-submissions`,
+          //     route: `/${hubName}/quest-submissions`,
           //     exact: true,
           //     icon: PeopleIcon,
           //     badgeCounter: totalSubmissions,
@@ -150,132 +141,131 @@ export const pluginRoutes = (
           // }
           mainMenu.children.push(childMenuItem);
         }
-        switch (plugin.pluginDefinitionId) {
-          // case PluginDefinitionType.QuestOnboardingPlugin:
-          //   if (isAdmin) {
-          //     prev.allRoutes.push(
-          //       <Route
-          //         key={`${path}/create`}
-          //         path={`${path}/create`}
-          //         element={<CreateQuest plugin={plugin} />}
-          //       />
-          //     );
-          //   }
-          //   prev.allRoutes.push(
-          //     <Route
-          //       key={path}
-          //       path={path}
-          //       element={<Quests plugin={plugin} />}
-          //     />,
-          //     <Route
-          //       key={`${path}/:questId`}
-          //       path={`${path}/:questId`}
-          //       element={<Quest plugin={plugin} />}
-          //     />
-          //   );
+        // switch (plugin.pluginDefinitionId) {
+        // case PluginDefinitionType.QuestOnboardingPlugin:
+        //   if (isAdmin) {
+        //     prev.allRoutes.push(
+        //       <Route
+        //         key={`${path}/create`}
+        //         path={`${path}/create`}
+        //         element={<CreateQuest plugin={plugin} />}
+        //       />
+        //     );
+        //   }
+        //   prev.allRoutes.push(
+        //     <Route
+        //       key={path}
+        //       path={path}
+        //       element={<Quests plugin={plugin} />}
+        //     />,
+        //     <Route
+        //       key={`${path}/:questId`}
+        //       path={`${path}/:questId`}
+        //       element={<Quest plugin={plugin} />}
+        //     />
+        //   );
 
-          //   break;
-          case PluginDefinitionType.OnboardingOpenTaskPlugin:
-            if (isAdmin) {
-              prev.allRoutes.push(
-                <Route
-                  key={path}
-                  path={path}
-                  element={<OpenTasks plugin={plugin} />}
-                />,
-                <Route
-                  key={`${path}/create`}
-                  path={`${path}/create`}
-                  element={<CreateOpenTask plugin={plugin} />}
-                />
-              );
-            }
-            prev.allRoutes.push(
-              <Route
-                key={`${path}/:taskId`}
-                path={`${path}/:taskId`}
-                element={<OpenTask plugin={plugin} />}
-              />,
-              <Route
-                key={`${path}/:taskId/submissions`}
-                path={`${path}/:taskId/submissions`}
-                element={<Submissions plugin={plugin} />}
-              />
-            );
+        //   break;
+        // case PluginDefinitionType.OnboardingOpenTaskPlugin:
+        //   if (isAdmin) {
+        //     prev.allRoutes.push(
+        //       <Route
+        //         key={path}
+        //         path={path}
+        //         element={<OpenTasks plugin={plugin} />}
+        //       />,
+        //       <Route
+        //         key={`${path}/create`}
+        //         path={`${path}/create`}
+        //         element={<CreateOpenTask plugin={plugin} />}
+        //       />
+        //     );
+        //   }
+        //   prev.allRoutes.push(
+        //     <Route
+        //       key={`${path}/:taskId`}
+        //       path={`${path}/:taskId`}
+        //       element={<OpenTask plugin={plugin} />}
+        //     />,
+        //     <Route
+        //       key={`${path}/:taskId/submissions`}
+        //       path={`${path}/:taskId/submissions`}
+        //       element={<Submissions plugin={plugin} />}
+        //     />
+        //   );
 
-            break;
-          // case PluginDefinitionType.OnboardingTransactionTaskPlugin:
-          //   if (isAdmin) {
-          //     prev.allRoutes.push(
-          //       <Route
-          //         key={path}
-          //         path={path}
-          //         element={<TransactionTasks plugin={plugin} />}
-          //       />,
-          //       <Route
-          //         key={`${path}/create`}
-          //         path={`${path}/create`}
-          //         element={<CreateTransactionTask plugin={plugin} />}
-          //       />
-          //     );
-          //   }
-          //   prev.allRoutes.push(
-          //     <Route
-          //       key={`${path}/:taskId`}
-          //       path={`${path}/:taskId`}
-          //       element={<TransactionTask plugin={plugin} />}
-          //     />
-          //   );
-          //   break;
-          case PluginDefinitionType.OnboardingJoinDiscordTaskPlugin:
-            if (isAdmin) {
-              prev.allRoutes.push(
-                <Route
-                  key={path}
-                  path={path}
-                  element={<JoinDiscordTasks plugin={plugin} />}
-                />,
-                <Route
-                  key={`${path}/create`}
-                  path={`${path}/create`}
-                  element={<CreateJoinDiscordTask plugin={plugin} />}
-                />
-              );
-            }
-            prev.allRoutes.push(
-              <Route
-                key={`${path}/:taskId`}
-                path={`${path}/:taskId`}
-                element={<JoinDiscordTask plugin={plugin} />}
-              />
-            );
-            break;
-          case PluginDefinitionType.OnboardingQuizTaskPlugin:
-            if (isAdmin) {
-              prev.allRoutes.push(
-                <Route
-                  key={path}
-                  path={path}
-                  element={<QuizTasks plugin={plugin} />}
-                />,
-                <Route
-                  key={`${path}/create`}
-                  path={`${path}/create`}
-                  element={<CreateQuizTask plugin={plugin} />}
-                />
-              );
-            }
-            prev.allRoutes.push(
-              <Route
-                key={`${path}/:taskId`}
-                path={`${path}/:taskId`}
-                element={<QuizTask plugin={plugin} />}
-              />
-            );
-            break;
-        }
+        //   break;
+        // case PluginDefinitionType.OnboardingTransactionTaskPlugin:
+        //   if (isAdmin) {
+        //     prev.allRoutes.push(
+        //       <Route
+        //         key={path}
+        //         path={path}
+        //         element={<TransactionTasks plugin={plugin} />}
+        //       />,
+        //       <Route
+        //         key={`${path}/create`}
+        //         path={`${path}/create`}
+        //         element={<CreateTransactionTask plugin={plugin} />}
+        //       />
+        //     );
+        //   }
+        //   prev.allRoutes.push(
+        //     <Route
+        //       key={`${path}/:taskId`}
+        //       path={`${path}/:taskId`}
+        //       element={<TransactionTask plugin={plugin} />}
+        //     />
+        //   );
+        //   break;
+        // case PluginDefinitionType.OnboardingJoinDiscordTaskPlugin:
+        //   if (isAdmin) {
+        //     prev.allRoutes.push(
+        //       <Route
+        //         key={path}
+        //         path={path}
+        //         element={<JoinDiscordTasks plugin={plugin} />}
+        //       />,
+        //       <Route
+        //         key={`${path}/create`}
+        //         path={`${path}/create`}
+        //         element={<CreateJoinDiscordTask plugin={plugin} />}
+        //       />
+        //     );
+        //   }
+        //   prev.allRoutes.push(
+        //     <Route
+        //       key={`${path}/:taskId`}
+        //       path={`${path}/:taskId`}
+        //       element={<JoinDiscordTask plugin={plugin} />}
+        //     />
+        //   );
+        //   break;
+        // case PluginDefinitionType.OnboardingQuizTaskPlugin:
+        //   if (isAdmin) {
+        //     prev.allRoutes.push(
+        //       <Route
+        //         key={path}
+        //         path={path}
+        //         element={<QuizTasks plugin={plugin} />}
+        //       />,
+        //       <Route
+        //         key={`${path}/create`}
+        //         path={`${path}/create`}
+        //         element={<CreateQuizTask plugin={plugin} />}
+        //       />
+        //     );
+        //   }
+        //   prev.allRoutes.push(
+        //     <Route
+        //       key={`${path}/:taskId`}
+        //       path={`${path}/:taskId`}
+        //       element={<QuizTask plugin={plugin} />}
+        //     />
+        //   );
+        //   break;
+        // }
       }
-
       return prev;
     },
     {

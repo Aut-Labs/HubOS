@@ -16,7 +16,7 @@ import { useVerifyENSMutation } from "@api/socials.api";
 import { useAccount } from "wagmi";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { useSelector } from "react-redux";
-import { IsSocialVerified } from "@store/Community/community.reducer";
+import { IsSocialVerified } from "@store/Hub/hub.reducer";
 
 const ENSCard = () => {
   const { address } = useAccount();

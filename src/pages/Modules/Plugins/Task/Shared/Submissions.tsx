@@ -1,4 +1,3 @@
-import { Task } from "@aut-labs/sdk";
 import {
   Box,
   Stack,
@@ -23,11 +22,6 @@ import {
 
 import { TaskStatus } from "@store/model";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
-import {
-  PluginDefinition,
-  PluginDefinitionType
-} from "@aut-labs/sdk/dist/models/plugin";
-import { TaskType } from "@aut-labs/sdk/dist/models/task";
 import OverflowTooltip from "@components/OverflowTooltip";
 import AutLoading from "@components/AutLoading";
 import {
@@ -36,11 +30,12 @@ import {
 } from "@api/onboarding.api";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useSelector } from "react-redux";
-import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
+import { HubData, IsAdmin } from "@store/Hub/hub.reducer";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CopyAddress from "@components/CopyAddress";
 import { useAccount } from "wagmi";
 import { differenceInDays } from "date-fns";
+import { TaskContributionNFT } from "@aut-labs/sdk";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {
@@ -62,49 +57,47 @@ export const taskStatuses: any = {
 };
 
 export const taskTypes = {
-  [TaskType.Open]: {
-    pluginType: PluginDefinitionType.OnboardingOpenTaskPlugin,
-    label: "Open Task",
-    labelColor: "#FFC1A9"
-  },
-  // [TaskType.ContractInteraction]: {
-  //   pluginType: PluginDefinitionType.OnboardingTransactionTaskPlugin,
-  //   label: "Contract Interaction",
-  //   labelColor: "#FFECB3"
+  // [TaskType.Open]: {
+  //   pluginType: PluginDefinitionType.OnboardingOpenTaskPlugin,
+  //   label: "Open Task",
+  //   labelColor: "#FFC1A9"
   // },
-  [TaskType.Quiz]: {
-    pluginType: PluginDefinitionType.OnboardingQuizTaskPlugin,
-    label: "Multiple-Choice Quiz",
-    labelColor: "#C1FFC1 "
-  },
-  [TaskType.JoinDiscord]: {
-    pluginType: PluginDefinitionType.OnboardingJoinDiscordTaskPlugin,
-    label: "Join Discord",
-    labelColor: "#A5AAFF"
-  }
+  // // [TaskType.ContractInteraction]: {
+  // //   pluginType: PluginDefinitionType.OnboardingTransactionTaskPlugin,
+  // //   label: "Contract Interaction",
+  // //   labelColor: "#FFECB3"
+  // // },
+  // [TaskType.Quiz]: {
+  //   pluginType: PluginDefinitionType.OnboardingQuizTaskPlugin,
+  //   label: "Multiple-Choice Quiz",
+  //   labelColor: "#C1FFC1 "
+  // },
+  // [TaskType.JoinDiscord]: {
+  //   pluginType: PluginDefinitionType.OnboardingJoinDiscordTaskPlugin,
+  //   label: "Join Discord",
+  //   labelColor: "#A5AAFF"
+  // }
 };
 
 export const SubmissionCard = ({
   row,
   questId,
-  novaAddress,
+  hubAddress,
   onboardingQuestAddress
 }: {
-  row: Task;
+  row: TaskContributionNFT;
   questId: string;
-  novaAddress: string;
+  hubAddress: string;
   onboardingQuestAddress: string;
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const communityData = useSelector(CommunityData);
+  const hubData = useSelector(HubData);
   const theme = useTheme();
 
   const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
     selectFromResult: ({ data }) => ({
-      plugin: (data || []).find(
-        (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
-      )
+      plugin: (data || [])[0]
     })
   });
 
@@ -112,7 +105,7 @@ export const SubmissionCard = ({
     if (!plugin) return;
     const stackType = plugin.metadata.properties.module.type;
     const stack = `modules/${stackType}`;
-    return `${stack}/${PluginDefinitionType[plugin.pluginDefinitionId]}`;
+    // return `${stack}/${PluginDefinitionType[plugin.pluginDefinitionId]}`;
   }, [plugin]);
 
   return (
@@ -146,7 +139,7 @@ export const SubmissionCard = ({
           subheaderTypographyProps={{
             color: "white"
           }}
-          title={row?.metadata?.name}
+          title={row?.name}
         />
         <CardContent
           sx={{
@@ -159,14 +152,14 @@ export const SubmissionCard = ({
           <Stack flex={1} direction="column" gap={2}>
             <Typography variant="body" color="white">
               Status:{" "}
-              <Chip
+              {/* <Chip
                 sx={{
                   ml: 1
                 }}
                 label={taskStatuses[row.status].label}
                 color={taskStatuses[row.status].color}
                 size="small"
-              />
+              /> */}
             </Typography>
             <Typography
               sx={{
@@ -176,11 +169,11 @@ export const SubmissionCard = ({
               variant="body"
               color="white"
             >
-              Submitter: <CopyAddress address={row.submitter} />
+              {/* Submitter: <CopyAddress address={row.submitter} /> */}
             </Typography>
             <Typography variant="body" color="white">
               Task type:{" "}
-              <span
+              {/* <span
                 style={{
                   // backgroundColor: taskTypes[row.taskType]?.labelColor,
                   // color: "#000",
@@ -189,15 +182,15 @@ export const SubmissionCard = ({
                 }}
               >
                 {taskTypes[row.taskType]?.label}
-              </span>
+              </span> */}
             </Typography>
-            <Typography variant="body" color="white">
+            {/* <Typography variant="body" color="white">
               Duration:{" "}
               {differenceInDays(new Date(row.endDate), new Date(row.startDate))}{" "}
               days
-            </Typography>
+            </Typography> */}
 
-            <OverflowTooltip maxLine={4} text={row.metadata?.description} />
+            {/* <OverflowTooltip maxLine={4} text={row.metadata?.description} /> */}
           </Stack>
 
           <Box
@@ -213,19 +206,19 @@ export const SubmissionCard = ({
                 mb: 4,
                 mx: "auto"
               }}
-              onClick={() => {
-                navigate({
-                  pathname: `/${communityData?.name}/${path}/${row.taskId}`,
-                  search: new URLSearchParams({
-                    submitter: row.submitter,
-                    questId: questId.toString(),
-                    onboardingQuestAddress: onboardingQuestAddress,
-                    novaAddress: novaAddress,
-                    returnUrlLinkName: "Back to quest",
-                    returnUrl: `${location?.pathname}`
-                  }).toString()
-                });
-              }}
+              // onClick={() => {
+              //   navigate({
+              //     pathname: `/${hubData?.name}/${path}/${row.taskId}`,
+              //     search: new URLSearchParams({
+              //       submitter: row.submitter,
+              //       questId: questId.toString(),
+              //       onboardingQuestAddress: onboardingQuestAddress,
+              //       hubAddress: hubAddress,
+              //       returnUrlLinkName: "Back to quest",
+              //       returnUrl: `${location?.pathname}`
+              //     }).toString()
+              //   });
+              // }}
               size="large"
               variant="outlined"
               color="offWhite"
@@ -267,7 +260,7 @@ export const SubmissionsGridBox = styled(Box)(({ theme }) => {
 
 interface TasksParams {
   isLoading: boolean;
-  tasks: Task[];
+  tasks: TaskContributionNFT[];
   canDelete?: boolean;
   isAdmin: boolean;
   onboardingQuestAddress: string;
@@ -275,7 +268,7 @@ interface TasksParams {
 }
 
 interface PluginParams {
-  plugin: PluginDefinition;
+  plugin: any;
 }
 
 const Submissions = ({ plugin }: PluginParams) => {
@@ -283,7 +276,7 @@ const Submissions = ({ plugin }: PluginParams) => {
   const { address: userAddress } = useAccount();
   const params = useParams<{ taskId: string }>();
   const isAdmin = useSelector(IsAdmin);
-  const communityData = useSelector(CommunityData);
+  const hubData = useSelector(HubData);
 
   const { task, submissions, isLoading } = useGetAllTasksQuery(
     {
@@ -296,17 +289,17 @@ const Submissions = ({ plugin }: PluginParams) => {
           isLoading: isLoading || isFetching,
           ...(data?.tasks || []).reduce(
             (prev, curr) => {
-              const isCurrentTask =
-                curr.taskId === +params?.taskId &&
-                PluginDefinitionType.OnboardingOpenTaskPlugin ===
-                  taskTypes[curr.taskType].pluginType;
+              // const isCurrentTask =
+              //   curr.taskId === +params?.taskId &&
+              //   PluginDefinitionType.OnboardingOpenTaskPlugin ===
+              //     taskTypes[curr.taskType].pluginType;
 
-              if (isCurrentTask) {
-                prev.task = curr;
-                prev.submissions = data.submissions.filter(
-                  (r) => r.taskId === curr.taskId
-                );
-              }
+              // if (isCurrentTask) {
+              //   prev.task = curr;
+              //   prev.submissions = data.submissions.filter(
+              //     (r) => r.taskId === curr.taskId
+              //   );
+              // }
               return prev;
             },
             { task: null, submissions: [] }
@@ -322,7 +315,7 @@ const Submissions = ({ plugin }: PluginParams) => {
       onboardingQuestAddress: searchParams.get(
         RequiredQueryParams.OnboardingQuestAddress
       ),
-      novaAddress: searchParams.get(RequiredQueryParams.NovaAddress)
+      hubAddress: searchParams.get(RequiredQueryParams.HubAddress)
     };
   }, [searchParams]);
 
@@ -364,7 +357,7 @@ const Submissions = ({ plugin }: PluginParams) => {
                 }}
                 to={{
                   pathname: `/${
-                    communityData?.name
+                    hubData?.name
                   }/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
                     RequiredQueryParams.QuestId
                   )}`,
@@ -386,7 +379,7 @@ const Submissions = ({ plugin }: PluginParams) => {
                     row={row}
                     questId={taskParams.questId}
                     onboardingQuestAddress={taskParams.onboardingQuestAddress}
-                    novaAddress={taskParams.novaAddress}
+                    hubAddress={taskParams.hubAddress}
                     {...taskParams}
                   />
                 ))}

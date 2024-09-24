@@ -25,7 +25,7 @@ import {
   activityUpdateGroupCallData,
   activityUpdateGroupCallStatus
 } from "@store/Activity/call.reducer";
-import { allRoles } from "@store/Community/community.reducer";
+import { allRoles } from "@store/Hub/hub.reducer";
 // import { addGroupCall } from "@api/activities.api";
 import { ResultState } from "@store/result-status";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
@@ -100,7 +100,7 @@ const CallInformationStep = () => {
       <LoadingDialog
         handleClose={handleDialogClose}
         open={status === ResultState.Updating}
-        message="Creating community call activity..."
+        message="Creating hub call activity..."
       />
 
       <AutHeader
@@ -111,7 +111,7 @@ const CallInformationStep = () => {
         subtitle={
           <>
             Almost there 🙌 Now just pick a duration ⌚ <br /> And decide
-            whether the Call is for the entire Community, or a specific Role.
+            whether the Call is for the entire Hub, or a specific Role.
           </>
         }
       />
@@ -267,7 +267,7 @@ const CallInformationStep = () => {
                         }}
                         value={false}
                         control={<Radio />}
-                        label="Community"
+                        label="Hub"
                       />
                     </RadioGroup>
                   )}

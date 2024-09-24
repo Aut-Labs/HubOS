@@ -1,21 +1,18 @@
-import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
-import { CommunityMembershipDetails } from "@aut-labs/sdk/dist/models/holder";
 
-/* eslint-disable no-shadow */
 export enum ActivityTypes {
   Polls = 1,
   Gatherings,
   Tasks
 }
 
-export enum CommunityEventTypes {
+export enum HubEventTypes {
   Ongoing,
   Upcoming,
   Past
 }
 
 export interface HolderData {
-  daos: CommunityMembershipDetails[];
+  daos: any[];
   address: string;
   tokenId: string;
   metadataUri: string;
@@ -65,7 +62,7 @@ export interface ActivityPollData {
   roleName?: string;
   allRoles: boolean;
 }
-export interface CommunityContractError {
+export interface HubContractError {
   code: number;
   message: string;
   data: {

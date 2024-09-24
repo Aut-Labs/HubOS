@@ -1,5 +1,4 @@
 import { useAddPluginToDAOMutation } from "@api/plugin-registry.api";
-import { PluginDefinition } from "@aut-labs/sdk";
 import {
   Box,
   Button,
@@ -20,10 +19,6 @@ import AddIcon from "@mui/icons-material/Add";
 import { useSelector } from "react-redux";
 import { SelectedNetwork } from "@store/WalletProvider/WalletProvider";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
-import {
-  ModuleDefinition,
-  PluginDefinitionType
-} from "@aut-labs/sdk/dist/models/plugin";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { useActivateModuleMutation } from "@api/module-registry.api";
 import { LoadingButton } from "@mui/lab";
@@ -46,7 +41,7 @@ const PluginCard = ({
   hasCopyright
 }: {
   isAdmin: boolean;
-  plugin: PluginDefinition;
+  plugin: any;
   isFetching: boolean;
   hasCopyright: boolean;
 }) => {
@@ -61,7 +56,7 @@ const PluginCard = ({
   }, [selectedNetwork?.explorerUrls, plugin?.pluginAddress]);
 
   const path = useMemo(() => {
-    return `${PluginDefinitionType[plugin.pluginDefinitionId]}`;
+    return ``;
   }, []);
 
   const actionName = useMemo(() => {
@@ -280,7 +275,7 @@ export const ModuleDefinitionCard = ({
   isFetching
 }: {
   isFetching: boolean;
-  pluginModule: ModuleDefinition;
+  pluginModule: any;
 }) => {
   const [activateOnboarding, { isLoading }] = useActivateModuleMutation();
 
