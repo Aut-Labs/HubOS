@@ -14,6 +14,7 @@ import { styled } from "@mui/material";
 import backgroundImage from "@assets/hubos/bg-main.png";
 import HubEdit from "./HubEdit/HubEdit";
 import Members from "./Members/Members";
+import TaskManager from "./TaskManager";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -137,6 +138,7 @@ const AutDashboardMain = () => {
                 <Route path="your-archetype" element={<Archetype />} />
                 <Route path="modules/dAut" element={<DAut />} />
                 <Route path="members" element={<Members />} />
+                <Route path="task-manager" element={<TaskManager />} />
                 {/* <Route path="tasks" element={<AllTasks />} /> */}
                 {/* {modulesRoutes?.routes?.length && (
                 <Route

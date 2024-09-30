@@ -1,4 +1,3 @@
-import { useAddPluginToDAOMutation } from "@api/plugin-registry.api";
 import {
   Box,
   Button,
@@ -20,7 +19,6 @@ import { useSelector } from "react-redux";
 import { SelectedNetwork } from "@store/WalletProvider/WalletProvider";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LinkWithQuery from "@components/LinkWithQuery";
-import { useActivateModuleMutation } from "@api/module-registry.api";
 import { LoadingButton } from "@mui/lab";
 
 const GridCard = styled(Card)(({ theme }) => {
@@ -46,14 +44,6 @@ const PluginCard = ({
   hasCopyright: boolean;
 }) => {
   const selectedNetwork = useSelector(SelectedNetwork);
-  const [addPlugin, { error, isLoading, isError, reset }] =
-    useAddPluginToDAOMutation();
-
-  const exploreAddressUrl = useMemo(() => {
-    if (!selectedNetwork) return;
-    const [exploreUrl] = selectedNetwork.explorerUrls;
-    return `${exploreUrl}address/${plugin?.pluginAddress}`;
-  }, [selectedNetwork?.explorerUrls, plugin?.pluginAddress]);
 
   const path = useMemo(() => {
     return ``;
@@ -72,7 +62,6 @@ const PluginCard = ({
 
   return (
     <>
-      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
       <GridCard
         sx={{
           bgcolor: "nightBlack.main",
@@ -143,48 +132,6 @@ const PluginCard = ({
             )}
           </Stack> */}
 
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex"
-            }}
-          >
-            <LoadingButton
-              loading={isLoading}
-              sx={{
-                width: "80%",
-                my: 6,
-                mx: "auto"
-              }}
-              size="large"
-              disabled={
-                isFetching || !path || (!plugin.pluginAddress && !isAdmin)
-              }
-              variant="outlined"
-              loadingIndicator={
-                <Stack direction="row" gap={1} alignItems="center">
-                  <Typography className="text-secondary">
-                    Installing...
-                  </Typography>
-                  <CircularProgress
-                    size="20px"
-                    color={plugin.pluginAddress ? "offWhite" : "primary"}
-                  />
-                </Stack>
-              }
-              {...(!!plugin.pluginAddress && {
-                to: path,
-                preserveParams: true,
-                component: LinkWithQuery
-              })}
-              {...(!plugin.pluginAddress && {
-                onClick: () => addPlugin(plugin)
-              })}
-              color="offWhite"
-            >
-              {actionName}
-            </LoadingButton>
-          </Box>
           {hasCopyright && (
             <Box
               sx={{
@@ -277,8 +224,6 @@ export const ModuleDefinitionCard = ({
   isFetching: boolean;
   pluginModule: any;
 }) => {
-  const [activateOnboarding, { isLoading }] = useActivateModuleMutation();
-
   return (
     <GridCard
       sx={{
@@ -322,52 +267,15 @@ export const ModuleDefinitionCard = ({
             {pluginModule?.metadata?.properties?.shortDescription}
           </Typography>
         </Stack>
-        <LoadingButton
-          loading={isLoading}
-          sx={{
-            width: "80%",
-            mx: "auto",
-            my: 6
-          }}
-          disabled={isLoading || isFetching}
-          variant="outlined"
-          size="large"
-          loadingIndicator={
-            <Stack direction="row" gap={1} alignItems="center">
-              <Typography className="text-secondary">Activating...</Typography>
-              <CircularProgress
-                size="20px"
-                color={pluginModule.isActivated ? "offWhite" : "primary"}
-              />
-            </Stack>
-          }
-          {...(pluginModule.isActivated && {
-            to: pluginModule?.metadata?.properties?.type,
-            preserveParams: true,
-            component: LinkWithQuery
-          })}
-          {...(!pluginModule.isActivated && {
-            onClick: () =>
-              activateOnboarding({
-                moduleId: pluginModule.id
-              })
-          })}
+
+        <Button
+          variant="contained"
           color="offWhite"
+          sx={{ mt: 2 }}
+
         >
-          {/* @ts-ignore */}
-          {pluginModule?.metadata?.properties?.buttonName && (
-            <>
-              {/* @ts-ignore */}
-              {pluginModule?.metadata?.properties?.buttonName}
-            </>
-          )}
-          {/* @ts-ignore */}
-          {!pluginModule?.metadata?.properties?.buttonName
-            ? pluginModule.isActivated
-              ? "Go to plugins"
-              : "Activate"
-            : ""}
-        </LoadingButton>
+          Create Contribution
+        </Button>
 
         {/* <Stack direction="row" justifyContent="flex-end">
           <Typography
@@ -379,7 +287,7 @@ export const ModuleDefinitionCard = ({
               fontSize: "12px"
             }}
           >
-            {plugin?.metadata?.name}
+            {pluginModule?.metadata?.name}
           </Typography>
         </Stack> */}
       </CardContent>

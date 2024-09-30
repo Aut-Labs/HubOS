@@ -42,6 +42,18 @@ const menuItems = (hubName: string): SidebarMenuItem[] => [
     title: "Members",
     route: `/${hubName}/members`,
     icon: AdminIcon
+  },
+  {
+    title: "Task Manager",
+    route: `/${hubName}/task-manager`,
+    icon: AdminIcon,
+    children: [
+      {
+        title: "Contributions",
+        route: `/${hubName}/contributions`,
+        icon: AdminIcon
+      }
+    ]
   }
 ];
 

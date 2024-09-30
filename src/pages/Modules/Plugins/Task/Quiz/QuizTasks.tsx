@@ -1,5 +1,3 @@
-
-import { useCreateQuizTaskMutation } from "@api/onboarding.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { AutDatepicker, FormHelperText } from "@components/Fields";
@@ -25,12 +23,13 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
-import { HubData, allRoles } from "@store/Hub/hub.reducer";
+import { HubData } from "@store/Hub/hub.reducer";
 import { useSelector } from "react-redux";
 import { useAccount } from "wagmi";
 import { FormContainer } from "../Shared/FormContainer";
 import { addMinutes } from "date-fns";
 import { TaskContributionNFT } from "@aut-labs/sdk";
+import { TaskType } from "@api/models/task-type";
 
 // import "./ScrollbarStyles.scss";
 
@@ -40,8 +39,8 @@ const errorTypes = {
   maxLength: `Characters cannot be more than 257`
 };
 
-interface PluginParams {
-  plugin: any;
+interface TaskTypeParams {
+  taskType: TaskType;
 }
 
 const TaskSuccess = ({ pluginId, reset }) => {
@@ -119,13 +118,10 @@ const TaskSuccess = ({ pluginId, reset }) => {
 const endDatetime = new Date();
 addMinutes(endDatetime, 45);
 
-const QuizTasks = ({ plugin }: PluginParams) => {
+const QuizTasks = ({ taskType }: TaskTypeParams) => {
   const [searchParams] = useSearchParams();
-
-  console.log(plugin);
   const navigate = useNavigate();
   const { address: account } = useAccount();
-  const roles = useSelector(allRoles);
   const hubData = useSelector(HubData);
   const [answersSaved, setAnswersSaved] = useState(false);
   const {
@@ -151,8 +147,8 @@ const QuizTasks = ({ plugin }: PluginParams) => {
 
   const values = watch();
 
-  const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
-    useCreateQuizTaskMutation();
+  // const [createTask, { error, isError, isSuccess, data, isLoading, reset }] =
+  //   useCreateQuizTaskMutation();
 
   const onSubmit = async () => {
     const values = getValues();
@@ -171,45 +167,41 @@ const QuizTasks = ({ plugin }: PluginParams) => {
       questionsWithoutAnswers.push(questionWithoutAnswer);
     }
 
-    createTask({
-      userAddress: account,
-      isAdmin: true,
-      hubAddress: hubData.properties.address,
-      pluginTokenId: plugin.pluginDefinitionId,
-      pluginAddress: plugin.pluginAddress,
-      allQuestions: values.questions,
-      task: {
-        role: 1,
-        weight: values.weight,
-        metadata: {
-          name: values.title,
-          description: values.description,
-          properties: {
-            questions: questionsWithoutAnswers
-          }
-        },
-        startDate: dateToUnix(values.startDate),
-        endDate: dateToUnix(values.endDate)
-      } as unknown as TaskContributionNFT
-    });
+    // createTask({
+    //   userAddress: account,
+    //   isAdmin: true,
+    //   hubAddress: hubData.properties.address,
+    //   pluginTokenId: plugin.pluginDefinitionId,
+    //   pluginAddress: plugin.pluginAddress,
+    //   allQuestions: values.questions,
+    //   task: {
+    //     role: 1,
+    //     weight: values.weight,
+    //     metadata: {
+    //       name: values.title,
+    //       description: values.description,
+    //       properties: {
+    //         questions: questionsWithoutAnswers
+    //       }
+    //     },
+    //     startDate: dateToUnix(values.startDate),
+    //     endDate: dateToUnix(values.endDate)
+    //   } as unknown as TaskContributionNFT
+    // });
   };
 
-  const selectedRole = useMemo(() => {
-    return roles.find((r) => r.id === 1);
-  }, [roles, searchParams]);
-
-  useEffect(() => {
-    if (isSuccess) {
-      navigate({
-        pathname: `/${hubData?.name}/tasks`
-      });
-    }
-  }, [isSuccess, hubData]);
+  // useEffect(() => {
+  //   if (isSuccess) {
+  //     navigate({
+  //       pathname: `/${hubData?.name}/tasks`
+  //     });
+  //   }
+  // }, [isSuccess, hubData]);
 
   return (
     <FormContainer onSubmit={handleSubmit(onSubmit)}>
-      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
-      <LoadingDialog open={isLoading} message="Creating task..." />
+      {/* <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <LoadingDialog open={isLoading} message="Creating task..." /> */}
 
       <Box
         sx={{
@@ -243,7 +235,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
             </Typography>
           </Button>
           <Typography textAlign="center" color="white" variant="h3">
-            Quiz for {selectedRole?.roleName}
+            Quiz
           </Typography>
         </Stack>
         <Typography
