@@ -44,6 +44,11 @@ const menuItems = (hubName: string): SidebarMenuItem[] => [
     icon: AdminIcon
   },
   {
+    title: "Discord Bot",
+    route: `/${hubName}/discord-bot`,
+    icon: AdminIcon
+  },
+  {
     title: "Task Manager",
     route: `/${hubName}/task-manager`,
     icon: AdminIcon,
