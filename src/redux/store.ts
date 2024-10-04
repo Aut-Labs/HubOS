@@ -3,6 +3,7 @@ import logger from "redux-logger";
 import { reducers } from "./reducers";
 import { hubApi } from "@api/hub.api";
 import { socialsApi } from "@api/socials.api";
+import { contributionsApi } from "@api/contributions.api";
 // import storage from "redux-persist/lib/storage";
 // import {
 //   FLUSH,
@@ -57,6 +58,7 @@ export const store = configureStore({
     }).concat(
       logger,
       hubApi.middleware,
+      contributionsApi.middleware,
       socialsApi.middleware
     ),
   reducer: rootReducer

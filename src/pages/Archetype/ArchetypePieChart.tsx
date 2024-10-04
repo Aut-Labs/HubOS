@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import {
   PieChart,
   Pie,
@@ -7,32 +7,11 @@ import {
   ResponsiveContainer,
   Sector
 } from "recharts";
-import Size from "@assets/archetypes/people.png";
-import Growth from "@assets/archetypes/seed.png";
-import Performance from "@assets/archetypes/growth.png";
-import Reputation from "@assets/archetypes/reputation-management.png";
-import Conviction from "@assets/archetypes/deal.png";
+import { ArchetypeTypes } from "@api/hub.api";
+import { Box, Typography } from "@mui/material";
 import { HubArchetype, HubArchetypeParameters } from "@aut-labs/sdk";
 
-const nameShortcut = {
-  Size: "S",
-  Growth: "G",
-  Performance: "P",
-  Reputation: "R",
-  Conviction: "C"
-};
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF"];
-// const MUTED_COLORS = ["#124b7e", "#12685e", "#7f6b14", "#7f4021", "#58127e"];
-// const MUTED_COLORS = ["#468189", "#37509b", "#6a0dad", "#662d91", "#800020"];
-const MUTED_COLORS = ["#7692FF", "#297373", "#8BB174", "#A54657", "#BEB2C8"];
-const MORE_MUTED_COLORS = [
-  "#5f70cc",
-  "#214d4d",
-  "#6d8d5b",
-  "#804044",
-  "#968fa3"
-];
+const COLORS = ["#9BA1ED", "#272D76", "#4A3398", "#5C0E8D", "#2360EA"];
 const RADIAN = Math.PI / 180;
 
 const renderCustomizedLabel = ({
@@ -59,7 +38,7 @@ const renderCustomizedLabel = ({
       textAnchor="middle" // Change 'centre' to 'middle'
       dominantBaseline="middle" // Add this line
     >
-      {nameShortcut[name]}
+      {`${(percent * 100).toFixed(0)}%`}
     </text>
   );
 };
@@ -76,95 +55,128 @@ export const archetypeChartValues = (archetype: HubArchetypeParameters) => {
   const { min: sizeMin, max: sizeMax } = archetypeLimits[HubArchetype.SIZE];
   return {
     [HubArchetype.SIZE]: {
-      type: HubArchetype.SIZE,
-      title: "Size",
-      description: "how many members",
-      logo: Size,
+      ...ArchetypeTypes[HubArchetype.SIZE],
       value: archetype?.size,
       min: sizeMin,
       max: sizeMax,
       defaults: {
-        [HubArchetype.SIZE]: 60,
-        [HubArchetype.GROWTH]: 10,
-        [HubArchetype.PERFORMANCE]: 10,
-        [HubArchetype.REPUTATION]: 10,
-        [HubArchetype.CONVICTION]: 10
+        [HubArchetype.SIZE]: 40,
+        [HubArchetype.GROWTH]: 15,
+        [HubArchetype.PERFORMANCE]: 15,
+        [HubArchetype.REPUTATION]: 15,
+        [HubArchetype.CONVICTION]: 15
       }
     },
     [HubArchetype.REPUTATION]: {
-      type: HubArchetype.REPUTATION,
-      title: "Reputation",
-      description: "avg. reputation of members",
-      logo: Reputation,
+      ...ArchetypeTypes[HubArchetype.REPUTATION],
       value: archetype?.reputation,
       min: sizeMin,
       max: sizeMax,
       defaults: {
-        [HubArchetype.SIZE]: 10,
-        [HubArchetype.GROWTH]: 10,
-        [HubArchetype.PERFORMANCE]: 10,
-        [HubArchetype.REPUTATION]: 60,
-        [HubArchetype.CONVICTION]: 10
+        [HubArchetype.SIZE]: 15,
+        [HubArchetype.GROWTH]: 15,
+        [HubArchetype.PERFORMANCE]: 15,
+        [HubArchetype.REPUTATION]: 40,
+        [HubArchetype.CONVICTION]: 15
       }
     },
     [HubArchetype.CONVICTION]: {
-      type: HubArchetype.CONVICTION,
-      title: "Conviction",
-      description: "avg. commitment level of members",
-      logo: Conviction,
+      ...ArchetypeTypes[HubArchetype.CONVICTION],
       value: archetype?.conviction,
       min: sizeMin,
       max: sizeMax,
       defaults: {
-        [HubArchetype.SIZE]: 10,
-        [HubArchetype.GROWTH]: 10,
-        [HubArchetype.PERFORMANCE]: 10,
-        [HubArchetype.REPUTATION]: 10,
-        [HubArchetype.CONVICTION]: 60
+        [HubArchetype.SIZE]: 15,
+        [HubArchetype.GROWTH]: 15,
+        [HubArchetype.PERFORMANCE]: 15,
+        [HubArchetype.REPUTATION]: 15,
+        [HubArchetype.CONVICTION]: 40
       }
     },
     [HubArchetype.PERFORMANCE]: {
-      type: HubArchetype.PERFORMANCE,
-      title: "Performance",
-      description: "ratio between Created Points and Completed Points",
-      logo: Performance,
+      ...ArchetypeTypes[HubArchetype.PERFORMANCE],
       value: archetype?.performance,
       min: sizeMin,
       max: sizeMax,
       defaults: {
-        [HubArchetype.SIZE]: 10,
-        [HubArchetype.GROWTH]: 10,
-        [HubArchetype.PERFORMANCE]: 60,
-        [HubArchetype.REPUTATION]: 10,
-        [HubArchetype.CONVICTION]: 10
+        [HubArchetype.SIZE]: 15,
+        [HubArchetype.GROWTH]: 15,
+        [HubArchetype.PERFORMANCE]: 40,
+        [HubArchetype.REPUTATION]: 15,
+        [HubArchetype.CONVICTION]: 15
       }
     },
     [HubArchetype.GROWTH]: {
-      type: HubArchetype.GROWTH,
-      title: "Growth",
-      description: "% of member’s growth respect to previous period",
-      logo: Growth,
+      ...ArchetypeTypes[HubArchetype.GROWTH],
       value: archetype?.growth,
       min: sizeMin,
       max: sizeMax,
       defaults: {
-        [HubArchetype.SIZE]: 10,
-        [HubArchetype.GROWTH]: 60,
-        [HubArchetype.PERFORMANCE]: 10,
-        [HubArchetype.REPUTATION]: 10,
-        [HubArchetype.CONVICTION]: 10
+        [HubArchetype.SIZE]: 15,
+        [HubArchetype.GROWTH]: 40,
+        [HubArchetype.PERFORMANCE]: 15,
+        [HubArchetype.REPUTATION]: 15,
+        [HubArchetype.CONVICTION]: 15
       }
     }
   };
 };
 
+const CustomTooltip = ({ active, payload }) => {
+  const template = useMemo(() => {
+    if (!active || !payload || !payload.length) return null;
+
+    const {
+      name,
+      payload: { description, value }
+    } = payload[0];
+
+    if (value < 40) return null;
+
+    return (
+      <Box
+        sx={{
+          borderRadius: "8px",
+          maxWidth: {
+            xs: "200px",
+            sm: "220px",
+            xl: "240px",
+            xxl: "280px"
+          },
+          boxShadow: 2,
+          background: "rgba(240, 245, 255, 0.4)",
+          backdropFilter: "blur(12px)",
+          padding: 2
+        }}
+      >
+        <Typography mb={1} variant="subtitle1">
+          {name}
+        </Typography>
+        <Typography variant="body">{description}</Typography>
+      </Box>
+    );
+  }, [active, payload]);
+
+  return template;
+};
+
 const ArchetypePieChart = ({
   archetype
 }: {
-  archetype: HubArchetypeParameters;
+  archetype: {
+    default: number;
+    parameters: HubArchetypeParameters;
+  };
 }) => {
+  const mappedArchetype: HubArchetypeParameters = useMemo(() => {
+    return {
+      archetype: archetype?.default,
+      ...archetype?.parameters
+    };
+  }, [archetype]);
+
   const mappedData = useMemo(() => {
-    const data = archetypeChartValues(archetype);
+    const data = archetypeChartValues(mappedArchetype);
     return Object.keys(data || {}).reduce((prev, curr) => {
       prev = [
         ...prev,
@@ -175,9 +187,7 @@ const ArchetypePieChart = ({
       ];
       return prev;
     }, []);
-  }, [archetype]);
-
-  console.log(mappedData);
+  }, [mappedArchetype]);
 
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -190,13 +200,13 @@ const ArchetypePieChart = ({
       <PieChart>
         <Pie
           activeIndex={activeIndex}
-          activeShape={renderActiveShape}
+          // activeShape={renderActiveShape}
           data={mappedData}
           cx="50%"
           cy="50%"
           labelLine={false}
           label={renderCustomizedLabel}
-          outerRadius={100} // Increased the chart size
+          outerRadius={150} // Increased the chart size
           fill="#8884d8"
           onMouseEnter={onPieEnter}
           dataKey="value"
@@ -205,67 +215,102 @@ const ArchetypePieChart = ({
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip />
+        <Tooltip content={CustomTooltip} />
       </PieChart>
     </ResponsiveContainer>
   );
 };
 
-export const ArchetypePieChartDesign = ({
-  archetype
-}: {
-  archetype: HubArchetypeParameters;
-}) => {
-  const mappedData = useMemo(() => {
-    const data = archetypeChartValues(archetype);
-    return Object.keys(data || {}).reduce((prev, curr) => {
-      prev = [
-        ...prev,
-        {
-          ...data[curr],
-          name: data[curr].title
-        }
-      ];
-      return prev;
-    }, []);
-  }, [archetype]);
+// const renderActiveShape = (props) => {
+//   const RADIAN = Math.PI / 180;
+//   const {
+//     cx,
+//     cy,
+//     midAngle,
+//     outerRadius,
+//     startAngle,
+//     endAngle,
+//     fill,
+//     payload,
+//     percent,
+//     value
+//   } = props;
+//   const sin = Math.sin(-RADIAN * midAngle);
+//   const cos = Math.cos(-RADIAN * midAngle);
+//   const sx = cx + (outerRadius + 10) * cos;
+//   const sy = cy + (outerRadius + 10) * sin;
+//   const mx = cx + (outerRadius + 30) * cos;
+//   const my = cy + (outerRadius + 30) * sin;
+//   const ex = mx + (cos >= 0 ? 1 : -1) * 22;
+//   const ey = my;
+//   const textAnchor = cos >= 0 ? "start" : "end";
 
-  console.log(mappedData);
+//   // Split description into lines
+//   const maxCharPerLine = 25; // Adjust as needed
+//   const words = payload?.description.split(" ");
+//   const lines = [];
+//   let currentLine = words[0];
 
-  const [activeIndex, setActiveIndex] = useState(0);
+//   words.slice(1).forEach((word) => {
+//     if ((currentLine + " " + word).length > maxCharPerLine) {
+//       lines.push(currentLine);
+//       currentLine = word;
+//     } else {
+//       currentLine += " " + word;
+//     }
+//   });
+//   lines.push(currentLine); // Push the last line
 
-  const onPieEnter = (_data, index) => {
-    setActiveIndex(index);
-  };
+//   const lineHeight = 16; // Line height for text elements
+//   const backgroundPadding = 20; // Padding around text for background
 
-  return (
-    <ResponsiveContainer>
-      <PieChart>
-        <Pie
-          activeIndex={activeIndex}
-          activeShape={renderActiveShape}
-          data={mappedData}
-          cx="50%"
-          cy="50%"
-          labelLine={false}
-          label={renderCustomizedLabel}
-          outerRadius={200} // Increased the chart size
-          fill="#8884d8"
-          onMouseEnter={onPieEnter}
-          dataKey="value"
-        >
-          {mappedData.map((entry, index) => (
-            <Cell
-              key={`cell-${index}`}
-              fill={MORE_MUTED_COLORS[index % COLORS.length]}
-            />
-          ))}
-        </Pie>
-        <Tooltip />
-      </PieChart>
-    </ResponsiveContainer>
-  );
-};
+//   return (
+//     <g>
+//       <Sector
+//         cx={cx}
+//         cy={cy}
+//         outerRadius={outerRadius}
+//         startAngle={startAngle}
+//         endAngle={endAngle}
+//         fill={fill}
+//       />
+//       <Sector
+//         cx={cx}
+//         cy={cy}
+//         startAngle={startAngle}
+//         endAngle={endAngle}
+//         outerRadius={outerRadius + 6}
+//         fill={fill}
+//       />
+//       <path
+//         d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
+//         stroke={fill}
+//         fill="none"
+//       />
+//       <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
+//       {/* Background rectangle for text */}
+//       <rect
+//         x={ex + (cos >= 0 ? 1 : -1) * 12 - backgroundPadding}
+//         y={ey - lineHeight / 2 - backgroundPadding}
+//         width={maxCharPerLine * 6 + 2 * backgroundPadding} // Approximate width calculation
+//         height={lines.length * lineHeight + 2 * backgroundPadding}
+//         fill="rgba(255, 255, 255, 0.8)" // Semi-transparent white
+//       />
+//       {lines.map((line, index) => (
+//         <text
+//           key={index}
+//           x={ex + (cos >= 0 ? 1 : -1) * 12}
+//           y={ey + index * lineHeight}
+//           dy={18}
+//           textAnchor={textAnchor}
+//           fill="#333"
+//         >
+//           {line}
+//         </text>
+//       ))}
+//     </g>
+//   );
+// };
 
 const renderActiveShape = (props) => {
   const RADIAN = Math.PI / 180;
@@ -315,12 +360,12 @@ const renderActiveShape = (props) => {
         fill="none"
       />
       <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-      <text
+      {/* <text
         x={ex + (cos >= 0 ? 1 : -1) * 12}
         y={ey}
         textAnchor={textAnchor}
         fill="#333"
-      >{`Value ${value}`}</text>
+      >{`Value ${value}`}</text> */}
       <text
         x={ex + (cos >= 0 ? 1 : -1) * 12}
         y={ey}
@@ -328,10 +373,10 @@ const renderActiveShape = (props) => {
         textAnchor={textAnchor}
         fill="#999"
       >
-        {`(Rate ${(percent * 100).toFixed(0)}%)`}
+        {payload?.description}
       </text>
     </g>
   );
 };
 
-export default ArchetypePieChart;
+export default memo(ArchetypePieChart);

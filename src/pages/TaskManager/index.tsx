@@ -40,6 +40,7 @@ const TaskManager = () => {
       take: 1000
     }
   });
+
   useEffect(() => {
     dispatch(setTitle(`Modules`));
   }, [dispatch]);
@@ -47,7 +48,7 @@ const TaskManager = () => {
   return (
     <>
       <LoadingProgressBar isLoading={isLoading} />
-      <Container maxWidth="lg" sx={{ py: "20px" }}>
+      <Container maxWidth="md" sx={{ py: "20px" }}>
         <Box
           sx={{
             display: "flex",
@@ -96,11 +97,11 @@ const TaskManager = () => {
           <>
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>
               {/* @TODO - Iulia to redesign this */}
-              {data.map((pluginModule, index) => (
+              {data.map((taskType, index) => (
                 <ModuleDefinitionCard
                   key={`modules-plugin-${index}`}
                   isFetching={isLoading}
-                  pluginModule={pluginModule}
+                  taskType={taskType}
                 />
               ))}
             </GridBox>

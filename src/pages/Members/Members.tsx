@@ -299,7 +299,7 @@ function Members() {
   }, [hubData, data]);
 
   return (
-    <Container maxWidth="lg" sx={{ py: "20px" }}>
+    <Container maxWidth="md" sx={{ py: "20px" }}>
       <LoadingProgressBar isLoading={isLoading} />
       {/* <Box
         sx={{

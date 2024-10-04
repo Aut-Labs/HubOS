@@ -15,7 +15,7 @@ const CreateQuest = lazy(
 const Quest = lazy(() => import("../Plugins/Onboarding/Quest/Quest"));
 
 /* Task Types */
-const OpenTasks = lazy(() => import(`../Plugins/Task/Open/OpenTasks`));
+const OpenTasks = lazy(() => import(`../Plugins/Task/Open/CreateOpenTask`));
 const OpenTask = lazy(() => import("../Plugins/Task/Open/OpenTask"));
 const CreateOpenTask = lazy(
   () => import("../Plugins/Task/Open/CreateOpenTask")

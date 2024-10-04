@@ -38,8 +38,6 @@ const SuccessStep = () => {
             sx={{
               my: "40px"
             }}
-            component={Link}
-            to="/aut-dashboard/tasks"
             size="small"
             color="primary"
           >

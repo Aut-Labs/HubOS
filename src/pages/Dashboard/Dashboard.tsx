@@ -17,8 +17,8 @@ import { ArchetypeTypes } from "@api/hub.api";
 import AutIconLabel from "@components/AutIconLabel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { AutIDData, HubData } from "@store/Hub/hub.reducer";
-import Members from "../Members/Members";
 import { ArchetypePie } from "../Archetype/ArchetypePie";
+import { HubArchetype } from "@aut-labs/sdk";
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -62,15 +62,17 @@ const LeftWrapper = styled(Box)(({ theme }) => ({
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  height: "fit-content",
+  height: "70%",
   width: "100%",
   maxWidth: "480px",
   backdropFilter: "blur(12px)",
   backgroundColor: "rgba(128, 128, 128, 0.06)",
   boxShadow: "0px 3px 6px #00000029",
   borderRadius: "24px",
-  padding: "32px 16px",
+  // padding: "32px 16px",
   marginLeft: "24px",
+  marginTop: "auto",
+  marginBottom: "auto",
   [theme.breakpoints.down("md")]: {
     width: "90%",
     maxWidth: "unset",
@@ -130,7 +132,7 @@ const Dashboard = () => {
     if (!hubData?.properties?.archetype?.default) {
       return null;
     }
-    return ArchetypeTypes[hubData?.properties?.archetype?.default];
+    return ArchetypeTypes[HubArchetype.SIZE];
   }, [hubData]);
 
   useEffect(() => {
@@ -149,10 +151,7 @@ const Dashboard = () => {
         flexGrow: 1,
         display: "flex",
         gap: "30px",
-        maxWidth: {
-          xs: "sm",
-          sm: "100%"
-        }
+        maxWidth: "md"
       }}
     >
       <LeftWrapper>
@@ -378,7 +377,7 @@ const Dashboard = () => {
                       border: "1px solid #707070",
                       minHeight: "42px",
                       minWidth: "165px",
-                      ...(!selectedArchetype?.archetype && {
+                      ...(!selectedArchetype && {
                         ".MuiSvgIcon-root": {
                           display: "none"
                         }
@@ -431,7 +430,7 @@ const Dashboard = () => {
         </Stack>
       </LeftWrapper>
       <RightWrapper>
-        <ArchetypePie archetype={selectedArchetype} />
+        <ArchetypePie archetype={hubData?.properties?.archetype} />
       </RightWrapper>
     </Container>
   );
