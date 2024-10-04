@@ -1,24 +1,26 @@
 import { Box, Container, Stack, Typography } from "@mui/material";
 import { useMemo, useState } from "react";
-import Tasks from "../../Task/Shared/Tasks";
-import { useGetAllTasksQuery } from "@api/onboarding.api";
-import { IsAdmin } from "@store/Hub/hub.reducer";
-import { useSelector } from "react-redux";
+// import Tasks from "../../Task/Shared/Tasks";
 import { useAccount } from "wagmi";
 import AutLoading from "@components/AutLoading";
 
 export const AllTasks = () => {
-  const isAdmin = useSelector(IsAdmin);
+  const isAdmin = true;
   const { address } = useAccount();
-  const { data, isLoading } = useGetAllTasksQuery(
-    {
-      userAddress: address,
-      isAdmin
-    },
-    {
-      refetchOnMountOrArgChange: true
-    }
-  );
+  // const { data, isLoading } = useGetAllTasksQuery(
+  //   {
+  //     userAddress: address,
+  //     isAdmin
+  //   },
+  //   {
+  //     refetchOnMountOrArgChange: true
+  //   }
+  // );
+
+  const isLoading = false;
+  const data = {
+    tasks: []
+  };
   const [searchState, setSearchState] = useState({
     title: ""
   });
@@ -64,7 +66,7 @@ export const AllTasks = () => {
                 component={Link}
               ></Button> */}
             <Typography textAlign="center" color="white" variant="h3">
-              Tasks
+              Contributions
             </Typography>
           </Stack>
           <Box>
@@ -80,18 +82,18 @@ export const AllTasks = () => {
                 }}
               >
                 <Typography color="rgb(107, 114, 128)" variant="subtitle2">
-                  No tasks found!
+                  No contributions found...
                 </Typography>
               </Box>
             )}
 
-            <Tasks
+            {/* <Tasks
               isAdmin={isAdmin}
               canAdd={false}
               canDelete={false}
               isLoading={isLoading}
               tasks={filteredTasks}
-            />
+            /> */}
           </Box>
 
           {!isLoading && !data?.tasks?.length && (
@@ -106,7 +108,7 @@ export const AllTasks = () => {
               }}
             >
               <Typography className="text-secondary" variant="subtitle2">
-                No submissions yet...
+                No contributions found...
               </Typography>
             </Box>
           )}

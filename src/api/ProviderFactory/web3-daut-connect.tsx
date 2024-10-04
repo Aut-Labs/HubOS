@@ -91,6 +91,7 @@ function Web3DautConnect({
     multiSigner: MultiSigner
   ) => {
     const sdk = await AutSDK.getInstance(false);
+    debugger;
     await sdk.init(multiSigner, {
       hubRegistryAddress: network.contracts.hubRegistryAddress,
       autIDAddress: network.contracts.autIDAddress,

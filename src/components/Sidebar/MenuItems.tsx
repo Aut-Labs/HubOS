@@ -6,6 +6,9 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import { alpha, Badge, styled, SvgIcon } from "@mui/material";
 import DashboardIcon from "@assets/dashboard.svg?react";
 import ArchertypeIcon from "@assets/archetype.svg?react";
+import MembersIcon from "@assets/hubos/users.svg?react";
+import TaskManagerIcon from "@assets/manage.svg?react";
+import ContributionsIcon from "@assets/aut/stack.svg?react";
 import AdminIcon from "@assets/admin.svg?react";
 import { NavLink as RouteNavLink } from "react-router-dom";
 import { forwardRef, Fragment } from "react";
@@ -30,7 +33,7 @@ const menuItems = (hubName: string): SidebarMenuItem[] => [
   },
   {
     title: "Your Archertype",
-    route: `/${hubName}/your-archetype`,
+    route: `/${hubName}/archetype`,
     icon: ArchertypeIcon
   },
   {
@@ -41,17 +44,17 @@ const menuItems = (hubName: string): SidebarMenuItem[] => [
   {
     title: "Members",
     route: `/${hubName}/members`,
-    icon: AdminIcon
+    icon: MembersIcon
   },
   {
     title: "Task Manager",
     route: `/${hubName}/task-manager`,
-    icon: AdminIcon,
+    icon: TaskManagerIcon,
     children: [
       {
         title: "Contributions",
         route: `/${hubName}/contributions`,
-        icon: AdminIcon
+        icon: ContributionsIcon
       }
     ]
   }

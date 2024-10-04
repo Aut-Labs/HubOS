@@ -1,10 +1,10 @@
- 
 import { Box, Button, Link, Typography, useTheme } from "@mui/material";
-import { ArchetypePieChartDesign } from "./ArchetypePieChart";
 import { useForm } from "react-hook-form";
 import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
 import JoinDiscordTasks from "../Modules/Plugins/Task/JoinDiscord/JoinDiscordTasks";
 import TransactionTasks from "../Modules/Plugins/Task/Transaction/TransactionTasks";
+import ArchetypePieChart from "./ArchetypePieChart";
+import { ResponsiveContainer } from "recharts";
 
 export const ArchetypePie = ({ archetype }) => {
   const theme = useTheme();
@@ -43,7 +43,9 @@ export const ArchetypePie = ({ archetype }) => {
 
   return (
     <>
-      <ArchetypePieChartDesign archetype={archetype} />
+      <ResponsiveContainer width="100%" height="100%">
+        <ArchetypePieChart archetype={archetype} />
+      </ResponsiveContainer>
       {/* @ts-ignore */}
       {/* {archetype?.archetype === HubArchetype.NONE && (
         <>
@@ -59,7 +61,7 @@ export const ArchetypePie = ({ archetype }) => {
               textAlign: "center"
             }}
             component={Link}
-            to={`your-archetype`}
+            to={`archetype`}
             type="button"
             color="secondary"
             variant="contained"

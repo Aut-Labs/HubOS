@@ -1,6 +1,7 @@
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import {
+  Box,
   Button,
   Select,
   SelectProps,
@@ -30,6 +31,7 @@ import {
 import theme from "@theme/theme";
 import { StepperButton } from "./Stepper";
 import { generateFieldColors } from "@theme/field-text-styles";
+import { AutOsButton } from "./buttons";
 
 interface FormHelperTextProps {
   errors: FieldErrors<any>;
@@ -201,21 +203,28 @@ function ActionList(props: PickersActionBarProps) {
   const isDesktop = useMediaQuery(theme.breakpoints.up("sm"));
 
   return (
-    <Button
-      onClick={onAccept}
-      variant="outlined"
-      size="normal"
-      color="offWhite"
+    <Box
       sx={{
-        textAlign: "center",
-        textTransform: "uppercase",
-        width: "120px",
-        height: "40px",
-        margin: "8px auto 0 auto"
+        display: "flex",
+        justifyContent: "flex-end",
+        px: 2,
       }}
     >
-      Confirm
-    </Button>
+      <AutOsButton
+        onClick={onAccept}
+        variant="outlined"
+        color="primary"
+        sx={{
+          my: "4px",
+          "&.MuiButton-root": {
+            width: "100px",
+            height: "35px",
+          }
+        }}
+      >
+        Confirm
+      </AutOsButton>
+    </Box>
   );
 }
 
@@ -231,44 +240,44 @@ export const AutDatepicker = ({ value, onChange, placeholder, ...props }) => {
         {...props}
         onAccept={(newValue) => onChange(newValue)}
         slots={{
-          layout: CustomLayout,
+          // layout: CustomLayout,
           actionBar: ActionList
         }}
         slotProps={{
-          popper: {
-            sx: {
-              ".MuiDateCalendar-root": {
-                borderRight: "1px white solid",
-                paddingRight: "10px"
-              },
-              ".MuiDivider-root": {
-                width: 0
-              },
-              ".MuiMultiSectionDigitalClock-root": {
-                ul: {
-                  borderLeft: 0
-                }
-              },
-              "div.MuiMultiSectionDigitalClock-root": {
-                marginLeft: "30px",
-                ul: {
-                  borderLeft: 0,
-                  "&:last-of-type": {
-                    display: "flex",
-                    flexDirection: "column"
-                  }
-                }
-              },
-              "MuiPickersCalendarHeader-label": {
-                fontSize: "18px"
-              }
-            }
-          },
+          // popper: {
+          //   sx: {
+          //     ".MuiDateCalendar-root": {
+          //       borderRight: "1px white solid",
+          //       paddingRight: "10px"
+          //     },
+          //     ".MuiDivider-root": {
+          //       width: 0
+          //     },
+          //     ".MuiMultiSectionDigitalClock-root": {
+          //       ul: {
+          //         borderLeft: 0
+          //       }
+          //     },
+          //     "div.MuiMultiSectionDigitalClock-root": {
+          //       marginLeft: "30px",
+          //       ul: {
+          //         borderLeft: 0,
+          //         "&:last-of-type": {
+          //           display: "flex",
+          //           flexDirection: "column"
+          //         }
+          //       }
+          //     },
+          //     "MuiPickersCalendarHeader-label": {
+          //       fontSize: "18px"
+          //     }
+          //   }
+          // },
           desktopPaper: {
             sx: {
-              svg: { color: theme.palette.offWhite.main },
-              span: { color: theme.palette.offWhite.main },
-              backgroundColor: theme.palette.background.default,
+              // svg: { color: theme.palette.offWhite.main },
+              // span: { color: theme.palette.offWhite.main },
+              backgroundColor: "#2F3746",
               color: theme.palette.offWhite.main,
               ".MuiPickersLayout-root": {
                 display: "flex",
@@ -281,13 +290,13 @@ export const AutDatepicker = ({ value, onChange, placeholder, ...props }) => {
           },
           mobilePaper: {
             sx: {
-              svg: { color: theme.palette.offWhite.main },
-              span: { color: theme.palette.offWhite.main },
-              backgroundColor: theme.palette.background.default,
+              // svg: { color: theme.palette.offWhite.main },
+              // span: { color: theme.palette.offWhite.main },
+              backgroundColor: "#2F3746",
               color: theme.palette.offWhite.main,
-              ".MuiPickersToolbarText-root.Mui-selected": {
-                color: theme.palette.primary.main
-              }
+              // ".MuiPickersToolbarText-root.Mui-selected": {
+              //   color: theme.palette.primary.main
+              // }
             }
           },
           textField: {

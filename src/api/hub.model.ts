@@ -1,10 +1,22 @@
-import { Role } from "@aut-labs/sdk";
+import { HubArchetype, Role } from "@aut-labs/sdk";
 import { DAutHub, HubProperties as BaseHubProperties } from "@aut-labs/d-aut";
 import OpenSource from "@assets/icons/opensource.svg?react";
 import Defi from "@assets/icons/defi.svg?react";
 import Social from "@assets/icons/social.svg?react";
 import Refi from "@assets/icons/refi.svg?react";
 import Identity from "@assets/icons/identity.svg?react";
+
+const mockArchetype = {
+  default: HubArchetype.SIZE,
+  parameters: {
+    archetype: HubArchetype.SIZE,
+    size: Number(20),
+    reputation: Number(20),
+    conviction: Number(20),
+    performance: Number(20),
+    growth: Number(20)
+  }
+}
 
 interface MarketTemplate {
   title: string;
@@ -46,6 +58,7 @@ export class HubProperties extends BaseHubProperties {
   constructor(data: HubProperties) {
     super(data);
     this.metadataUri = data.metadataUri;
+    this.archetype = data.archetype || mockArchetype;
   }
 }
 

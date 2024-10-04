@@ -15,6 +15,8 @@ import backgroundImage from "@assets/hubos/bg-main.png";
 import HubEdit from "./HubEdit/HubEdit";
 import Members from "./Members/Members";
 import TaskManager from "./TaskManager";
+import { AllTasks } from "./Modules/Plugins/Task/Shared/AllTasks";
+import CreateOpenTask from "./Modules/Plugins/Task/Open/CreateOpenTask";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -133,12 +135,13 @@ const AutDashboardMain = () => {
               <Routes>
                 <Route index element={<Dashboard />} />
                 <Route path="admins" element={<Admins />} />
-                {/* <Route path="hub" element={<Members />} /> */}
                 <Route path="edit-hub" element={<HubEdit />} />
-                <Route path="your-archetype" element={<Archetype />} />
+                <Route path="archetype" element={<Archetype />} />
                 <Route path="modules/dAut" element={<DAut />} />
                 <Route path="members" element={<Members />} />
                 <Route path="task-manager" element={<TaskManager />} />
+                <Route path="contributions" element={<AllTasks />} />
+                <Route path="create-open-task" element={<CreateOpenTask />} />
                 {/* <Route path="tasks" element={<AllTasks />} /> */}
                 {/* {modulesRoutes?.routes?.length && (
                 <Route

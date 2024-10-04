@@ -34,7 +34,7 @@ import { useState, useEffect, useMemo } from "react";
 
 const GridCard = styled(Card)(({ theme }) => {
   return {
-    minHeight: "365px",
+    height: "310px",
     margin: "0 auto",
     transition: theme.transitions.create(["transform"]),
     "&:hover": {
@@ -64,11 +64,11 @@ const Title = styled(Typography, {
   position: "absolute",
   width: "100%",
   left: "0",
-  bottom: isHovered ? "110px" : "80px",
+  top: isHovered ? "100px" : "50px",
   textAlign: "center",
   textTransform: "uppercase",
   zIndex: 1,
-  transition: theme.transitions.create("bottom")
+  transition: theme.transitions.create("top")
 }));
 
 const Description = styled(Typography, {
@@ -780,7 +780,7 @@ const Archetypes = () => {
   console.log("archetypeData: ", archetypeData, archetype, selected);
 
   return (
-    <Container maxWidth="lg" sx={{ py: "20px" }}>
+    <Container maxWidth="md" sx={{ py: "20px" }}>
       {selected && (
         <YourArchetype
           archetype={archetypeData}

@@ -20,6 +20,9 @@ import { SelectedNetwork } from "@store/WalletProvider/WalletProvider";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { LoadingButton } from "@mui/lab";
+import { Link } from "react-router-dom";
+import { TaskType } from "@api/models/task-type";
+import { HubData } from "@store/Hub/hub.reducer";
 
 const GridCard = styled(Card)(({ theme }) => {
   return {
@@ -218,12 +221,18 @@ export const EmptyPluginCard = ({ type, typeformLink }) => {
 };
 
 export const ModuleDefinitionCard = ({
-  pluginModule,
+  taskType,
   isFetching
 }: {
   isFetching: boolean;
-  pluginModule: any;
+  taskType: TaskType;
 }) => {
+  const hubData = useSelector(HubData);
+  const path = useMemo(() => {
+    const titleAsType = taskType?.metadata?.properties?.title?.toLowerCase()?.replace(/\s/g, "-");
+    return `/${hubData?.name}/create-${titleAsType}`;
+  }, [hubData]);
+
   return (
     <GridCard
       sx={{
@@ -253,7 +262,7 @@ export const ModuleDefinitionCard = ({
           color: "white",
           variant: "subtitle1"
         }}
-        title={`${pluginModule?.metadata?.properties?.title}`}
+        title={`${taskType?.metadata?.properties?.title}`}
       />
       <CardContent
         sx={{
@@ -262,34 +271,25 @@ export const ModuleDefinitionCard = ({
           flexDirection: "column"
         }}
       >
-        <Stack flex={1} maxWidth="80%" mx="auto">
-          <Typography variant="body" textAlign="center" color="white">
-            {pluginModule?.metadata?.properties?.shortDescription}
-          </Typography>
-        </Stack>
+        <Typography variant="body" textAlign="left" color="white">
+          {taskType?.metadata?.properties?.shortDescription}
+        </Typography>
 
         <Button
-          variant="contained"
+          type="button"
           color="offWhite"
+          variant="outlined"
+          size="medium"
           sx={{ mt: 2 }}
-
+          component={Link}
+          startIcon={<AddIcon />}
+          to={{
+            pathname: path,
+            search: `?taskId=${taskType?.taskId}`
+          }}
         >
-          Create Contribution
+          Contribution
         </Button>
-
-        {/* <Stack direction="row" justifyContent="flex-end">
-          <Typography
-            className="text-secondary"
-            sx={{
-              mr: "2px",
-              fontWeight: "bold",
-              fontFamily: "FractulAltBold",
-              fontSize: "12px"
-            }}
-          >
-            {pluginModule?.metadata?.name}
-          </Typography>
-        </Stack> */}
       </CardContent>
     </GridCard>
   );
