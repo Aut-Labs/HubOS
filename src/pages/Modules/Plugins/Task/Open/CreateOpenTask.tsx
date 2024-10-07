@@ -29,6 +29,8 @@ import {
 } from "../Shared/StyledFields";
 import { useCreateOpenTaskContributionMutation } from "@api/contributions.api";
 import { OpenTaskContribution } from "@api/contribution.model";
+import SuccessDialog from "@components/Dialog/SuccessPopup";
+import SubmitDialog from "@components/Dialog/SubmitDialog";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -87,14 +89,14 @@ const CreateOpenTask = () => {
   const { control, handleSubmit, getValues, formState, watch } = useForm({
     mode: "onChange",
     defaultValues: {
-      title: "Test",
+      title: "",
       startDate: new Date(),
-      endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
-      description: "A test description",
+      endDate: null,
+      description: "",
       attachmentType: "",
       attachmentRequired: false,
-      textRequired: true,
-      weight: 4
+      textRequired: false,
+      weight: 0
     }
   });
   const values = watch();
@@ -127,9 +129,9 @@ const CreateOpenTask = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      navigate({
-        pathname: `/${hubData?.name}/contributions`
-      });
+      // navigate({
+      //   pathname: `/${hubData?.name}/contributions`
+      // });
     }
   }, [isSuccess, hubData]);
 
@@ -141,7 +143,25 @@ const CreateOpenTask = () => {
   return (
     <FormContainer onSubmit={handleSubmit(onSubmit)}>
       <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
-      <LoadingDialog open={isLoading} message="Creating contribution..." />
+      <SubmitDialog
+        open={isSuccess || isLoading}
+        mode={isSuccess ? "success" : "loading"}
+        backdropFilter={true}
+        message={isLoading ? "" : "Congratulations!"}
+        titleVariant="h2"
+        subtitle={
+          isLoading
+            ? "Creating contribution..."
+            : "Your submission has been created successfully!"
+        }
+        subtitleVariant="subtitle1"
+        handleClose={() => {
+          reset();
+          navigate({
+            pathname: `/${hubData?.name}/contributions`
+          });
+        }}
+      ></SubmitDialog>
 
       <Box
         sx={{

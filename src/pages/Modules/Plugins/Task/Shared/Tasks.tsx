@@ -15,18 +15,12 @@ import {
 import { memo, useMemo } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { TaskStatus } from "@store/model";
-import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useConfirmDialog } from "react-mui-confirm";
 import OverflowTooltip from "@components/OverflowTooltip";
 import AutLoading from "@components/AutLoading";
-import {
-  useRemoveTaskFromQuestMutation,
-  useRemoveTaskMutation
-} from "@api/onboarding.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import AddIcon from "@mui/icons-material/Add";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { HubData } from "@store/Hub/hub.reducer";
 import { useSelector } from "react-redux";
 import { useAccount } from "wagmi";
@@ -89,40 +83,40 @@ const TaskCard = ({
   const [searchParams] = useSearchParams();
   const hubData = useSelector(HubData);
   const { address: userAddress } = useAccount();
-  const [removeTask, { error, isError, isLoading, reset }] =
-    useRemoveTaskMutation();
+  // const [removeTask, { error, isError, isLoading, reset }] =
+  //   useRemoveTaskMutation();
 
-  const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
-    selectFromResult: ({ data }) => ({
-      plugin: (data || [])[0]
-    })
-  });
+  // const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
+  //   selectFromResult: ({ data }) => ({
+  //     plugin: (data || [])[0]
+  //   })
+  // });
 
-  const confimDelete = () =>
-    confirm({
-      title: "Are you sure you want to delete this task?",
-      onConfirm: () => {
-        removeTask({
-          userAddress,
-          task: row,
-          questId: +params.questId,
-          pluginTokenId: plugin.tokenId,
-          pluginAddress: plugin.pluginAddress,
-          hubAddress: searchParams.get(RequiredQueryParams.HubAddress)
-        });
-      }
-    });
+  // const confimDelete = () =>
+  //   confirm({
+  //     title: "Are you sure you want to delete this task?",
+  //     onConfirm: () => {
+  //       removeTask({
+  //         userAddress,
+  //         task: row,
+  //         questId: +params.questId,
+  //         pluginTokenId: plugin.tokenId,
+  //         pluginAddress: plugin.pluginAddress,
+  //         hubAddress: searchParams.get(RequiredQueryParams.HubAddress)
+  //       });
+  //     }
+  //   });
 
-  const path = useMemo(() => {
-    if (!plugin) return;
-    const stackType = plugin.metadata.properties.module.type;
-    const stack = `modules/${stackType}`;
-    // return `${stack}/${PluginDefinitionType[plugin.pluginDefinitionId]}`;
-  }, [plugin]);
+  // const path = useMemo(() => {
+  //   if (!plugin) return;
+  //   const stackType = plugin.metadata.properties.module.type;
+  //   const stack = `modules/${stackType}`;
+  //   // return `${stack}/${PluginDefinitionType[plugin.pluginDefinitionId]}`;
+  // }, [plugin]);
 
   return (
     <>
-      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      {/* <ErrorDialog handleClose={() => reset()} open={isError} message={error} /> */}
       <GridCard
         sx={{
           bgcolor: "nightBlack.main",
@@ -152,17 +146,17 @@ const TaskCard = ({
           subheaderTypographyProps={{
             color: "white"
           }}
-          action={
-            <IconButton
-              disabled={isLoading || !canDelete}
-              color="error"
-              onClick={() => {
-                confimDelete();
-              }}
-            >
-              <DeleteIcon />
-            </IconButton>
-          }
+          // action={
+          //   <IconButton
+          //     disabled={isLoading || !canDelete}
+          //     color="error"
+          //     onClick={() => {
+          //       confimDelete();
+          //     }}
+          //   >
+          //     <DeleteIcon />
+          //   </IconButton>
+          // }
           // title={row?.metadata?.name}
         />
         <CardContent

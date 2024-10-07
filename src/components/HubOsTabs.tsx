@@ -2,7 +2,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import { SxProps, useTheme } from "@mui/material";
-import { useState, memo } from "react";
+import { useState, memo, SyntheticEvent, CSSProperties, useEffect } from "react";
 
 interface HubOsTabParams {
   label: string | any;
@@ -58,7 +58,7 @@ function TabPanel(props: any) {
 }
 
 function HubOsTabs(props: HubOsParams) {
-  const [value, setSelectedIndex] = useState(props.selectedTabIndex || 0);
+  const [value, setSelectedIndex] = useState(0);
   const theme = useTheme();
 
   console.log("HubOsTabs", props);
@@ -72,6 +72,12 @@ function HubOsTabs(props: HubOsParams) {
     setSelectedIndex(index);
     props.selectedTab && props.selectedTab(index, null);
   };
+
+  useEffect(() => {
+    if (props.selectedTabIndex !== undefined) {
+      handleChangeIndex(props.selectedTabIndex);
+    }
+  }, [props.selectedTabIndex]);
 
   return (
     <Box

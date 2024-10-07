@@ -22,6 +22,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArchetypePieChart, { archetypeChartValues } from "./ArchetypePieChart";
 import EditIcon from "@assets/actions/edit.svg?react";
 import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
 import {
   useGetArchetypeAndStatsQuery,
   useSetArchetypeMutation
@@ -31,6 +32,9 @@ import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { calculateAV } from "@utils/av-calculator";
 import { HubArchetype, HubArchetypeParameters } from "@aut-labs/sdk";
 import { useState, useEffect, useMemo } from "react";
+import OverflowTooltip from "@components/OverflowTooltip";
+import { AutOsButton } from "@components/buttons";
+import { Link } from "react-router-dom";
 
 const GridCard = styled(Card)(({ theme }) => {
   return {
@@ -106,86 +110,187 @@ const ArchetypeCard = ({
   const theme = useTheme();
   const [isHovered, setIsHovered] = useState(false);
   return (
-    <GridCard
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={() =>
-        onSelect({
-          title,
-          description,
-          logo,
-          type
-        })
-      }
+    // <GridCard
+    //   onMouseEnter={() => setIsHovered(true)}
+    //   onMouseLeave={() => setIsHovered(false)}
+    //   onClick={() =>
+    //     onSelect({
+    //       title,
+    //       description,
+    //       logo,
+    //       type
+    //     })
+    //   }
+    //   sx={{
+    //     ...(!activeArchetype
+    //       ? {
+    //           bgcolor: "nightBlack.main"
+    //         }
+    //       : {
+    //           bgcolor: alpha(theme.palette.primary.main, 0.3)
+    //         }),
+    //     display: "flex",
+    //     flexDirection: "column",
+    //     justifyContent: "space-between",
+    //     borderColor: "divider",
+    //     borderRadius: "16px",
+    //     minHeight: "300px",
+    //     position: "relative",
+    //     boxShadow: 7,
+    //     width: {
+    //       xs: "100%",
+    //       md: "250px",
+    //       lg: "300px",
+    //       xxl: "350px"
+    //     }
+    //   }}
+    //   variant="outlined"
+    // >
+    //   <Overlay isHovered={isHovered} />
+    //   <CardMedia
+    //     sx={{ height: "140px", width: "140px", margin: "0 auto", mt: 2, mb: 0 }}
+    //     image={logo}
+    //     title={title}
+    //   />
+    //   <CardContent
+    //     sx={{
+    //       pt: 0,
+    //       display: "flex",
+    //       flexDirection: "column"
+    //     }}
+    //   >
+    //     <Title
+    //       fontFamily={"FractulAltBold"}
+    //       fontWeight={900}
+    //       color="white"
+    //       variant="subtitle1"
+    //       isHovered={isHovered}
+    //     >
+    //       {title}
+    //     </Title>
+    //     <Description
+    //       isHovered={isHovered}
+    //       textAlign="center"
+    //       color="white"
+    //       variant="body"
+    //     >
+    //       {description}
+    //     </Description>
+    //     <ChooseArchetypeBtn
+    //       onClick={() => onSelect(type)}
+    //       color="offWhite"
+    //       variant="outlined"
+    //       sx={{
+    //         width: "80%"
+    //       }}
+    //       size="large"
+    //       isHovered={isHovered}
+    //     >
+    //       {activeArchetype ? "Change archetype" : "Choose Archetype"}
+    //     </ChooseArchetypeBtn>
+    //   </CardContent>
+    // </GridCard>
+
+    <Box
       sx={{
-        ...(!activeArchetype
-          ? {
-              bgcolor: "nightBlack.main"
-            }
-          : {
-              bgcolor: alpha(theme.palette.primary.main, 0.3)
-            }),
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
+        backdropFilter: "blur(50px)",
+        backgroundColor: "rgba(128, 128, 128, 0.05)",
+        border: `1px solid ${theme.palette.offWhite.dark}`,
+        ...(activeArchetype && {
+          backgroundColor: alpha(theme.palette.primary.main, 0.3),
+          border: `1px solid ${theme.palette.primary.main}`
+        }),
+        borderRadius: "6px",
+        opacity: 1,
+        WebkitBackdropFilter: "blur(6px)",
+        padding: {
+          xs: "24px 24px",
+          md: "20px 20px",
+          xxl: "36px 32px"
+        },
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
-        borderColor: "divider",
-        borderRadius: "16px",
-        minHeight: "300px",
-        position: "relative",
-        boxShadow: 7,
-        width: {
-          xs: "100%",
-          md: "250px",
-          lg: "300px",
-          xxl: "350px"
-        }
+        animation: "none"
       }}
-      variant="outlined"
     >
-      <Overlay isHovered={isHovered} />
-      <CardMedia
-        sx={{ height: "140px", width: "140px", margin: "0 auto", mt: 2, mb: 0 }}
-        image={logo}
-        title={title}
-      />
-      <CardContent
-        sx={{
-          pt: 0,
-          display: "flex",
-          flexDirection: "column"
-        }}
-      >
-        <Title
-          fontFamily={"FractulAltBold"}
-          fontWeight={900}
-          color="white"
-          variant="subtitle1"
-          isHovered={isHovered}
-        >
-          {title}
-        </Title>
-        <Description
-          isHovered={isHovered}
-          textAlign="center"
-          color="white"
-          variant="body"
-        >
-          {description}
-        </Description>
-        <ChooseArchetypeBtn
-          onClick={() => onSelect(type)}
-          color="offWhite"
-          variant="outlined"
-          sx={{
-            width: "80%"
+      <Stack direction="column" justifyContent="center" display="flex">
+        <Box
+          style={{
+            flex: "2",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px"
           }}
-          size="large"
-          isHovered={isHovered}
         >
-          {activeArchetype ? "Change archetype" : "Choose Archetype"}
-        </ChooseArchetypeBtn>
-      </CardContent>
-    </GridCard>
+          <Box
+            sx={{
+              height: {
+                xs: "60px",
+                sm: "60px",
+                md: "60px",
+                xxl: "60px"
+              },
+              width: {
+                xs: "60px",
+                sm: "60px",
+                md: "60px",
+                xxl: "60px"
+              },
+              "@media (max-width: 370px)": {
+                height: "60px",
+                width: "60px"
+              },
+              minWidth: "60px",
+              position: "relative"
+            }}
+          >
+            <Avatar
+              variant="square"
+              sx={{
+                width: "100%",
+                height: "100%",
+                borderRadius: "50%",
+                background: "transparent"
+              }}
+              aria-label="avatar"
+              component={logo}
+            />
+          </Box>
+          <Typography
+            color="offWhite.main"
+            textAlign="center"
+            lineHeight={1}
+            variant="subtitle2"
+          >
+            {title}
+          </Typography>
+        </Box>
+      </Stack>
+      <Stack sx={{ mt: 2, mb: 2 }}>
+        <OverflowTooltip
+          typography={{
+            variant: "caption",
+            fontWeight: "400",
+            letterSpacing: "0.66px"
+          }}
+          maxLine={5}
+          text={description}
+        />
+        <AutOsButton
+          type="button"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 2 }}
+          // onClick={() => onSelect(type)}
+        >
+          <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
+            {activeArchetype ? "Change archetype" : "Choose Archetype"}
+          </Typography>
+        </AutOsButton>
+      </Stack>
+    </Box>
   );
 };
 
@@ -220,10 +325,9 @@ const ChooseYourArchetype = ({ setSelected, archetype }) => {
           }}
           variant="body"
         >
-          The archetype represents the KPI, the driver of your hub. Set up
-          your hub values, deliver, and thrive. The better you perform,
-          the more your hub credibility will grow. Read more about
-          Archetypes
+          The archetype represents the KPI, the driver of your hub. Set up your
+          hub values, deliver, and thrive. The better you perform, the more your
+          hub credibility will grow. Read more about Archetypes
         </Typography>
       </Box>
       <Grid container spacing={3} sx={{ flexGrow: 1 }}>

@@ -10,7 +10,8 @@ import {
   Stack,
   Tooltip,
   Typography,
-  styled
+  styled,
+  useTheme
 } from "@mui/material";
 import { memo, useMemo } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -23,6 +24,8 @@ import { LoadingButton } from "@mui/lab";
 import { Link } from "react-router-dom";
 import { TaskType } from "@api/models/task-type";
 import { HubData } from "@store/Hub/hub.reducer";
+import OverflowTooltip from "@components/OverflowTooltip";
+import { AutOsButton } from "@components/buttons";
 
 const GridCard = styled(Card)(({ theme }) => {
   return {
@@ -227,59 +230,69 @@ export const ModuleDefinitionCard = ({
   isFetching: boolean;
   taskType: TaskType;
 }) => {
+  const theme = useTheme();
   const hubData = useSelector(HubData);
   const path = useMemo(() => {
-    const titleAsType = taskType?.metadata?.properties?.title?.toLowerCase()?.replace(/\s/g, "-");
+    const titleAsType = taskType?.metadata?.properties?.title
+      ?.toLowerCase()
+      ?.replace(/\s/g, "-");
     return `/${hubData?.name}/create-${titleAsType}`;
   }, [hubData]);
 
   return (
-    <GridCard
+    <Box
       sx={{
-        bgcolor: "nightBlack.main",
-        borderColor: "divider",
-        borderRadius: "16px",
-        minHeight: "300px",
-        boxShadow: 7,
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
+        backdropFilter: "blur(50px)",
+        backgroundColor: "rgba(128, 128, 128, 0.05)",
+        border: `1px solid ${theme.palette.offWhite.dark}`,
+        borderRadius: "6px",
+        opacity: 1,
+        WebkitBackdropFilter: "blur(6px)",
+        padding: {
+          xs: "24px 24px",
+          md: "20px 20px",
+          xxl: "36px 32px"
+        },
         display: "flex",
-        flexDirection: "column"
+        flexDirection: "column",
+        animation: "none"
       }}
-      variant="outlined"
     >
-      <CardHeader
-        sx={{
-          alignItems: "center",
-          ".MuiCardHeader-action": {
-            mt: "3px"
-          },
-          display: "flex",
-          flexDirection: "column"
-        }}
-        titleTypographyProps={{
-          fontFamily: "FractulAltBold",
-          mb: 2,
-          fontWeight: 900,
-          color: "white",
-          variant: "subtitle1"
-        }}
-        title={`${taskType?.metadata?.properties?.title}`}
-      />
-      <CardContent
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column"
-        }}
-      >
-        <Typography variant="body" textAlign="left" color="white">
-          {taskType?.metadata?.properties?.shortDescription}
-        </Typography>
-
-        <Button
+      <Stack direction="column" justifyContent="center" display="flex">
+        <Box
+          style={{
+            flex: "2",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px"
+          }}
+        >
+          <Typography
+            color="offWhite.main"
+            textAlign="center"
+            lineHeight={1}
+            variant="subtitle2"
+          >
+            {taskType?.metadata?.properties?.title}
+          </Typography>
+        </Box>
+      </Stack>
+      <Stack sx={{ mt: 2, mb: 2 }}>
+        <OverflowTooltip
+          typography={{
+            variant: "caption",
+            fontWeight: "400",
+            letterSpacing: "0.66px"
+          }}
+          maxLine={5}
+          text={taskType?.metadata?.properties?.shortDescription}
+        />
+        <AutOsButton
           type="button"
-          color="offWhite"
+          color="primary"
           variant="outlined"
-          size="medium"
           sx={{ mt: 2 }}
           component={Link}
           startIcon={<AddIcon />}
@@ -288,10 +301,12 @@ export const ModuleDefinitionCard = ({
             search: `?taskId=${taskType?.taskId}`
           }}
         >
-          Contribution
-        </Button>
-      </CardContent>
-    </GridCard>
+          <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
+            Contribution
+          </Typography>
+        </AutOsButton>
+      </Stack>
+    </Box>
   );
 };
 

@@ -4,11 +4,13 @@ import { fetchHub, updateHub } from "@api/hub.api";
 import { createSelector } from "reselect";
 import { HubOSHub } from "@api/hub.model";
 import { HubOSAutID } from "@api/aut.model";
+import { TaskType } from "@api/models/task-type";
 
 export interface HubState {
   selectedHubAddress: string;
   hubs: HubOSHub[];
   autID: HubOSAutID;
+  taskTypes: TaskType[];
   status: ResultState;
 }
 
@@ -16,6 +18,7 @@ const initialState: HubState = {
   selectedHubAddress: null,
   hubs: [],
   autID: null,
+  taskTypes: [],
   status: ResultState.Idle
 };
 
@@ -85,5 +88,6 @@ export const HubData = createSelector(Hubs, HubAddress, (hubs, address) => {
   return hubs.find((c) => c.properties.address === address);
 });
 export const AutIDData = (state) => state.hub.autID as HubOSAutID;
+export const TaskTypes = (state) => state.hub.taskTypes as TaskType[];
 
 export default hubSlice.reducer;

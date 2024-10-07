@@ -8,6 +8,8 @@ import {
 import { useEffect, useState } from "react";
 import { environment } from "@api/environment";
 import { TaskType } from "@api/models/task-type";
+import { useDispatch } from "react-redux";
+import { hubUpdateState } from "@store/Hub/hub.reducer";
 
 const GET_TASK_TYPES = gql`
   query GetTaskTypes($skip: Int, $first: Int, $where: HubAdmin_filter) {
@@ -40,6 +42,7 @@ const fetchTaskTypesMetadata = (taskTypes: TaskType[]) => {
 };
 
 const useQueryTaskTypes = (props: QueryFunctionOptions<any, any> = {}) => {
+  const dispatch = useDispatch();
   const { data, loading, ...rest } = useQuery(GET_TASK_TYPES, {
     fetchPolicy: "cache-and-network",
     ...props
@@ -53,6 +56,7 @@ const useQueryTaskTypes = (props: QueryFunctionOptions<any, any> = {}) => {
       const fetch = async () => {
         setLoadingMetadata(true);
         const taskTypes = await Promise.all([...fetchTaskTypesMetadata(data?.tasks)]);
+        dispatch(hubUpdateState({ taskTypes }));
         setLoadingMetadata(false);
         setTaskTypes(taskTypes);
       };

@@ -32,14 +32,8 @@ const GridBox = styled(Box)(({ theme }) => {
   };
 });
 
-const TaskManager = () => {
+const TaskManager = ({ isLoading, data, refetch }) => {
   const dispatch = useAppDispatch();
-  const { data, loading: isLoading, refetch } = useQueryTaskTypes({
-    variables: {
-      skip: 0,
-      take: 1000
-    }
-  });
 
   useEffect(() => {
     dispatch(setTitle(`Modules`));

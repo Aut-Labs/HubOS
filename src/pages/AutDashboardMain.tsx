@@ -17,6 +17,7 @@ import Members from "./Members/Members";
 import TaskManager from "./TaskManager";
 import { AllTasks } from "./Modules/Plugins/Task/Shared/AllTasks";
 import CreateOpenTask from "./Modules/Plugins/Task/Open/CreateOpenTask";
+import useQueryTaskTypes from "@hooks/useQueryTaskTypes";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -40,6 +41,13 @@ const AutDashboardMain = () => {
   const { data: archetype } = useGetArchetypeAndStatsQuery(null, {
     refetchOnMountOrArgChange: false,
     skip: false
+  });
+
+  const { data, loading: isLoading, refetch } = useQueryTaskTypes({
+    variables: {
+      skip: 0,
+      take: 1000
+    }
   });
 
   console.log(archetype, "archetype");
@@ -139,8 +147,8 @@ const AutDashboardMain = () => {
                 <Route path="archetype" element={<Archetype />} />
                 <Route path="modules/dAut" element={<DAut />} />
                 <Route path="members" element={<Members />} />
-                <Route path="task-manager" element={<TaskManager />} />
-                <Route path="contributions" element={<AllTasks />} />
+                <Route path="task-manager" element={<TaskManager isLoading={isLoading} data={data} refetch={refetch} />} />
+                <Route path="contributions" element={<AllTasks data={data} />} />
                 <Route path="create-open-task" element={<CreateOpenTask />} />
                 {/* <Route path="tasks" element={<AllTasks />} /> */}
                 {/* {modulesRoutes?.routes?.length && (
