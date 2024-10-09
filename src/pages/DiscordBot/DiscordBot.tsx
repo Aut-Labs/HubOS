@@ -26,7 +26,7 @@ import { HubData } from "@store/Hub/hub.reducer";
 import { DAutAutID } from "@aut-labs/d-aut";
 import useQueryHubMembers from "@hooks/useQueryHubMembers";
 import HubOsTabs from "@components/HubOsTabs";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { AutOsButton } from "@components/buttons";
 import AutSDK, { Hub } from "@aut-labs/sdk";
@@ -45,26 +45,46 @@ function DiscordBot() {
     }
   });
 
-  const { mutateAsync: checkBotActive } = useMutation<any, void, string>({
-    mutationFn: (guildId) => {
+  // const { mutateAsync: checkBotActive } = useMutation<any, void, string>({
+  //   mutationFn: (guildId) => {
+  //     return axios.get(`http://localhost:4005/api/discord/check/${guildId}`);
+  //   }
+  // });
+
+  const hubData = useSelector(HubData);
+  console.log(hubData, "hubData");
+
+  const guildId = useMemo(() => {
+    const social = hubData.properties.socials.find((s) => s.type === "discord");
+    return social.metadata.guildId;
+  }, [hubData]);
+
+  const {
+    data: activeData,
+    isLoading,
+    isError,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ["checkBotActive"],
+    queryFn: () => {
       return axios.get(`http://localhost:4005/api/discord/check/${guildId}`);
-    }
+    },
+    enabled: !!guildId
   });
 
   useEffect(() => {
     dispatch(setTitle(`Hub - Everything Discord bot related.`));
   }, [dispatch]);
 
-  const hubData = useSelector(HubData);
-  console.log(hubData, "hubData");
-
   const handleAddBot = async () => {
     await activateBot();
   };
 
   const handleCheckBot = async () => {
-    const result = await checkBotActive("962324247152312410");
-    console.log(result, "result");
+    // const result = await checkBotActive("962324247152312410");
+    // console.log(result, "result");
+    refetch();
   };
 
   return (
@@ -74,38 +94,49 @@ function DiscordBot() {
       {/* {isLoading ? (
         <AutLoading width="130px" height="130px" />
       ) : ( */}
-      <Box>
-        <AutOsButton
-          onClick={handleAddBot}
-          type="button"
-          textTransform="uppercase"
-          color="primary"
-          // disabled={!formState.isValid}
-          variant="outlined"
-          sx={{
-            width: "250px"
-          }}
-        >
-          <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
-            Connect Discord Bot
-          </Typography>
-        </AutOsButton>
+      <Box
+        width="100%"
+        sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
+      >
+        {!activeData?.data?.active && (
+          <AutOsButton
+            onClick={handleAddBot}
+            type="button"
+            textTransform="uppercase"
+            color="primary"
+            // disabled={!formState.isValid}
+            variant="outlined"
+            sx={{
+              width: "250px"
+            }}
+          >
+            <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
+              Connect Discord Bot
+            </Typography>
+          </AutOsButton>
+        )}
 
-        <AutOsButton
-          onClick={handleCheckBot}
-          type="button"
-          textTransform="uppercase"
-          color="primary"
-          // disabled={!formState.isValid}
-          variant="outlined"
-          sx={{
-            width: "250px"
-          }}
-        >
-          <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
-            Check Bot Active
+        {activeData?.data?.active ? (
+          <Typography textAlign="center" color="white" variant="h3">
+            Bot is active
           </Typography>
-        </AutOsButton>
+        ) : (
+          <AutOsButton
+            onClick={handleCheckBot}
+            type="button"
+            textTransform="uppercase"
+            color="primary"
+            // disabled={!formState.isValid}
+            variant="outlined"
+            sx={{
+              width: "250px"
+            }}
+          >
+            <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
+              Check Bot Active
+            </Typography>
+          </AutOsButton>
+        )}
       </Box>
       {/* )} */}
     </Container>
