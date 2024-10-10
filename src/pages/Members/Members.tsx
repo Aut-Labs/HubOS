@@ -1,4 +1,4 @@
-import { useEffect, memo, useMemo } from "react";
+import { useEffect, memo, useMemo, useState } from "react";
 import Box from "@mui/material/Box";
 import { useAppDispatch } from "@store/store.model";
 import {
@@ -226,39 +226,12 @@ const MembersList = ({ members = [] }: { members: DAutAutID[] }) => {
         <HubMemberCard key={`role-item-${member?.name}`} member={member} />
       ))}
     </Box>
-    // <>
-    //   {members.length ? (
-    //     <GridBox sx={{ flexGrow: 1, mt: 6 }}>
-    //       {members.map((member, index) => (
-    //         <MemberCard
-    //           key={`member-plugin-${index}`}
-    //           member={member}
-    //           isFetching={false}
-    //         />
-    //       ))}
-    //     </GridBox>
-    //   ) : (
-    //     <Box
-    //       sx={{
-    //         display: "flex",
-    //         p: "10px 30px 30px 30px",
-    //         mt: "48px",
-    //         flexDirection: "column",
-    //         alignItems: "center",
-    //         justifyContent: "center"
-    //       }}
-    //     >
-    //       <Typography color="rgb(107, 114, 128)" variant="subtitle2">
-    //         There are no contributors with this role yet...
-    //       </Typography>
-    //     </Box>
-    //   )}
-    // </>
   );
 };
 
 function Members() {
   const dispatch = useAppDispatch();
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
   useEffect(() => {
     dispatch(setTitle(`Hub - Members & Roles in your Hub.`));
@@ -295,6 +268,12 @@ function Members() {
       group[roleName].push(member);
       return group;
     }, initializedTabs);
+    // set tab that has at least one member
+    setSelectedTabIndex(
+      Object.keys(groupedMembers).findIndex(
+        (role) => groupedMembers[role].length > 0
+      )
+    );
     return generateMemberTabs(groupedMembers);
   }, [hubData, data]);
 
@@ -343,7 +322,7 @@ function Members() {
       {isLoading ? (
         <AutLoading width="130px" height="130px" />
       ) : (
-        <HubOsTabs tabs={tabs} />
+        <HubOsTabs selectedTabIndex={selectedTabIndex} tabs={tabs} />
       )}
     </Container>
   );

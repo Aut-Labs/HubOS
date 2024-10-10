@@ -1,4 +1,4 @@
- 
+
 import {
   Dialog,
   DialogActions,
@@ -16,6 +16,7 @@ export const DialogWrapper = ({
   open,
   onClose = null,
   fullScreen = false,
+  backdropFilter = false,
   contentSx = {} as any
 }) => {
   const theme = useTheme();
