@@ -19,6 +19,7 @@ import DiscordBot from "./DiscordBot/DiscordBot";
 import { AllTasks } from "./Modules/Plugins/Task/Shared/AllTasks";
 import CreateOpenTask from "./Modules/Plugins/Task/Open/CreateOpenTask";
 import useQueryTaskTypes from "@hooks/useQueryTaskTypes";
+import CreateGathering from "./DiscordBot/CreateGathering";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -44,7 +45,11 @@ const AutDashboardMain = () => {
     skip: false
   });
 
-  const { data, loading: isLoading, refetch } = useQueryTaskTypes({
+  const {
+    data,
+    loading: isLoading,
+    refetch
+  } = useQueryTaskTypes({
     variables: {
       skip: 0,
       take: 1000
@@ -148,10 +153,32 @@ const AutDashboardMain = () => {
                 <Route path="archetype" element={<Archetype />} />
                 <Route path="modules/dAut" element={<DAut />} />
                 <Route path="members" element={<Members />} />
-                <Route path="discord-bot" element={<DiscordBot />} />
-                <Route path="task-manager" element={<TaskManager isLoading={isLoading} data={data} refetch={refetch} />} />
-                <Route path="contributions" element={<AllTasks data={data} />} />
+                <Route
+                  path="discord-bot"
+                  element={
+                    <DiscordBot
+                    />
+                  }
+                />
+                <Route
+                  path="task-manager"
+                  element={
+                    <TaskManager
+                      isLoading={isLoading}
+                      data={data}
+                      refetch={refetch}
+                    />
+                  }
+                />
+                <Route
+                  path="contributions"
+                  element={<AllTasks data={data} />}
+                />
                 <Route path="create-open-task" element={<CreateOpenTask />} />
+                <Route
+                  path="create-discord-gathering"
+                  element={<CreateGathering />}
+                />
                 {/* <Route path="tasks" element={<AllTasks />} /> */}
                 {/* {modulesRoutes?.routes?.length && (
                 <Route
