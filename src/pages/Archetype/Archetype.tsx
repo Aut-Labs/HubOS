@@ -99,7 +99,7 @@ const Overlay = styled("div", {
   transition: theme.transitions.create("background")
 }));
 
-const ArchetypeCard = ({
+export const ArchetypeCard = ({
   title,
   description,
   logo,

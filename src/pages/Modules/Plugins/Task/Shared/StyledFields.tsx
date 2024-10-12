@@ -40,17 +40,17 @@ export const SliderFieldWrapper = styled(Box)(({ theme }) => ({
 }));
 
 export const CommitmentSliderWrapper = styled("div")(({ theme }) => ({
-  width: "100%",
-  maxWidth: "100%",
-  marginTop: 0,
-  marginBottom: theme.spacing(2),
-  [theme.breakpoints.up("sm")]: {
-    maxWidth: "650px"
-  },
-  [theme.breakpoints.up("xxl")]: {
-    maxWidth: "800px"
-  },
-  [theme.breakpoints.down("lg")]: {
-    marginTop: 0
-  }
+  // width: "100%",
+  // maxWidth: "100%",
+  // marginTop: 0,
+  // marginBottom: theme.spacing(2),
+  // [theme.breakpoints.up("sm")]: {
+  //   maxWidth: "650px"
+  // },
+  // [theme.breakpoints.up("xxl")]: {
+  //   maxWidth: "800px"
+  // },
+  // [theme.breakpoints.down("lg")]: {
+  //   marginTop: 0
+  // }
 }));

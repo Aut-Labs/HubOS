@@ -31,11 +31,11 @@ const menuItems = (hubName: string): SidebarMenuItem[] => [
     exact: true,
     icon: DashboardIcon
   },
-  {
-    title: "Your Archertype",
-    route: `/${hubName}/archetype`,
-    icon: ArchertypeIcon
-  },
+  // {
+  //   title: "Your Archertype",
+  //   route: `/${hubName}/archetype`,
+  //   icon: ArchertypeIcon
+  // },
   {
     title: "Admins",
     route: `/${hubName}/admins`,

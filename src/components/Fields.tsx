@@ -215,7 +215,7 @@ function ActionList(props: PickersActionBarProps) {
         variant="outlined"
         color="primary"
         sx={{
-          my: "4px",
+          my: "10px",
           "&.MuiButton-root": {
             width: "100px",
             height: "35px",

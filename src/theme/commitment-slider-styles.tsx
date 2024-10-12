@@ -137,9 +137,8 @@ export default (theme: Theme) =>
     ...theme.components.MuiSelect,
     styleOverrides: {
       root: {
-        width: "354px",
+        // width: "354px",
         padding: "0 !important",
-        marginLeft: "-34px",
         border: "none",
         "&.MuiSlider-colorPrimary": {
           color: "#14ECEC",
@@ -189,18 +188,22 @@ export default (theme: Theme) =>
           width: "32px",
           height: "6px",
           marginRight: "2px",
+          marginLeft: "-32px",
 
           [theme.breakpoints.up("sm")]: {
             width: "52px",
-            height: "9px"
+            height: "9px",
+            marginLeft: "-62px"
           },
           [theme.breakpoints.up("md")]: {
             width: "52px",
-            height: "9px"
+            height: "9px",
+            marginLeft: "-62px"
           },
           [theme.breakpoints.up("xxl")]: {
             width: "70px",
-            height: "12px"
+            height: "12px",
+            marginLeft: "-76px"
           },
 
           "&.MuiSlider-markActive": {

@@ -18,7 +18,10 @@ import AutIconLabel from "@components/AutIconLabel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { AutIDData, HubData } from "@store/Hub/hub.reducer";
 import { ArchetypePie } from "../Archetype/ArchetypePie";
-import { HubArchetype } from "@aut-labs/sdk";
+import { AutIDProperties, HubArchetype } from "@aut-labs/sdk";
+import { ArchetypeCard } from "../Archetype/Archetype";
+import { archetypeChartValues } from "../Archetype/ArchetypePieChart";
+import { HubOSAutID } from "@api/aut.model";
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -62,7 +65,7 @@ const LeftWrapper = styled(Box)(({ theme }) => ({
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  height: "70%",
+  height: "80%",
   width: "100%",
   maxWidth: "480px",
   backdropFilter: "blur(12px)",
@@ -92,7 +95,7 @@ const RightWrapper = styled(Box)(({ theme }) => ({
   marginLeft: "25px",
   height: "100%",
   position: "relative",
-  // width: "70%",
+  // width: "80%",
   flex: 1,
   [theme.breakpoints.down("md")]: {
     width: "100%",
@@ -122,7 +125,7 @@ const calculateFontSize = (name: string) => {
   }
 };
 
-const Dashboard = () => {
+const Dashboard = ({ members }: { members: HubOSAutID<AutIDProperties>[] }) => {
   const dispatch = useDispatch();
   const autIDData = useSelector(AutIDData);
   const theme = useTheme();
@@ -133,6 +136,13 @@ const Dashboard = () => {
       return null;
     }
     return ArchetypeTypes[HubArchetype.SIZE];
+  }, [hubData]);
+
+  const archetypeState = useMemo(() => {
+    const states = archetypeChartValues(
+      hubData.properties.archetype.parameters
+    );
+    return states[hubData.properties.archetype.default];
   }, [hubData]);
 
   useEffect(() => {
@@ -159,9 +169,19 @@ const Dashboard = () => {
           sx={{
             width: "100%",
             maxWidth: "400px",
-            px: "24px"
+            px: "24px",
+            height: "100%"
           }}
         >
+          <Typography
+            variant="h3"
+            color="offWhite.main"
+            textAlign="center"
+            mt={2}
+          >
+            Your Hub
+          </Typography>
+
           <AutContainer>
             <Stack
               sx={{
@@ -174,7 +194,7 @@ const Dashboard = () => {
                   display: "flex",
                   flexDirection: "row",
                   gap: "12px",
-                  justifyContent: "center"
+                  justifyContent: "flex-start"
                 }}
               >
                 <Box
@@ -202,21 +222,22 @@ const Dashboard = () => {
                 >
                   <Avatar
                     sx={{
-                      width: "100%",
+                      width: "unset",
                       height: "100%",
                       borderRadius: "0",
-                      background: "transparent"
+                      background: "transparent",
                     }}
                     aria-label="avatar"
+                    src={ipfsCIDToHttpUrl(hubData?.image as string)}
                   >
-                    <img
+                    {/* <img
                       src={ipfsCIDToHttpUrl(hubData?.image as string)}
                       style={{
                         objectFit: "contain",
                         width: "100%",
                         height: "100%"
                       }}
-                    />
+                    /> */}
                   </Avatar>
                 </Box>
 
@@ -297,7 +318,7 @@ const Dashboard = () => {
                         color: "#FFF"
                       }}
                     >
-                      {/* {hub?.properties.members} */}
+                      {members?.length}
                     </Typography>
                     <Typography
                       fontWeight="bold"
@@ -429,9 +450,285 @@ const Dashboard = () => {
           </AutContainer>
         </Stack>
       </LeftWrapper>
-      <RightWrapper>
-        <ArchetypePie archetype={hubData?.properties?.archetype} />
-      </RightWrapper>
+      <LeftWrapper>
+        {/* <ArchetypePie archetype={hubData?.properties?.archetype} /> */}
+        {/* <ArchetypeCard {...archetypeState} /> */}
+        <Stack
+          sx={{
+            width: "100%",
+            maxWidth: "400px",
+            px: "24px",
+            height: "100%"
+          }}
+        >
+          <Typography
+            variant="h3"
+            color="offWhite.main"
+            textAlign="center"
+            mt={2}
+          >
+            Your Archetype
+          </Typography>
+          <AutContainer>
+            <Stack
+              sx={{
+                width: "100%",
+                maxWidth: "400px"
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "12px",
+                  justifyContent: "flex-start"
+                }}
+              >
+                <Box
+                  sx={{
+                    flex: "1",
+                    height: {
+                      xs: "120px",
+                      sm: "120px",
+                      md: "120px",
+                      xxl: "130px"
+                    },
+                    width: {
+                      xs: "120px",
+                      sm: "120px",
+                      md: "120px",
+                      xxl: "130px"
+                    },
+                    "@media (max-width: 370px)": {
+                      height: "100px",
+                      width: "100px"
+                    },
+                    minWidth: "120px",
+                    position: "relative"
+                  }}
+                >
+                  <Avatar
+                    sx={{
+                      width: "unset",
+                      height: "100px",
+                      borderRadius: "0",
+                      background: "transparent"
+                    }}
+                    aria-label="avatar"
+                    component={archetypeState.logo}
+                  />
+                </Box>
+
+                <div
+                  style={{
+                    flex: "1",
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "column",
+                    justifyContent: "center"
+                  }}
+                >
+                  <Typography
+                    color="offWhite.main"
+                    textAlign="center"
+                    lineHeight={1}
+                    variant="h3"
+                    marginBottom={2}
+                    fontSize={calculateFontSize(archetypeState.title as string)}
+                  >
+                    {archetypeState.title}
+                  </Typography>
+                </div>
+              </Box>
+
+              <Box
+                sx={{
+                  marginTop: theme.spacing(2)
+                }}
+              >
+                <Box sx={{ padding: "8px 0px" }}>
+                  <Typography
+                    sx={{ flex: "1" }}
+                    color="offWhite.main"
+                    textAlign="left"
+                    variant="body"
+                  >
+                    {hubData?.description || "No description yet..."}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Stack
+                direction="row"
+                sx={{
+                  marginTop: 3
+                }}
+              >
+                <Stack
+                  width="100%"
+                  direction="column"
+                  justifyContent="space-around"
+                  sx={{
+                    marginTop: theme.spacing(2)
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      marginRight: "16px",
+                      mb: "8px",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center"
+                    }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulAltBold"
+                      variant="subtitle1"
+                      sx={{
+                        mb: "0px",
+                        color: "#FFF"
+                      }}
+                    >
+                      1
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulRegular"
+                      variant="caption"
+                      sx={{
+                        mb: "0px",
+                        color: "#A7B1C4"
+                      }}
+                    >
+                      Your Av:
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      marginRight: "16px",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center"
+                    }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulAltBold"
+                      variant="subtitle1"
+                      sx={{
+                        mb: "0px",
+                        color: "#FFF"
+                      }}
+                    >
+                      #1
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulRegular"
+                      variant="caption"
+                      sx={{
+                        mb: "0px",
+                        color: "#A7B1C4"
+                      }}
+                    >
+                      Period no.
+                    </Typography>
+                  </Box>
+                </Stack>
+                <Stack
+                  width="100%"
+                  direction="column"
+                  justifyContent="space-around"
+                  sx={{
+                    marginTop: theme.spacing(2)
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      marginRight: "16px",
+                      mb: "8px",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center"
+                    }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulAltBold"
+                      variant="subtitle1"
+                      sx={{
+                        mb: "0px",
+                        color: "#FFF"
+                      }}
+                    >
+                      n+1
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulRegular"
+                      variant="caption"
+                      sx={{
+                        mb: "0px",
+                        color: "#A7B1C4"
+                      }}
+                    >
+                      exp. AV in period:
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      marginRight: "16px",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center"
+                    }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulAltBold"
+                      variant="subtitle1"
+                      sx={{
+                        mb: "0px",
+                        color: "#FFF"
+                      }}
+                    >
+                      0%
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulRegular"
+                      variant="caption"
+                      sx={{
+                        mb: "0px",
+                        color: "#A7B1C4"
+                      }}
+                    >
+                      how you’re doing:
+                    </Typography>
+                  </Box>
+                </Stack>
+              </Stack>
+
+              <Box
+                marginTop={theme.spacing(2)}
+                sx={{
+                  display: "flex",
+                  marginTop: theme.spacing(2),
+                  flexDirection: "row",
+                  gap: "12px",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              ></Box>
+            </Stack>
+          </AutContainer>
+        </Stack>
+      </LeftWrapper>
     </Container>
   );
 };
