@@ -7,113 +7,115 @@ import useQueryContributions from "@hooks/useQueryContributions";
 import Tasks from "./Tasks";
 import { TaskContributionNFT } from "@aut-labs/sdk";
 import OverflowTooltip from "@components/OverflowTooltip";
+import { ContributionsTable } from "./ContributionsTable";
+import { TaskStatus } from "@store/model";
 
-const ContributionCard = ({
-  contribution
-}: {
-  contribution: TaskContributionNFT;
-}) => {
-  const theme = useTheme();
+// const ContributionCard = ({
+//   contribution
+// }: {
+//   contribution: TaskContributionNFT;
+// }) => {
+//   const theme = useTheme();
 
-  return (
-    <>
-      <Box
-        sx={{
-          alignItems: "flex-start",
-          justifyContent: "flex-start",
-          backdropFilter: "blur(50px)",
-          backgroundColor: "rgba(128, 128, 128, 0.05)",
-          border: `1px solid ${theme.palette.offWhite.dark}`,
-          borderRadius: "6px",
-          opacity: 1,
-          WebkitBackdropFilter: "blur(6px)",
-          padding: {
-            xs: "24px 24px",
-            md: "20px 20px",
-            xxl: "36px 32px"
-          },
-          display: "flex",
-          flexDirection: "column",
-          animation: "none"
-        }}
-      >
-        <Stack direction="column" justifyContent="center" display="flex">
-          <Box
-            style={{
-              flex: "2",
-              display: "flex",
-              alignItems: "center",
-              gap: "12px"
-            }}
-          >
-            <Box
-              sx={{
-                height: {
-                  xs: "60px",
-                  sm: "60px",
-                  md: "60px",
-                  xxl: "60px"
-                },
-                width: {
-                  xs: "60px",
-                  sm: "60px",
-                  md: "60px",
-                  xxl: "60px"
-                },
-                "@media (max-width: 370px)": {
-                  height: "60px",
-                  width: "60px"
-                },
-                minWidth: "60px",
-                position: "relative"
-              }}
-            >
-              {/* <Avatar
-                variant="circular"
-                sx={{
-                  width: "100%",
-                  height: "100%",
-                  borderRadius: "50%",
-                  background: "transparent"
-                }}
-                aria-label="avatar"
-              >
-                <img
-                  src={ipfsCIDToHttpUrl(member?.properties?.avatar as string)}
-                  style={{
-                    objectFit: "contain",
-                    width: "100%",
-                    height: "100%"
-                  }}
-                />
-              </Avatar> */}
-            </Box>
+//   return (
+//     <>
+//       <Box
+//         sx={{
+//           alignItems: "flex-start",
+//           justifyContent: "flex-start",
+//           backdropFilter: "blur(50px)",
+//           backgroundColor: "rgba(128, 128, 128, 0.05)",
+//           border: `1px solid ${theme.palette.offWhite.dark}`,
+//           borderRadius: "6px",
+//           opacity: 1,
+//           WebkitBackdropFilter: "blur(6px)",
+//           padding: {
+//             xs: "24px 24px",
+//             md: "20px 20px",
+//             xxl: "36px 32px"
+//           },
+//           display: "flex",
+//           flexDirection: "column",
+//           animation: "none"
+//         }}
+//       >
+//         <Stack direction="column" justifyContent="center" display="flex">
+//           <Box
+//             style={{
+//               flex: "2",
+//               display: "flex",
+//               alignItems: "center",
+//               gap: "12px"
+//             }}
+//           >
+//             <Box
+//               sx={{
+//                 height: {
+//                   xs: "60px",
+//                   sm: "60px",
+//                   md: "60px",
+//                   xxl: "60px"
+//                 },
+//                 width: {
+//                   xs: "60px",
+//                   sm: "60px",
+//                   md: "60px",
+//                   xxl: "60px"
+//                 },
+//                 "@media (max-width: 370px)": {
+//                   height: "60px",
+//                   width: "60px"
+//                 },
+//                 minWidth: "60px",
+//                 position: "relative"
+//               }}
+//             >
+//               {/* <Avatar
+//                 variant="circular"
+//                 sx={{
+//                   width: "100%",
+//                   height: "100%",
+//                   borderRadius: "50%",
+//                   background: "transparent"
+//                 }}
+//                 aria-label="avatar"
+//               >
+//                 <img
+//                   src={ipfsCIDToHttpUrl(member?.properties?.avatar as string)}
+//                   style={{
+//                     objectFit: "contain",
+//                     width: "100%",
+//                     height: "100%"
+//                   }}
+//                 />
+//               </Avatar> */}
+//             </Box>
 
-            <Typography
-              color="offWhite.main"
-              textAlign="center"
-              lineHeight={1}
-              variant="subtitle2"
-            >
-              {contribution?.name}
-            </Typography>
-          </Box>
-          </Stack>
-          <Stack sx={{ mt: 2, mb: 2 }}>
-            <OverflowTooltip
-              typography={{
-                variant: "caption",
-                fontWeight: "400",
-                letterSpacing: "0.66px"
-              }}
-              maxLine={3}
-              text={contribution?.description}
-            />
-        </Stack>
-      </Box>
-    </>
-  );
-};
+//             <Typography
+//               color="offWhite.main"
+//               textAlign="center"
+//               lineHeight={1}
+//               variant="subtitle2"
+//             >
+//               {contribution?.name}
+//             </Typography>
+//           </Box>
+//         </Stack>
+//         <Stack sx={{ mt: 2, mb: 2 }}>
+//           <OverflowTooltip
+//             typography={{
+//               variant: "caption",
+//               fontWeight: "400",
+//               letterSpacing: "0.66px"
+//             }}
+//             maxLine={3}
+//             text={contribution?.description}
+//           />
+//         </Stack>
+//       </Box>
+//     </>
+//   );
+// };
 
 export const AllTasks = ({ data: taskTypes }) => {
   const theme = useTheme();
@@ -140,7 +142,11 @@ export const AllTasks = ({ data: taskTypes }) => {
     }
   });
 
-  console.log(data, "data");
+  const updatedContributions = data?.map((item) => ({
+    ...item,
+    contributionType: "open",
+    status: TaskStatus.Created
+  }));
 
   // const isLoading = false;
   // const data = {
@@ -172,7 +178,28 @@ export const AllTasks = ({ data: taskTypes }) => {
         <AutLoading width="130px" height="130px" />
       ) : (
         <>
-          <Box
+          <Container maxWidth="md">
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                flex: 1,
+                position: "relative"
+              }}
+            >
+              <Typography textAlign="center" color="white" variant="h3">
+                Contributions
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                mt: theme.spacing(4)
+              }}
+            >
+              <ContributionsTable contributions={updatedContributions} />
+            </Box>
+          </Container>
+          {/* <Box
             sx={{
               marginTop: theme.spacing(3),
               display: "grid",
@@ -206,7 +233,7 @@ export const AllTasks = ({ data: taskTypes }) => {
               />
             ))}
           </Box>
-
+          
           {!isLoading && !data?.length && (
             <Box
               sx={{
@@ -222,7 +249,7 @@ export const AllTasks = ({ data: taskTypes }) => {
                 No contributions found...
               </Typography>
             </Box>
-          )}
+          )} */}
         </>
       )}
     </Container>
