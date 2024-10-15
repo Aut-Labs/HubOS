@@ -74,17 +74,9 @@ const TableListItem = memo((data: any) => {
         "&:last-child td, &:last-child th": { border: 0 },
         "td, th": {
           padding: theme.spacing(2),
+          width: "15%",
           "&:nth-of-type(1)": {
-            width: "50%"
-          },
-          "&:nth-of-type(2)": {
-            width: "20%"
-          },
-          "&:nth-of-type(3)": {
-            width: "15%"
-          },
-          "&:nth-of-type(4)": {
-            width: "15%"
+            width: "40%"
           }
         }
       }}
@@ -111,6 +103,11 @@ const TableListItem = memo((data: any) => {
             {contributionType}
           </Typography>
         </Box>
+      </StyledTableCell>
+      <StyledTableCell align="left">
+        <Typography variant="body" fontWeight="normal" color="white">
+          {`${row?.properties?.points} ${row?.properties?.points === 1 ? "pt" : "pts"}`}
+        </Typography>
       </StyledTableCell>
       <StyledTableCell align="left">
         <Box
@@ -198,6 +195,15 @@ export const ContributionsTable = ({ contributions }) => {
                 color="offWhite.dark"
               >
                 Type
+              </Typography>
+            </StyledTableCell>
+            <StyledTableCell align="left">
+              <Typography
+                variant="body"
+                fontWeight="normal"
+                color="offWhite.dark"
+              >
+                Points
               </Typography>
             </StyledTableCell>
             <StyledTableCell align="left">
