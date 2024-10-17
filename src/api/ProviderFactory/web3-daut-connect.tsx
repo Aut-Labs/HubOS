@@ -11,11 +11,13 @@ import { EnvMode, autUrls, environment } from "@api/environment";
 import AutSDK from "@aut-labs/sdk";
 import { MultiSigner } from "@aut-labs/sdk/dist/models/models";
 import { NetworkConfig } from "./network.config";
-import { useAutConnector } from "@aut-labs/connector";
+import { AutWalletConnector, useAutConnector } from "@aut-labs/connector";
 import { hubUpdateState } from "@store/Hub/hub.reducer";
 import { resetState } from "@store/store";
 import { AUTH_TOKEN_KEY } from "@api/auth.api";
 import { HubOSAutID } from "@api/aut.model";
+import { AppTitle } from "@store/ui-reducer";
+import AutLoading from "@components/AutLoading";
 
 function Web3DautConnect({
   setLoading
@@ -177,6 +179,20 @@ function Web3DautConnect({
 
   return (
     <>
+      <AutWalletConnector
+        connect={connect}
+        titleContent={
+          <AppTitle
+            mb={{
+              xs: "16px",
+              lg: "24px",
+              xxl: "32px"
+            }}
+            variant="h2"
+          />
+        }
+        loadingContent={<AutLoading width="130px" height="130px" />}
+      />
       <d-aut
         style={{
           display: "none",

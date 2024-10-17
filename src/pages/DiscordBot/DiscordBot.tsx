@@ -48,9 +48,9 @@ const data = [
       name: "Aut Labs Plugin",
       properties: {
         shortDescription:
-        "A contribution to organize your Hub. Create a Discord Poll and reward participation.",
+          "A contribution to organize your Hub. Create a Discord Poll and reward participation.",
         longDescription:
-        "A contribution to organize your Hub. Create a Discord Poll and reward participation.",
+          "A contribution to organize your Hub. Create a Discord Poll and reward participation.",
         author: "Āut Labs",
         tags: ["Workflow"],
         contract: "TaskFactory",
@@ -168,7 +168,7 @@ function DiscordBot() {
         }}
       >
         {!activeData?.data?.active && (
-          <Stack gap={2}>
+          <Stack gap={2} alignItems="center">
             <Typography textAlign="center" color="white" variant="h3">
               Discord Bot Inactive
             </Typography>
@@ -179,6 +179,7 @@ function DiscordBot() {
               color="primary"
               variant="outlined"
               sx={{
+                mt: 6,
                 width: "250px"
               }}
             >
@@ -189,7 +190,7 @@ function DiscordBot() {
           </Stack>
         )}
 
-        {activeData?.data?.active ? (
+        {activeData?.data?.active && (
           <Stack gap={2}>
             <Typography textAlign="center" color="white" variant="h3">
               Discord Bot
@@ -239,21 +240,6 @@ function DiscordBot() {
               </>
             )}
           </Stack>
-        ) : (
-          <AutOsButton
-            onClick={() => refetch()}
-            type="button"
-            textTransform="uppercase"
-            color="primary"
-            variant="outlined"
-            sx={{
-              width: "250px"
-            }}
-          >
-            <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
-              Check Bot Active
-            </Typography>
-          </AutOsButton>
         )}
       </Box>
     </Container>
