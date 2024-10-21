@@ -20,6 +20,10 @@ import { AllTasks } from "./Modules/Plugins/Task/Shared/AllTasks";
 import CreateOpenTask from "./Modules/Plugins/Task/Open/CreateOpenTask";
 import useQueryTaskTypes from "@hooks/useQueryTaskTypes";
 import CreateGathering from "./DiscordBot/CreateGathering";
+import CreatXCommentTask from "./TwitterTasks/CreatXCommentTask";
+import CreateXLikeTask from "./TwitterTasks/CreateXLikeTask";
+import CreateXFollowTask from "./TwitterTasks/CreateXFollowTask";
+import CreateGithubCommitTask from "./GithubTasks/CreateGithubCommitTask";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -174,11 +178,26 @@ const AutDashboardMain = () => {
                   path="contributions"
                   element={<AllTasks data={data} />}
                 />
-                <Route path="create-open-task" element={<CreateOpenTask />} />
+                <Route path="create-open-task" element={<CreateOpenTask />} />  <Route
+                  path="create-github-commit-task"
+                  element={<CreateGithubCommitTask />}
+                />
                 <Route
                   path="create-discord-gathering"
                   element={<CreateGathering />}
                 />
+                <Route
+                 path="create-x-follow-task"
+                 element={<CreateXFollowTask />}
+               />
+               <Route
+                path="create-x-comment-task"
+                element={<CreatXCommentTask />}
+              />
+                <Route
+                path="create-twixtter-like-task"
+                element={<CreateXLikeTask />}
+              />
                 {/* <Route path="tasks" element={<AllTasks />} /> */}
                 {/* {modulesRoutes?.routes?.length && (
                 <Route

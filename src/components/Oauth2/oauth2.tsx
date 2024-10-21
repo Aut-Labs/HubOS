@@ -190,7 +190,7 @@ export const useOAuthSocials = () => {
           } else {
             xCleanUp(xIntervalRef);
             const response = await axios.post(
-              `${environment.apiUrl}/aut/config/oauth2AccessTokenX`,
+              `http://localhost:4005/api/aut/config/oauth2AccessTokenX`,
               {
                 code: message.data.payload.code,
                 callbackUrl
