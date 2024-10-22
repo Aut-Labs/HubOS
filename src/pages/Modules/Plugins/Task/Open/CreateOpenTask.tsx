@@ -96,7 +96,8 @@ const CreateOpenTask = () => {
       attachmentType: "",
       attachmentRequired: false,
       textRequired: false,
-      weight: 0
+      weight: 0,
+      quantity: 1
     }
   });
   const values = watch();
@@ -120,7 +121,7 @@ const CreateOpenTask = () => {
         startDate: dateToUnix(values.startDate),
         endDate: dateToUnix(values.endDate),
         points: values.weight,
-        quantity: 1,
+        quantity: values.quantity,
         uri: ""
       }
     });
@@ -152,7 +153,7 @@ const CreateOpenTask = () => {
         subtitle={
           isLoading
             ? "Creating contribution..."
-            : "Your submission has been created successfully!"
+            : "Your contribution has been created successfully!"
         }
         subtitleVariant="subtitle1"
         handleClose={() => {
@@ -219,57 +220,114 @@ const CreateOpenTask = () => {
           }
         }}
       >
-        <TextFieldWrapper>
-          <Typography
-            variant="caption"
-            color="offWhite.main"
-            mb={theme.spacing(1)}
+        <Stack direction="row" gap={4}>
+          <TextFieldWrapper
+            sx={{
+              width: "100%"
+            }}
           >
-            Title
-          </Typography>
-          <Controller
-            name="title"
-            control={control}
-            rules={{
-              required: true,
-              validate: {
-                maxWords: (v: string) => countWords(v) <= 6
-              }
+            <Typography
+              variant="caption"
+              color="offWhite.main"
+              mb={theme.spacing(1)}
+            >
+              Title
+            </Typography>
+            <Controller
+              name="title"
+              control={control}
+              rules={{
+                required: true,
+                validate: {
+                  maxWords: (v: string) => countWords(v) <= 6
+                }
+              }}
+              render={({ field: { name, value, onChange } }) => {
+                return (
+                  <StyledTextField
+                    color="offWhite"
+                    required
+                    sx={{
+                      // ".MuiInputBase-input": {
+                      //   height: "48px"
+                      // },
+                      width: "100%",
+                      height: "48px"
+                    }}
+                    autoFocus
+                    name={name}
+                    value={value || ""}
+                    onChange={onChange}
+                    placeholder="Choose a title for your task"
+                    helperText={
+                      <FormHelperText
+                        errorTypes={errorTypes}
+                        value={value}
+                        name={name}
+                        errors={formState.errors}
+                      >
+                        <Typography variant="caption" color="white">
+                          {6 - countWords(value)} Words left
+                        </Typography>
+                      </FormHelperText>
+                    }
+                  />
+                );
+              }}
+            />
+          </TextFieldWrapper>
+          <TextFieldWrapper
+            sx={{
+              width: "100%"
             }}
-            render={({ field: { name, value, onChange } }) => {
-              return (
-                <StyledTextField
-                  color="offWhite"
-                  required
-                  sx={{
-                    // ".MuiInputBase-input": {
-                    //   height: "48px"
-                    // },
-                    width: "100%",
-                    height: "48px"
-                  }}
-                  autoFocus
-                  name={name}
-                  value={value || ""}
-                  onChange={onChange}
-                  placeholder="Choose a title for your task"
-                  helperText={
-                    <FormHelperText
-                      errorTypes={errorTypes}
-                      value={value}
-                      name={name}
-                      errors={formState.errors}
-                    >
-                      <Typography variant="caption" color="white">
-                        {6 - countWords(value)} Words left
-                      </Typography>
-                    </FormHelperText>
-                  }
-                />
-              );
-            }}
-          />
-        </TextFieldWrapper>
+          >
+            <Typography
+              variant="caption"
+              color="offWhite.main"
+              mb={theme.spacing(1)}
+            >
+              Quantity
+            </Typography>
+            <Controller
+              name="quantity"
+              control={control}
+              rules={{
+                required: true,
+                min: 1
+              }}
+              render={({ field: { name, value, onChange } }) => {
+                return (
+                  <StyledTextField
+                    color="offWhite"
+                    required
+                    type="number"
+                    sx={{
+                      width: "100%",
+                      height: "48px"
+                    }}
+                    name={name}
+                    value={value || ""}
+                    onChange={onChange}
+                    placeholder="Choose a title for your task"
+                    helperText={
+                      <FormHelperText
+                        errorTypes={errorTypes}
+                        value={value}
+                        name={name}
+                        errors={formState.errors}
+                      >
+                        {/* <Typography variant="caption" color="white">
+                          {6 - countWords(value)} Words left
+                        </Typography> */}
+                      </FormHelperText>
+                    }
+                  />
+                );
+              }}
+            />
+          </TextFieldWrapper>
+        </Stack>
+
         <TextFieldWrapper>
           <Typography
             variant="caption"
@@ -312,133 +370,194 @@ const CreateOpenTask = () => {
             }}
           />
         </TextFieldWrapper>
-        <SliderFieldWrapper>
-          <Typography
-            variant="caption"
-            color="offWhite.main"
-            mb={theme.spacing(1)}
+
+        <Stack direction="row" gap={4}>
+          <TextFieldWrapper
+            sx={{
+              width: "100%"
+            }}
           >
-            Weight (1-10)
-          </Typography>
-          <CommitmentSliderWrapper>
+            <Typography
+              variant="caption"
+              color="offWhite.main"
+              mb={theme.spacing(1)}
+            >
+              Weight (1-10)
+            </Typography>
+            <CommitmentSliderWrapper>
+              <Controller
+                name="weight"
+                control={control}
+                rules={{
+                  required: true,
+                  min: 1,
+                  max: 10
+                }}
+                render={({ field: { name, value, onChange } }) => {
+                  return (
+                    <Box
+                      sx={{
+                        marginTop: "10px"
+                        // marginLeft: {
+                        //   sm: "-24px",
+                        //   xxl: "-44px"
+                        // }
+                      }}
+                      gap={2}
+                    >
+                      <AutOSSlider
+                        value={value}
+                        name={name}
+                        errors={null}
+                        sliderProps={{
+                          defaultValue: 1,
+                          step: 1,
+                          marks: true,
+                          name,
+                          value: (value as any) || 0,
+                          onChange,
+                          min: 0,
+                          max: 10
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                          pr: 1,
+                          width: {
+                            xs: "100%"
+                          }
+                        }}
+                      >
+                        <Typography variant="body" color="offWhite.dark">
+                          {value}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    // <AutTextField
+                    //   variant="standard"
+                    //   color="offWhite"
+                    //   required
+                    //   type="number"
+                    //   sx={{
+                    //     width: "100%"
+                    //   }}
+                    //   autoFocus
+                    //   name={name}
+                    //   value={value || ""}
+                    //   onChange={onChange}
+                    //   placeholder="Weight"
+                    //   helperText={
+                    //     <FormHelperText
+                    //       errorTypes={errorTypes}
+                    //       value={value}
+                    //       name={name}
+                    //       errors={formState.errors}
+                    //     >
+                    //       <Typography color="white" variant="caption">
+                    //         Between 1 - 10
+                    //       </Typography>
+                    //     </FormHelperText>
+                    //   }
+                    // />
+                  );
+                }}
+              />
+            </CommitmentSliderWrapper>
+          </TextFieldWrapper>
+          {/* <TextFieldWrapper
+            sx={{
+              width: "100%"
+            }}
+          >
+            <Typography
+              variant="caption"
+              color="offWhite.main"
+              mb={theme.spacing(1)}
+            >
+              End date
+            </Typography>
             <Controller
-              name="weight"
+              name="startDate"
               control={control}
               rules={{
-                required: true,
-                min: 1,
-                max: 10
+                required: true
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
-                  <Box
-                    sx={{
-                      marginTop: "10px",
-                      marginLeft: {
-                        sm: "-24px",
-                        xxl: "-44px"
-                      }
-                    }}
-                    gap={2}
-                  >
-                    <AutOSSlider
-                      value={value}
-                      name={name}
-                      errors={null}
-                      sliderProps={{
-                        defaultValue: 1,
-                        step: 1,
-                        marks: true,
-                        name,
-                        value: (value as any) || 0,
-                        onChange,
-                        min: 0,
-                        max: 10
-                      }}
-                    />
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        width: {
-                          xs: "100%",
-                          sm: "620px",
-                          xxl: "840px"
-                        }
-                      }}
-                    >
-                      <Typography variant="caption" color="offWhite.dark">
-                        {value}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  // <AutTextField
-                  //   variant="standard"
-                  //   color="offWhite"
-                  //   required
-                  //   type="number"
-                  //   sx={{
-                  //     width: "100%"
-                  //   }}
-                  //   autoFocus
-                  //   name={name}
-                  //   value={value || ""}
-                  //   onChange={onChange}
-                  //   placeholder="Weight"
-                  //   helperText={
-                  //     <FormHelperText
-                  //       errorTypes={errorTypes}
-                  //       value={value}
-                  //       name={name}
-                  //       errors={formState.errors}
-                  //     >
-                  //       <Typography color="white" variant="caption">
-                  //         Between 1 - 10
-                  //       </Typography>
-                  //     </FormHelperText>
-                  //   }
-                  // />
+                  <AutDatepicker
+                    placeholder="Start date"
+                    value={value}
+                    onChange={onChange}
+                  />
                 );
               }}
             />
-          </CommitmentSliderWrapper>
-        </SliderFieldWrapper>
+          </TextFieldWrapper> */}
+        </Stack>
 
         <Stack direction="row" gap={4}>
-          <Controller
-            name="startDate"
-            control={control}
-            rules={{
-              required: true
+          <TextFieldWrapper
+            sx={{
+              width: "100%"
             }}
-            render={({ field: { name, value, onChange } }) => {
-              return (
-                <AutDatepicker
-                  placeholder="Start date"
-                  value={value}
-                  onChange={onChange}
-                />
-              );
+          >
+            <Typography
+              variant="caption"
+              color="offWhite.main"
+              mb={theme.spacing(1)}
+            >
+              Start date
+            </Typography>
+            <Controller
+              name="startDate"
+              control={control}
+              rules={{
+                required: true
+              }}
+              render={({ field: { name, value, onChange } }) => {
+                return (
+                  <AutDatepicker
+                    placeholder="Start date"
+                    value={value}
+                    onChange={onChange}
+                  />
+                );
+              }}
+            />
+          </TextFieldWrapper>
+          <TextFieldWrapper
+            sx={{
+              width: "100%"
             }}
-          />
-          <Controller
-            name="endDate"
-            control={control}
-            rules={{
-              required: true
-            }}
-            render={({ field: { name, value, onChange } }) => {
-              return (
-                <AutDatepicker
-                  placeholder="End date"
-                  minDateTime={values.startDate}
-                  value={value}
-                  onChange={onChange}
-                />
-              );
-            }}
-          />
+          >
+            <Typography
+              variant="caption"
+              color="offWhite.main"
+              mb={theme.spacing(1)}
+            >
+              End date
+            </Typography>
+            <Controller
+              name="endDate"
+              control={control}
+              rules={{
+                required: true
+              }}
+              render={({ field: { name, value, onChange } }) => {
+                return (
+                  <AutDatepicker
+                    placeholder="End date"
+                    minDateTime={values.startDate}
+                    value={value}
+                    onChange={onChange}
+                  />
+                );
+              }}
+            />
+          </TextFieldWrapper>
         </Stack>
 
         <Stack
@@ -620,39 +739,6 @@ const CreateOpenTask = () => {
                 />
               )}
             </Stack>
-            {/* <Controller
-            name="attachmentType"
-            control={control}
-            rules={{
-              required: true
-            }}
-            render={({ field: { name, value, onChange } }) => {
-              return (
-                <AutTextField
-                  sx={{
-                    width: "150px",
-                    ".MuiSvgIcon-root ": {
-                      fill: "white !important"
-                    }
-                  }}
-                  id="attachmentType"
-                  value={value}
-                  name={name}
-                  color="offWhite"
-                  onChange={onChange}
-                  label="Type"
-                  size="small"
-                  select
-                  InputLabelProps={{
-                    style: { color: "white" }
-                  }}
-                  SelectProps={{
-                    style: { color: "white" }
-                  }}
-                ></AutTextField>
-              );
-            }}
-          /> */}
           </Stack>
         </Stack>
 

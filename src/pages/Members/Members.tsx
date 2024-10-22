@@ -23,10 +23,11 @@ import { autUrls } from "@api/environment";
 import AutTabs from "@components/AutTabs/AutTabs";
 import { useSelector } from "react-redux";
 import { HubData } from "@store/Hub/hub.reducer";
-import { DAutAutID } from "@aut-labs/d-aut";
+import { AutIDProperties, DAutAutID } from "@aut-labs/d-aut";
 import useQueryHubMembers from "@hooks/useQueryHubMembers";
 import HubOsTabs from "@components/HubOsTabs";
 import HubMemberCard from "./HubMemberCard";
+import { HubOSAutID } from "@api/aut.model";
 
 const generateMemberTabs = (members: { [role: string]: DAutAutID[] }) => {
   return Object.keys(members || []).reduce((prev, curr) => {
@@ -229,7 +230,7 @@ const MembersList = ({ members = [] }: { members: DAutAutID[] }) => {
   );
 };
 
-function Members() {
+const Members = ({ members, isLoading }: { members: HubOSAutID<AutIDProperties>[], isLoading: boolean }) => {
   const dispatch = useAppDispatch();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
@@ -238,18 +239,6 @@ function Members() {
   }, [dispatch]);
 
   const hubData = useSelector(HubData);
-  const { data, loading: isLoading } = useQueryHubMembers({
-    skip: !hubData?.properties?.address,
-    variables: {
-      skip: 0,
-      take: 1000,
-      where: {
-        joinedHubs_: {
-          hubAddress: hubData.properties.address
-        }
-      }
-    }
-  });
 
   const tabs = useMemo(() => {
     const roles = hubData.roles;
@@ -259,7 +248,7 @@ function Members() {
       return tab;
     }, {});
 
-    const groupedMembers = data?.reduce((group, member) => {
+    const groupedMembers = members?.reduce((group, member) => {
       const joinedHub = member.joinedHub(hubData.properties.address);
       const roleName = hubData.roleName(+joinedHub?.role);
       if (!group[roleName]) {
@@ -275,7 +264,7 @@ function Members() {
       )
     );
     return generateMemberTabs(groupedMembers);
-  }, [hubData, data]);
+  }, [hubData, members]);
 
   return (
     <Container maxWidth="md" sx={{ py: "20px" }}>
@@ -302,7 +291,7 @@ function Members() {
         </Box>
       </Box> */}
 
-      {!isLoading && !data?.length && (
+      {!isLoading && !members?.length && (
         <Box
           sx={{
             display: "flex",

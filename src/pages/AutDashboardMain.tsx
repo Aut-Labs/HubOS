@@ -24,6 +24,7 @@ import CreatXCommentTask from "./TwitterTasks/CreatXCommentTask";
 import CreateXLikeTask from "./TwitterTasks/CreateXLikeTask";
 import CreateXFollowTask from "./TwitterTasks/CreateXFollowTask";
 import CreateGithubCommitTask from "./GithubTasks/CreateGithubCommitTask";
+import useQueryHubMembers from "@hooks/useQueryHubMembers";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -35,7 +36,6 @@ const AutContainer = styled("div")(() => ({
 }));
 
 const AutDashboardMain = () => {
-  const hubData = useSelector(HubData);
   // const { data: plugins, isLoading } = useGetAllPluginDefinitionsByDAOQuery(
   //   null,
   //   {
@@ -43,6 +43,20 @@ const AutDashboardMain = () => {
   //     skip: false
   //   }
   // );
+  const hubData = useSelector(HubData);
+
+  const { data: members, loading: isLoadingMembers } = useQueryHubMembers({
+    skip: !hubData?.properties?.address,
+    variables: {
+      skip: 0,
+      take: 1000,
+      where: {
+        joinedHubs_: {
+          hubAddress: hubData.properties.address
+        }
+      }
+    }
+  });
 
   const { data: archetype } = useGetArchetypeAndStatsQuery(null, {
     refetchOnMountOrArgChange: false,
@@ -151,17 +165,21 @@ const AutDashboardMain = () => {
           >
             <Suspense fallback={<AutLoading width="130px" height="130px" />}>
               <Routes>
-                <Route index element={<Dashboard />} />
+                <Route index element={<Dashboard members={members} />} />
                 <Route path="admins" element={<Admins />} />
                 <Route path="edit-hub" element={<HubEdit />} />
                 <Route path="archetype" element={<Archetype />} />
                 <Route path="modules/dAut" element={<DAut />} />
-                <Route path="members" element={<Members />} />
+                <Route path="members" element={<Members members={[]} isLoading={false} />} />
                 <Route
                   path="discord-bot"
                   element={
                     <DiscordBot
-                    />
+                    />}></Route>
+                <Route
+                  path="members"
+                  element={
+                    <Members members={members} isLoading={isLoadingMembers} />
                   }
                 />
                 <Route
@@ -178,7 +196,8 @@ const AutDashboardMain = () => {
                   path="contributions"
                   element={<AllTasks data={data} />}
                 />
-                <Route path="create-open-task" element={<CreateOpenTask />} />  <Route
+                <Route path="create-open-task" element={<CreateOpenTask />} />  
+                <Route
                   path="create-github-commit-task"
                   element={<CreateGithubCommitTask />}
                 />
@@ -198,6 +217,7 @@ const AutDashboardMain = () => {
                 path="create-twixtter-like-task"
                 element={<CreateXLikeTask />}
               />
+                <Route path="create-open-task" element={<CreateOpenTask />} />
                 {/* <Route path="tasks" element={<AllTasks />} /> */}
                 {/* {modulesRoutes?.routes?.length && (
                 <Route
