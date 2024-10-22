@@ -91,7 +91,6 @@ const AttachmentTypes = [
 //   }
 // }));
 
-
 const CreateXFollowTask = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -102,7 +101,10 @@ const CreateXFollowTask = () => {
   const { mutateAsync: verifyFollow } = useMutation<any, void, any>({
     mutationFn: (verifyFollowRequest) => {
       return axios
-        .post(`http://localhost:4005/api/task/twitter/comment`, verifyFollowRequest)
+        .post(
+          `http://localhost:4005/api/task/twitter/comment`,
+          verifyFollowRequest
+        )
         .then((res) => res.data);
     }
   });
@@ -249,7 +251,7 @@ const CreateXFollowTask = () => {
           color="offWhite.main"
           fontSize="16px"
         >
-          Create a discord gathering for your community to participate in.
+          Create a task that requires users to follow your hub's Twitter account.
         </Typography>
       </Box>
       <Stack
@@ -297,7 +299,7 @@ const CreateXFollowTask = () => {
                   name={name}
                   value={value || ""}
                   onChange={onChange}
-                  placeholder="Choose a title for your gathering"
+                  placeholder="Choose a title"
                   helperText={
                     <FormHelperText
                       errorTypes={errorTypes}
@@ -339,7 +341,7 @@ const CreateXFollowTask = () => {
                   rows="5"
                   multiline
                   onChange={onChange}
-                  placeholder="Describe what the gathering is about"
+                  placeholder="Describe what the task is about"
                   helperText={
                     <FormHelperText
                       errorTypes={errorTypes}

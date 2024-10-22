@@ -91,7 +91,8 @@ const AttachmentTypes = [
 //   }
 // }));
 
-const CreateXLikeTask = () => {
+
+const CreateXCommentTask = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -101,10 +102,7 @@ const CreateXLikeTask = () => {
   const { mutateAsync: verifyFollow } = useMutation<any, void, any>({
     mutationFn: (verifyFollowRequest) => {
       return axios
-        .post(
-          `http://localhost:4005/api/task/twitter/like`,
-          verifyFollowRequest
-        )
+        .post(`http://localhost:4005/api/task/twitter/like`, verifyFollowRequest)
         .then((res) => res.data);
     }
   });
@@ -233,7 +231,7 @@ const CreateXLikeTask = () => {
             color="offWhite.main"
             fontWeight="bold"
           >
-            Twitter Like Task
+            X Follow Task
           </Typography>
         </Stack>
         <Typography
@@ -251,7 +249,7 @@ const CreateXLikeTask = () => {
           color="offWhite.main"
           fontSize="16px"
         >
-          Create a task that requires users to like a tweet on Twitter.
+          Create a task that requires users to comment on a specific tweet.
         </Typography>
       </Box>
       <Stack
@@ -518,4 +516,4 @@ const CreateXLikeTask = () => {
   );
 };
 
-export default memo(CreateXLikeTask);
+export default memo(CreateXCommentTask);

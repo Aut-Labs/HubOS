@@ -92,23 +92,15 @@ const AttachmentTypes = [
 // }));
 
 
-const CreateXCommentTask = () => {
+const CreateGithubCommitTask = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const theme = useTheme();
   const hubData = useSelector(HubData);
-  const autID = useSelector(AutIDData);
+  const autID = useSelector(AutIDData)
 
-  const { mutateAsync: verifyFollow } = useMutation<any, void, any>({
-    mutationFn: (verifyFollowRequest) => {
-      return axios
-        .post(`http://localhost:4005/api/task/twitter/like`, verifyFollowRequest)
-        .then((res) => res.data);
-    }
-  });
-
-  const twitterId = useMemo(() => {
-    const social = hubData.properties.socials.find((s) => s.type === "twitter");
+  const githubId = useMemo(() => {
+    const social = hubData.properties.socials.find((s) => s.type === "github");
     return social.link;
   }, [hubData]);
 
@@ -130,7 +122,7 @@ const CreateXCommentTask = () => {
   });
   const values = watch();
 
-  const { getAuthX } = useOAuthSocials();
+  const { getAuthGithub } = useOAuthSocials();
 
   const onSubmit = async () => {
     // const values = getValues();
@@ -152,7 +144,7 @@ const CreateXCommentTask = () => {
     // });
     // createTask(contribution);
 
-    await getAuthX(
+    await getAuthGithub(
       async (data) => {
         debugger;
         const { access_token } = data;
@@ -231,7 +223,7 @@ const CreateXCommentTask = () => {
             color="offWhite.main"
             fontWeight="bold"
           >
-            X Follow Task
+            Github Commit Task
           </Typography>
         </Stack>
         <Typography
@@ -249,7 +241,8 @@ const CreateXCommentTask = () => {
           color="offWhite.main"
           fontSize="16px"
         >
-          Create a discord gathering for your community to participate in.
+            Create a task that requires users to commit to a specific repository
+            on Github. 
         </Typography>
       </Box>
       <Stack
@@ -297,7 +290,7 @@ const CreateXCommentTask = () => {
                   name={name}
                   value={value || ""}
                   onChange={onChange}
-                  placeholder="Choose a title for your gathering"
+                  placeholder="Choose a title"
                   helperText={
                     <FormHelperText
                       errorTypes={errorTypes}
@@ -339,7 +332,7 @@ const CreateXCommentTask = () => {
                   rows="5"
                   multiline
                   onChange={onChange}
-                  placeholder="Describe what the gathering is about"
+                  placeholder="Describe what the task is about"
                   helperText={
                     <FormHelperText
                       errorTypes={errorTypes}
@@ -516,4 +509,4 @@ const CreateXCommentTask = () => {
   );
 };
 
-export default memo(CreateXCommentTask);
+export default memo(CreateGithubCommitTask);

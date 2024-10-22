@@ -49,49 +49,7 @@ const errorTypes = {
   maxLength: `Characters cannot be more than 257`
 };
 
-const AttachmentTypes = [
-  {
-    value: "url",
-    label: "URL"
-  },
-  {
-    value: "text",
-    label: "Document"
-  },
-  {
-    value: "image",
-    label: "Image"
-  }
-];
-// const StyledTextField = styled(AutTextField)(({ theme }) => ({
-//   width: "100%",
-//   ".MuiInputBase-input": {
-//     fontSize: "16px",
-//     color: theme.palette.offWhite.main,
-//     "&::placeholder": {
-//       color: theme.palette.offWhite.main,
-//       opacity: 0.5
-//     },
-//     "&.Mui-disabled": {
-//       color: "#7C879D",
-//       textFillColor: "#7C879D"
-//     }
-//   },
-//   ".MuiInputBase-root": {
-//     caretColor: theme.palette.primary.main,
-//     fieldset: {
-//       border: "1.5px solid #576176 !important",
-//       borderRadius: "6px"
-//     },
-//     borderRadius: "6px",
-//     background: "transparent"
-//   },
-//   ".MuiInputLabel-root": {
-//     color: "#7C879D"
-//   }
-// }));
-
-const CreateXLikeTask = () => {
+const CreateXRetweetTask = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -233,7 +191,7 @@ const CreateXLikeTask = () => {
             color="offWhite.main"
             fontWeight="bold"
           >
-            Twitter Like Task
+            Retweet Task
           </Typography>
         </Stack>
         <Typography
@@ -251,7 +209,7 @@ const CreateXLikeTask = () => {
           color="offWhite.main"
           fontSize="16px"
         >
-          Create a task that requires users to like a tweet on Twitter.
+          Create a task that requires users to retweet a specific tweet.
         </Typography>
       </Box>
       <Stack
@@ -518,4 +476,4 @@ const CreateXLikeTask = () => {
   );
 };
 
-export default memo(CreateXLikeTask);
+export default memo(CreateXRetweetTask);

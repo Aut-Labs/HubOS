@@ -223,7 +223,7 @@ const CreateGithubCommitTask = () => {
             color="offWhite.main"
             fontWeight="bold"
           >
-            Github Commit Task
+            Github Oen PR Task
           </Typography>
         </Stack>
         <Typography
@@ -241,7 +241,7 @@ const CreateGithubCommitTask = () => {
           color="offWhite.main"
           fontSize="16px"
         >
-          Create a discord gathering for your community to participate in.
+            Create a task that requires users to open a PR on your Github repository.
         </Typography>
       </Box>
       <Stack
@@ -289,7 +289,7 @@ const CreateGithubCommitTask = () => {
                   name={name}
                   value={value || ""}
                   onChange={onChange}
-                  placeholder="Choose a title for your gathering"
+                  placeholder="Choose a title"
                   helperText={
                     <FormHelperText
                       errorTypes={errorTypes}
@@ -331,7 +331,7 @@ const CreateGithubCommitTask = () => {
                   rows="5"
                   multiline
                   onChange={onChange}
-                  placeholder="Describe what the gathering is about"
+                  placeholder="Describe what the task is about"
                   helperText={
                     <FormHelperText
                       errorTypes={errorTypes}
