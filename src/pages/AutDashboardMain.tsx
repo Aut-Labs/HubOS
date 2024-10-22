@@ -28,6 +28,7 @@ import useQueryHubMembers from "@hooks/useQueryHubMembers";
 import CreateXRetweetTask from "./TwitterTasks/CreateXRetweetTask";
 import CreateXCommentTask from "./TwitterTasks/CreateXCommentTask";
 import CreatePoll from "./DiscordBot/CreatePoll";
+import CreateGithubOpenPRTask from "./GithubTasks/CreateGithubOpenPRTask";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -200,9 +201,12 @@ const AutDashboardMain = () => {
                 />
                 <Route path="create-open-task" element={<CreateOpenTask />} />
                 <Route
-                  path="create-github-commit-task"
+                  path="create-github-commit"
                   element={<CreateGithubCommitTask />}
-                />
+                />  <Route
+                path="create-github-open-pull-request"
+                element={<CreateGithubOpenPRTask />}
+              />
                 <Route
                   path="create-discord-gatherings"
                   element={<CreateGathering />}

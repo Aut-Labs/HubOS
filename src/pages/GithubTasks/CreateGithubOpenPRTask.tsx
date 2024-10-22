@@ -92,7 +92,7 @@ const AttachmentTypes = [
 // }));
 
 
-const CreateGithubCommitTask = () => {
+const CreateGithubOpenPRTask = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -223,7 +223,7 @@ const CreateGithubCommitTask = () => {
             color="offWhite.main"
             fontWeight="bold"
           >
-            Github Commit Task
+            Github Open PR Task
           </Typography>
         </Stack>
         <Typography
@@ -241,8 +241,7 @@ const CreateGithubCommitTask = () => {
           color="offWhite.main"
           fontSize="16px"
         >
-            Create a task that requires users to commit to a specific repository
-            on Github. 
+            Create a task for the community to open PRs on your Github repository.
         </Typography>
       </Box>
       <Stack
@@ -509,4 +508,4 @@ const CreateGithubCommitTask = () => {
   );
 };
 
-export default memo(CreateGithubCommitTask);
+export default memo(CreateGithubOpenPRTask);

@@ -223,7 +223,7 @@ const CreateGithubCommitTask = () => {
             color="offWhite.main"
             fontWeight="bold"
           >
-            Github Oen PR Task
+            Github Commit Task
           </Typography>
         </Stack>
         <Typography
@@ -241,7 +241,7 @@ const CreateGithubCommitTask = () => {
           color="offWhite.main"
           fontSize="16px"
         >
-            Create a task that requires users to open a PR on your Github repository.
+            Create a task that requires the user to commit to your hub's repository.
         </Typography>
       </Box>
       <Stack
