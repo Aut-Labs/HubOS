@@ -24,6 +24,7 @@ const Callback = () => {
       });
     } else {
       console.log("POST MESSAGE");
+      localStorage.setItem("OAUTH_RESPONSE", JSON.stringify({ payload }));
       window.opener.postMessage({
         type: "OAUTH_RESPONSE",
         payload
