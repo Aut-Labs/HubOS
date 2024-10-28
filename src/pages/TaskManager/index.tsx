@@ -4,6 +4,7 @@ import {
   CircularProgress,
   Container,
   IconButton,
+  Stack,
   Tooltip,
   Typography,
   styled
@@ -17,6 +18,10 @@ import AutLoading from "@components/AutLoading";
 import useQueryTaskTypes from "@hooks/useQueryTaskTypes";
 import { ModuleDefinitionCard } from "../Modules/Shared/PluginCard";
 import HubOsTabs from "@components/HubOsTabs";
+import { useSelector } from "react-redux";
+import { HubData } from "@store/Hub/hub.reducer";
+import { AutButton, AutOsButton } from "@components/buttons";
+import { SocialVerificationCard } from "./SocialVerificationCard";
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -48,12 +53,26 @@ const AutTasksTab = ({ tasks, isLoading }) => {
   );
 };
 
+
 const SocialTasksTab = ({ tasks, isLoading }) => {
+  const hubData = useSelector(HubData);
+
+  const socials = useMemo(() => {
+    const socialLinks = {
+      twitter: hubData.properties.socials.find((s) => s.type === "twitter")
+        ?.link,
+      discord: hubData.properties.socials.find((s) => s.type === "discord")
+        ?.link,
+      github: hubData.properties.socials.find((s) => s.type === "github")?.link
+    };
+    return socialLinks;
+  }, [hubData]);
+
   const { discordTasks, twitterTasks, githubTasks } = tasks;
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 4, mt: 4 }}>
-      {discordTasks?.length > 0 && (
+      {(discordTasks?.length > 0 || !socials.discord) && (
         <Box>
           <Typography
             variant="h4"
@@ -69,18 +88,22 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
             Discord Tasks
           </Typography>
           <GridBox>
-            {discordTasks.map((taskType, index) => (
-              <ModuleDefinitionCard
-                key={`discord-task-${index}`}
-                isFetching={isLoading}
-                taskType={taskType}
-              />
-            ))}
+            {socials.discord ? (
+              discordTasks.map((taskType, index) => (
+                <ModuleDefinitionCard
+                  key={`discord-task-${index}`}
+                  isFetching={isLoading}
+                  taskType={taskType}
+                />
+              ))
+            ) : (
+              <SocialVerificationCard socialType="discord" />
+            )}
           </GridBox>
         </Box>
       )}
 
-      {twitterTasks?.length > 0 && (
+      {(twitterTasks?.length > 0 || !socials.twitter) && (
         <Box>
           <Typography
             variant="h4"
@@ -96,18 +119,22 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
             Twitter Tasks
           </Typography>
           <GridBox>
-            {twitterTasks.map((taskType, index) => (
-              <ModuleDefinitionCard
-                key={`twitter-task-${index}`}
-                isFetching={isLoading}
-                taskType={taskType}
-              />
-            ))}
+            {socials.twitter ? (
+              twitterTasks.map((taskType, index) => (
+                <ModuleDefinitionCard
+                  key={`twitter-task-${index}`}
+                  isFetching={isLoading}
+                  taskType={taskType}
+                />
+              ))
+            ) : (
+              <SocialVerificationCard socialType="twitter" />
+            )}
           </GridBox>
         </Box>
       )}
 
-      {githubTasks?.length > 0 && (
+      {(githubTasks?.length > 0 || !socials.github) && (
         <Box>
           <Typography
             variant="h4"
@@ -123,20 +150,27 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
             GitHub Tasks
           </Typography>
           <GridBox>
-            {githubTasks.map((taskType, index) => (
-              <ModuleDefinitionCard
-                key={`github-task-${index}`}
-                isFetching={isLoading}
-                taskType={taskType}
-              />
-            ))}
+            {socials.github ? (
+              githubTasks.map((taskType, index) => (
+                <ModuleDefinitionCard
+                  key={`github-task-${index}`}
+                  isFetching={isLoading}
+                  taskType={taskType}
+                />
+              ))
+            ) : (
+              <SocialVerificationCard socialType="github" />
+            )}
           </GridBox>
         </Box>
       )}
 
       {!discordTasks?.length &&
         !twitterTasks?.length &&
-        !githubTasks?.length && (
+        !githubTasks?.length &&
+        socials.discord &&
+        socials.twitter &&
+        socials.github && (
           <Box
             sx={{
               display: "flex",

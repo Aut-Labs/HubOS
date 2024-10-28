@@ -7,7 +7,8 @@ import AutSDK, {
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import {
   DiscordGatheringContribution,
-  OpenTaskContribution
+  OpenTaskContribution,
+  RetweetContribution
 } from "./contribution.model";
 
 const hubServiceCache: Record<string, Hub> = {};
@@ -80,6 +81,14 @@ const createOpenTaskContribution = async (
   return createContribution(openTaskContribution, nft, api);
 };
 
+const createTwitterRetweetContribution = async (
+  retweetContribution: RetweetContribution,
+  api: BaseQueryApi
+) => {
+  const nft = RetweetContribution.getContributionNFT(retweetContribution);
+  return createContribution(retweetContribution, nft, api);
+};
+
 const createDiscordGatheringContribution = async (
   openTaskContribution: DiscordGatheringContribution,
   api: BaseQueryApi
@@ -98,6 +107,9 @@ export const contributionsApi = createApi({
     }
     if (url === "createDiscordGatheringContribution") {
       return createDiscordGatheringContribution(body, api);
+    }
+    if (url === "createTwitterRetweetContribution") {
+      return createTwitterRetweetContribution(body, api);
     }
     return {
       data: "Test"
@@ -123,11 +135,23 @@ export const contributionsApi = createApi({
           url: "createDiscordGatheringContribution"
         };
       }
+    }),
+    createTwitterRetweetContribution: builder.mutation<
+      void,
+      RetweetContribution
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "createTwitterRetweetContribution"
+        };
+      }
     })
   })
 });
 
 export const {
+  useCreateTwitterRetweetContributionMutation,
   useCreateOpenTaskContributionMutation,
   useCreateDiscordGatheringContributionMutation
 } = contributionsApi;

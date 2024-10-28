@@ -24,11 +24,13 @@ import { AutOSSlider } from "@theme/commitment-slider-styles";
 import { AutOsButton } from "@components/buttons";
 import {
   useCreateDiscordGatheringContributionMutation,
-  useCreateOpenTaskContributionMutation
+  useCreateOpenTaskContributionMutation,
+  useCreateTwitterRetweetContributionMutation
 } from "@api/contributions.api";
 import {
   DiscordGatheringContribution,
-  OpenTaskContribution
+  OpenTaskContribution,
+  RetweetContribution
 } from "@api/contribution.model";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import SubmitDialog from "@components/Dialog/SubmitDialog";
@@ -46,7 +48,9 @@ import { useOAuthSocials } from "@components/Oauth2/oauth2";
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
   maxNameChars: `Characters cannot be more than 24`,
-  maxLength: `Characters cannot be more than 257`
+  maxLength: `Characters cannot be more than 257`,
+  invalidTweetUrl:
+    "Please enter a valid tweet URL (e.g., https://twitter.com/username/status/123456789 or https://x.com/username/status/123456789)"
 };
 
 const CreateXRetweetTask = () => {
@@ -56,16 +60,8 @@ const CreateXRetweetTask = () => {
   const hubData = useSelector(HubData);
   const autID = useSelector(AutIDData);
 
-  const { mutateAsync: verifyFollow } = useMutation<any, void, any>({
-    mutationFn: (verifyFollowRequest) => {
-      return axios
-        .post(
-          `http://localhost:4005/api/task/twitter/like`,
-          verifyFollowRequest
-        )
-        .then((res) => res.data);
-    }
-  });
+  const [createTask, { error, isError, isSuccess, isLoading, reset }] =
+    useCreateTwitterRetweetContributionMutation();
 
   const twitterId = useMemo(() => {
     const social = hubData.properties.socials.find((s) => s.type === "twitter");
@@ -81,6 +77,8 @@ const CreateXRetweetTask = () => {
       startDate: new Date(),
       endDate: null,
       description: "",
+      tweetUrl: "", // Add tweet URL field
+      quantity: 1,
       role: null,
       duration: null,
       allCanAttend: false,
@@ -93,83 +91,28 @@ const CreateXRetweetTask = () => {
   const { getAuthX } = useOAuthSocials();
 
   const onSubmit = async () => {
-    // const values = getValues();
-    // const contribution = new DiscordGatheringContribution({
-    //   name: values.title,
-    //   description: values.description,
-    //   image: "",
-    //   properties: {
-    //     taskId: searchParams.get("taskId"),
-    //     role: values.role,
-    //     duration: values.duration,
-    //     startDate: dateToUnix(values.startDate),
-    //     endDate: dateToUnix(values.endDate),
-    //     channelId: values.channelId,
-    //     points: values.weight,
-    //     quantity: 1,
-    //     uri: ""
-    //   }
-    // });
-    // createTask(contribution);
-
-    await getAuthX(
-      async (data) => {
-        debugger;
-        const { access_token } = data;
-        debugger;
-        setLoading(true);
-        // const requestModel = {
-        //   discordAccessToken: access_token,
-        //   hubAddress,
-        //   authSig
-        // };
-        // const result = await claimRole(requestModel, {
-        //   onSuccess: (response) => {
-        //     setLoading(false);
-        //     setRoleClaimed(true);
-        //   },
-        //   onError: (res) => {
-        //     setLoading(false);
-        //   }
-        // });
-      },
-      () => {
-        setLoading(false);
+    const values = getValues();
+    const joinedHub = autID.joinedHub(hubData.properties.address);
+    const contribution = new RetweetContribution({
+      name: values.title,
+      description: values.description,
+      image: "",
+      properties: {
+        taskId: searchParams.get("taskId"),
+        role: +joinedHub.role,
+        startDate: dateToUnix(values.startDate),
+        endDate: dateToUnix(values.endDate),
+        points: values.weight,
+        tweetUrl: values.tweetUrl,
+        quantity: values.quantity,
+        uri: ""
       }
-    );
+    });
+    createTask(contribution);
   };
-
-  //   useEffect(() => {
-  //     if (isSuccess) {
-  //       // navigate({
-  //       //   pathname: `/${hubData?.name}/contributions`
-  //       // });
-  //     }
-  //   }, [isSuccess, hubData]);
 
   return (
     <FormContainer onSubmit={handleSubmit(onSubmit)}>
-      {/* <ErrorDialog handleClose={() => reset()} open={isError} message={error} /> */}
-      {/* <SubmitDialog
-        open={isSuccess || isLoading}
-        mode={isSuccess ? "success" : "loading"}
-        backdropFilter={true}
-        message={isLoading ? "" : "Congratulations!"}
-        titleVariant="h2"
-        subtitle={
-          isLoading
-            ? "Creating contribution..."
-            : "Your submission has been created successfully!"
-        }
-        subtitleVariant="subtitle1"
-        handleClose={() => {
-          reset();
-          navigate({
-            pathname: `/${hubData?.name}/contributions`
-          });
-        }}
-      ></SubmitDialog> */}
-
       <Box
         sx={{
           display: "flex",
@@ -247,9 +190,6 @@ const CreateXRetweetTask = () => {
                   color="offWhite"
                   required
                   sx={{
-                    // ".MuiInputBase-input": {
-                    //   height: "48px"
-                    // },
                     width: "100%",
                     height: "48px"
                   }}
@@ -317,6 +257,96 @@ const CreateXRetweetTask = () => {
             }}
           />
         </TextFieldWrapper>
+        <TextFieldWrapper>
+          <Typography
+            variant="caption"
+            color="offWhite.main"
+            mb={theme.spacing(1)}
+          >
+            Tweet URL
+          </Typography>
+          <Controller
+            name="tweetUrl"
+            control={control}
+            rules={{
+              required: true,
+              pattern: {
+                value:
+                  /^https?:\/\/(twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/[0-9]+(\?.*)?$/,
+                message: errorTypes.invalidTweetUrl
+              }
+            }}
+            render={({
+              field: { name, value, onChange },
+              fieldState: { error }
+            }) => {
+              return (
+                <StyledTextField
+                  name={name}
+                  value={value || ""}
+                  color="offWhite"
+                  onChange={onChange}
+                  error={!!error}
+                  placeholder="Enter the tweet URL to be retweeted"
+                  helperText={
+                    <FormHelperText
+                      errorTypes={errorTypes}
+                      value={value}
+                      name={name}
+                      errors={formState.errors}
+                    />
+                  }
+                />
+              );
+            }}
+          />
+        </TextFieldWrapper>
+        <TextFieldWrapper
+          sx={{
+            width: "100%"
+          }}
+        >
+          <Typography
+            variant="caption"
+            color="offWhite.main"
+            mb={theme.spacing(1)}
+          >
+            Quantity
+          </Typography>
+          <Controller
+            name="quantity"
+            control={control}
+            rules={{
+              required: true,
+              min: 1
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <StyledTextField
+                  color="offWhite"
+                  required
+                  type="number"
+                  sx={{
+                    width: "100%",
+                    height: "48px"
+                  }}
+                  name={name}
+                  value={value || ""}
+                  onChange={onChange}
+                  placeholder="Quantity"
+                  helperText={
+                    <FormHelperText
+                      errorTypes={errorTypes}
+                      value={value}
+                      name={name}
+                      errors={formState.errors}
+                    ></FormHelperText>
+                  }
+                />
+              );
+            }}
+          />
+        </TextFieldWrapper>
         <SliderFieldWrapper>
           <Typography
             variant="caption"
@@ -377,33 +407,6 @@ const CreateXRetweetTask = () => {
                       </Typography>
                     </Box>
                   </Box>
-
-                  // <AutTextField
-                  //   variant="standard"
-                  //   color="offWhite"
-                  //   required
-                  //   type="number"
-                  //   sx={{
-                  //     width: "100%"
-                  //   }}
-                  //   autoFocus
-                  //   name={name}
-                  //   value={value || ""}
-                  //   onChange={onChange}
-                  //   placeholder="Weight"
-                  //   helperText={
-                  //     <FormHelperText
-                  //       errorTypes={errorTypes}
-                  //       value={value}
-                  //       name={name}
-                  //       errors={formState.errors}
-                  //     >
-                  //       <Typography color="white" variant="caption">
-                  //         Between 1 - 10
-                  //       </Typography>
-                  //     </FormHelperText>
-                  //   }
-                  // />
                 );
               }}
             />
@@ -459,7 +462,7 @@ const CreateXRetweetTask = () => {
           <AutOsButton
             type="button"
             color="primary"
-            // disabled={!formState.isValid}
+            disabled={!formState.isValid}
             onClick={() => onSubmit()}
             variant="outlined"
             sx={{
