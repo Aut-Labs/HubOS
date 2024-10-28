@@ -3,7 +3,7 @@ name: Deployment Dev
 on:
   push:
     branches:
-      - main
+      - nova_os_revival
 
 jobs:
   build-and-deploy:
@@ -25,8 +25,8 @@ jobs:
             #!/usr/bin/env bash
 
             cd HubOS
-            sudo git checkout main;
-            sudo git pull origin main;
+            sudo git checkout nova_os_revival;
+            sudo git pull origin nova_os_revival;
 
             sudo docker-compose stop hubos_main
             sudo docker rmi $(sudo docker images -f "dangling=true" -q) || true
