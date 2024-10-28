@@ -6,7 +6,7 @@ import {
 import { duration } from "@mui/material";
 
 export class RetweetContributionProperties extends TaskContributionProperties {
-  tweetUrl: boolean;
+  tweetUrl: string;
   constructor(data: RetweetContributionProperties) {
     super(data);
     this.tweetUrl = data.tweetUrl;
