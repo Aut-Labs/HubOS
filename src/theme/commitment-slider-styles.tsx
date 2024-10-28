@@ -61,8 +61,8 @@ export const AutOSSlider = ({
           sx={{
             "&.MuiSlider-root": {
               [`span[data-index="${value}"].MuiSlider-mark`]: {
-                borderTop: "2px solid #14ECEC",
-                borderBottom: "2px solid #14ECEC"
+                borderTop: "2px solid #256BB0",
+                borderBottom: "2px solid #256BB0"
               }
             }
           }}
@@ -141,7 +141,7 @@ export default (theme: Theme) =>
         padding: "0 !important",
         border: "none",
         "&.MuiSlider-colorPrimary": {
-          color: "#14ECEC",
+          color: "#256BB0",
           "&.MuiSlider-rail": {
             display: "none"
           },
@@ -207,7 +207,7 @@ export default (theme: Theme) =>
           },
 
           "&.MuiSlider-markActive": {
-            background: "#14ECEC",
+            background: "#256BB0",
             boxShadow: `
             0px 8px 20px 0px rgba(46, 144, 250, 0.25),
             0px 4px 16px 0px rgba(20, 200, 236, 0.22),

@@ -480,7 +480,7 @@ const QuestionsAndAnswers = ({ control, updateForm, getFormValues }) => {
               // borderRadius: "10px",
               transition: theme.transitions.create(["border-color"]),
               ":hover": {
-                // borderColor: "#14ECEC"
+                // borderColor: "#256BB0"
                 borderColor: "white"
               }
             }}
