@@ -125,6 +125,20 @@ const calculateFontSize = (name: string) => {
   }
 };
 
+function getScoreColor(prestige: number): string {
+  if (prestige <= 75) {
+    return "#BF1A2F"; // Red - Really Bad
+  } else if (prestige <= 99) {
+    return "#88498F"; // Purple - Bad
+  } else if (prestige <= 120) {
+    return "#2E90FA"; // Blue - OK
+  } else if (prestige <= 149) {
+    return "#20A4B2"; // Blue-Green - Good
+  } else {
+    return "#12B76A"; // Green - Excellent
+  }
+}
+
 const Dashboard = ({ members }: { members: HubOSAutID<AutIDProperties>[] }) => {
   const dispatch = useDispatch();
   const autIDData = useSelector(AutIDData);
@@ -144,6 +158,16 @@ const Dashboard = ({ members }: { members: HubOSAutID<AutIDProperties>[] }) => {
     );
     return states[hubData.properties.archetype.default];
   }, [hubData]);
+
+  const prestige = useMemo(() => {
+    return (hubData?.properties as any)?.prestige ?? 100;
+  }, [hubData]);
+
+  const period = useMemo(() => {
+    return (hubData?.properties as any)?.period ?? 1;
+  }, [hubData]);
+
+
 
   useEffect(() => {
     dispatch(
@@ -225,7 +249,7 @@ const Dashboard = ({ members }: { members: HubOSAutID<AutIDProperties>[] }) => {
                       width: "unset",
                       height: "100%",
                       borderRadius: "0",
-                      background: "transparent",
+                      background: "transparent"
                     }}
                     aria-label="avatar"
                     src={ipfsCIDToHttpUrl(hubData?.image as string)}
@@ -347,10 +371,10 @@ const Dashboard = ({ members }: { members: HubOSAutID<AutIDProperties>[] }) => {
                       variant="subtitle1"
                       sx={{
                         mb: "0px",
-                        color: "#FFF"
+                        color: getScoreColor(prestige)
                       }}
                     >
-                      {/* {hub?.properties.prestige} */}
+                      {prestige}
                     </Typography>
                     <Typography
                       fontWeight="bold"
@@ -623,7 +647,7 @@ const Dashboard = ({ members }: { members: HubOSAutID<AutIDProperties>[] }) => {
                         color: "#FFF"
                       }}
                     >
-                      #1
+                      {`#${period}`}
                     </Typography>
                     <Typography
                       fontWeight="bold"
