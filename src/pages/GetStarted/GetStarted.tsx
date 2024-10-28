@@ -1,6 +1,6 @@
 import { Box, Container, styled, Typography } from "@mui/material";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
-import backgroundImage from "@assets/hubos/bg-blue-web.png";
+import backgroundImage from "@assets/hubos/bg-aut-blue-web.png";
 import HubOsLogo from "@assets/hubos/hubos-logo.svg?react";
 
 const Content = styled("div")(({ theme }) => {

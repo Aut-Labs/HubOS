@@ -24,8 +24,11 @@ const fetchOnChainContributions = async (
     ids.map(async (id) => {
       const _contribution = await taskFactory.functions.getContributionById(id);
       const contribution = TaskContribution.mapFromTuple(_contribution as any);
+      const { uri } = await taskFactory.functions.getDescriptionById(
+        contribution.descriptionId
+      );
       const metadata = await fetchMetadata<BaseNFTModel<any>>(
-        contribution.uri,
+        uri,
         environment.ipfsGatewayUrl
       );
       return {

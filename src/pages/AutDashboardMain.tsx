@@ -11,7 +11,7 @@ import Archetype from "./Archetype/Archetype";
 import DAut from "./Modules/Plugins/DAut/DAut";
 import { useGetArchetypeAndStatsQuery } from "@api/hub.api";
 import { styled } from "@mui/material";
-import backgroundImage from "@assets/hubos/bg-main.png";
+import backgroundImage from "@assets/hubos/bg-aut-blue.png";
 import HubEdit from "./HubEdit/HubEdit";
 import Members from "./Members/Members";
 import TaskManager from "./TaskManager";
