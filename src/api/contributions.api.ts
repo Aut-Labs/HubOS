@@ -1,11 +1,13 @@
 import AutSDK, {
   BaseNFTModel,
+  findLogEvent,
   getOverrides,
   Hub,
   TaskContributionNFT
 } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { OpenTaskContribution } from "./contribution.model";
+import { TaskFactoryContractEventType } from "@aut-labs/abi-types";
 
 const hubServiceCache: Record<string, Hub> = {};
 
@@ -41,6 +43,21 @@ const createContribution = async (
       quantity: contribution.properties.quantity,
       uri: uri
     });
+
+    const tx = await (await taskFactory.functions.registerDescription(
+      { uri },
+      overrides
+    )).wait();
+    debugger;
+
+    const event = findLogEvent(tx, TaskFactoryContractEventType.RegisterDescription);
+    if (!event) {
+      return {
+        error: "Failed to register description"
+      };
+    }
+
+    const descriptionId = event.args[0]?.toString();
     const response = await taskFactory.createContribution(
       {
         taskId: contribution.properties.taskId,
@@ -49,7 +66,7 @@ const createContribution = async (
         endDate: contribution.properties.endDate,
         points: contribution.properties.points,
         quantity: contribution.properties.quantity,
-        uri: uri
+        descriptionId: descriptionId
       },
       overrides
     );
