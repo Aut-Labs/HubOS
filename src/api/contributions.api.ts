@@ -6,7 +6,11 @@ import AutSDK, {
   TaskContributionNFT
 } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
-import { OpenTaskContribution } from "./contribution.model";
+import {
+  DiscordGatheringContribution,
+  OpenTaskContribution,
+  RetweetContribution
+} from "./contribution.model";
 import { TaskFactoryContractEventType } from "@aut-labs/abi-types";
 
 const hubServiceCache: Record<string, Hub> = {};
@@ -94,12 +98,35 @@ const createOpenTaskContribution = async (
   return createContribution(openTaskContribution, nft, api);
 };
 
+const createTwitterRetweetContribution = async (
+  retweetContribution: RetweetContribution,
+  api: BaseQueryApi
+) => {
+  const nft = RetweetContribution.getContributionNFT(retweetContribution);
+  return createContribution(retweetContribution, nft, api);
+};
+
+const createDiscordGatheringContribution = async (
+  openTaskContribution: DiscordGatheringContribution,
+  api: BaseQueryApi
+) => {
+  const nft =
+    DiscordGatheringContribution.getContributionNFT(openTaskContribution);
+  return createContribution(openTaskContribution, nft, api);
+};
+
 export const contributionsApi = createApi({
   reducerPath: "contributionsApi",
   baseQuery: (args, api, extraOptions) => {
     const { url, body } = args;
     if (url === "createOpenTaskContribution") {
       return createOpenTaskContribution(body, api);
+    }
+    if (url === "createDiscordGatheringContribution") {
+      return createDiscordGatheringContribution(body, api);
+    }
+    if (url === "createTwitterRetweetContribution") {
+      return createTwitterRetweetContribution(body, api);
     }
     return {
       data: "Test"
@@ -114,8 +141,34 @@ export const contributionsApi = createApi({
           url: "createOpenTaskContribution"
         };
       }
+    }),
+    createDiscordGatheringContribution: builder.mutation<
+      void,
+      DiscordGatheringContribution
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "createDiscordGatheringContribution"
+        };
+      }
+    }),
+    createTwitterRetweetContribution: builder.mutation<
+      void,
+      RetweetContribution
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "createTwitterRetweetContribution"
+        };
+      }
     })
   })
 });
 
-export const { useCreateOpenTaskContributionMutation } = contributionsApi;
+export const {
+  useCreateTwitterRetweetContributionMutation,
+  useCreateOpenTaskContributionMutation,
+  useCreateDiscordGatheringContributionMutation
+} = contributionsApi;

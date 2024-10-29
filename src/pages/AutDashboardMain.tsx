@@ -15,10 +15,21 @@ import backgroundImage from "@assets/hubos/bg-aut-blue.png";
 import HubEdit from "./HubEdit/HubEdit";
 import Members from "./Members/Members";
 import TaskManager from "./TaskManager";
+import DiscordBot from "./DiscordBot/DiscordBot";
 import { AllTasks } from "./Modules/Plugins/Task/Shared/AllTasks";
 import CreateOpenTask from "./Modules/Plugins/Task/Open/CreateOpenTask";
 import useQueryTaskTypes from "@hooks/useQueryTaskTypes";
+import CreateGathering from "./DiscordBot/CreateGathering";
+import CreatXCommentTask from "./TwitterTasks/CreateXCommentTask";
+import CreateXLikeTask from "./TwitterTasks/CreateXLikeTask";
+import CreateXFollowTask from "./TwitterTasks/CreateXFollowTask";
+import CreateGithubCommitTask from "./GithubTasks/CreateGithubCommitTask";
 import useQueryHubMembers from "@hooks/useQueryHubMembers";
+import CreateXRetweetTask from "./TwitterTasks/CreateXRetweetTask";
+import CreateXCommentTask from "./TwitterTasks/CreateXCommentTask";
+import CreatePoll from "./DiscordBot/CreatePoll";
+import CreateGithubOpenPRTask from "./GithubTasks/CreateGithubOpenPRTask";
+import SubmitRetweetTask from "./TwitterTasks/SubmitRetweetTask";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -166,6 +177,11 @@ const AutDashboardMain = () => {
                 <Route path="modules/dAut" element={<DAut />} />
                 <Route
                   path="members"
+                  element={<Members members={[]} isLoading={false} />}
+                />
+                <Route path="discord-bot" element={<DiscordBot />}></Route>
+                <Route
+                  path="members"
                   element={
                     <Members members={members} isLoading={isLoadingMembers} />
                   }
@@ -185,6 +201,40 @@ const AutDashboardMain = () => {
                   element={<AllTasks data={data} />}
                 />
                 <Route path="create-open-task" element={<CreateOpenTask />} />
+                <Route
+                  path="create-github-commit"
+                  element={<CreateGithubCommitTask />}
+                />{" "}
+                <Route
+                  path="create-github-open-pull-request"
+                  element={<CreateGithubOpenPRTask />}
+                />
+                <Route
+                  path="create-discord-gatherings"
+                  element={<CreateGathering />}
+                />
+                <Route path="create-discord-polls" element={<CreatePoll />} />
+                <Route
+                  path="create-twitter-follow"
+                  element={<CreateXFollowTask />}
+                />
+                <Route
+                  path="create-twitter-comment"
+                  element={<CreateXCommentTask />}
+                />
+                <Route
+                  path="create-twitter-retweet"
+                  element={<CreateXRetweetTask />}
+                />
+                <Route
+                  path="create-twitter-like"
+                  element={<CreateXLikeTask />}
+                />
+                <Route path="create-open-task" element={<CreateOpenTask />} />
+                <Route
+                  path="submit-retweet-task"
+                  element={<SubmitRetweetTask />}
+                />
                 {/* <Route path="tasks" element={<AllTasks />} /> */}
                 {/* {modulesRoutes?.routes?.length && (
                 <Route

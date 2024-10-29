@@ -9,6 +9,7 @@ import { TaskContributionNFT } from "@aut-labs/sdk";
 import OverflowTooltip from "@components/OverflowTooltip";
 import { ContributionsTable } from "./ContributionsTable";
 import { TaskStatus } from "@store/model";
+import { RetweetContributionProperties } from "@api/contribution.model";
 
 // const ContributionCard = ({
 //   contribution
@@ -142,12 +143,15 @@ export const AllTasks = ({ data: taskTypes }) => {
     }
   });
 
+  //TODO: Check the type more efficiently
   const updatedContributions = data?.map((item) => ({
     ...item,
-    contributionType: "open",
+    contributionType: (item.properties as RetweetContributionProperties)
+      .tweetUrl
+      ? "Retweet"
+      : "open",
     status: TaskStatus.Created
   }));
-
   // const isLoading = false;
   // const data = {
   //   tasks: []

@@ -1,4 +1,3 @@
-
 import { lazy, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
@@ -13,6 +12,8 @@ import AutSDK from "@aut-labs/sdk";
 import GetStarted from "./pages/GetStarted/GetStarted";
 import AutLoading from "@components/AutLoading";
 import { HubData } from "@store/Hub/hub.reducer";
+import ClaimRole from "./pages/DiscordBot/ClaimRole";
+import Callback from "./pages/Oauth2Callback/Callback";
 
 const AutDashboardMain = lazy(() => import("./pages/AutDashboardMain"));
 
@@ -34,11 +35,8 @@ function App() {
   const returnUrl = useMemo(() => {
     if (!hubData) return "/";
     const shouldGoToDashboard =
-      location.pathname === "/" ||
-      !location.pathname.includes(hubData?.name);
-    const goTo = shouldGoToDashboard
-      ? `/${hubData?.name}`
-      : location.pathname;
+      location.pathname === "/" || !location.pathname.includes(hubData?.name);
+    const goTo = shouldGoToDashboard ? `/${hubData?.name}` : location.pathname;
     const url = location.state?.from;
     return url || goTo;
   }, [hubData]);
@@ -100,7 +98,8 @@ function App() {
         ) : (
           <>
             <Routes>
-              {/* <Route path="callback" element={<Callback />} /> */}
+              <Route path="callback" element={<Callback />} />
+              <Route path="claim-discord-role" element={<ClaimRole />} />
               {!hubData && (
                 <>
                   <Route path="/" element={<GetStarted />} />

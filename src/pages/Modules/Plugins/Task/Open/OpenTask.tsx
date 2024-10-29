@@ -80,8 +80,8 @@ const UserSubmitContent = ({
     }
   }, [initialized, task]);
 
-  const [submitTask, { error, isError, isLoading, reset }] =
-    useSubmitOpenTaskMutation();
+  // const [submitTask, { error, isError, isLoading, reset }] =
+  //   useSubmitOpenTaskMutation();
 
   const onSubmit = async (values) => {
     submitTask({
