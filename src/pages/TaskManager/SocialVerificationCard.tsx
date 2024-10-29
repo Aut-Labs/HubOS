@@ -1,3 +1,4 @@
+import { environment } from "@api/environment";
 import { AutOsButton } from "@components/buttons";
 import { Box, Stack, Typography } from "@mui/material";
 import { HubData } from "@store/Hub/hub.reducer";
@@ -62,7 +63,7 @@ export const SocialVerificationCard = ({ socialType }) => {
           </Typography>
           <AutOsButton
             onClick={() => {
-              window.open(`http://localhost:3001/project/${hubData.name}`, '_blank');
+              window.open(`${environment.hubShowcaseUrl}/project/${hubData.name}`, '_blank');
             }}
             variant="outlined"
             sx={{ mt: "auto" }}

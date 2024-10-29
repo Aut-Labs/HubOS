@@ -27,6 +27,8 @@ export const swEnvVariables = {
   discordBotAddress: "VITE_DISCORD_BOT_ADDRESS",
   discordBotUrl: "VITE_DISCORD_BOT_API_URL",
 
+  hubShowcaseUrl: "VITE_HUB_SHOWCASE_URL",
+
   twitterClientId: "VITE_TWITTER_CLIENT_ID",
   githubClientId: "VITE_GITHUB_CLIENT_ID"
 };
