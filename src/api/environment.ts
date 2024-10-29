@@ -25,7 +25,10 @@ export const swEnvVariables = {
   discordRedirectUri: "VITE_DISCORD_REDIRECT_URL",
   discordApiUrl: "VITE_DISCORD_API_URL",
   discordBotAddress: "VITE_DISCORD_BOT_ADDRESS",
-  discordBotUrl: "VITE_DISCORD_BOT_API_URL"
+  discordBotUrl: "VITE_DISCORD_BOT_API_URL",
+
+  twitterClientId: "VITE_TWITTER_CLIENT_ID",
+  githubClientId: "VITE_GITHUB_CLIENT_ID"
 };
 
 export const environment: typeof swEnvVariables =
