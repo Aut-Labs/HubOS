@@ -37,7 +37,7 @@ root.render(
       <QueryClientProvider client={queryClient}>
         <WalletConnectorProvider
           defaultChainId={+environment.defaultChainId}
-          requestSig={true}
+          requestSig={false}
         >
           <StyledEngineProvider injectFirst>
             <ThemeProvider theme={AutTheme}>
