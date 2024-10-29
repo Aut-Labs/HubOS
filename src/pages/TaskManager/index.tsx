@@ -22,6 +22,7 @@ import { useSelector } from "react-redux";
 import { HubData } from "@store/Hub/hub.reducer";
 import { AutButton, AutOsButton } from "@components/buttons";
 import { SocialVerificationCard } from "./SocialVerificationCard";
+import ComingSoonCard from "./ComingSoonCard";
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -53,7 +54,6 @@ const AutTasksTab = ({ tasks, isLoading }) => {
   );
 };
 
-
 const SocialTasksTab = ({ tasks, isLoading }) => {
   const hubData = useSelector(HubData);
 
@@ -68,10 +68,49 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
     return socialLinks;
   }, [hubData]);
 
-  const { discordTasks, twitterTasks, githubTasks } = tasks;
+  const { discordTasks, twitterTasks, githubTasks, disabledTwitter } = tasks;
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 4, mt: 4 }}>
+      {(twitterTasks?.length > 0 || !socials.twitter) && (
+        <Box>
+          <Typography
+            variant="h4"
+            sx={{
+              color: "white",
+              fontWeight: 600,
+              borderBottom: "1px solid",
+              borderColor: "grey.700",
+              pb: 1,
+              mb: 2
+            }}
+          >
+            Twitter Tasks
+          </Typography>
+          <GridBox>
+            {socials.twitter ? (
+              <>
+                {twitterTasks.map((taskType, index) => (
+                  <ModuleDefinitionCard
+                    key={`twitter-task-${index}`}
+                    isFetching={isLoading}
+                    taskType={taskType}
+                  />
+                ))}
+                {disabledTwitter.map((taskType, index) => (
+                  <ComingSoonCard
+                    key={`twitter-task-${index}`}
+                    isFetching={isLoading}
+                    taskType={taskType}
+                  />
+                ))}
+              </>
+            ) : (
+              <SocialVerificationCard socialType="twitter" />
+            )}
+          </GridBox>
+        </Box>
+      )}
       {(discordTasks?.length > 0 || !socials.discord) && (
         <Box>
           <Typography
@@ -90,7 +129,7 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
           <GridBox>
             {socials.discord ? (
               discordTasks.map((taskType, index) => (
-                <ModuleDefinitionCard
+                <ComingSoonCard
                   key={`discord-task-${index}`}
                   isFetching={isLoading}
                   taskType={taskType}
@@ -98,37 +137,6 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
               ))
             ) : (
               <SocialVerificationCard socialType="discord" />
-            )}
-          </GridBox>
-        </Box>
-      )}
-
-      {(twitterTasks?.length > 0 || !socials.twitter) && (
-        <Box>
-          <Typography
-            variant="h4"
-            sx={{
-              color: "white",
-              fontWeight: 600,
-              borderBottom: "1px solid",
-              borderColor: "grey.700",
-              pb: 1,
-              mb: 2
-            }}
-          >
-            Twitter Tasks
-          </Typography>
-          <GridBox>
-            {socials.twitter ? (
-              twitterTasks.map((taskType, index) => (
-                <ModuleDefinitionCard
-                  key={`twitter-task-${index}`}
-                  isFetching={isLoading}
-                  taskType={taskType}
-                />
-              ))
-            ) : (
-              <SocialVerificationCard socialType="twitter" />
             )}
           </GridBox>
         </Box>
@@ -152,7 +160,7 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
           <GridBox>
             {socials.github ? (
               githubTasks.map((taskType, index) => (
-                <ModuleDefinitionCard
+                <ComingSoonCard
                   key={`github-task-${index}`}
                   isFetching={isLoading}
                   taskType={taskType}
@@ -200,6 +208,7 @@ const TaskManager = ({ isLoading, data, refetch }) => {
     const twitterTasks: any[] = [];
     const githubTasks: any[] = [];
     const otherTasks: any[] = [];
+    const disabledTwitter: any[] = [];
 
     if (data) {
       data.forEach((task) => {
@@ -212,15 +221,16 @@ const TaskManager = ({ isLoading, data, refetch }) => {
           taskType === "JoinDiscord"
         ) {
           discordTasks.push(task);
-        } else if (
-          taskType === "TwitterLike" ||
-          taskType === "TwitterComment" ||
-          taskType === "TwitterFollow" ||
-          taskType === "TwitterRetweet"
-        ) {
+        } else if (taskType === "TwitterRetweet") {
           twitterTasks.push(task);
         } else if (taskType === "GitHubOpenPR" || taskType === "GitHubCommit") {
           githubTasks.push(task);
+        } else if (
+          taskType === "TwitterLike" ||
+          taskType === "TwitterComment" ||
+          taskType === "TwitterFollow"
+        ) {
+          disabledTwitter.push(task);
         } else {
           otherTasks.push(task);
         }
@@ -231,7 +241,8 @@ const TaskManager = ({ isLoading, data, refetch }) => {
       discordTasks,
       twitterTasks,
       githubTasks,
-      otherTasks
+      otherTasks,
+      disabledTwitter
     };
   }, [data]);
 

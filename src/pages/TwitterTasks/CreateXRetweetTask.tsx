@@ -113,6 +113,26 @@ const CreateXRetweetTask = () => {
 
   return (
     <FormContainer onSubmit={handleSubmit(onSubmit)}>
+      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <SubmitDialog
+        open={isSuccess || isLoading}
+        mode={isSuccess ? "success" : "loading"}
+        backdropFilter={true}
+        message={isLoading ? "" : "Congratulations!"}
+        titleVariant="h2"
+        subtitle={
+          isLoading
+            ? "Creating contribution..."
+            : "Your contribution has been created successfully!"
+        }
+        subtitleVariant="subtitle1"
+        handleClose={() => {
+          reset();
+          navigate({
+            pathname: `/${hubData?.name}/contributions`
+          });
+        }}
+      ></SubmitDialog>
       <Box
         sx={{
           display: "flex",
