@@ -26,10 +26,6 @@ import {
   useCreateDiscordGatheringContributionMutation,
   useCreateOpenTaskContributionMutation
 } from "@api/contributions.api";
-import {
-  DiscordGatheringContribution,
-  OpenTaskContribution
-} from "@api/contribution.model";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import SubmitDialog from "@components/Dialog/SubmitDialog";
 import {
@@ -41,6 +37,7 @@ import {
 import { FormContainer } from "../Modules/Plugins/Task/Shared/FormContainer";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { DiscordGatheringContribution } from "@api/contribution-types/discord-gathering.model";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -154,7 +151,7 @@ const CreateDiscordGathering = () => {
         channelId: values.channelId,
         points: values.weight,
         quantity: 1,
-        uri: ""
+        descriptionId: ""
       }
     });
     createTask(contribution);

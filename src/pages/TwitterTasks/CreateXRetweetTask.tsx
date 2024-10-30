@@ -27,11 +27,6 @@ import {
   useCreateOpenTaskContributionMutation,
   useCreateTwitterRetweetContributionMutation
 } from "@api/contributions.api";
-import {
-  DiscordGatheringContribution,
-  OpenTaskContribution,
-  RetweetContribution
-} from "@api/contribution.model";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import SubmitDialog from "@components/Dialog/SubmitDialog";
 import {
@@ -44,6 +39,7 @@ import { FormContainer } from "../Modules/Plugins/Task/Shared/FormContainer";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useOAuthSocials } from "@components/Oauth2/oauth2";
+import { RetweetContribution } from "@api/contribution-types/retweet.model";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -105,7 +101,7 @@ const CreateXRetweetTask = () => {
         points: values.weight,
         tweetUrl: values.tweetUrl,
         quantity: values.quantity,
-        uri: ""
+        descriptionId: ""
       }
     });
     createTask(contribution);

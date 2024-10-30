@@ -28,9 +28,9 @@ import {
   TextFieldWrapper
 } from "../Shared/StyledFields";
 import { useCreateOpenTaskContributionMutation } from "@api/contributions.api";
-import { OpenTaskContribution } from "@api/contribution.model";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import SubmitDialog from "@components/Dialog/SubmitDialog";
+import { OpenTaskContribution } from "@api/contribution-types/open-task.model";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -122,7 +122,7 @@ const CreateOpenTask = () => {
         endDate: dateToUnix(values.endDate),
         points: values.weight,
         quantity: values.quantity,
-        uri: ""
+        descriptionId: ""
       }
     });
     createTask(contribution);

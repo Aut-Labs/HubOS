@@ -26,10 +26,6 @@ import {
   useCreateDiscordGatheringContributionMutation,
   useCreateOpenTaskContributionMutation
 } from "@api/contributions.api";
-import {
-  DiscordGatheringContribution,
-  OpenTaskContribution
-} from "@api/contribution.model";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import SubmitDialog from "@components/Dialog/SubmitDialog";
 import {

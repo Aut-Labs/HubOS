@@ -175,10 +175,6 @@ const AutDashboardMain = () => {
                 <Route path="edit-hub" element={<HubEdit />} />
                 <Route path="archetype" element={<Archetype />} />
                 <Route path="modules/dAut" element={<DAut />} />
-                <Route
-                  path="members"
-                  element={<Members members={[]} isLoading={false} />}
-                />
                 <Route path="discord-bot" element={<DiscordBot />}></Route>
                 <Route
                   path="members"

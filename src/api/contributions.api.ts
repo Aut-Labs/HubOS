@@ -6,12 +6,10 @@ import AutSDK, {
   TaskContributionNFT
 } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
-import {
-  DiscordGatheringContribution,
-  OpenTaskContribution,
-  RetweetContribution
-} from "./contribution.model";
 import { TaskFactoryContractEventType } from "@aut-labs/abi-types";
+import { DiscordGatheringContribution } from "./contribution-types/discord-gathering.model";
+import { OpenTaskContribution } from "./contribution-types/open-task.model";
+import { RetweetContribution } from "./contribution-types/retweet.model";
 
 const hubServiceCache: Record<string, Hub> = {};
 
@@ -52,7 +50,6 @@ const createContribution = async (
       { uri },
       overrides
     )).wait();
-    debugger;
 
     const event = findLogEvent(tx, TaskFactoryContractEventType.RegisterDescription);
     if (!event) {

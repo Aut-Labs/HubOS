@@ -9,7 +9,7 @@ import { TaskContributionNFT } from "@aut-labs/sdk";
 import OverflowTooltip from "@components/OverflowTooltip";
 import { ContributionsTable } from "./ContributionsTable";
 import { TaskStatus } from "@store/model";
-import { RetweetContributionProperties } from "@api/contribution.model";
+import { RetweetContributionProperties } from "@api/contribution-types/retweet.model";
 
 // const ContributionCard = ({
 //   contribution
@@ -139,7 +139,7 @@ export const AllTasks = ({ data: taskTypes }) => {
   } = useQueryContributions({
     variables: {
       skip: 0,
-      take: 1000
+      take: 1000,
     }
   });
 
@@ -237,7 +237,7 @@ export const AllTasks = ({ data: taskTypes }) => {
               />
             ))}
           </Box>
-          
+
           {!isLoading && !data?.length && (
             <Box
               sx={{
