@@ -160,7 +160,7 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
           <GridBox>
             {socials.github ? (
               githubTasks.map((taskType, index) => (
-                <ComingSoonCard
+                <ModuleDefinitionCard
                   key={`github-task-${index}`}
                   isFetching={isLoading}
                   taskType={taskType}

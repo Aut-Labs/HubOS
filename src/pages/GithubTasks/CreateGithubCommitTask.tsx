@@ -27,6 +27,7 @@ import {
   useCreateOpenTaskContributionMutation
 } from "@api/contributions.api";
 import {
+  CommitContribution,
   DiscordGatheringContribution,
   OpenTaskContribution
 } from "@api/contribution.model";
@@ -91,17 +92,16 @@ const AttachmentTypes = [
 //   }
 // }));
 
-
 const CreateGithubCommitTask = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const theme = useTheme();
   const hubData = useSelector(HubData);
-  const autID = useSelector(AutIDData)
+  const autID = useSelector(AutIDData);
 
-  const githubId = useMemo(() => {
+  const metadata = useMemo(() => {
     const social = hubData.properties.socials.find((s) => s.type === "github");
-    return social.link;
+    return social.metadata;
   }, [hubData]);
 
   const [loading, setLoading] = useState(false);
@@ -113,6 +113,8 @@ const CreateGithubCommitTask = () => {
       startDate: new Date(),
       endDate: null,
       description: "",
+      repository: "",
+      branch: "",
       role: null,
       duration: null,
       allCanAttend: false,
@@ -122,53 +124,59 @@ const CreateGithubCommitTask = () => {
   });
   const values = watch();
 
+  // Query to fetch repositories
+  const { data: reposResponse, isLoading: loadingRepos } = useQuery({
+    queryKey: ["repositories", metadata.orgId],
+    queryFn: async () => {
+      const response = await axios.post(
+        "http://localhost:4005/api/task/github/getRepositories",
+        {
+          organisationId: metadata.orgId,
+          organisationName: metadata.orgName
+        }
+      );
+      return response.data;
+    },
+    enabled: !!metadata.orgId && !!metadata.orgName
+  });
+  // Query to fetch branches when a repository is selected
+  const { data: branchesResponse, isLoading: loadingBranches } = useQuery({
+    queryKey: ["branches", values.repository],
+    queryFn: async () => {
+      const response = await axios.post(
+        "http://localhost:4005/api/task/github/getBranches",
+        {
+          repositoryName: values.repository,
+          organisationName: metadata.orgName
+        }
+      );
+      return response.data;
+    },
+    enabled: !!values.repository && !!metadata.orgName
+  });
+
   const { getAuthGithub } = useOAuthSocials();
 
-  const onSubmit = async () => {
-    // const values = getValues();
-    // const contribution = new DiscordGatheringContribution({
-    //   name: values.title,
-    //   description: values.description,
-    //   image: "",
-    //   properties: {
-    //     taskId: searchParams.get("taskId"),
-    //     role: values.role,
-    //     duration: values.duration,
-    //     startDate: dateToUnix(values.startDate),
-    //     endDate: dateToUnix(values.endDate),
-    //     channelId: values.channelId,
-    //     points: values.weight,
-    //     quantity: 1,
-    //     uri: ""
-    //   }
-    // });
-    // createTask(contribution);
-
-    await getAuthGithub(
-      async (data) => {
-        debugger;
-        const { access_token } = data;
-        debugger;
-        setLoading(true);
-        // const requestModel = {
-        //   discordAccessToken: access_token,
-        //   hubAddress,
-        //   authSig
-        // };
-        // const result = await claimRole(requestModel, {
-        //   onSuccess: (response) => {
-        //     setLoading(false);
-        //     setRoleClaimed(true);
-        //   },
-        //   onError: (res) => {
-        //     setLoading(false);
-        //   }
-        // });
-      },
-      () => {
-        setLoading(false);
+  const onSubmit = async (data: any) => {
+    const values = getValues();
+    const joinedHub = autID.joinedHub(hubData.properties.address);
+    const contribution = new CommitContribution({
+      name: values.title,
+      description: values.description,
+      image: "",
+      properties: {
+        taskId: searchParams.get("taskId"),
+        role: +joinedHub.role,
+        startDate: dateToUnix(values.startDate),
+        endDate: dateToUnix(values.endDate),
+        points: values.weight,
+        branch: values.branch,
+        repository: values.repository,
+        quantity: values.quantity,
+        uri: ""
       }
-    );
+    });
+    createTask(contribution);
   };
 
   //   useEffect(() => {
@@ -241,7 +249,8 @@ const CreateGithubCommitTask = () => {
           color="offWhite.main"
           fontSize="16px"
         >
-            Create a task that requires the user to commit to your hub's repository.
+          Create a task that requires the user to commit to your hub's
+          repository.
         </Typography>
       </Box>
       <Stack
@@ -347,6 +356,77 @@ const CreateGithubCommitTask = () => {
                 />
               );
             }}
+          />
+        </TextFieldWrapper>
+        {!!reposResponse?.repositories?.length && (
+          <TextFieldWrapper>
+            <Typography
+              variant="caption"
+              color="offWhite.main"
+              mb={theme.spacing(1)}
+            >
+              Repository
+            </Typography>
+            <Controller
+              name="repository"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { name, value, onChange } }) => (
+                <AutSelectField
+                  value={value}
+                  onChange={onChange}
+                  color="offWhite"
+                  disabled={loadingRepos}
+                  sx={{ width: "100%" }}
+                >
+                  <MenuItem value="">
+                    <em>Select a repository</em>
+                  </MenuItem>
+                  {reposResponse?.repositories?.map((repo) => (
+                    <MenuItem key={repo.id} value={repo.name}>
+                      {repo.name}
+                    </MenuItem>
+                  ))}
+                </AutSelectField>
+              )}
+            />
+          </TextFieldWrapper>
+        )}
+
+        <TextFieldWrapper>
+          <Typography
+            variant="caption"
+            color="offWhite.main"
+            mb={theme.spacing(1)}
+          >
+            Branch
+          </Typography>
+          <Controller
+            name="branch"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { name, value, onChange } }) => (
+              <AutSelectField
+                value={value}
+                onChange={onChange}
+                color="offWhite"
+                disabled={
+                  !values.repository ||
+                  loadingBranches ||
+                  branchesResponse?.branches?.length === 0
+                }
+                sx={{ width: "100%" }}
+              >
+                <MenuItem value="">
+                  <em>Select a branch</em>
+                </MenuItem>
+                {branchesResponse?.branches?.map((branch) => (
+                  <MenuItem key={branch.name} value={branch.name}>
+                    {branch.name}
+                  </MenuItem>
+                ))}
+              </AutSelectField>
+            )}
           />
         </TextFieldWrapper>
         <SliderFieldWrapper>
