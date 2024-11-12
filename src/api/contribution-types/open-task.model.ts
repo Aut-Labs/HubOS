@@ -39,4 +39,6 @@ export class OpenTaskContributionProperties extends TaskContributionProperties {
         data.properties as OpenTaskContributionProperties
       ) as T;
     }
+
+    contributionType? = "Open Task";
   }

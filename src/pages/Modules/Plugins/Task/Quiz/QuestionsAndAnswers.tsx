@@ -30,7 +30,7 @@ import {
 } from "react-hook-form";
 import AddIcon from "@mui/icons-material/Add";
 import { FormHelperText } from "@components/Fields";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { SubtitleWithInfo } from "@components/SubtitleWithInfoIcon";
 
 import DeleteIcon from "@assets/hubos/delete-icon.svg?react";
@@ -436,7 +436,7 @@ const QuestionsAndAnswers = ({ control, updateForm, getFormValues }) => {
     null
   );
 
-  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 

@@ -1,136 +1,11 @@
-import { Box, Container, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Container, Typography, useTheme } from "@mui/material";
 import { useMemo, useState } from "react";
-// import Tasks from "../../Task/Shared/Tasks";
-import { useAccount } from "wagmi";
 import AutLoading from "@components/AutLoading";
 import useQueryContributions from "@hooks/useQueryContributions";
-import Tasks from "./Tasks";
-import { TaskContributionNFT } from "@aut-labs/sdk";
-import OverflowTooltip from "@components/OverflowTooltip";
 import { ContributionsTable } from "./ContributionsTable";
-import { TaskStatus } from "@store/model";
-import { RetweetContributionProperties } from "@api/contribution-types/retweet.model";
 
-// const ContributionCard = ({
-//   contribution
-// }: {
-//   contribution: TaskContributionNFT;
-// }) => {
-//   const theme = useTheme();
-
-//   return (
-//     <>
-//       <Box
-//         sx={{
-//           alignItems: "flex-start",
-//           justifyContent: "flex-start",
-//           backdropFilter: "blur(50px)",
-//           backgroundColor: "rgba(128, 128, 128, 0.05)",
-//           border: `1px solid ${theme.palette.offWhite.dark}`,
-//           borderRadius: "6px",
-//           opacity: 1,
-//           WebkitBackdropFilter: "blur(6px)",
-//           padding: {
-//             xs: "24px 24px",
-//             md: "20px 20px",
-//             xxl: "36px 32px"
-//           },
-//           display: "flex",
-//           flexDirection: "column",
-//           animation: "none"
-//         }}
-//       >
-//         <Stack direction="column" justifyContent="center" display="flex">
-//           <Box
-//             style={{
-//               flex: "2",
-//               display: "flex",
-//               alignItems: "center",
-//               gap: "12px"
-//             }}
-//           >
-//             <Box
-//               sx={{
-//                 height: {
-//                   xs: "60px",
-//                   sm: "60px",
-//                   md: "60px",
-//                   xxl: "60px"
-//                 },
-//                 width: {
-//                   xs: "60px",
-//                   sm: "60px",
-//                   md: "60px",
-//                   xxl: "60px"
-//                 },
-//                 "@media (max-width: 370px)": {
-//                   height: "60px",
-//                   width: "60px"
-//                 },
-//                 minWidth: "60px",
-//                 position: "relative"
-//               }}
-//             >
-//               {/* <Avatar
-//                 variant="circular"
-//                 sx={{
-//                   width: "100%",
-//                   height: "100%",
-//                   borderRadius: "50%",
-//                   background: "transparent"
-//                 }}
-//                 aria-label="avatar"
-//               >
-//                 <img
-//                   src={ipfsCIDToHttpUrl(member?.properties?.avatar as string)}
-//                   style={{
-//                     objectFit: "contain",
-//                     width: "100%",
-//                     height: "100%"
-//                   }}
-//                 />
-//               </Avatar> */}
-//             </Box>
-
-//             <Typography
-//               color="offWhite.main"
-//               textAlign="center"
-//               lineHeight={1}
-//               variant="subtitle2"
-//             >
-//               {contribution?.name}
-//             </Typography>
-//           </Box>
-//         </Stack>
-//         <Stack sx={{ mt: 2, mb: 2 }}>
-//           <OverflowTooltip
-//             typography={{
-//               variant: "caption",
-//               fontWeight: "400",
-//               letterSpacing: "0.66px"
-//             }}
-//             maxLine={3}
-//             text={contribution?.description}
-//           />
-//         </Stack>
-//       </Box>
-//     </>
-//   );
-// };
-
-export const AllTasks = ({ data: taskTypes }) => {
+export const AllTasks = () => {
   const theme = useTheme();
-  const isAdmin = true;
-  const { address } = useAccount();
-  // const { data, isLoading } = useGetAllTasksQuery(
-  //   {
-  //     userAddress: address,
-  //     isAdmin
-  //   },
-  //   {
-  //     refetchOnMountOrArgChange: true
-  //   }
-  // );
 
   const {
     data,
@@ -139,23 +14,10 @@ export const AllTasks = ({ data: taskTypes }) => {
   } = useQueryContributions({
     variables: {
       skip: 0,
-      take: 1000,
+      take: 1000
     }
   });
 
-  //TODO: Check the type more efficiently
-  const updatedContributions = data?.map((item) => ({
-    ...item,
-    contributionType: (item.properties as RetweetContributionProperties)
-      .tweetUrl
-      ? "Retweet"
-      : "open",
-    status: TaskStatus.Created
-  }));
-  // const isLoading = false;
-  // const data = {
-  //   tasks: []
-  // };
   const [searchState, setSearchState] = useState({
     title: ""
   });
@@ -200,7 +62,7 @@ export const AllTasks = ({ data: taskTypes }) => {
                 mt: theme.spacing(4)
               }}
             >
-              <ContributionsTable contributions={updatedContributions} />
+              <ContributionsTable contributions={data} />
             </Box>
           </Container>
           {/* <Box

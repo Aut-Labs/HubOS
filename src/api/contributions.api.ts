@@ -10,6 +10,9 @@ import { TaskFactoryContractEventType } from "@aut-labs/abi-types";
 import { DiscordGatheringContribution } from "./contribution-types/discord-gathering.model";
 import { OpenTaskContribution } from "./contribution-types/open-task.model";
 import { RetweetContribution } from "./contribution-types/retweet.model";
+import { QuizTaskContribution } from "./contribution-types/quiz.model.model";
+import { encryptMessage } from "./aut.api";
+import { AuthSig } from "@aut-labs/connector/lib/esm/aut-sig";
 
 const hubServiceCache: Record<string, Hub> = {};
 
@@ -46,12 +49,14 @@ const createContribution = async (
       uri: uri
     });
 
-    const tx = await (await taskFactory.functions.registerDescription(
-      { uri },
-      overrides
-    )).wait();
+    const tx = await (
+      await taskFactory.functions.registerDescription({ uri }, overrides)
+    ).wait();
 
-    const event = findLogEvent(tx, TaskFactoryContractEventType.RegisterDescription);
+    const event = findLogEvent(
+      tx,
+      TaskFactoryContractEventType.RegisterDescription
+    );
     if (!event) {
       return {
         error: "Failed to register description"
@@ -88,28 +93,69 @@ const createContribution = async (
 };
 
 const createOpenTaskContribution = async (
-  openTaskContribution: OpenTaskContribution,
+  {
+    contribution,
+    autSig
+  }: { contribution: OpenTaskContribution; autSig: AuthSig },
   api: BaseQueryApi
 ) => {
-  const nft = OpenTaskContribution.getContributionNFT(openTaskContribution);
-  return createContribution(openTaskContribution, nft, api);
+  const nft = OpenTaskContribution.getContributionNFT(contribution);
+  return createContribution(contribution, nft, api);
 };
 
 const createTwitterRetweetContribution = async (
-  retweetContribution: RetweetContribution,
+  {
+    contribution,
+    autSig
+  }: { contribution: RetweetContribution; autSig: AuthSig },
   api: BaseQueryApi
 ) => {
-  const nft = RetweetContribution.getContributionNFT(retweetContribution);
-  return createContribution(retweetContribution, nft, api);
+  const nft = RetweetContribution.getContributionNFT(contribution);
+  return createContribution(contribution, nft, api);
 };
 
 const createDiscordGatheringContribution = async (
-  openTaskContribution: DiscordGatheringContribution,
+  {
+    contribution,
+    autSig
+  }: { contribution: DiscordGatheringContribution; autSig: AuthSig },
   api: BaseQueryApi
 ) => {
-  const nft =
-    DiscordGatheringContribution.getContributionNFT(openTaskContribution);
-  return createContribution(openTaskContribution, nft, api);
+  const nft = DiscordGatheringContribution.getContributionNFT(contribution);
+  return createContribution(contribution, nft, api);
+};
+
+const createQuizContribution = async (
+  {
+    contribution,
+    autSig
+  }: { contribution: QuizTaskContribution; autSig: AuthSig },
+  api: BaseQueryApi
+) => {
+  const state: any = api.getState() as any;
+  const questionsWithoutAnswers = [];
+  const questions = contribution.properties.questions;
+  for (let i = 0; i < questions.length; i++) {
+    const { question, answers } = questions[i];
+    const questionWithoutAnswer = {
+      question,
+      answers: answers.map((answer) => ({
+        value: answer.value
+      }))
+    };
+    questionsWithoutAnswers.push(questionWithoutAnswer);
+  }
+  const hubAddress = state.hub.selectedHubAddress;
+  const hash = await encryptMessage({
+    autSig,
+    message: JSON.stringify(questions),
+    hubAddress
+  });
+  contribution.properties.hash = hash;
+  contribution.properties.questions = questionsWithoutAnswers;
+
+  const nft = QuizTaskContribution.getContributionNFT(contribution);
+  return createContribution(contribution, nft, api);
 };
 
 export const contributionsApi = createApi({
@@ -125,13 +171,22 @@ export const contributionsApi = createApi({
     if (url === "createTwitterRetweetContribution") {
       return createTwitterRetweetContribution(body, api);
     }
+    if (url === "createQuizContribution") {
+      return createQuizContribution(body, api);
+    }
     return {
       data: "Test"
     };
   },
   tagTypes: ["Contributions"],
   endpoints: (builder) => ({
-    createOpenTaskContribution: builder.mutation<void, OpenTaskContribution>({
+    createOpenTaskContribution: builder.mutation<
+      void,
+      {
+        autSig: AuthSig;
+        contribution: OpenTaskContribution;
+      }
+    >({
       query: (body) => {
         return {
           body,
@@ -141,7 +196,10 @@ export const contributionsApi = createApi({
     }),
     createDiscordGatheringContribution: builder.mutation<
       void,
-      DiscordGatheringContribution
+      {
+        autSig: AuthSig;
+        contribution: DiscordGatheringContribution;
+      }
     >({
       query: (body) => {
         return {
@@ -152,12 +210,29 @@ export const contributionsApi = createApi({
     }),
     createTwitterRetweetContribution: builder.mutation<
       void,
-      RetweetContribution
+      {
+        autSig: AuthSig;
+        contribution: RetweetContribution;
+      }
     >({
       query: (body) => {
         return {
           body,
           url: "createTwitterRetweetContribution"
+        };
+      }
+    }),
+    createQuizContribution: builder.mutation<
+      void,
+      {
+        autSig: AuthSig;
+        contribution: QuizTaskContribution;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "createQuizContribution"
         };
       }
     })
@@ -167,5 +242,6 @@ export const contributionsApi = createApi({
 export const {
   useCreateTwitterRetweetContributionMutation,
   useCreateOpenTaskContributionMutation,
-  useCreateDiscordGatheringContributionMutation
+  useCreateDiscordGatheringContributionMutation,
+  useCreateQuizContributionMutation
 } = contributionsApi;

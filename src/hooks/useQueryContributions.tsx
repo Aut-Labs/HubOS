@@ -68,8 +68,7 @@ const useQueryContributions = (props: QueryFunctionOptions<any, any> = {}) => {
   });
 
   const [contributions, setContributions] = useState<TaskContributionNFT[]>([]);
-  const [loadingMetadata, setLoadingMetadata] = useState(false);
-
+  const [loadingMetadata, setLoadingMetadata] = useState(true);
 
   useEffect(() => {
     if (hubData?.properties?.address && data?.contributions?.length && taskTypes.length) {

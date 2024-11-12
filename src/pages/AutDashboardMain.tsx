@@ -3,13 +3,11 @@ import SidebarDrawer from "@components/Sidebar/Sidebar";
 import Dashboard from "./Dashboard/Dashboard";
 import { Suspense, memo } from "react";
 import AutLoading from "@components/AutLoading";
-// import { pluginRoutes } from "./Modules/Shared/routes";
 import { useSelector } from "react-redux";
 import { HubData } from "@store/Hub/hub.reducer";
 import Admins from "./Admins/Admins";
 import Archetype from "./Archetype/Archetype";
 import DAut from "./Modules/Plugins/DAut/DAut";
-import { useGetArchetypeAndStatsQuery } from "@api/hub.api";
 import { styled } from "@mui/material";
 import backgroundImage from "@assets/hubos/bg-aut-blue.png";
 import HubEdit from "./HubEdit/HubEdit";
@@ -20,7 +18,6 @@ import { AllTasks } from "./Modules/Plugins/Task/Shared/AllTasks";
 import CreateOpenTask from "./Modules/Plugins/Task/Open/CreateOpenTask";
 import useQueryTaskTypes from "@hooks/useQueryTaskTypes";
 import CreateGathering from "./DiscordBot/CreateGathering";
-import CreatXCommentTask from "./TwitterTasks/CreateXCommentTask";
 import CreateXLikeTask from "./TwitterTasks/CreateXLikeTask";
 import CreateXFollowTask from "./TwitterTasks/CreateXFollowTask";
 import CreateGithubCommitTask from "./GithubTasks/CreateGithubCommitTask";
@@ -30,6 +27,7 @@ import CreateXCommentTask from "./TwitterTasks/CreateXCommentTask";
 import CreatePoll from "./DiscordBot/CreatePoll";
 import CreateGithubOpenPRTask from "./GithubTasks/CreateGithubOpenPRTask";
 import SubmitRetweetTask from "./TwitterTasks/SubmitRetweetTask";
+import CreateQuizTask from "./Modules/Plugins/Task/Quiz/CreateQuizTask";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -41,15 +39,7 @@ const AutContainer = styled("div")(() => ({
 }));
 
 const AutDashboardMain = () => {
-  // const { data: plugins, isLoading } = useGetAllPluginDefinitionsByDAOQuery(
-  //   null,
-  //   {
-  //     refetchOnMountOrArgChange: false,
-  //     skip: false
-  //   }
-  // );
   const hubData = useSelector(HubData);
-
   const { data: members, loading: isLoadingMembers } = useQueryHubMembers({
     skip: !hubData?.properties?.address,
     variables: {
@@ -63,11 +53,6 @@ const AutDashboardMain = () => {
     }
   });
 
-  const { data: archetype } = useGetArchetypeAndStatsQuery(null, {
-    refetchOnMountOrArgChange: false,
-    skip: false
-  });
-
   const {
     data,
     loading: isLoading,
@@ -78,176 +63,73 @@ const AutDashboardMain = () => {
       take: 1000
     }
   });
-
-  console.log(archetype, "archetype");
-
-  // const { questOnboarding } = useGetAllPluginDefinitionsByDAOQuery(null, {
-  //   selectFromResult: ({ data }) => ({
-  //     questOnboarding: (data || []).find(
-  //       (p) =>
-  //         PluginDefinitionType.QuestOnboardingPlugin === p.pluginDefinitionId
-  //     )
-  //   })
-  // });
-
-  // const { data: onboardingProgress } = useGetOnboardingProgressQuery(
-  //   questOnboarding?.pluginAddress,
-  //   {
-  //     pollingInterval: 15000,
-  //     refetchOnMountOrArgChange: true
-  //   }
-  // );
-
-  // const totalSubmissions = useMemo(() => {
-  //   if (onboardingProgress?.quests) {
-  //     return onboardingProgress?.quests.reduce((prev, curr) => {
-  //       prev += curr.tasksAndSubmissions.submissions.length;
-  //       return prev;
-  //     }, 0);
-  //   }
-
-  //   return 0;
-  // }, [onboardingProgress]);
-
-  const modules = [];
-  const isLoadingModules = false;
-
-  // const { data: modules, isLoading: isLoadingModules } =
-  //   useGetAllModuleDefinitionsQuery(null, {
-  //     refetchOnMountOrArgChange: false,
-  //     skip: false
-  //   });
-
-  // const modulesRoutes = useMemo(() => {
-  //   const { allRoutes, menuItems } = pluginRoutes(
-  //     plugins || [],
-  //     modules || [],
-  //     isAdmin,
-  //     0,
-  //     ""
-  //   );
-
-  //   console.log(allRoutes, menuItems, "allRoutes");
-
-  //   return {
-  //     menuItem: {
-  //       title: "Hub",
-  //       icon: ManageIcon,
-  //       route: `hub`,
-  //       children: [
-  //         {
-  //           title: "Onboard new members",
-  //           route: "modules",
-  //           exact: true,
-  //           icon: StackIcon,
-  //           children: menuItems
-  //         },
-  //         {
-  //           title: "Tasks",
-  //           route: "tasks",
-  //           exact: true,
-  //           icon: StackIcon
-  //         }
-  //       ]
-  //     },
-  //     routes: allRoutes
-  //   };
-  // }, [plugins, modules, isAdmin]);
-
   return (
     <>
       <AutContainer>
-        {isLoadingModules ? (
-          <AutLoading width="130px" height="130px" />
-        ) : (
-          <SidebarDrawer
-            addonMenuItems={[]}
-            // addonMenuItems={
-            //   modulesRoutes?.routes?.length
-            //     ? [modulesRoutes.menuItem]
-            //     : [modulesRoutes.menuItem]
-            // }
-          >
-            <Suspense fallback={<AutLoading width="130px" height="130px" />}>
-              <Routes>
-                <Route index element={<Dashboard members={members} />} />
-                <Route path="admins" element={<Admins />} />
-                <Route path="edit-hub" element={<HubEdit />} />
-                <Route path="archetype" element={<Archetype />} />
-                <Route path="modules/dAut" element={<DAut />} />
-                <Route path="discord-bot" element={<DiscordBot />}></Route>
-                <Route
-                  path="members"
-                  element={
-                    <Members members={members} isLoading={isLoadingMembers} />
-                  }
-                />
-                <Route
-                  path="task-manager"
-                  element={
-                    <TaskManager
-                      isLoading={isLoading}
-                      data={data}
-                      refetch={refetch}
-                    />
-                  }
-                />
-                <Route
-                  path="contributions"
-                  element={<AllTasks data={data} />}
-                />
-                <Route path="create-open-task" element={<CreateOpenTask />} />
-                <Route
-                  path="create-github-commit"
-                  element={<CreateGithubCommitTask />}
-                />{" "}
-                <Route
-                  path="create-github-open-pull-request"
-                  element={<CreateGithubOpenPRTask />}
-                />
-                <Route
-                  path="create-discord-gatherings"
-                  element={<CreateGathering />}
-                />
-                <Route path="create-discord-polls" element={<CreatePoll />} />
-                <Route
-                  path="create-twitter-follow"
-                  element={<CreateXFollowTask />}
-                />
-                <Route
-                  path="create-twitter-comment"
-                  element={<CreateXCommentTask />}
-                />
-                <Route
-                  path="create-twitter-retweet"
-                  element={<CreateXRetweetTask />}
-                />
-                <Route
-                  path="create-twitter-like"
-                  element={<CreateXLikeTask />}
-                />
-                <Route path="create-open-task" element={<CreateOpenTask />} />
-                <Route
-                  path="submit-retweet-task"
-                  element={<SubmitRetweetTask />}
-                />
-                {/* <Route path="tasks" element={<AllTasks />} /> */}
-                {/* {modulesRoutes?.routes?.length && (
-                <Route
-                  path="quest-submissions"
-                  element={<QuestSubmissions />}
-                />
-              )} */}
-                {/* <Route path="modules" element={<Modules />} />
-              {modulesRoutes.routes.map((r) => r)}
+        <SidebarDrawer
+          addonMenuItems={[]}
+        >
+          <Suspense fallback={<AutLoading width="130px" height="130px" />}>
+            <Routes>
+              <Route index element={<Dashboard members={members} />} />
+              <Route path="admins" element={<Admins />} />
+              <Route path="edit-hub" element={<HubEdit />} />
+              <Route path="archetype" element={<Archetype />} />
+              <Route path="modules/dAut" element={<DAut />} />
+              <Route path="discord-bot" element={<DiscordBot />}></Route>
               <Route
-                path="*"
-                element={<Navigate to={`/${hubData.name}`} />}
-              /> */}
-              </Routes>
-            </Suspense>
-          </SidebarDrawer>
-        )}
+                path="members"
+                element={
+                  <Members members={members} isLoading={isLoadingMembers} />
+                }
+              />
+              <Route
+                path="task-manager"
+                element={
+                  <TaskManager
+                    isLoading={isLoading}
+                    data={data}
+                    refetch={refetch}
+                  />
+                }
+              />
+              <Route path="contributions" element={<AllTasks />} />
+              <Route path="create-open-task" element={<CreateOpenTask />} />
+              <Route path="create-quiz" element={<CreateQuizTask />} />
+              <Route
+                path="create-github-commit"
+                element={<CreateGithubCommitTask />}
+              />{" "}
+              <Route
+                path="create-github-open-pull-request"
+                element={<CreateGithubOpenPRTask />}
+              />
+              <Route
+                path="create-discord-gatherings"
+                element={<CreateGathering />}
+              />
+              <Route path="create-discord-polls" element={<CreatePoll />} />
+              <Route
+                path="create-twitter-follow"
+                element={<CreateXFollowTask />}
+              />
+              <Route
+                path="create-twitter-comment"
+                element={<CreateXCommentTask />}
+              />
+              <Route
+                path="create-twitter-retweet"
+                element={<CreateXRetweetTask />}
+              />
+              <Route path="create-twitter-like" element={<CreateXLikeTask />} />
+              <Route path="create-open-task" element={<CreateOpenTask />} />
+              <Route
+                path="submit-retweet-task"
+                element={<SubmitRetweetTask />}
+              />
+            </Routes>
+          </Suspense>
+        </SidebarDrawer>
       </AutContainer>
     </>
   );

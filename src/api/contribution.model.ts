@@ -1,4 +1,4 @@
-import { BaseNFTModel } from "@aut-labs/sdk";
+import { BaseNFTModel, TaskContributionNFT } from "@aut-labs/sdk";
 import { TaskType } from "./models/task-type";
 import { OpenTaskContribution } from "./contribution-types/open-task.model";
 import { DiscordGatheringContribution } from "./contribution-types/discord-gathering.model";
@@ -43,7 +43,8 @@ export const ContributionFactory = (
     case "DiscordPolls":
     case "TwitterFollow":
     case "TwitterComment":
-      throw new Error("Task type not implemented");
+      // throw new Error("Task type not implemented");
+      return new TaskContributionNFT(data);
 
     default:
       throw new Error("Task type not found");

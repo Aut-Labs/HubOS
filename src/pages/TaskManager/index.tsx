@@ -1,26 +1,14 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Container,
-  IconButton,
-  Stack,
-  Tooltip,
-  Typography,
-  styled
-} from "@mui/material";
+import { Box, Button, Container, Typography, styled } from "@mui/material";
 import { memo, useEffect, useMemo, useState } from "react";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { setTitle } from "@store/ui-reducer";
 import { useAppDispatch } from "@store/store.model";
 import AutLoading from "@components/AutLoading";
-import useQueryTaskTypes from "@hooks/useQueryTaskTypes";
 import { ModuleDefinitionCard } from "../Modules/Shared/PluginCard";
 import HubOsTabs from "@components/HubOsTabs";
 import { useSelector } from "react-redux";
 import { HubData } from "@store/Hub/hub.reducer";
-import { AutButton, AutOsButton } from "@components/buttons";
 import { SocialVerificationCard } from "./SocialVerificationCard";
 import ComingSoonCard from "./ComingSoonCard";
 
@@ -246,6 +234,7 @@ const TaskManager = ({ isLoading, data, refetch }) => {
     };
   }, [data]);
 
+  console.log(filteredTasks);
   const tabs = useMemo(() => {
     if (filteredTasks && filteredTasks.otherTasks.length) {
       return [
