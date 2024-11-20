@@ -90,7 +90,7 @@ const TableListItem = memo((data: any) => {
           }}
         >
           <Typography variant="body" fontWeight="normal" color="white">
-            {row?.contributionType || 'N/A'}
+            {row?.contributionType || "N/A"}
           </Typography>
         </Box>
       </StyledTableCell>

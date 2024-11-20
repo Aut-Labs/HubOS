@@ -1,3 +1,9 @@
+import {
+  BaseNFTModel,
+  TaskContributionNFT,
+  TaskContributionProperties
+} from "@aut-labs/sdk";
+
 export class CommitContributionProperties extends TaskContributionProperties {
   branch: string;
   repository: string;
@@ -33,4 +39,6 @@ export class CommitContribution<
       data.properties as CommitContributionProperties
     ) as T;
   }
+
+  contributionType? = "Commit";
 }

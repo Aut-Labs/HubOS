@@ -1,12 +1,6 @@
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { AutDatepicker, FormHelperText } from "@components/Fields";
-import {
-  Box,
-  MenuItem,
-  Stack,
-  Typography,
-  useTheme
-} from "@mui/material";
+import { Box, MenuItem, Stack, Typography, useTheme } from "@mui/material";
 import { AutSelectField } from "@theme/field-select-styles";
 import { memo, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -35,6 +29,8 @@ import { FormContainer } from "../Modules/Plugins/Task/Shared/FormContainer";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { PullRequestContribution } from "@api/contribution-types/github-pr.model";
+import { useWalletConnector } from "@aut-labs/connector";
+import { environment } from "@api/environment";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -85,6 +81,7 @@ const AttachmentTypes = [
 // }));
 
 const CreateGithubPRTask = () => {
+  const { state } = useWalletConnector();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -122,7 +119,7 @@ const CreateGithubPRTask = () => {
     queryKey: ["repositories", metadata.orgId],
     queryFn: async () => {
       const response = await axios.post(
-        "http://localhost:4005/api/task/github/getRepositories",
+        `${environment.apiUrl}/task/github/getRepositories`,
         {
           organisationId: metadata.orgId,
           organisationName: metadata.orgName
@@ -136,7 +133,7 @@ const CreateGithubPRTask = () => {
     queryKey: ["branches", values.repository],
     queryFn: async () => {
       const response = await axios.post(
-        "http://localhost:4005/api/task/github/getBranches",
+        `${environment.apiUrl}/task/github/getBranches`,
         {
           repositoryName: values.repository,
           organisationName: metadata.orgName
@@ -164,10 +161,10 @@ const CreateGithubPRTask = () => {
         repository: values.repository,
         organisation: metadata.orgName,
         quantity: values.quantity,
-        uri: ""
+        descriptionId: ""
       }
     });
-    createTask(contribution);
+    createTask({ contribution, autSig: state.authSig });
   };
 
   //   useEffect(() => {

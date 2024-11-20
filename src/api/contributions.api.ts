@@ -112,6 +112,7 @@ const createTwitterRetweetContribution = async (
   }: { contribution: RetweetContribution; autSig: AuthSig },
   api: BaseQueryApi
 ) => {
+  debugger;
   const nft = RetweetContribution.getContributionNFT(contribution);
   return createContribution(contribution, nft, api);
 };
@@ -161,19 +162,26 @@ const createQuizContribution = async (
 };
 
 const createGithubCommitContribution = async (
-  githubContribution: CommitContribution,
+  {
+    contribution,
+    autSig
+  }: { contribution: CommitContribution; autSig: AuthSig },
   api: BaseQueryApi
 ) => {
-  const nft = CommitContribution.getContributionNFT(githubContribution);
-  return createContribution(githubContribution, nft, api);
+  debugger;
+  const nft = CommitContribution.getContributionNFT(contribution);
+  return createContribution(contribution, nft, api);
 };
 
 const createGithubPullRequestContribution = async (
-  githubContribution: PullRequestContribution,
+  {
+    contribution,
+    autSig
+  }: { contribution: PullRequestContribution; autSig: AuthSig },
   api: BaseQueryApi
 ) => {
-  const nft = PullRequestContribution.getContributionNFT(githubContribution);
-  return createContribution(githubContribution, nft, api);
+  const nft = PullRequestContribution.getContributionNFT(contribution);
+  return createContribution(contribution, nft, api);
 };
 
 export const contributionsApi = createApi({
@@ -246,7 +254,13 @@ export const contributionsApi = createApi({
         };
       }
     }),
-    createGithubCommitContribution: builder.mutation<void, CommitContribution>({
+    createGithubCommitContribution: builder.mutation<
+      void,
+      {
+        autSig: AuthSig;
+        contribution: CommitContribution;
+      }
+    >({
       query: (body) => {
         return {
           body,
@@ -254,16 +268,20 @@ export const contributionsApi = createApi({
         };
       }
     }),
-    createGithubPRContribution: builder.mutation<void, PullRequestContribution>(
+    createGithubPRContribution: builder.mutation<
+      void,
       {
-        query: (body) => {
-          return {
-            body,
-            url: "createGithubPRContribution"
-          };
-        }
+        autSig: AuthSig;
+        contribution: PullRequestContribution;
       }
-    ),
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "createGithubPRContribution"
+        };
+      }
+    }),
     createQuizContribution: builder.mutation<
       void,
       {

@@ -111,7 +111,7 @@ function DiscordBot() {
   } = useQuery({
     queryKey: ["checkBotActive"],
     queryFn: () => {
-      return axios.get(`http://localhost:4005/api/discord/check/${guildId}`);
+      return axios.get(`${environment.apiUrl}/discord/check/${guildId}`);
     },
     enabled: !!guildId
   });

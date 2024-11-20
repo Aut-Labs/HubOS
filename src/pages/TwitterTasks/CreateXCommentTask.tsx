@@ -38,6 +38,7 @@ import { FormContainer } from "../Modules/Plugins/Task/Shared/FormContainer";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useOAuthSocials } from "@components/Oauth2/oauth2";
+import { environment } from "@api/environment";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -98,7 +99,7 @@ const CreateXCommentTask = () => {
   const { mutateAsync: verifyFollow } = useMutation<any, void, any>({
     mutationFn: (verifyFollowRequest) => {
       return axios
-        .post(`http://localhost:4005/api/task/twitter/like`, verifyFollowRequest)
+        .post(`${environment.apiUrl}/task/twitter/like`, verifyFollowRequest)
         .then((res) => res.data);
     }
   });

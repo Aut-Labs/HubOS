@@ -40,7 +40,7 @@ const ClaimRole = () => {
   const { mutateAsync: claimRole } = useMutation<any, void, any>({
     mutationFn: (claimRoleRequest) => {
       return axios
-        .post(`http://localhost:4005/api/discord//get-role`, claimRoleRequest)
+        .post(`${environment.apiUrl}/discord//get-role`, claimRoleRequest)
         .then((res) => res.data);
     }
   });

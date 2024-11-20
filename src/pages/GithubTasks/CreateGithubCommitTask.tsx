@@ -40,6 +40,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useOAuthSocials } from "@components/Oauth2/oauth2";
 import { CommitContribution } from "@api/contribution-types/github-commit.model";
+import { useWalletConnector } from "@aut-labs/connector";
+import { environment } from "@api/environment";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -63,6 +65,7 @@ const AttachmentTypes = [
 ];
 
 const CreateGithubCommitTask = () => {
+  const { state } = useWalletConnector();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -100,7 +103,7 @@ const CreateGithubCommitTask = () => {
     queryKey: ["repositories", metadata.orgId],
     queryFn: async () => {
       const response = await axios.post(
-        "http://localhost:4005/api/task/github/getRepositories",
+        `${environment.apiUrl}/task/github/getRepositories`,
         {
           organisationId: metadata.orgId,
           organisationName: metadata.orgName
@@ -115,7 +118,7 @@ const CreateGithubCommitTask = () => {
     queryKey: ["branches", values.repository],
     queryFn: async () => {
       const response = await axios.post(
-        "http://localhost:4005/api/task/github/getBranches",
+        `${environment.apiUrl}/task/github/getBranches`,
         {
           repositoryName: values.repository,
           organisationName: metadata.orgName
@@ -143,10 +146,10 @@ const CreateGithubCommitTask = () => {
         repository: values.repository,
         organisation: metadata.orgName,
         quantity: values.quantity,
-        uri: ""
+        descriptionId: ""
       }
     });
-    createTask(contribution);
+    createTask({ contribution, autSig: state.authSig });
   };
 
   //   useEffect(() => {
