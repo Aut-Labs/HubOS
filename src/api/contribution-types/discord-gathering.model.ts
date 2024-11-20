@@ -40,4 +40,6 @@ export class DiscordGatheringContribution<
       data.properties as DiscordGatheringContributionProperties
     ) as T;
   }
+
+  contributionType? = "Discord Gatherings";
 }

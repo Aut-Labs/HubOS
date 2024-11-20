@@ -21,7 +21,7 @@ const CreateOpenTask = lazy(
   () => import("../Plugins/Task/Open/CreateOpenTask")
 );
 
-const QuizTasks = lazy(() => import("../Plugins/Task/Quiz/QuizTasks"));
+const QuizTasks = lazy(() => import("../Plugins/Task/Quiz/CreateQuizTask"));
 const QuizTask = lazy(() => import("../Plugins/Task/Quiz/QuizTask"));
 const CreateQuizTask = lazy(
   () => import("../Plugins/Task/Quiz/CreateQuizTask")

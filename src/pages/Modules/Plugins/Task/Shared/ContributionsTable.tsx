@@ -19,11 +19,6 @@ import {
   useTheme
 } from "@mui/material";
 import { format } from "date-fns";
-import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { TaskStatus } from "@store/model";
-import useQueryContributions from "@hooks/useQueryContributions";
-import { formatContributionType } from "@utils/format-contribution-type";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}, &.${tableCellClasses.body}`]: {
@@ -48,11 +43,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 const TableListItem = memo((data: any) => {
   const { row } = data;
   const theme = useTheme();
-
-  const contributionType = useMemo(
-    () => formatContributionType(row?.contributionType),
-    [row?.contributionType]
-  );
 
   const startDate = useMemo(() => {
     return format(
@@ -100,7 +90,7 @@ const TableListItem = memo((data: any) => {
           }}
         >
           <Typography variant="body" fontWeight="normal" color="white">
-            {contributionType}
+            {row?.contributionType || "N/A"}
           </Typography>
         </Box>
       </StyledTableCell>

@@ -40,6 +40,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useOAuthSocials } from "@components/Oauth2/oauth2";
 import { RetweetContribution } from "@api/contribution-types/retweet.model";
+import { useWalletConnector } from "@aut-labs/connector";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -50,6 +51,7 @@ const errorTypes = {
 };
 
 const CreateXRetweetTask = () => {
+  const { state } = useWalletConnector();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -84,8 +86,6 @@ const CreateXRetweetTask = () => {
   });
   const values = watch();
 
-  const { getAuthX } = useOAuthSocials();
-
   const onSubmit = async () => {
     const values = getValues();
     const joinedHub = autID.joinedHub(hubData.properties.address);
@@ -104,7 +104,7 @@ const CreateXRetweetTask = () => {
         descriptionId: ""
       }
     });
-    createTask(contribution);
+    createTask({ contribution, autSig: state.authSig });
   };
 
   return (

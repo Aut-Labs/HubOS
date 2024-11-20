@@ -33,4 +33,6 @@ export class RetweetContribution<
       data.properties as RetweetContributionProperties
     ) as T;
   }
+
+  contributionType? = "Retweet";
 }

@@ -35,4 +35,6 @@ export class JoinDiscordContribution<
       data.properties as JoinDiscordTaskContributionProperties
     ) as T;
   }
+
+  contributionType? = "Join Discord";
 }
