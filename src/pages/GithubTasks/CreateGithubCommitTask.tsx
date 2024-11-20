@@ -27,11 +27,6 @@ import {
   useCreateGithubCommitContributionMutation,
   useCreateOpenTaskContributionMutation
 } from "@api/contributions.api";
-import {
-  CommitContribution,
-  DiscordGatheringContribution,
-  OpenTaskContribution
-} from "@api/contribution.model";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import SubmitDialog from "@components/Dialog/SubmitDialog";
 import {
@@ -44,6 +39,7 @@ import { FormContainer } from "../Modules/Plugins/Task/Shared/FormContainer";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useOAuthSocials } from "@components/Oauth2/oauth2";
+import { CommitContribution } from "@api/contribution-types/github-commit.model";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,

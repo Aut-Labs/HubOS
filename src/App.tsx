@@ -9,13 +9,13 @@ import { environment } from "@api/environment";
 import { updateWalletProviderState } from "@store/WalletProvider/WalletProvider";
 import { getAppConfig } from "@api/aut.api";
 import AutSDK from "@aut-labs/sdk";
-import GetStarted from "./pages/GetStarted/GetStarted";
 import AutLoading from "@components/AutLoading";
 import { HubData } from "@store/Hub/hub.reducer";
-import ClaimRole from "./pages/DiscordBot/ClaimRole";
-import Callback from "./pages/Oauth2Callback/Callback";
 
 const AutDashboardMain = lazy(() => import("./pages/AutDashboardMain"));
+const Callback = lazy(() => import("./pages/Oauth2Callback/Callback"));
+const ClaimRole = lazy(() => import("./pages/DiscordBot/ClaimRole"));
+const GetStarted = lazy(() => import("./pages/GetStarted/GetStarted"));
 
 function App() {
   const dispatch = useAppDispatch();
@@ -24,14 +24,6 @@ function App() {
   const hubData = useSelector(HubData);
   const location = useLocation();
 
-  // const isLoading = useMemo(
-  //   () => !isAuthenticating && isInitialized,
-  //   [isAuthenticating, isInitialized]
-  // );
-
-  console.log(isAuthenticating, "isAuthenticating");
-  console.log(isInitialized, "isInitialized");
-  // console.log(isLoading, "isLoading");
   const returnUrl = useMemo(() => {
     if (!hubData) return "/";
     const shouldGoToDashboard =
@@ -40,7 +32,6 @@ function App() {
     const url = location.state?.from;
     return url || goTo;
   }, [hubData]);
-  console.log(returnUrl, "returnUrl");
 
   useEffect(() => {
     getAppConfig().then(async (networks) => {
@@ -49,7 +40,6 @@ function App() {
           networksConfig: networks
         })
       );
-
       const sdk = new AutSDK({
         ipfs: {
           apiKey: environment.ipfsApiKey,
@@ -57,30 +47,9 @@ function App() {
           gatewayUrl: environment.ipfsGatewayUrl
         }
       });
-      // await AutSDK.getInstance(true);
       setInitialized(true);
     });
-    // .finally(() => setLoading(false));
   }, []);
-
-  // useEffect(() => {
-  //   getAppConfig()
-  //     .then(async (res) => {
-  //       dispatch(setNetworks(res));
-  //       const [network] = res.filter((d) => !d.disabled);
-  //       setConfig(generateNetworkConfig(network));
-  //       new AutSDK({
-  //         ipfs: {
-  //           apiKey: environment.ipfsApiKey,
-  //           secretApiKey: environment.ipfsApiSecret,
-  //           gatewayUrl: environment.ipfsGatewayUrl
-  //         }
-  //       });
-  //     })
-  //     .catch(() => {
-  //       setError(true);
-  //     });
-  // }, []);
 
   return (
     <>

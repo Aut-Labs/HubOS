@@ -2,67 +2,98 @@ import AutSDK, {
   BaseNFTModel,
   fetchMetadata,
   Hub,
-  TaskContribution,
-  TaskContributionNFT
+  TaskContributionNFT,
+  TaskFactoryContract
 } from "@aut-labs/sdk";
-import { QueryFunctionOptions, QueryResult } from "@apollo/client";
+import {
+  gql,
+  QueryFunctionOptions,
+  QueryResult,
+  useQuery
+} from "@apollo/client";
 import { useEffect, useState } from "react";
 import { environment } from "@api/environment";
 import { useSelector } from "react-redux";
-import { HubData } from "@store/Hub/hub.reducer";
-import { HubOSHub } from "@api/hub.model";
+import { HubData, TaskTypes } from "@store/Hub/hub.reducer";
+import { TaskType } from "@api/models/task-type";
+import { ContributionFactory } from "@api/contribution.model";
 
-const fetchOnChainContributions = async (
-  hubData: HubOSHub
-): Promise<TaskContributionNFT[]> => {
-  const sdk = await AutSDK.getInstance();
-  const hubService: Hub = sdk.initService<Hub>(Hub, hubData.properties.address);
-  const taskFactory = await hubService.getTaskFactory();
-  const ids = (await taskFactory.functions.contributionIds()) as string[];
+const GET_HUB_CONTRIBUTIONS = gql`
+  query GetContributions($skip: Int, $first: Int, $where: Contribution_filter) {
+    contributions(skip: $skip, first: $first, where: $where) {
+      id
+      taskId
+      role
+      startDate
+      endDate
+      points
+      quantity
+      descriptionId
+    }
+  }
+`;
 
-  const contributions = await Promise.all(
-    ids.map(async (id) => {
-      const _contribution = await taskFactory.functions.getContributionById(id);
-      const contribution = TaskContribution.mapFromTuple(_contribution as any);
-      const { uri } = await taskFactory.functions.getDescriptionById(
-        contribution.descriptionId
-      );
-      const metadata = await fetchMetadata<BaseNFTModel<any>>(
-        uri,
-        environment.ipfsGatewayUrl
-      );
-      return {
-        ...metadata,
-        properties: {
-          ...metadata.properties,
-          ...contribution
-        }
-      };
-    })
-  );
-  return contributions;
+const contributionsMetadata = (
+  contributions: any[],
+  taskFactory: TaskFactoryContract,
+  taskTypes: TaskType[]
+) => {
+  return contributions.map(async (contribution) => {
+    const { uri } = await taskFactory.functions.getDescriptionById(
+      contribution?.descriptionId
+    );
+    let metadata = await fetchMetadata<BaseNFTModel<any>>(
+      uri,
+      environment.ipfsGatewayUrl
+    );
+    metadata = metadata || ({ properties: {} } as BaseNFTModel<any>);
+    return ContributionFactory(metadata, contribution, taskTypes);
+  });
 };
 
 const useQueryContributions = (props: QueryFunctionOptions<any, any> = {}) => {
-  const [contributions, setContributions] = useState<TaskContributionNFT[]>([]);
-  const [loadingMetadata, setLoadingMetadata] = useState(false);
   const hubData = useSelector(HubData);
+  const taskTypes = useSelector(TaskTypes);
+  const { data, loading, ...rest } = useQuery(GET_HUB_CONTRIBUTIONS, {
+    skip: !hubData?.properties?.address || !taskTypes.length,
+    fetchPolicy: "cache-and-network",
+    variables: {
+      ...props.variables,
+      where: {
+        hubAddress: hubData.properties.address,
+        ...(props.variables?.where || {})
+      }
+    },
+    ...props
+  });
+
+  const [contributions, setContributions] = useState<TaskContributionNFT[]>([]);
+  const [loadingMetadata, setLoadingMetadata] = useState(true);
 
   useEffect(() => {
-    if (hubData) {
+    if (hubData?.properties?.address && data?.contributions?.length && taskTypes.length) {
       const fetch = async () => {
+        const sdk = await AutSDK.getInstance();
+        const hubService: Hub = sdk.initService<Hub>(
+          Hub,
+          hubData.properties.address
+        );
+        const taskFactory = await hubService.getTaskFactory();
         setLoadingMetadata(true);
-        const contributions = await fetchOnChainContributions(hubData);
+        const contributions = await Promise.all(
+          contributionsMetadata(data?.contributions, taskFactory, taskTypes)
+        );
         setLoadingMetadata(false);
         setContributions(contributions);
       };
       fetch();
     }
-  }, [hubData]);
+  }, [hubData?.properties?.address, data, taskTypes]);
 
   return {
     data: contributions || [],
-    loading: loadingMetadata
+    ...rest,
+    loading: loading || loadingMetadata
   } as QueryResult<TaskContributionNFT[]>;
 };
 

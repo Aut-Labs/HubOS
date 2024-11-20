@@ -26,10 +26,6 @@ import {
   useCreateDiscordGatheringContributionMutation,
   useCreateOpenTaskContributionMutation
 } from "@api/contributions.api";
-import {
-  DiscordGatheringContribution,
-  OpenTaskContribution
-} from "@api/contribution.model";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import SubmitDialog from "@components/Dialog/SubmitDialog";
 import {
@@ -41,6 +37,8 @@ import {
 import { FormContainer } from "../Modules/Plugins/Task/Shared/FormContainer";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { DiscordGatheringContribution } from "@api/contribution-types/discord-gathering.model";
+import { useWalletConnector } from "@aut-labs/connector";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -98,6 +96,7 @@ const fetchVoiceChannels = async (guildId: string) => {
 };
 
 const CreateDiscordGathering = () => {
+  const { state } = useWalletConnector();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -154,10 +153,10 @@ const CreateDiscordGathering = () => {
         channelId: values.channelId,
         points: values.weight,
         quantity: 1,
-        uri: ""
+        descriptionId: ""
       }
     });
-    createTask(contribution);
+    createTask({ contribution, autSig: state.authSig });
   };
 
   useEffect(() => {
@@ -167,7 +166,6 @@ const CreateDiscordGathering = () => {
       // });
     }
   }, [isSuccess, hubData]);
-
 
   return (
     <FormContainer onSubmit={handleSubmit(onSubmit)}>

@@ -240,6 +240,8 @@ const Members = ({ members, isLoading }: { members: HubOSAutID<AutIDProperties>[
 
   const hubData = useSelector(HubData);
 
+  console.log(members);
+
   const tabs = useMemo(() => {
     const roles = hubData.roles;
     const initializedTabs = roles.reduce((tab, role) => {
@@ -303,7 +305,7 @@ const Members = ({ members, isLoading }: { members: HubOSAutID<AutIDProperties>[
           }}
         >
           <Typography color="rgb(107, 114, 128)" variant="subtitle2">
-            There are no contributors in this hub yet...
+            There are no members in this hub yet...
           </Typography>
         </Box>
       )}

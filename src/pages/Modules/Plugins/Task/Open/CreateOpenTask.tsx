@@ -28,9 +28,10 @@ import {
   TextFieldWrapper
 } from "../Shared/StyledFields";
 import { useCreateOpenTaskContributionMutation } from "@api/contributions.api";
-import { OpenTaskContribution } from "@api/contribution.model";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import SubmitDialog from "@components/Dialog/SubmitDialog";
+import { OpenTaskContribution } from "@api/contribution-types/open-task.model";
+import { useWalletConnector } from "@aut-labs/connector";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -81,6 +82,7 @@ const AttachmentTypes = [
 // }));
 
 const CreateOpenTask = () => {
+  const { state } = useWalletConnector();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -93,11 +95,11 @@ const CreateOpenTask = () => {
       startDate: new Date(),
       endDate: null,
       description: "",
+      weight: 0,
+      quantity: 1,
       attachmentType: "",
       attachmentRequired: false,
-      textRequired: false,
-      weight: 0,
-      quantity: 1
+      textRequired: false
     }
   });
   const values = watch();
@@ -122,10 +124,10 @@ const CreateOpenTask = () => {
         endDate: dateToUnix(values.endDate),
         points: values.weight,
         quantity: values.quantity,
-        uri: ""
+        descriptionId: ""
       }
     });
-    createTask(contribution);
+    createTask({ contribution, autSig: state.authSig });
   };
 
   useEffect(() => {

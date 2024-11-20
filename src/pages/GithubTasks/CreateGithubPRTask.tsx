@@ -19,10 +19,11 @@ import { useSelector } from "react-redux";
 import { AutOSSlider } from "@theme/commitment-slider-styles";
 import { AutOsButton } from "@components/buttons";
 import {
-  useCreateGithubPRContributionMutation} from "@api/contributions.api";
-import {
-  PullRequestContribution
-} from "@api/contribution.model";
+  useCreateDiscordGatheringContributionMutation,
+  useCreateGithubPRContributionMutation,
+  useCreateOpenTaskContributionMutation
+} from "@api/contributions.api";
+import SuccessDialog from "@components/Dialog/SuccessPopup";
 import SubmitDialog from "@components/Dialog/SubmitDialog";
 import {
   CommitmentSliderWrapper,
@@ -33,6 +34,7 @@ import {
 import { FormContainer } from "../Modules/Plugins/Task/Shared/FormContainer";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { PullRequestContribution } from "@api/contribution-types/github-pr.model";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,

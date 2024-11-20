@@ -1,4 +1,3 @@
-import { useGetAllTasksQuery } from "@api/onboarding.api";
 import AutLoading from "@components/AutLoading";
 import {
   Box,
@@ -11,7 +10,7 @@ import {
   styled,
   Typography
 } from "@mui/material";
-import { HubData, IsAdmin } from "@store/Hub/hub.reducer";
+import { HubData } from "@store/Hub/hub.reducer";
 import { memo, useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
@@ -101,23 +100,9 @@ const Answers = memo(({ control, questionIndex, answers, isDisabled }: any) => {
 });
 
 const QuizTask = ({ plugin }: PluginParams) => {
-  const isAdmin = useSelector(IsAdmin);
   const { address: userAddress } = useAccount();
   const params = useParams();
   const [initialized, setInitialized] = useState(false);
-
-  const { task } = useGetAllTasksQuery(
-    {
-      userAddress,
-      isAdmin
-    },
-    {
-      selectFromResult: ({ data, isLoading, isFetching }) => ({
-        isLoading: isLoading || isFetching,
-        task: (data?.tasks || [])[0]
-      })
-    }
-  );
 
   const { control, setValue, watch } = useForm({
     mode: "onChange",
