@@ -1,18 +1,14 @@
 import ErrorDialog from "@components/Dialog/ErrorPopup";
-import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { AutDatepicker, FormHelperText } from "@components/Fields";
 import {
   Box,
-  Checkbox,
-  duration,
-  FormControlLabel,
   MenuItem,
   Stack,
   Typography,
   useTheme
 } from "@mui/material";
 import { AutSelectField } from "@theme/field-select-styles";
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { dateToUnix } from "@utils/date-format";
@@ -23,14 +19,10 @@ import { useSelector } from "react-redux";
 import { AutOSSlider } from "@theme/commitment-slider-styles";
 import { AutOsButton } from "@components/buttons";
 import {
-  useCreateDiscordGatheringContributionMutation,
-  useCreateOpenTaskContributionMutation
-} from "@api/contributions.api";
+  useCreateGithubPRContributionMutation} from "@api/contributions.api";
 import {
-  DiscordGatheringContribution,
-  OpenTaskContribution
+  PullRequestContribution
 } from "@api/contribution.model";
-import SuccessDialog from "@components/Dialog/SuccessPopup";
 import SubmitDialog from "@components/Dialog/SubmitDialog";
 import {
   CommitmentSliderWrapper,
@@ -39,9 +31,8 @@ import {
   TextFieldWrapper
 } from "../Modules/Plugins/Task/Shared/StyledFields";
 import { FormContainer } from "../Modules/Plugins/Task/Shared/FormContainer";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useOAuthSocials } from "@components/Oauth2/oauth2";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -91,17 +82,18 @@ const AttachmentTypes = [
 //   }
 // }));
 
-
-const CreateGithubOpenPRTask = () => {
+const CreateGithubPRTask = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const theme = useTheme();
   const hubData = useSelector(HubData);
-  const autID = useSelector(AutIDData)
+  const autID = useSelector(AutIDData);
+  const [createTask, { error, isError, isSuccess, isLoading, reset }] =
+    useCreateGithubPRContributionMutation();
 
-  const githubId = useMemo(() => {
+  const metadata = useMemo(() => {
     const social = hubData.properties.socials.find((s) => s.type === "github");
-    return social.link;
+    return social.metadata;
   }, [hubData]);
 
   const [loading, setLoading] = useState(false);
@@ -113,8 +105,10 @@ const CreateGithubOpenPRTask = () => {
       startDate: new Date(),
       endDate: null,
       description: "",
+      repository: "",
+      branch: "",
       role: null,
-      duration: null,
+      quantity: 1,
       allCanAttend: false,
       weight: 0,
       channelId: ""
@@ -122,53 +116,56 @@ const CreateGithubOpenPRTask = () => {
   });
   const values = watch();
 
-  const { getAuthGithub } = useOAuthSocials();
+  const { data: reposResponse, isLoading: loadingRepos } = useQuery({
+    queryKey: ["repositories", metadata.orgId],
+    queryFn: async () => {
+      const response = await axios.post(
+        "http://localhost:4005/api/task/github/getRepositories",
+        {
+          organisationId: metadata.orgId,
+          organisationName: metadata.orgName
+        }
+      );
+      return response.data;
+    },
+    enabled: !!metadata.orgId && !!metadata.orgName
+  });
+  const { data: branchesResponse, isLoading: loadingBranches } = useQuery({
+    queryKey: ["branches", values.repository],
+    queryFn: async () => {
+      const response = await axios.post(
+        "http://localhost:4005/api/task/github/getBranches",
+        {
+          repositoryName: values.repository,
+          organisationName: metadata.orgName
+        }
+      );
+      return response.data;
+    },
+    enabled: !!values.repository && !!metadata.orgName
+  });
 
   const onSubmit = async () => {
-    // const values = getValues();
-    // const contribution = new DiscordGatheringContribution({
-    //   name: values.title,
-    //   description: values.description,
-    //   image: "",
-    //   properties: {
-    //     taskId: searchParams.get("taskId"),
-    //     role: values.role,
-    //     duration: values.duration,
-    //     startDate: dateToUnix(values.startDate),
-    //     endDate: dateToUnix(values.endDate),
-    //     channelId: values.channelId,
-    //     points: values.weight,
-    //     quantity: 1,
-    //     uri: ""
-    //   }
-    // });
-    // createTask(contribution);
-
-    await getAuthGithub(
-      async (data) => {
-        debugger;
-        const { access_token } = data;
-        debugger;
-        setLoading(true);
-        // const requestModel = {
-        //   discordAccessToken: access_token,
-        //   hubAddress,
-        //   authSig
-        // };
-        // const result = await claimRole(requestModel, {
-        //   onSuccess: (response) => {
-        //     setLoading(false);
-        //     setRoleClaimed(true);
-        //   },
-        //   onError: (res) => {
-        //     setLoading(false);
-        //   }
-        // });
-      },
-      () => {
-        setLoading(false);
+    const values = getValues();
+    const joinedHub = autID.joinedHub(hubData.properties.address);
+    const contribution = new PullRequestContribution({
+      name: values.title,
+      description: values.description,
+      image: "",
+      properties: {
+        taskId: searchParams.get("taskId"),
+        role: +joinedHub.role,
+        startDate: dateToUnix(values.startDate),
+        endDate: dateToUnix(values.endDate),
+        points: values.weight,
+        branch: values.branch,
+        repository: values.repository,
+        organisation: metadata.orgName,
+        quantity: values.quantity,
+        uri: ""
       }
-    );
+    });
+    createTask(contribution);
   };
 
   //   useEffect(() => {
@@ -181,8 +178,8 @@ const CreateGithubOpenPRTask = () => {
 
   return (
     <FormContainer onSubmit={handleSubmit(onSubmit)}>
-      {/* <ErrorDialog handleClose={() => reset()} open={isError} message={error} /> */}
-      {/* <SubmitDialog
+      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <SubmitDialog
         open={isSuccess || isLoading}
         mode={isSuccess ? "success" : "loading"}
         backdropFilter={true}
@@ -191,7 +188,7 @@ const CreateGithubOpenPRTask = () => {
         subtitle={
           isLoading
             ? "Creating contribution..."
-            : "Your submission has been created successfully!"
+            : "Your contribution has been created successfully!"
         }
         subtitleVariant="subtitle1"
         handleClose={() => {
@@ -200,7 +197,7 @@ const CreateGithubOpenPRTask = () => {
             pathname: `/${hubData?.name}/contributions`
           });
         }}
-      ></SubmitDialog> */}
+      ></SubmitDialog>
 
       <Box
         sx={{
@@ -223,7 +220,7 @@ const CreateGithubOpenPRTask = () => {
             color="offWhite.main"
             fontWeight="bold"
           >
-            Github Open PR Task
+            Github Commit Task
           </Typography>
         </Stack>
         <Typography
@@ -241,7 +238,8 @@ const CreateGithubOpenPRTask = () => {
           color="offWhite.main"
           fontSize="16px"
         >
-            Create a task for the community to open PRs on your Github repository.
+          Create a task that requires the user to commit to your hub's
+          repository.
         </Typography>
       </Box>
       <Stack
@@ -343,6 +341,123 @@ const CreateGithubOpenPRTask = () => {
                         {257 - (value?.length || 0)} of 257 characters left
                       </Typography>
                     </FormHelperText>
+                  }
+                />
+              );
+            }}
+          />
+        </TextFieldWrapper>
+        {!!reposResponse?.repositories?.length && (
+          <TextFieldWrapper>
+            <Typography
+              variant="caption"
+              color="offWhite.main"
+              mb={theme.spacing(1)}
+            >
+              Repository
+            </Typography>
+            <Controller
+              name="repository"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { name, value, onChange } }) => (
+                <AutSelectField
+                  value={value}
+                  onChange={onChange}
+                  color="offWhite"
+                  disabled={loadingRepos}
+                  sx={{ width: "100%" }}
+                >
+                  <MenuItem value="">
+                    <em>Select a repository</em>
+                  </MenuItem>
+                  {reposResponse?.repositories?.map((repo) => (
+                    <MenuItem key={repo.id} value={repo.name}>
+                      {repo.name}
+                    </MenuItem>
+                  ))}
+                </AutSelectField>
+              )}
+            />
+          </TextFieldWrapper>
+        )}
+
+        <TextFieldWrapper>
+          <Typography
+            variant="caption"
+            color="offWhite.main"
+            mb={theme.spacing(1)}
+          >
+            Branch
+          </Typography>
+          <Controller
+            name="branch"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { name, value, onChange } }) => (
+              <AutSelectField
+                value={value}
+                onChange={onChange}
+                color="offWhite"
+                disabled={
+                  !values.repository ||
+                  loadingBranches ||
+                  branchesResponse?.branches?.length === 0
+                }
+                sx={{ width: "100%" }}
+              >
+                <MenuItem value="">
+                  <em>Select a branch</em>
+                </MenuItem>
+                {branchesResponse?.branches?.map((branch) => (
+                  <MenuItem key={branch.name} value={branch.name}>
+                    {branch.name}
+                  </MenuItem>
+                ))}
+              </AutSelectField>
+            )}
+          />
+        </TextFieldWrapper>
+        <TextFieldWrapper
+          sx={{
+            width: "100%"
+          }}
+        >
+          <Typography
+            variant="caption"
+            color="offWhite.main"
+            mb={theme.spacing(1)}
+          >
+            Quantity
+          </Typography>
+          <Controller
+            name="quantity"
+            control={control}
+            rules={{
+              required: true,
+              min: 1
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <StyledTextField
+                  color="offWhite"
+                  required
+                  type="number"
+                  sx={{
+                    width: "100%",
+                    height: "48px"
+                  }}
+                  name={name}
+                  value={value || ""}
+                  onChange={onChange}
+                  placeholder="Quantity"
+                  helperText={
+                    <FormHelperText
+                      errorTypes={errorTypes}
+                      value={value}
+                      name={name}
+                      errors={formState.errors}
+                    ></FormHelperText>
                   }
                 />
               );
@@ -508,4 +623,4 @@ const CreateGithubOpenPRTask = () => {
   );
 };
 
-export default memo(CreateGithubOpenPRTask);
+export default memo(CreateGithubPRTask);

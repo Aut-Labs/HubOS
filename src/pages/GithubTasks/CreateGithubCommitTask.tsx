@@ -24,6 +24,7 @@ import { AutOSSlider } from "@theme/commitment-slider-styles";
 import { AutOsButton } from "@components/buttons";
 import {
   useCreateDiscordGatheringContributionMutation,
+  useCreateGithubCommitContributionMutation,
   useCreateOpenTaskContributionMutation
 } from "@api/contributions.api";
 import {
@@ -64,33 +65,6 @@ const AttachmentTypes = [
     label: "Image"
   }
 ];
-// const StyledTextField = styled(AutTextField)(({ theme }) => ({
-//   width: "100%",
-//   ".MuiInputBase-input": {
-//     fontSize: "16px",
-//     color: theme.palette.offWhite.main,
-//     "&::placeholder": {
-//       color: theme.palette.offWhite.main,
-//       opacity: 0.5
-//     },
-//     "&.Mui-disabled": {
-//       color: "#7C879D",
-//       textFillColor: "#7C879D"
-//     }
-//   },
-//   ".MuiInputBase-root": {
-//     caretColor: theme.palette.primary.main,
-//     fieldset: {
-//       border: "1.5px solid #576176 !important",
-//       borderRadius: "6px"
-//     },
-//     borderRadius: "6px",
-//     background: "transparent"
-//   },
-//   ".MuiInputLabel-root": {
-//     color: "#7C879D"
-//   }
-// }));
 
 const CreateGithubCommitTask = () => {
   const [searchParams] = useSearchParams();
@@ -98,6 +72,8 @@ const CreateGithubCommitTask = () => {
   const theme = useTheme();
   const hubData = useSelector(HubData);
   const autID = useSelector(AutIDData);
+  const [createTask, { error, isError, isSuccess, isLoading, reset }] =
+    useCreateGithubCommitContributionMutation();
 
   const metadata = useMemo(() => {
     const social = hubData.properties.socials.find((s) => s.type === "github");
@@ -116,7 +92,7 @@ const CreateGithubCommitTask = () => {
       repository: "",
       branch: "",
       role: null,
-      duration: null,
+      quantity: 1,
       allCanAttend: false,
       weight: 0,
       channelId: ""
@@ -124,7 +100,6 @@ const CreateGithubCommitTask = () => {
   });
   const values = watch();
 
-  // Query to fetch repositories
   const { data: reposResponse, isLoading: loadingRepos } = useQuery({
     queryKey: ["repositories", metadata.orgId],
     queryFn: async () => {
@@ -139,7 +114,7 @@ const CreateGithubCommitTask = () => {
     },
     enabled: !!metadata.orgId && !!metadata.orgName
   });
-  // Query to fetch branches when a repository is selected
+
   const { data: branchesResponse, isLoading: loadingBranches } = useQuery({
     queryKey: ["branches", values.repository],
     queryFn: async () => {
@@ -155,9 +130,7 @@ const CreateGithubCommitTask = () => {
     enabled: !!values.repository && !!metadata.orgName
   });
 
-  const { getAuthGithub } = useOAuthSocials();
-
-  const onSubmit = async (data: any) => {
+  const onSubmit = async () => {
     const values = getValues();
     const joinedHub = autID.joinedHub(hubData.properties.address);
     const contribution = new CommitContribution({
@@ -172,6 +145,7 @@ const CreateGithubCommitTask = () => {
         points: values.weight,
         branch: values.branch,
         repository: values.repository,
+        organisation: metadata.orgName,
         quantity: values.quantity,
         uri: ""
       }
@@ -189,8 +163,8 @@ const CreateGithubCommitTask = () => {
 
   return (
     <FormContainer onSubmit={handleSubmit(onSubmit)}>
-      {/* <ErrorDialog handleClose={() => reset()} open={isError} message={error} /> */}
-      {/* <SubmitDialog
+      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <SubmitDialog
         open={isSuccess || isLoading}
         mode={isSuccess ? "success" : "loading"}
         backdropFilter={true}
@@ -199,7 +173,7 @@ const CreateGithubCommitTask = () => {
         subtitle={
           isLoading
             ? "Creating contribution..."
-            : "Your submission has been created successfully!"
+            : "Your contribution has been created successfully!"
         }
         subtitleVariant="subtitle1"
         handleClose={() => {
@@ -208,7 +182,7 @@ const CreateGithubCommitTask = () => {
             pathname: `/${hubData?.name}/contributions`
           });
         }}
-      ></SubmitDialog> */}
+      ></SubmitDialog>
 
       <Box
         sx={{
@@ -427,6 +401,52 @@ const CreateGithubCommitTask = () => {
                 ))}
               </AutSelectField>
             )}
+          />
+        </TextFieldWrapper>
+        <TextFieldWrapper
+          sx={{
+            width: "100%"
+          }}
+        >
+          <Typography
+            variant="caption"
+            color="offWhite.main"
+            mb={theme.spacing(1)}
+          >
+            Quantity
+          </Typography>
+          <Controller
+            name="quantity"
+            control={control}
+            rules={{
+              required: true,
+              min: 1
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <StyledTextField
+                  color="offWhite"
+                  required
+                  type="number"
+                  sx={{
+                    width: "100%",
+                    height: "48px"
+                  }}
+                  name={name}
+                  value={value || ""}
+                  onChange={onChange}
+                  placeholder="Quantity"
+                  helperText={
+                    <FormHelperText
+                      errorTypes={errorTypes}
+                      value={value}
+                      name={name}
+                      errors={formState.errors}
+                    ></FormHelperText>
+                  }
+                />
+              );
+            }}
           />
         </TextFieldWrapper>
         <SliderFieldWrapper>

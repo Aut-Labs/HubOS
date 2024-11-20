@@ -28,7 +28,7 @@ import useQueryHubMembers from "@hooks/useQueryHubMembers";
 import CreateXRetweetTask from "./TwitterTasks/CreateXRetweetTask";
 import CreateXCommentTask from "./TwitterTasks/CreateXCommentTask";
 import CreatePoll from "./DiscordBot/CreatePoll";
-import CreateGithubOpenPRTask from "./GithubTasks/CreateGithubOpenPRTask";
+import CreateGithubOpenPRTask from "./GithubTasks/CreateGithubPRTask";
 import SubmitRetweetTask from "./TwitterTasks/SubmitRetweetTask";
 
 const AutContainer = styled("div")(() => ({

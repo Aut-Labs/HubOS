@@ -7,8 +7,11 @@ import AutSDK, {
 } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import {
+  CommitContribution,
+  CommitContributionProperties,
   DiscordGatheringContribution,
   OpenTaskContribution,
+  PullRequestContribution,
   RetweetContribution
 } from "./contribution.model";
 import { TaskFactoryContractEventType } from "@aut-labs/abi-types";
@@ -48,13 +51,14 @@ const createContribution = async (
       uri: uri
     });
 
-    const tx = await (await taskFactory.functions.registerDescription(
-      { uri },
-      overrides
-    )).wait();
-    debugger;
+    const tx = await (
+      await taskFactory.functions.registerDescription({ uri }, overrides)
+    ).wait();
 
-    const event = findLogEvent(tx, TaskFactoryContractEventType.RegisterDescription);
+    const event = findLogEvent(
+      tx,
+      TaskFactoryContractEventType.RegisterDescription
+    );
     if (!event) {
       return {
         error: "Failed to register description"
@@ -115,6 +119,22 @@ const createDiscordGatheringContribution = async (
   return createContribution(openTaskContribution, nft, api);
 };
 
+const createGithubCommitContribution = async (
+  githubContribution: CommitContribution,
+  api: BaseQueryApi
+) => {
+  const nft = CommitContribution.getContributionNFT(githubContribution);
+  return createContribution(githubContribution, nft, api);
+};
+
+const createGithubPullRequestContribution = async (
+  githubContribution: PullRequestContribution,
+  api: BaseQueryApi
+) => {
+  const nft = PullRequestContribution.getContributionNFT(githubContribution);
+  return createContribution(githubContribution, nft, api);
+};
+
 export const contributionsApi = createApi({
   reducerPath: "contributionsApi",
   baseQuery: (args, api, extraOptions) => {
@@ -127,6 +147,12 @@ export const contributionsApi = createApi({
     }
     if (url === "createTwitterRetweetContribution") {
       return createTwitterRetweetContribution(body, api);
+    }
+    if (url === "createGithubCommitContribution") {
+      return createGithubCommitContribution(body, api);
+    }
+    if (url === "createGithubPRContribution") {
+      return createGithubPullRequestContribution(body, api);
     }
     return {
       data: "Test"
@@ -163,11 +189,29 @@ export const contributionsApi = createApi({
           url: "createTwitterRetweetContribution"
         };
       }
+    }),
+    createGithubCommitContribution: builder.mutation<void, CommitContribution>({
+      query: (body) => {
+        return {
+          body,
+          url: "createGithubCommitContribution"
+        };
+      }
+    }),
+    createGithubPRContribution: builder.mutation<void, PullRequestContribution>({
+      query: (body) => {
+        return {
+          body,
+          url: "createGithubPRContribution"
+        };
+      }
     })
   })
 });
 
 export const {
+  useCreateGithubPRContributionMutation,
+  useCreateGithubCommitContributionMutation,
   useCreateTwitterRetweetContributionMutation,
   useCreateOpenTaskContributionMutation,
   useCreateDiscordGatheringContributionMutation

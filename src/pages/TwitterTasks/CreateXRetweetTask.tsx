@@ -88,8 +88,6 @@ const CreateXRetweetTask = () => {
   });
   const values = watch();
 
-  const { getAuthX } = useOAuthSocials();
-
   const onSubmit = async () => {
     const values = getValues();
     const joinedHub = autID.joinedHub(hubData.properties.address);
