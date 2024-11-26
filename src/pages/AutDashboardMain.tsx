@@ -14,7 +14,7 @@ import HubEdit from "./HubEdit/HubEdit";
 import Members from "./Members/Members";
 import TaskManager from "./TaskManager";
 import DiscordBot from "./DiscordBot/DiscordBot";
-import { AllTasks } from "./Modules/Plugins/Task/Shared/AllTasks";
+import Contributions from "./Modules/Plugins/Task/Shared/Contributions";
 import CreateOpenTask from "./Modules/Plugins/Task/Open/CreateOpenTask";
 import useQueryTaskTypes from "@hooks/useQueryTaskTypes";
 import CreateGathering from "./DiscordBot/CreateGathering";
@@ -93,7 +93,7 @@ const AutDashboardMain = () => {
                   />
                 }
               />
-              <Route path="contributions" element={<AllTasks />} />
+              <Route path="contributions" element={<Contributions />} />
               <Route path="create-open-task" element={<CreateOpenTask />} />
               <Route path="create-quiz" element={<CreateQuizTask />} />
               <Route

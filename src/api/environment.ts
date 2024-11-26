@@ -41,7 +41,7 @@ export const autUrls = () => {
     return {
       tryAut: "https://try-internal.aut.id/",
       hubDashboard: "https://hub-internal.aut.id/",
-      myAut: "https://my-internal.aut.id/",
+      myAut: "https://internal.os.aut.id/",
       showcase: "https://showcase-internal.aut.id/",
       leaderboard: "https://leaderboard-internal.aut.id/",
       expander: "https://expander-internal.aut.id/"

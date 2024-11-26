@@ -13,6 +13,7 @@ import { RetweetContribution } from "./contribution-types/retweet.model";
 import { QuizTaskContribution } from "./contribution-types/quiz.model.model";
 import { encryptMessage } from "./aut.api";
 import { AuthSig } from "@aut-labs/connector/lib/esm/aut-sig";
+import { ContributionCommit } from "@hooks/useQueryContributionCommits";
 
 const hubServiceCache: Record<string, Hub> = {};
 
@@ -26,6 +27,18 @@ const getTaskFactory = async (api: BaseQueryApi) => {
   }
 
   return hubService.getTaskFactory();
+};
+
+const getTaskManager = async (api: BaseQueryApi) => {
+  const sdk = await AutSDK.getInstance();
+  const state: any = api.getState() as any;
+
+  let hubService = hubServiceCache[state.hub.selectedHubAddress];
+  if (!hubService) {
+    hubService = sdk.initService<Hub>(Hub, state.hub.selectedHubAddress);
+  }
+
+  return hubService.getTaskManager();
 };
 
 const createContribution = async (
@@ -158,6 +171,42 @@ const createQuizContribution = async (
   return createContribution(contribution, nft, api);
 };
 
+const giveContribution = async (
+  {
+    contribution,
+    submission
+  }: {
+    contribution: TaskContributionNFT;
+    submission: ContributionCommit;
+  },
+  api: BaseQueryApi
+) => {
+  try {
+    const sdk = await AutSDK.getInstance();
+    const overrides = await getOverrides(sdk.signer, 3000);
+    const taskManager = await getTaskManager(api);
+
+    const response = await taskManager.giveContribution(
+      contribution.properties.id,
+      submission.who,
+      overrides
+    );
+
+    if (!response.isSuccess) {
+      return {
+        error: response.errorMessage
+      };
+    }
+    return {
+      data: response.data
+    };
+  } catch (error) {
+    return {
+      error: error.message
+    };
+  }
+};
+
 export const contributionsApi = createApi({
   reducerPath: "contributionsApi",
   baseQuery: (args, api, extraOptions) => {
@@ -173,6 +222,9 @@ export const contributionsApi = createApi({
     }
     if (url === "createQuizContribution") {
       return createQuizContribution(body, api);
+    }
+    if (url === "giveContribution") {
+      return giveContribution(body, api);
     }
     return {
       data: "Test"
@@ -235,7 +287,21 @@ export const contributionsApi = createApi({
           url: "createQuizContribution"
         };
       }
-    })
+    }),
+    giveContribution: builder.mutation<
+      void,
+      {
+        submission: ContributionCommit;
+        contribution: TaskContributionNFT;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "giveContribution"
+        };
+      }
+    }),
   })
 });
 
@@ -243,5 +309,6 @@ export const {
   useCreateTwitterRetweetContributionMutation,
   useCreateOpenTaskContributionMutation,
   useCreateDiscordGatheringContributionMutation,
-  useCreateQuizContributionMutation
+  useCreateQuizContributionMutation,
+  useGiveContributionMutation
 } = contributionsApi;

@@ -3,6 +3,8 @@ import Box from "@mui/material/Box";
 import ArrowIcon from "@assets/hubos/move-right.svg?react";
 
 import {
+  Alert,
+  AlertTitle,
   Paper,
   Stack,
   SvgIcon,
@@ -17,12 +19,17 @@ import {
   tableCellClasses,
   useTheme
 } from "@mui/material";
-import { format } from "date-fns";
+import { format, min } from "date-fns";
 import { AutOsButton } from "@components/buttons";
-import { Link } from "react-router-dom";
 import { TaskContributionNFT } from "@aut-labs/sdk";
-import { ContributionCommit } from "@hooks/useQueryContributionCommits";
+import {
+  ContributionCommit,
+  ContributionStatus,
+  ContributionStatusMap
+} from "@hooks/useQueryContributionCommits";
 import OverflowTooltip from "@components/OverflowTooltip";
+import { autUrls } from "@api/environment";
+const urls = autUrls();
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}, &.${tableCellClasses.body}`]: {
@@ -45,7 +52,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 export interface ContributionTableProps {
-  onViewSubmissions: (contribution: TaskContributionNFT) => void;
+  selectedContribution: TaskContributionNFT;
+  onGiveSubmission: (contribution: TaskContributionNFT, submission: ContributionCommit) => void;
   contributionsWithSubmissions: {
     contribution: TaskContributionNFT & { contributionType?: string };
     submissions: ContributionCommit[];
@@ -55,28 +63,28 @@ export interface ContributionTableProps {
 const TableListItem = memo(
   ({
     contribution,
-    submissions,
-    onViewSubmissions
+    submission,
+    onGiveSubmission
   }: {
     contribution: TaskContributionNFT & { contributionType?: string };
-    submissions: ContributionCommit[];
-    onViewSubmissions: (contribution: TaskContributionNFT) => void;
+    submission: ContributionCommit;
+    onGiveSubmission: (contribution: TaskContributionNFT, submission: ContributionCommit) => void;
   }) => {
     const theme = useTheme();
 
-    const startDate = useMemo(() => {
-      return format(
-        new Date(contribution?.properties?.startDate * 1000),
-        "dd.MM.yy"
-      ).toString();
-    }, [contribution?.properties?.startDate]);
+    const status = useMemo(() => {
+      let severity = "warning";
+      if (submission.status === ContributionStatus.Rejected) {
+        severity = "error";
+      } else if (submission.status === ContributionStatus.Complete) {
+        severity = "success";
+      }
 
-    const endDate = useMemo(() => {
-      return format(
-        new Date(contribution?.properties?.endDate * 1000),
-        "dd.MM.yy"
-      ).toString();
-    }, [contribution?.properties?.endDate]);
+      return {
+        state: ContributionStatusMap[submission.status],
+        severity
+      };
+    }, [submission.status]);
 
     return (
       <StyledTableRow
@@ -114,74 +122,109 @@ const TableListItem = memo(
           </Stack>
         </StyledTableCell>
         <StyledTableCell align="left">
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "flex-start",
-              alignItems: "center"
-            }}
-          >
-            <Typography variant="body" fontWeight="normal" color="white">
-              {contribution?.contributionType || "N/A"}
-            </Typography>
-          </Box>
-        </StyledTableCell>
-        <StyledTableCell align="left">
-          <Typography variant="body" fontWeight="normal" color="white">
-            {`${contribution?.properties?.points} ${contribution?.properties?.points === 1 ? "pt" : "pts"}`}
-          </Typography>
-        </StyledTableCell>
-        <StyledTableCell align="left">
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "flex-start",
-              alignItems: "center"
-            }}
-          >
-            <Typography variant="body" fontWeight="normal" color="white">
-              {startDate}
-            </Typography>
-            <SvgIcon
-              sx={{ fill: "transparent", ml: theme.spacing(4) }}
-              component={ArrowIcon}
-            />
-          </Box>
-        </StyledTableCell>
-        <StyledTableCell align="left">
-          <Typography variant="body" fontWeight="normal" color="white">
-            {endDate}
-          </Typography>
-        </StyledTableCell>
-
-        <StyledTableCell align="left">
-          <Typography variant="body" fontWeight="normal" color="white">
-            {submissions?.length} / {contribution?.properties?.quantity}
-          </Typography>
-        </StyledTableCell>
-
-        <StyledTableCell align="left">
           <AutOsButton
+            target="_blank"
+            href={`${urls.myAut}${submission.who}`}
             type="button"
             variant="contained"
-            onClick={() => onViewSubmissions(contribution)}
-            disabled={!submissions?.length}
           >
             <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
-              View
+              View Profile
             </Typography>
           </AutOsButton>
+        </StyledTableCell>
+        <StyledTableCell align="left">
+          <Typography variant="body" fontWeight="normal" color="white">
+            {`${submission.points} ${submission.points === 1 ? "pt" : "pts"}`}
+          </Typography>
+        </StyledTableCell>
+
+        <StyledTableCell align="left">
+          <Alert
+            sx={{
+              borderRadius: "8px",
+              border: 0,
+              height: "40px",
+              width: "134px",
+              display: "flex",
+              alignItems: "center",
+              ".MuiAlert-message": {
+                overflow: "hidden"
+              }
+            }}
+            severity={status?.severity as any}
+          >
+            {status?.state}
+          </Alert>
+        </StyledTableCell>
+
+        <StyledTableCell align="left">
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gridGap: 4
+            }}
+          >
+            <AutOsButton
+              type="button"
+              variant="contained"
+              sx={{
+                "&.MuiButton-root": {
+                  minWidth: "160px",
+                  width: "160px"
+                }
+              }}
+              // onViewSubmissions={() => onViewSubmissions(contribution)}
+            >
+              <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
+                View
+              </Typography>
+            </AutOsButton>
+            <AutOsButton
+              type="button"
+              variant="contained"
+              disabled={submission.status !== ContributionStatus.Pending}
+              sx={{
+                "&.MuiButton-root": {
+                  minWidth: "160px",
+                  width: "160px"
+                }
+              }}
+              onClick={() => onGiveSubmission(contribution, submission)}
+            >
+              <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
+                Give Contribution
+              </Typography>
+            </AutOsButton>
+          </Box>
         </StyledTableCell>
       </StyledTableRow>
     );
   }
 );
 
-export const ContributionsTable = ({
+export const SubmissionsTable = ({
   contributionsWithSubmissions,
-  onViewSubmissions
+  selectedContribution,
+  onGiveSubmission
 }: ContributionTableProps) => {
   const theme = useTheme();
+
+  const submissions = useMemo(() => {
+    if (selectedContribution) {
+      return contributionsWithSubmissions.find(
+        (contribution) =>
+          contribution.contribution.properties.id ===
+          selectedContribution.properties.id
+      )?.submissions;
+    }
+    return contributionsWithSubmissions.reduce(
+      (acc, { submissions }) => [...acc, ...submissions],
+      []
+    );
+  }, [contributionsWithSubmissions, selectedContribution]);
+
   return (
     <TableContainer
       sx={{
@@ -229,7 +272,7 @@ export const ContributionsTable = ({
                 fontWeight="normal"
                 color="offWhite.dark"
               >
-                Type
+                Member
               </Typography>
             </StyledTableCell>
             <StyledTableCell align="left">
@@ -247,25 +290,7 @@ export const ContributionsTable = ({
                 fontWeight="normal"
                 color="offWhite.dark"
               >
-                Start Date
-              </Typography>
-            </StyledTableCell>
-            <StyledTableCell align="left">
-              <Typography
-                variant="body"
-                fontWeight="normal"
-                color="offWhite.dark"
-              >
-                End Date
-              </Typography>
-            </StyledTableCell>
-            <StyledTableCell align="left">
-              <Typography
-                variant="body"
-                fontWeight="normal"
-                color="offWhite.dark"
-              >
-                Submissions
+                Status
               </Typography>
             </StyledTableCell>
             <StyledTableCell align="left">
@@ -277,14 +302,14 @@ export const ContributionsTable = ({
             </StyledTableCell>
           </TableRow>
         </TableHead>
-        {contributionsWithSubmissions?.length ? (
+        {submissions?.length ? (
           <TableBody>
-            {contributionsWithSubmissions?.map((row, index) => (
+            {submissions?.map((row, index) => (
               <TableListItem
                 key={`table-row-${index}`}
-                contribution={row.contribution}
-                submissions={row.submissions}
-                onViewSubmissions={onViewSubmissions}
+                contribution={selectedContribution}
+                submission={row}
+                onGiveSubmission={onGiveSubmission}
               />
             ))}
           </TableBody>

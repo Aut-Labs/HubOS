@@ -64,7 +64,7 @@ const useQueryContributions = (props: QueryFunctionOptions<any, any> = {}) => {
         ...(props.variables?.where || {})
       }
     },
-    ...props
+    // ...props
   });
 
   const [contributions, setContributions] = useState<TaskContributionNFT[]>([]);
