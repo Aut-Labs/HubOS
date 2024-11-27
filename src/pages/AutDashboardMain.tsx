@@ -25,8 +25,7 @@ import useQueryHubMembers from "@hooks/useQueryHubMembers";
 import CreateXRetweetTask from "./TwitterTasks/CreateXRetweetTask";
 import CreateXCommentTask from "./TwitterTasks/CreateXCommentTask";
 import CreatePoll from "./DiscordBot/CreatePoll";
-import CreateGithubOpenPRTask from "./GithubTasks/CreateGithubOpenPRTask";
-import SubmitRetweetTask from "./TwitterTasks/SubmitRetweetTask";
+import CreateGithubOpenPRTask from "./GithubTasks/CreateGithubPRTask";
 import CreateQuizTask from "./Modules/Plugins/Task/Quiz/CreateQuizTask";
 
 const AutContainer = styled("div")(() => ({
@@ -123,10 +122,6 @@ const AutDashboardMain = () => {
               />
               <Route path="create-twitter-like" element={<CreateXLikeTask />} />
               <Route path="create-open-task" element={<CreateOpenTask />} />
-              <Route
-                path="submit-retweet-task"
-                element={<SubmitRetweetTask />}
-              />
             </Routes>
           </Suspense>
         </SidebarDrawer>

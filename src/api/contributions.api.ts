@@ -14,6 +14,8 @@ import { QuizTaskContribution } from "./contribution-types/quiz.model.model";
 import { encryptMessage } from "./aut.api";
 import { AuthSig } from "@aut-labs/connector/lib/esm/aut-sig";
 import { ContributionCommit } from "@hooks/useQueryContributionCommits";
+import { CommitContribution } from "./contribution-types/github-commit.model";
+import { PullRequestContribution } from "./contribution-types/github-pr.model";
 
 const hubServiceCache: Record<string, Hub> = {};
 
@@ -123,6 +125,7 @@ const createTwitterRetweetContribution = async (
   }: { contribution: RetweetContribution; autSig: AuthSig },
   api: BaseQueryApi
 ) => {
+  debugger;
   const nft = RetweetContribution.getContributionNFT(contribution);
   return createContribution(contribution, nft, api);
 };
@@ -207,6 +210,29 @@ const giveContribution = async (
   }
 };
 
+const createGithubCommitContribution = async (
+  {
+    contribution,
+    autSig
+  }: { contribution: CommitContribution; autSig: AuthSig },
+  api: BaseQueryApi
+) => {
+  debugger;
+  const nft = CommitContribution.getContributionNFT(contribution);
+  return createContribution(contribution, nft, api);
+};
+
+const createGithubPullRequestContribution = async (
+  {
+    contribution,
+    autSig
+  }: { contribution: PullRequestContribution; autSig: AuthSig },
+  api: BaseQueryApi
+) => {
+  const nft = PullRequestContribution.getContributionNFT(contribution);
+  return createContribution(contribution, nft, api);
+};
+
 export const contributionsApi = createApi({
   reducerPath: "contributionsApi",
   baseQuery: (args, api, extraOptions) => {
@@ -219,6 +245,12 @@ export const contributionsApi = createApi({
     }
     if (url === "createTwitterRetweetContribution") {
       return createTwitterRetweetContribution(body, api);
+    }
+    if (url === "createGithubCommitContribution") {
+      return createGithubCommitContribution(body, api);
+    }
+    if (url === "createGithubPRContribution") {
+      return createGithubPullRequestContribution(body, api);
     }
     if (url === "createQuizContribution") {
       return createQuizContribution(body, api);
@@ -274,6 +306,34 @@ export const contributionsApi = createApi({
         };
       }
     }),
+    createGithubCommitContribution: builder.mutation<
+      void,
+      {
+        autSig: AuthSig;
+        contribution: CommitContribution;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "createGithubCommitContribution"
+        };
+      }
+    }),
+    createGithubPRContribution: builder.mutation<
+      void,
+      {
+        autSig: AuthSig;
+        contribution: PullRequestContribution;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "createGithubPRContribution"
+        };
+      }
+    }),
     createQuizContribution: builder.mutation<
       void,
       {
@@ -301,11 +361,13 @@ export const contributionsApi = createApi({
           url: "giveContribution"
         };
       }
-    }),
+    })
   })
 });
 
 export const {
+  useCreateGithubPRContributionMutation,
+  useCreateGithubCommitContributionMutation,
   useCreateTwitterRetweetContributionMutation,
   useCreateOpenTaskContributionMutation,
   useCreateDiscordGatheringContributionMutation,

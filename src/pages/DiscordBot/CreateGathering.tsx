@@ -90,7 +90,7 @@ const AttachmentTypes = [
 
 const fetchVoiceChannels = async (guildId: string) => {
   const response = await axios.get(
-    `http://localhost:4005/api/discord/guild/voiceChannels/${guildId}`
+    `${environment.apiUrl}/discord/guild/voiceChannels/${guildId}`
   );
   return response.data;
 };

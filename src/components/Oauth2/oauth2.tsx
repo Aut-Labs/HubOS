@@ -129,7 +129,7 @@ export const useOAuthSocials = () => {
             onFailure(error);
           } else {
             const response = await axios.post(
-              `http://localhost:4005/api/aut/config/oauth2AccessTokenDiscord`,
+              `${environment.apiUrl}/aut/config/oauth2AccessTokenDiscord`,
               {
                 code: message.data.payload.code,
                 callbackUrl
@@ -191,7 +191,7 @@ export const useOAuthSocials = () => {
           } else {
             xCleanUp(xIntervalRef);
             const response = await axios.post(
-              `http://localhost:4005/api/aut/config/oauth2AccessTokenX`,
+              `${environment.apiUrl}/aut/config/oauth2AccessTokenX`,
               {
                 code: message.data.payload.code,
                 callbackUrl
