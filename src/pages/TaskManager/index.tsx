@@ -133,7 +133,7 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
           <GridBox>
             {socials.discord ? (
               discordTasks.map((taskType, index) => (
-                <ComingSoonCard
+                <ModuleDefinitionCard
                   key={`discord-task-${index}`}
                   isFetching={isLoading}
                   taskType={taskType}
@@ -327,8 +327,8 @@ const TaskManager = ({ isLoading, data, refetch }) => {
           <>
             <HubOsTabs selectedTabIndex={selectedTabIndex} tabs={tabs} />
             {/* <GridBox sx={{ flexGrow: 1, mt: 4 }}> */}
-              {/* @TODO - Iulia to redesign this */}
-              {/* {filteredTasks.otherTasks.map((taskType, index) => (
+            {/* @TODO - Iulia to redesign this */}
+            {/* {filteredTasks.otherTasks.map((taskType, index) => (
                 <ModuleDefinitionCard
                   key={`modules-plugin-${index}`}
                   isFetching={isLoading}

@@ -27,6 +27,7 @@ import CreateXCommentTask from "./TwitterTasks/CreateXCommentTask";
 import CreatePoll from "./DiscordBot/CreatePoll";
 import CreateGithubOpenPRTask from "./GithubTasks/CreateGithubPRTask";
 import CreateQuizTask from "./Modules/Plugins/Task/Quiz/CreateQuizTask";
+import CreateJoinDiscordTask from "./Modules/Plugins/Task/JoinDiscord/CreateJoinDiscordTask";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -94,6 +95,7 @@ const AutDashboardMain = () => {
               />
               <Route path="contributions" element={<Contributions />} />
               <Route path="create-open-task" element={<CreateOpenTask />} />
+              <Route path="create-join-discord" element={<CreateJoinDiscordTask />} />
               <Route path="create-quiz" element={<CreateQuizTask />} />
               <Route
                 path="create-github-commit"

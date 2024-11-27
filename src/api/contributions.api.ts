@@ -16,6 +16,7 @@ import { AuthSig } from "@aut-labs/connector/lib/esm/aut-sig";
 import { ContributionCommit } from "@hooks/useQueryContributionCommits";
 import { CommitContribution } from "./contribution-types/github-commit.model";
 import { PullRequestContribution } from "./contribution-types/github-pr.model";
+import { JoinDiscordContribution } from "./contribution-types/discord-join.model";
 
 const hubServiceCache: Record<string, Hub> = {};
 
@@ -67,7 +68,7 @@ const createContribution = async (
     const tx = await (
       await taskFactory.functions.registerDescription({ uri }, overrides)
     ).wait();
-
+    debugger;
     const event = findLogEvent(
       tx,
       TaskFactoryContractEventType.RegisterDescription
@@ -138,6 +139,17 @@ const createDiscordGatheringContribution = async (
   api: BaseQueryApi
 ) => {
   const nft = DiscordGatheringContribution.getContributionNFT(contribution);
+  return createContribution(contribution, nft, api);
+};
+
+const createJoinDiscordContribution = async (
+  {
+    contribution,
+    autSig
+  }: { contribution: JoinDiscordContribution; autSig: AuthSig },
+  api: BaseQueryApi
+) => {
+  const nft = JoinDiscordContribution.getContributionNFT(contribution);
   return createContribution(contribution, nft, api);
 };
 
@@ -258,6 +270,9 @@ export const contributionsApi = createApi({
     if (url === "giveContribution") {
       return giveContribution(body, api);
     }
+    if (url === "createJoinDiscordContribution") {
+      return createJoinDiscordContribution(body, api);
+    }
     return {
       data: "Test"
     };
@@ -348,6 +363,20 @@ export const contributionsApi = createApi({
         };
       }
     }),
+    createJoinDiscordContribution: builder.mutation<
+      void,
+      {
+        autSig: AuthSig;
+        contribution: JoinDiscordContribution;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "createJoinDiscordContribution"
+        };
+      }
+    }),
     giveContribution: builder.mutation<
       void,
       {
@@ -371,6 +400,7 @@ export const {
   useCreateTwitterRetweetContributionMutation,
   useCreateOpenTaskContributionMutation,
   useCreateDiscordGatheringContributionMutation,
+  useCreateJoinDiscordContributionMutation,
   useCreateQuizContributionMutation,
   useGiveContributionMutation
 } = contributionsApi;

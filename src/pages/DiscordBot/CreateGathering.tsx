@@ -39,6 +39,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { DiscordGatheringContribution } from "@api/contribution-types/discord-gathering.model";
 import { useWalletConnector } from "@aut-labs/connector";
+import { environment } from "@api/environment";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
