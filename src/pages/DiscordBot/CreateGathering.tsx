@@ -141,6 +141,8 @@ const CreateDiscordGathering = () => {
 
   const onSubmit = async () => {
     const values = getValues();
+    const endDate = new Date(new Date(values.startDate).getTime() + values.duration * 60000);
+
     const contribution = new DiscordGatheringContribution({
       name: values.title,
       description: values.description,
@@ -149,8 +151,9 @@ const CreateDiscordGathering = () => {
         taskId: searchParams.get("taskId"),
         role: values.role,
         duration: values.duration,
+        guildId,
         startDate: dateToUnix(values.startDate),
-        endDate: dateToUnix(values.endDate),
+        endDate: dateToUnix(endDate),
         channelId: values.channelId,
         points: values.weight,
         quantity: 1,

@@ -7,11 +7,13 @@ import {
 export class DiscordGatheringContributionProperties extends TaskContributionProperties {
   channelId: string;
   duration: number;
+  guildId: string;
 
   constructor(data: DiscordGatheringContributionProperties) {
     super(data);
     this.channelId = data.channelId;
     this.duration = data.duration;
+    this.guildId = data.guildId;
   }
 }
 
@@ -27,7 +29,8 @@ export class DiscordGatheringContribution<
       description: taskContribution.description,
       properties: {
         duration: taskContribution.properties.duration,
-        channelId: taskContribution.properties.channelId
+        channelId: taskContribution.properties.channelId,
+        guildId: taskContribution.properties.guildId
       }
     } as BaseNFTModel<any>;
   }

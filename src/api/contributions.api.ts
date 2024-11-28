@@ -17,6 +17,8 @@ import { ContributionCommit } from "@hooks/useQueryContributionCommits";
 import { CommitContribution } from "./contribution-types/github-commit.model";
 import { PullRequestContribution } from "./contribution-types/github-pr.model";
 import { JoinDiscordContribution } from "./contribution-types/discord-join.model";
+import { DiscordPollContribution } from "./contribution-types/discord-poll-model";
+import { create } from "@mui/material/styles/createTransitions";
 
 const hubServiceCache: Record<string, Hub> = {};
 
@@ -68,7 +70,6 @@ const createContribution = async (
     const tx = await (
       await taskFactory.functions.registerDescription({ uri }, overrides)
     ).wait();
-    debugger;
     const event = findLogEvent(
       tx,
       TaskFactoryContractEventType.RegisterDescription
@@ -139,7 +140,86 @@ const createDiscordGatheringContribution = async (
   api: BaseQueryApi
 ) => {
   const nft = DiscordGatheringContribution.getContributionNFT(contribution);
-  return createContribution(contribution, nft, api);
+  // const result = await createContribution(contribution, nft, api);
+
+  try {
+    const gatheringPayload = {
+      guildId: contribution.properties.guildId,
+      channelId: contribution.properties.channelId,
+      title: contribution.name,
+      description: contribution.description,
+      startDate: new Date(contribution.properties.startDate * 1000), // Convert unix to Date
+      endDate: new Date(contribution.properties.endDate * 1000),
+      roles: [contribution.properties.role],
+      allCanAttend: false,
+      weight: contribution.properties.points,
+      taskId: contribution.properties.taskId
+    };
+    const response = await fetch(
+      "http://localhost:4005/api/discord/gathering",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(gatheringPayload)
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to create Discord gathering");
+    }
+
+    const gathering = await response.json();
+    return { gathering } as any;
+  } catch (error) {
+    console.error("Discord gathering creation failed:", error);
+    return { gatheringError: error.message } as any;
+  }
+};
+
+const createDiscordPollContribution = async (
+  {
+    contribution,
+    autSig
+  }: { contribution: DiscordPollContribution; autSig: AuthSig },
+  api: BaseQueryApi
+) => {
+  const nft = DiscordPollContribution.getContributionNFT(contribution);
+  // const result = await createContribution(contribution, nft, api);
+  debugger;
+  try {
+    const pollPayload = {
+      guildId: contribution.properties.guildId,
+      channelId: contribution.properties.channelId,
+      title: contribution.name,
+      options: contribution.properties.options,
+      description: contribution.description,
+      startDate: new Date(contribution.properties.startDate * 1000), // Convert unix to Date
+      endDate: new Date(contribution.properties.endDate * 1000),
+      roles: [contribution.properties.role],
+      allCanAttend: false,
+      weight: contribution.properties.points,
+      taskId: contribution.properties.taskId
+    };
+    const response = await fetch("http://localhost:4005/api/discord/poll", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(pollPayload)
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create Discord gathering");
+    }
+
+    const poll = await response.json();
+    return { poll } as any;
+  } catch (error) {
+    console.error("Discord poll creation failed:", error);
+    return { pollError: error.message } as any;
+  }
 };
 
 const createJoinDiscordContribution = async (
@@ -273,6 +353,9 @@ export const contributionsApi = createApi({
     if (url === "createJoinDiscordContribution") {
       return createJoinDiscordContribution(body, api);
     }
+    if (url === "createDiscordPollContribution") {
+      return createDiscordPollContribution(body, api);
+    }
     return {
       data: "Test"
     };
@@ -304,6 +387,20 @@ export const contributionsApi = createApi({
         return {
           body,
           url: "createDiscordGatheringContribution"
+        };
+      }
+    }),
+    createDiscordPollContribution: builder.mutation<
+      void,
+      {
+        autSig: AuthSig;
+        contribution: DiscordPollContribution;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "createDiscordPollContribution"
         };
       }
     }),
@@ -400,6 +497,7 @@ export const {
   useCreateTwitterRetweetContributionMutation,
   useCreateOpenTaskContributionMutation,
   useCreateDiscordGatheringContributionMutation,
+  useCreateDiscordPollContributionMutation,
   useCreateJoinDiscordContributionMutation,
   useCreateQuizContributionMutation,
   useGiveContributionMutation

@@ -66,9 +66,7 @@ const AutDashboardMain = () => {
   return (
     <>
       <AutContainer>
-        <SidebarDrawer
-          addonMenuItems={[]}
-        >
+        <SidebarDrawer addonMenuItems={[]}>
           <Suspense fallback={<AutLoading width="130px" height="130px" />}>
             <Routes>
               <Route index element={<Dashboard members={members} />} />
@@ -76,7 +74,10 @@ const AutDashboardMain = () => {
               <Route path="edit-hub" element={<HubEdit />} />
               <Route path="archetype" element={<Archetype />} />
               <Route path="modules/dAut" element={<DAut />} />
-              <Route path="discord-bot" element={<DiscordBot />}></Route>
+              <Route
+                path="discord-bot"
+                element={<DiscordBot data={data} />}
+              ></Route>
               <Route
                 path="members"
                 element={
@@ -95,7 +96,10 @@ const AutDashboardMain = () => {
               />
               <Route path="contributions" element={<Contributions />} />
               <Route path="create-open-task" element={<CreateOpenTask />} />
-              <Route path="create-join-discord" element={<CreateJoinDiscordTask />} />
+              <Route
+                path="create-join-discord"
+                element={<CreateJoinDiscordTask />}
+              />
               <Route path="create-quiz" element={<CreateQuizTask />} />
               <Route
                 path="create-github-commit"
