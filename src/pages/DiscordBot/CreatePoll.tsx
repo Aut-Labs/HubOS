@@ -135,7 +135,7 @@ const CreatePoll = () => {
         options: values.options.map((o) => o.option),
         points: values.weight,
         quantity: 1,
-        descriptionId: "",
+        uri: "",
         channelId: values.channelId,
         startDate: dateToUnix(values.startDate),
         endDate: dateToUnix(

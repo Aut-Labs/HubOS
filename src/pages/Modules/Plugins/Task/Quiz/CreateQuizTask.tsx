@@ -96,7 +96,7 @@ const CreateQuizTask = () => {
         endDate: dateToUnix(values.endDate),
         points: values.weight,
         quantity: values.quantity,
-        descriptionId: "",
+        uri: "",
         questions: values.questions,
         hash: ""
       }

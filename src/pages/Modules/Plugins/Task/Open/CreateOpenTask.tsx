@@ -32,6 +32,7 @@ import SuccessDialog from "@components/Dialog/SuccessPopup";
 import SubmitDialog from "@components/Dialog/SubmitDialog";
 import { OpenTaskContribution } from "@api/contribution-types/open-task.model";
 import { useWalletConnector } from "@aut-labs/connector";
+import useQueryHubPeriod from "@hooks/useQueryHubPeriod";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -88,6 +89,7 @@ const CreateOpenTask = () => {
   const theme = useTheme();
   const hubData = useSelector(HubData);
   const autID = useSelector(AutIDData);
+  const { data: periodData } = useQueryHubPeriod();
   const { control, handleSubmit, getValues, formState, watch } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -124,7 +126,7 @@ const CreateOpenTask = () => {
         endDate: dateToUnix(values.endDate),
         points: values.weight,
         quantity: values.quantity,
-        descriptionId: ""
+        uri: ""
       }
     });
     createTask({ contribution, autSig: state.authSig });
@@ -517,13 +519,15 @@ const CreateOpenTask = () => {
               name="startDate"
               control={control}
               rules={{
-                required: true
+                required: true,
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
                   <AutDatepicker
                     placeholder="Start date"
                     value={value}
+                    minDateTime={periodData?.startDate}
+                    maxDateTime={periodData?.endDate}
                     onChange={onChange}
                   />
                 );
@@ -546,13 +550,14 @@ const CreateOpenTask = () => {
               name="endDate"
               control={control}
               rules={{
-                required: true
+                required: true,
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (
                   <AutDatepicker
                     placeholder="End date"
                     minDateTime={values.startDate}
+                    maxDateTime={periodData?.endDate}
                     value={value}
                     onChange={onChange}
                   />
