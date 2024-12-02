@@ -35,6 +35,7 @@ import { autUrls } from "@api/environment";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setSelectedSubmission } from "@store/Contributions/contributions.reducer";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 const urls = autUrls();
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -265,31 +266,40 @@ export const SubmissionsTable = ({
       <Container maxWidth="md">
         <Box
           sx={{
-            my: theme.spacing(4),
+            my: theme.spacing(4)
           }}
         >
           <Stack alignItems="start" justifyContent="center">
-            <Button
-              startIcon={<ArrowBackIosNewIcon />}
+            <AutOsButton
+              startIcon={<ArrowBackIcon />}
               color="offWhite"
-              sx={{
-                left: 0
-              }}
+              variant="outlined"
+              size="small"
               onClick={() => navigate(-1)}
+              sx={{
+                mb: 2,
+                "&.MuiButton-root": {
+                  background: "transparent",
+                  border: "1px solid #A7B1C4"
+                }
+              }}
             >
-              <Typography color="white" variant="body">
-                Back
+              <Typography fontWeight="700" fontSize="16px" lineHeight="26px">
+                Back to Contributions
               </Typography>
-            </Button>
+            </AutOsButton>
           </Stack>
-          <Stack alignItems="start" justifyContent="start" flexDirection="row" gap={1}>
+          <Stack
+            alignItems="start"
+            justifyContent="start"
+            flexDirection="row"
+            gap={1}
+          >
             <Typography variant="h3" color="white">
               Submissions
             </Typography>
             <Typography variant="h3" color="white">
-           {
-              `(${submissions?.length}/${selectedContribution?.properties?.quantity})`
-           }
+              {`(${submissions?.length}/${selectedContribution?.properties?.quantity})`}
             </Typography>
           </Stack>
 
