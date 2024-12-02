@@ -67,20 +67,6 @@ const createContribution = async (
       uri: uri
     });
 
-    const tx = await (
-      await taskFactory.functions.registerDescription({ uri }, overrides)
-    ).wait();
-    const event = findLogEvent(
-      tx,
-      TaskFactoryContractEventType.RegisterDescription
-    );
-    if (!event) {
-      return {
-        error: "Failed to register description"
-      };
-    }
-
-    const descriptionId = event.args[0]?.toString();
     const response = await taskFactory.createContribution(
       {
         taskId: contribution.properties.taskId,
@@ -89,7 +75,7 @@ const createContribution = async (
         endDate: contribution.properties.endDate,
         points: contribution.properties.points,
         quantity: contribution.properties.quantity,
-        descriptionId: descriptionId
+        uri: uri
       },
       overrides
     );

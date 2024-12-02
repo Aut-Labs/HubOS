@@ -28,6 +28,7 @@ import CreatePoll from "./DiscordBot/CreatePoll";
 import CreateGithubOpenPRTask from "./GithubTasks/CreateGithubPRTask";
 import CreateQuizTask from "./Modules/Plugins/Task/Quiz/CreateQuizTask";
 import CreateJoinDiscordTask from "./Modules/Plugins/Task/JoinDiscord/CreateJoinDiscordTask";
+import useQueryHubPeriod from "@hooks/useQueryHubPeriod";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -40,6 +41,9 @@ const AutContainer = styled("div")(() => ({
 
 const AutDashboardMain = () => {
   const hubData = useSelector(HubData);
+  const { data: periodData } = useQueryHubPeriod();
+
+  console.log(periodData, "periodData");
   const { data: members, loading: isLoadingMembers } = useQueryHubMembers({
     skip: !hubData?.properties?.address,
     variables: {

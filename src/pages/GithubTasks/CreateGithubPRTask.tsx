@@ -161,7 +161,7 @@ const CreateGithubPRTask = () => {
         repository: values.repository,
         organisation: metadata.orgName,
         quantity: values.quantity,
-        descriptionId: ""
+        uri: ""
       }
     });
     createTask({ contribution, autSig: state.authSig });

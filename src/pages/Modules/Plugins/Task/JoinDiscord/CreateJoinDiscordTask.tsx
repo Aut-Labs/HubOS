@@ -85,7 +85,7 @@ const CreateJoinDiscordTask = () => {
         points: values.weight,
         guildId: guildId,
         quantity: values.quantity,
-        descriptionId: "",
+        uri: "",
         inviteUrl: values.inviteUrl
       }
     };

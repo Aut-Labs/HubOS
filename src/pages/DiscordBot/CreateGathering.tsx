@@ -157,7 +157,7 @@ const CreateDiscordGathering = () => {
         channelId: values.channelId,
         points: values.weight,
         quantity: 1,
-        descriptionId: ""
+        uri: ""
       }
     });
     createTask({ contribution, autSig: state.authSig });
