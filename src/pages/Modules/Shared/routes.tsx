@@ -3,7 +3,7 @@ import { Route } from "react-router-dom";
 import { SidebarMenuItem } from "@components/Sidebar/MenuItems";
 import ExtensionIcon from "@mui/icons-material/Extension";
 import SubStackIcon from "@assets/aut/sub-stack.svg?react";
-import Submissions from "../Plugins/Task/Shared/Submissions";
+import Submissions from "../Plugins/Task/Submissions/Submissions";
 
 const Plugins = lazy(() => import("./Plugins"));
 
@@ -63,8 +63,6 @@ export const pluginRoutes = (
       allRoutes: []
     };
   }
-
-  console.log(plugins, "plugins");
 
   // let questSubmissionsAdded = false;
 

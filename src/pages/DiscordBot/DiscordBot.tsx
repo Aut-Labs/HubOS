@@ -101,7 +101,6 @@ function DiscordBot({ data }) {
         clearInterval(refetchIntervalRef.current);
       } else if (attempts >= maxAttempts) {
         clearInterval(refetchIntervalRef.current);
-        console.log("Bot activation check timed out after 2 minutes");
       }
     };
 

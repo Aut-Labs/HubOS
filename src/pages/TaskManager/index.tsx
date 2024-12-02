@@ -37,7 +37,7 @@ const AutTasksTab = ({ tasks, isLoading }) => {
             color: "white",
             fontWeight: 600,
             borderBottom: "1px solid",
-            borderColor: "grey.700",
+            borderColor: "divider",
             pb: 1,
             mb: 2
           }}
@@ -84,7 +84,7 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
               color: "white",
               fontWeight: 600,
               borderBottom: "1px solid",
-              borderColor: "grey.700",
+              borderColor: "divider",
               pb: 1,
               mb: 2
             }}
@@ -123,7 +123,7 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
               color: "white",
               fontWeight: 600,
               borderBottom: "1px solid",
-              borderColor: "grey.700",
+              borderColor: "divider",
               pb: 1,
               mb: 2
             }}
@@ -154,7 +154,7 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
               color: "white",
               fontWeight: 600,
               borderBottom: "1px solid",
-              borderColor: "grey.700",
+              borderColor: "divider",
               pb: 1,
               mb: 2
             }}

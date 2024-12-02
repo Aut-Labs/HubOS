@@ -24,7 +24,6 @@ const AutContainer = styled("div")(() => ({
 }));
 
 const GetStarted = () => {
-  console.log("GetStarted");
   return (
     <AutContainer>
       {/* <BottomLeftBubble loading="lazy" src={BubbleBottomLeft} />

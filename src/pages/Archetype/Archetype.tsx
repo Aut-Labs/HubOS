@@ -296,7 +296,6 @@ export const ArchetypeCard = ({
 
 const ChooseYourArchetype = ({ setSelected, archetype }) => {
   const [state, setState] = useState(archetypeChartValues(archetype));
-  console.log("state: ", state);
   return (
     <>
       <Box
@@ -428,8 +427,6 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
       max = activeState.min;
     }
 
-    console.log(min, max, sliderId, selectedArchetype, activeState);
-
     if (newValue >= min && newValue <= max) {
       setState((prevState) => ({
         ...prevState,
@@ -458,7 +455,6 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
         return prev;
       }, {} as any);
 
-      console.log(newState, "newState");
       setState(newState);
       setInitialValues(false);
     }
@@ -881,7 +877,6 @@ const Archetypes = () => {
     };
   }, [archetype, selected]);
 
-  console.log("archetypeData: ", archetypeData, archetype, selected);
 
   return (
     <Container maxWidth="md" sx={{ py: "20px" }}>

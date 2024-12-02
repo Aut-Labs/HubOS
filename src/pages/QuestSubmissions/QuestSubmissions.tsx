@@ -23,7 +23,7 @@ import { TaskContributionNFT } from "@aut-labs/sdk";
 import {
   SubmissionCard,
   SubmissionsGridBox
-} from "../Modules/Plugins/Task/Shared/Submissions";
+} from "../Modules/Plugins/Task/Submissions/Submissions";
 
 const StyledTableTitle = styled("div")(({ theme }) => ({
   alignItems: "flex-start",

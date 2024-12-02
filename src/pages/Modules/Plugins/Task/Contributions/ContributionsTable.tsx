@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import ArrowIcon from "@assets/hubos/move-right.svg?react";
 
 import {
+  Container,
   Paper,
   Stack,
   SvgIcon,
@@ -183,123 +184,136 @@ export const ContributionsTable = ({
 }: ContributionTableProps) => {
   const theme = useTheme();
   return (
-    <TableContainer
-      sx={{
-        minWidth: {
-          sm: "100%"
-        },
-        width: {
-          xs: "100%",
-          sm: "unset"
-        },
-        margin: 0,
-        mt: theme.spacing(4),
-        padding: 0,
-        backgroundColor: "transparent",
-        borderColor: "#576176"
-      }}
-      component={Paper}
-    >
-      <Table
-        className="swiper-no-swiping"
-        sx={{
-          minWidth: {
-            xs: "700px",
-            sm: "unset"
-          },
-          ".MuiTableBody-root > .MuiTableRow-root:hover": {
-            backgroundColor: "#ffffff0a"
-          }
-        }}
-      >
-        <TableHead>
-          <TableRow>
-            <StyledTableCell align="left">
-              <Typography
-                variant="body"
-                fontWeight="normal"
-                color="offWhite.dark"
-              >
-                Name
-              </Typography>
-            </StyledTableCell>
-            <StyledTableCell align="left">
-              <Typography
-                variant="body"
-                fontWeight="normal"
-                color="offWhite.dark"
-              >
-                Type
-              </Typography>
-            </StyledTableCell>
-            <StyledTableCell align="left">
-              <Typography
-                variant="body"
-                fontWeight="normal"
-                color="offWhite.dark"
-              >
-                Points
-              </Typography>
-            </StyledTableCell>
-            <StyledTableCell align="left">
-              <Typography
-                variant="body"
-                fontWeight="normal"
-                color="offWhite.dark"
-              >
-                Start Date
-              </Typography>
-            </StyledTableCell>
-            <StyledTableCell align="left">
-              <Typography
-                variant="body"
-                fontWeight="normal"
-                color="offWhite.dark"
-              >
-                End Date
-              </Typography>
-            </StyledTableCell>
-            <StyledTableCell align="left">
-              <Typography
-                variant="body"
-                fontWeight="normal"
-                color="offWhite.dark"
-              >
-                Submissions
-              </Typography>
-            </StyledTableCell>
-            <StyledTableCell align="left">
-              <Typography
-                variant="body"
-                fontWeight="normal"
-                color="offWhite.dark"
-              ></Typography>
-            </StyledTableCell>
-          </TableRow>
-        </TableHead>
-        {contributionsWithSubmissions?.length ? (
-          <TableBody>
-            {contributionsWithSubmissions?.map((row, index) => (
-              <TableListItem
-                key={`table-row-${index}`}
-                contribution={row.contribution}
-                submissions={row.submissions}
-                onViewSubmissions={onViewSubmissions}
-              />
-            ))}
-          </TableBody>
-        ) : (
-          <Box
+    <>
+      <Container maxWidth="md">
+        <Box
+          sx={{
+            my: theme.spacing(4)
+          }}
+        >
+          <Typography variant="h3" color="white">
+            Contributions
+          </Typography>
+          <TableContainer
             sx={{
-              padding: theme.spacing(2)
+              minWidth: {
+                sm: "100%"
+              },
+              width: {
+                xs: "100%",
+                sm: "unset"
+              },
+              margin: 0,
+              mt: theme.spacing(4),
+              padding: 0,
+              backgroundColor: "transparent",
+              borderColor: "#576176"
             }}
+            component={Paper}
           >
-            <Typography variant="body" color="white">
-              No items found...
-            </Typography>
-          </Box>
-        )}
-      </Table>
-    </TableContainer>
+            <Table
+              className="swiper-no-swiping"
+              sx={{
+                minWidth: {
+                  xs: "700px",
+                  sm: "unset"
+                },
+                ".MuiTableBody-root > .MuiTableRow-root:hover": {
+                  backgroundColor: "#ffffff0a"
+                }
+              }}
+            >
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell align="left">
+                    <Typography
+                      variant="body"
+                      fontWeight="normal"
+                      color="offWhite.dark"
+                    >
+                      Name
+                    </Typography>
+                  </StyledTableCell>
+                  <StyledTableCell align="left">
+                    <Typography
+                      variant="body"
+                      fontWeight="normal"
+                      color="offWhite.dark"
+                    >
+                      Type
+                    </Typography>
+                  </StyledTableCell>
+                  <StyledTableCell align="left">
+                    <Typography
+                      variant="body"
+                      fontWeight="normal"
+                      color="offWhite.dark"
+                    >
+                      Points
+                    </Typography>
+                  </StyledTableCell>
+                  <StyledTableCell align="left">
+                    <Typography
+                      variant="body"
+                      fontWeight="normal"
+                      color="offWhite.dark"
+                    >
+                      Start Date
+                    </Typography>
+                  </StyledTableCell>
+                  <StyledTableCell align="left">
+                    <Typography
+                      variant="body"
+                      fontWeight="normal"
+                      color="offWhite.dark"
+                    >
+                      End Date
+                    </Typography>
+                  </StyledTableCell>
+                  <StyledTableCell align="left">
+                    <Typography
+                      variant="body"
+                      fontWeight="normal"
+                      color="offWhite.dark"
+                    >
+                      Submissions
+                    </Typography>
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    <Typography
+                      variant="body"
+                      fontWeight="normal"
+                      color="offWhite.dark"
+                    ></Typography>
+                  </StyledTableCell>
+                </TableRow>
+              </TableHead>
+              {contributionsWithSubmissions?.length ? (
+                <TableBody>
+                  {contributionsWithSubmissions?.map((row, index) => (
+                    <TableListItem
+                      key={`table-row-${index}`}
+                      contribution={row.contribution}
+                      submissions={row.submissions}
+                      onViewSubmissions={onViewSubmissions}
+                    />
+                  ))}
+                </TableBody>
+              ) : (
+                <Box
+                  sx={{
+                    padding: theme.spacing(2)
+                  }}
+                >
+                  <Typography variant="body" color="white">
+                    No items found...
+                  </Typography>
+                </Box>
+              )}
+            </Table>
+          </TableContainer>
+        </Box>
+      </Container>
+    </>
   );
 };

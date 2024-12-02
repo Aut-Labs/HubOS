@@ -7,24 +7,28 @@ import useQueryContributionCommits, {
   ContributionCommit
 } from "@hooks/useQueryContributionCommits";
 import { HubData } from "@store/Hub/hub.reducer";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { TaskContributionNFT } from "@aut-labs/sdk";
 import HubOsTabs from "@components/HubOsTabs";
-import { SubmissionsTable } from "./SubmissionsTable";
+import { SubmissionsTable } from "../Submissions/SubmissionsTable";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import SubmitDialog from "@components/Dialog/SubmitDialog";
 import {
   useCreateQuizContributionMutation,
   useGiveContributionMutation
 } from "@api/contributions.api";
+import { setSelectedContribution } from "@store/Contributions/contributions.reducer";
+import { useNavigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
+import SubmissionDetails from "../Submissions/SubmissionDetails";
 
 const Contributions = () => {
-  const theme = useTheme();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const hubData = useSelector(HubData);
-  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
-  const [selectedContribution, setSelectedContribution] =
-    useState<TaskContributionNFT>(null);
-
+  const selectedContribution = useSelector(
+    (state: any) => state.contribution.selectedContribution
+  );
   const [
     giveContribution,
     { error, isError, isSuccess, isLoading: isLoadingSubmit, reset }
@@ -37,17 +41,20 @@ const Contributions = () => {
     }
   });
 
-  const { data: commits, loading: isLoadingCommits, refetch } =
-    useQueryContributionCommits({
-      skip: !hubData?.properties?.address,
-      variables: {
-        skip: 0,
-        take: 1000,
-        where: {
-          hub: hubData?.properties?.address
-        }
+  const {
+    data: commits,
+    loading: isLoadingCommits,
+    refetch
+  } = useQueryContributionCommits({
+    skip: !hubData?.properties?.address,
+    variables: {
+      skip: 0,
+      take: 1000,
+      where: {
+        hub: hubData?.properties?.address
       }
-    });
+    }
+  });
 
   const isLoading = useMemo(() => {
     return isLoadingContributions || isLoadingCommits;
@@ -73,8 +80,11 @@ const Contributions = () => {
   }, [data, commits]);
 
   const onViewSubmissions = (contribution: TaskContributionNFT) => {
-    setSelectedContribution(contribution);
-    setSelectedTabIndex(1);
+    // setSelectedContribution(contribution);
+    dispatch(setSelectedContribution(contribution));
+    navigate({
+      pathname: `${contribution?.properties?.id}/submissions`
+    });
   };
 
   const onGiveSubmission = (
@@ -87,31 +97,6 @@ const Contributions = () => {
     });
   };
 
-  const tabs = useMemo(() => {
-    return [
-      {
-        label: "Contributions",
-        props: {
-          contributionsWithSubmissions: contributionsWithSubmissions,
-          onViewSubmissions: onViewSubmissions
-        },
-        component: ContributionsTable
-      },
-      {
-        label: "Submissions",
-        props: {
-          contributionsWithSubmissions: contributionsWithSubmissions,
-          selectedContribution: selectedContribution,
-          onGiveSubmission: onGiveSubmission
-        },
-        component: SubmissionsTable
-      }
-    ];
-  }, [
-    contributionsWithSubmissions,
-    selectedContribution,
-    onViewSubmissions
-  ]);
 
   return (
     <Container
@@ -145,21 +130,31 @@ const Contributions = () => {
         <AutLoading width="130px" height="130px" />
       ) : (
         <>
-          <Container maxWidth="md">
-            <Box
-              sx={{
-                my: theme.spacing(4)
-              }}
-            >
-              <HubOsTabs
-                selectedTab={(index) => {
-                  setSelectedTabIndex(index);
-                }}
-                selectedTabIndex={selectedTabIndex}
-                tabs={tabs}
-              />
-            </Box>
-          </Container>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <ContributionsTable
+                  contributionsWithSubmissions={contributionsWithSubmissions}
+                  onViewSubmissions={onViewSubmissions}
+                />
+              }
+            />
+            <Route
+              path=":contributionId/submissions"
+              element={
+                <SubmissionsTable
+                  contributionsWithSubmissions={contributionsWithSubmissions}
+                  selectedContribution={selectedContribution}
+                  onGiveSubmission={onGiveSubmission}
+                />
+              }
+            />
+            <Route
+              path=":contributionId/submissions/:submissionId"
+              element={<SubmissionDetails />}
+            />
+          </Routes>
         </>
       )}
     </Container>

@@ -68,8 +68,9 @@ const LeftWrapper = styled(Box)(({ theme }) => ({
   height: "80%",
   width: "100%",
   maxWidth: "480px",
-  backdropFilter: "blur(12px)",
-  backgroundColor: "rgba(128, 128, 128, 0.06)",
+  backdropFilter: "blur(6px)",
+  // backgroundColor: "rgba(255, 255, 255, 0.12)",
+  backgroundColor: "rgba(128, 128, 128, 0.2)",
   boxShadow: "0px 3px 6px #00000029",
   borderRadius: "24px",
   // padding: "32px 16px",
@@ -166,8 +167,6 @@ const Dashboard = ({ members }: { members: HubOSAutID<AutIDProperties>[] }) => {
   const period = useMemo(() => {
     return (hubData?.properties as any)?.period ?? 1;
   }, [hubData]);
-
-
 
   useEffect(() => {
     dispatch(

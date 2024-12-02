@@ -12,8 +12,6 @@ const HubRoleTabs = ({ roles }) => {
     };
   });
 
-  console.log("TABSS", tabs);
-
   return (
     <>
       <HubOsTabs tabs={tabs}></HubOsTabs>

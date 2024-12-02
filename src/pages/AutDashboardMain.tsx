@@ -14,7 +14,7 @@ import HubEdit from "./HubEdit/HubEdit";
 import Members from "./Members/Members";
 import TaskManager from "./TaskManager";
 import DiscordBot from "./DiscordBot/DiscordBot";
-import Contributions from "./Modules/Plugins/Task/Shared/Contributions";
+import Contributions from "./Modules/Plugins/Task/Contributions/Contributions";
 import CreateOpenTask from "./Modules/Plugins/Task/Open/CreateOpenTask";
 import useQueryTaskTypes from "@hooks/useQueryTaskTypes";
 import CreateGathering from "./DiscordBot/CreateGathering";
@@ -28,6 +28,9 @@ import CreatePoll from "./DiscordBot/CreatePoll";
 import CreateGithubOpenPRTask from "./GithubTasks/CreateGithubPRTask";
 import CreateQuizTask from "./Modules/Plugins/Task/Quiz/CreateQuizTask";
 import CreateJoinDiscordTask from "./Modules/Plugins/Task/JoinDiscord/CreateJoinDiscordTask";
+import Submissions from "./Modules/Plugins/Task/Submissions/Submissions";
+import SubmissionDetails from "./Modules/Plugins/Task/Submissions/SubmissionDetails";
+import { SubmissionsTable } from "./Modules/Plugins/Task/Submissions/SubmissionsTable";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -94,7 +97,7 @@ const AutDashboardMain = () => {
                   />
                 }
               />
-              <Route path="contributions" element={<Contributions />} />
+              <Route path="contributions/*" element={<Contributions />} />
               <Route path="create-open-task" element={<CreateOpenTask />} />
               <Route
                 path="create-join-discord"

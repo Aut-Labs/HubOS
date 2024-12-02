@@ -3,7 +3,6 @@ import { Container, styled } from "@mui/material";
 const ContainerWithForm = styled<any>(Container)``;
 
 export const FormContainer = ({ children, ...props }) => {
-  console.log("FormContainer", props);
   return (
     <ContainerWithForm
       sx={{ py: "20px", display: "flex", flexDirection: "column" }}
