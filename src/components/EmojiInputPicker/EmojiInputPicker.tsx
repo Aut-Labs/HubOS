@@ -6,32 +6,23 @@ import {
   IconButton,
   Popover,
   Paper,
+  Box,
   InputAdornment,
   TextFieldProps
 } from "@mui/material";
 import EmojiIcon from "@assets/smile-emoji.svg?react";
 
-// Helper functions for emoji handling
-const removeEmojis = (text = "") => {
-  return text.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, "").trim();
-};
-
-const hasEmoji = (text: string) => {
-  const regexExp =
-    /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/gi;
-  return regexExp.test(text);
-};
-
-interface EmojiInputPickerProps extends Omit<TextFieldProps, "onChange"> {
-  onChange?: (value: string) => void;
+interface EmojiOptionInputProps extends Omit<TextFieldProps, "onChange"> {
+  onChange?: (value: { option: string; emoji: string }) => void;
+  value?: { option: string; emoji: string };
   emojiButtonProps?: {
     disabled?: boolean;
   };
 }
 
-const EmojiInputPicker: React.FC<EmojiInputPickerProps> = ({
+const EmojiOptionInput: React.FC<EmojiOptionInputProps> = ({
   onChange,
-  value = "",
+  value = { option: "", emoji: "" },
   emojiButtonProps,
   InputProps,
   ...textFieldProps
@@ -48,37 +39,36 @@ const EmojiInputPicker: React.FC<EmojiInputPickerProps> = ({
   };
 
   const handleEmojiSelect = (emoji: { native: string }) => {
-    if (inputRef.current) {
-      const cursorPosition = inputRef.current.selectionStart || 0;
-      const textBeforeCursor = String(value).slice(0, cursorPosition);
-      const textAfterCursor = String(value).slice(cursorPosition);
+    onChange?.({
+      option: value.option,
+      emoji: emoji.native
+    });
+    handleClose();
+  };
 
-      const newText = `${textBeforeCursor}${emoji.native}${textAfterCursor}`;
-      onChange?.(newText);
-
-      handleClose();
-
-      // Restore focus and cursor position
-      setTimeout(() => {
-        inputRef.current?.focus();
-        const newPosition = cursorPosition + emoji.native.length;
-        inputRef.current?.setSelectionRange(newPosition, newPosition);
-      }, 0);
-    }
+  const handleOptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange?.({
+      option: e.target.value,
+      emoji: value.emoji
+    });
   };
 
   const open = Boolean(anchorEl);
   const id = open ? "emoji-popover" : undefined;
 
   return (
-    <>
+    <Box sx={{ display: "flex", gap: 2, alignItems: "center", width: "100%" }}>
       <TextField
         {...textFieldProps}
         inputRef={inputRef}
-        value={value}
-        onChange={(e) => onChange?.(e.target.value)}
+        value={value.option}
+        onChange={handleOptionChange}
+        sx={{ flex: 1 }}
+      />
+      <TextField
+        value={value.emoji}
         InputProps={{
-          ...InputProps,
+          readOnly: true,
           endAdornment: (
             <InputAdornment position="end">
               <IconButton
@@ -93,6 +83,7 @@ const EmojiInputPicker: React.FC<EmojiInputPickerProps> = ({
             </InputAdornment>
           )
         }}
+        sx={{ width: "100px" }}
       />
       <Popover
         id={id}
@@ -127,8 +118,8 @@ const EmojiInputPicker: React.FC<EmojiInputPickerProps> = ({
           />
         </Paper>
       </Popover>
-    </>
+    </Box>
   );
 };
 
-export default EmojiInputPicker;
+export default EmojiOptionInput;

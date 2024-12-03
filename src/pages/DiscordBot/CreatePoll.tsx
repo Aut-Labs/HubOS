@@ -23,7 +23,7 @@ import {
 import { AutDatepicker, FormHelperText } from "@components/Fields";
 import EmojiInputPicker from "@components/EmojiInputPicker/EmojiInputPicker";
 import { AutSelectField } from "@theme/field-select-styles";
-import { HubData } from "@store/Hub/hub.reducer";
+import { AutIDData, HubData } from "@store/Hub/hub.reducer";
 import { useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useWalletConnector } from "@aut-labs/connector";
@@ -34,11 +34,14 @@ import { dateToUnix } from "@utils/date-format";
 import axios from "axios";
 import { environment } from "@api/environment";
 import { useQuery } from "@tanstack/react-query";
+import EmojiOptionInput from "@components/EmojiInputPicker/EmojiInputPicker";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
   maxLength: `Characters cannot be more than 280`,
-  missingEmoji: `Whoops! You forgot to add an emoji 🤭`
+  missingEmoji: `Whoops! You forgot to add an emoji 🤭`,
+  duplicateOption: `Each option must be unique`,
+  duplicateEmoji: `Each emoji must be unique`
 };
 
 const durations = [
@@ -68,12 +71,30 @@ const fetchTextChannels = async (guildId: string) => {
   return response.data;
 };
 
+const hasDuplicates = (array) => {
+  return new Set(array).size !== array.length;
+};
+
+const validateOptions = (options) => {
+  const optionTexts = options.map((o) => o.option.trim()).filter(Boolean);
+  const emojis = options.map((o) => o.emoji).filter(Boolean);
+
+  if (hasDuplicates(optionTexts)) {
+    return "duplicateOption";
+  }
+  if (hasDuplicates(emojis)) {
+    return "duplicateEmoji";
+  }
+  return true;
+};
+
 const CreatePoll = () => {
   const { state } = useWalletConnector();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const theme = useTheme();
   const hubData = useSelector(HubData);
+  const autID = useSelector(AutIDData);
 
   const guildId = useMemo(() => {
     const social = hubData.properties.socials.find((s) => s.type === "discord");
@@ -120,8 +141,8 @@ const CreatePoll = () => {
     useCreateDiscordPollContributionMutation();
 
   const onSubmit = async () => {
-    debugger;
     const values = getValues();
+    const joinedHub = autID.joinedHub(hubData.properties.address);
 
     const contribution = new DiscordPollContribution({
       name: values.title,
@@ -129,10 +150,11 @@ const CreatePoll = () => {
       image: "",
       properties: {
         taskId: searchParams.get("taskId"),
-        role: values.allRoles ? null : (values.role as any),
+        role: +joinedHub.role,
+        roles: [values.role],
         duration: values.duration,
         guildId,
-        options: values.options.map((o) => o.option),
+        options: values.options,
         points: values.weight,
         quantity: 1,
         uri: "",
@@ -146,9 +168,7 @@ const CreatePoll = () => {
         )
       }
     });
-
     debugger;
-
     createPoll({ contribution, autSig: state.authSig });
   };
 
@@ -318,16 +338,39 @@ const CreatePoll = () => {
               sx={{ display: "flex", mb: 2, alignItems: "center" }}
             >
               <Controller
-                name={`options.${index}.option`}
+                name={`options.${index}`}
                 control={control}
                 rules={{
-                  required: true
+                  required: true,
+                  validate: {
+                    notEmpty: (value) => {
+                      if (!value.option.trim()) {
+                        return "Option text is required";
+                      }
+                      if (!value.emoji) {
+                        return "Please select an emoji";
+                      }
+                      return true;
+                    },
+                    unique: (value, formValues) => {
+                      const result = validateOptions(getValues().options);
+                      if (result === "duplicateOption") {
+                        return errorTypes.duplicateOption;
+                      }
+                      if (result === "duplicateEmoji") {
+                        return errorTypes.duplicateEmoji;
+                      }
+                      return true;
+                    }
+                  }
                 }}
-                render={({ field }) => (
-                  <EmojiInputPicker
+                render={({ field, fieldState: { error } }) => (
+                  <EmojiOptionInput
                     {...field}
                     placeholder={`Option ${index + 1}`}
                     autoFocus={index === 0}
+                    error={!!error}
+                    helperText={error?.message}
                     sx={{ flex: 1, mr: 2 }}
                   />
                 )}
@@ -338,7 +381,13 @@ const CreatePoll = () => {
                   onClick={() => remove(index)}
                   variant="text"
                   color="error"
-                  sx={{ minWidth: 40 }}
+                  sx={{
+                    ml: 2,
+                    "&.MuiButton-root": {
+                      minWidth: "40px",
+                      maxWidth: "60px"
+                    }
+                  }}
                 >
                   X
                 </AutOsButton>
@@ -459,13 +508,6 @@ const CreatePoll = () => {
               <AutSelectField
                 variant="standard"
                 color="offWhite"
-                // renderValue={(selected) => {
-                //   if (!selected) {
-                //     return "Role" as any;
-                //   }
-                //   const role = roles.find((t) => t.id === selected);
-                //   return role?.roleName || selected;
-                // }}
                 name={name}
                 value={value || ""}
                 displayEmpty

@@ -8,12 +8,14 @@ export class DiscordGatheringContributionProperties extends TaskContributionProp
   channelId: string;
   duration: number;
   guildId: string;
+  roles: string[];
 
   constructor(data: DiscordGatheringContributionProperties) {
     super(data);
     this.channelId = data.channelId;
     this.duration = data.duration;
     this.guildId = data.guildId;
+    this.roles = data.roles;
   }
 }
 
@@ -30,7 +32,8 @@ export class DiscordGatheringContribution<
       properties: {
         duration: taskContribution.properties.duration,
         channelId: taskContribution.properties.channelId,
-        guildId: taskContribution.properties.guildId
+        guildId: taskContribution.properties.guildId,
+        roles: taskContribution.properties.roles
       }
     } as BaseNFTModel<any>;
   }

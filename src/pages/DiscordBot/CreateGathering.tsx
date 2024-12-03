@@ -141,15 +141,18 @@ const CreateDiscordGathering = () => {
 
   const onSubmit = async () => {
     const values = getValues();
-    const endDate = new Date(new Date(values.startDate).getTime() + values.duration * 60000);
-
+    const endDate = new Date(
+      new Date(values.startDate).getTime() + values.duration * 60000
+    );
+    const joinedHub = autID.joinedHub(hubData.properties.address);
     const contribution = new DiscordGatheringContribution({
       name: values.title,
       description: values.description,
       image: "",
       properties: {
         taskId: searchParams.get("taskId"),
-        role: values.role,
+        role: +joinedHub.role,
+        roles: [values.role],
         duration: values.duration,
         guildId,
         startDate: dateToUnix(values.startDate),
@@ -160,6 +163,7 @@ const CreateDiscordGathering = () => {
         uri: ""
       }
     });
+    debugger;
     createTask({ contribution, autSig: state.authSig });
   };
 
@@ -624,6 +628,9 @@ const CreateDiscordGathering = () => {
               >
                 <MenuItem key={`duration-2`} value={2}>
                   2m
+                </MenuItem>
+                <MenuItem key={`duration-2`} value={5}>
+                  5m
                 </MenuItem>
                 <MenuItem key={`duration-15`} value={15}>
                   15m

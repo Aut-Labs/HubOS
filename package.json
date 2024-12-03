@@ -32,7 +32,7 @@
     "@aut-labs/abi-types": "^0.0.87-dev",
     "@aut-labs/connector": "^0.0.205",
     "@aut-labs/d-aut": "^1.0.205-dev",
-    "@aut-labs/sdk": "^0.0.227-dev",
+    "@aut-labs/sdk": "^0.0.229-dev",
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
     "@emotion/react": "^11.11.3",

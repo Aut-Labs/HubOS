@@ -8,7 +8,8 @@ export class DiscordPollContributionProperties extends TaskContributionPropertie
   channelId: string;
   duration: string;
   guildId: string;
-  options: string[];
+  options: { option: string; emoji: string }[];
+  roles: string[];
 
   constructor(data: DiscordPollContributionProperties) {
     super(data);
@@ -16,6 +17,7 @@ export class DiscordPollContributionProperties extends TaskContributionPropertie
     this.duration = data.duration;
     this.guildId = data.guildId;
     this.options = data.options || [];
+    this.roles = data.roles;
   }
 }
 
@@ -33,7 +35,8 @@ export class DiscordPollContribution<
         duration: taskContribution.properties.duration,
         channelId: taskContribution.properties.channelId,
         guildId: taskContribution.properties.guildId,
-        options: taskContribution.properties.options
+        options: taskContribution.properties.options,
+        roles: taskContribution.properties.roles
       }
     } as BaseNFTModel<any>;
   }

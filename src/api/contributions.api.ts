@@ -19,6 +19,7 @@ import { PullRequestContribution } from "./contribution-types/github-pr.model";
 import { JoinDiscordContribution } from "./contribution-types/discord-join.model";
 import { DiscordPollContribution } from "./contribution-types/discord-poll-model";
 import { create } from "@mui/material/styles/createTransitions";
+import { environment } from "./environment";
 
 const hubServiceCache: Record<string, Hub> = {};
 
@@ -79,7 +80,6 @@ const createContribution = async (
       },
       overrides
     );
-
     if (!response.isSuccess) {
       return {
         error: response.errorMessage
@@ -113,7 +113,6 @@ const createTwitterRetweetContribution = async (
   }: { contribution: RetweetContribution; autSig: AuthSig },
   api: BaseQueryApi
 ) => {
-  debugger;
   const nft = RetweetContribution.getContributionNFT(contribution);
   return createContribution(contribution, nft, api);
 };
@@ -126,42 +125,42 @@ const createDiscordGatheringContribution = async (
   api: BaseQueryApi
 ) => {
   const nft = DiscordGatheringContribution.getContributionNFT(contribution);
-  // const result = await createContribution(contribution, nft, api);
-
-  try {
-    const gatheringPayload = {
-      guildId: contribution.properties.guildId,
-      channelId: contribution.properties.channelId,
-      title: contribution.name,
-      description: contribution.description,
-      startDate: new Date(contribution.properties.startDate * 1000), // Convert unix to Date
-      endDate: new Date(contribution.properties.endDate * 1000),
-      roles: [contribution.properties.role],
-      allCanAttend: false,
-      weight: contribution.properties.points,
-      taskId: contribution.properties.taskId
-    };
-    const response = await fetch(
-      "http://localhost:4005/api/discord/gathering",
-      {
+  const result = await createContribution(contribution, nft, api);
+  if (!result.error) {
+    try {
+      const gatheringPayload = {
+        guildId: contribution.properties.guildId,
+        channelId: contribution.properties.channelId,
+        title: contribution.name,
+        description: contribution.description,
+        contributionId: result.data,
+        startDate: new Date(contribution.properties.startDate * 1000), // Convert unix to Date
+        endDate: new Date(contribution.properties.endDate * 1000),
+        roles: contribution.properties.roles,
+        allCanAttend: false,
+        weight: contribution.properties.points,
+        taskId: contribution.properties.taskId
+      };
+      const response = await fetch(`${environment.apiUrl}/discord/gathering`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify(gatheringPayload)
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create Discord gathering");
       }
-    );
 
-    if (!response.ok) {
-      throw new Error("Failed to create Discord gathering");
+      const gathering = await response.json();
+      return { gathering } as any;
+    } catch (error) {
+      console.error("Discord gathering creation failed:", error);
+      return { gatheringError: error.message } as any;
     }
-
-    const gathering = await response.json();
-    return { gathering } as any;
-  } catch (error) {
-    console.error("Discord gathering creation failed:", error);
-    return { gatheringError: error.message } as any;
   }
+  return { pollError: result.error } as any;
 };
 
 const createDiscordPollContribution = async (
@@ -172,40 +171,44 @@ const createDiscordPollContribution = async (
   api: BaseQueryApi
 ) => {
   const nft = DiscordPollContribution.getContributionNFT(contribution);
-  // const result = await createContribution(contribution, nft, api);
-  debugger;
-  try {
-    const pollPayload = {
-      guildId: contribution.properties.guildId,
-      channelId: contribution.properties.channelId,
-      title: contribution.name,
-      options: contribution.properties.options,
-      description: contribution.description,
-      startDate: new Date(contribution.properties.startDate * 1000), // Convert unix to Date
-      endDate: new Date(contribution.properties.endDate * 1000),
-      roles: [contribution.properties.role],
-      allCanAttend: false,
-      weight: contribution.properties.points,
-      taskId: contribution.properties.taskId
-    };
-    const response = await fetch("http://localhost:4005/api/discord/poll", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(pollPayload)
-    });
+  const result = await createContribution(contribution, nft, api);
 
-    if (!response.ok) {
-      throw new Error("Failed to create Discord gathering");
+  if (!result.error) {
+    try {
+      const pollPayload = {
+        guildId: contribution.properties.guildId,
+        channelId: contribution.properties.channelId,
+        contributionId: result.data,
+        title: contribution.name,
+        options: contribution.properties.options,
+        description: contribution.description,
+        startDate: new Date(contribution.properties.startDate * 1000), // Convert unix to Date
+        endDate: new Date(contribution.properties.endDate * 1000),
+        allCanAttend: false,
+        roles: contribution.properties.roles,
+        weight: contribution.properties.points,
+        taskId: contribution.properties.taskId
+      };
+      const response = await fetch(`${environment.apiUrl}/discord/poll`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(pollPayload)
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create Discord gathering");
+      }
+
+      const poll = await response.json();
+      return { poll } as any;
+    } catch (error) {
+      console.error("Discord poll creation failed:", error);
+      return { pollError: error.message } as any;
     }
-
-    const poll = await response.json();
-    return { poll } as any;
-  } catch (error) {
-    console.error("Discord poll creation failed:", error);
-    return { pollError: error.message } as any;
   }
+  return { pollError: result.error } as any;
 };
 
 const createJoinDiscordContribution = async (
