@@ -14,7 +14,7 @@ import HubEdit from "./HubEdit/HubEdit";
 import Members from "./Members/Members";
 import TaskManager from "./TaskManager";
 import DiscordBot from "./DiscordBot/DiscordBot";
-import { AllTasks } from "./Modules/Plugins/Task/Shared/AllTasks";
+import Contributions from "./Modules/Plugins/Task/Contributions/Contributions";
 import CreateOpenTask from "./Modules/Plugins/Task/Open/CreateOpenTask";
 import useQueryTaskTypes from "@hooks/useQueryTaskTypes";
 import CreateGathering from "./DiscordBot/CreateGathering";
@@ -27,6 +27,8 @@ import CreateXCommentTask from "./TwitterTasks/CreateXCommentTask";
 import CreatePoll from "./DiscordBot/CreatePoll";
 import CreateGithubOpenPRTask from "./GithubTasks/CreateGithubPRTask";
 import CreateQuizTask from "./Modules/Plugins/Task/Quiz/CreateQuizTask";
+import CreateJoinDiscordTask from "./Modules/Plugins/Task/JoinDiscord/CreateJoinDiscordTask";
+import useQueryHubPeriod from "@hooks/useQueryHubPeriod";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -39,6 +41,9 @@ const AutContainer = styled("div")(() => ({
 
 const AutDashboardMain = () => {
   const hubData = useSelector(HubData);
+  const { data: periodData } = useQueryHubPeriod();
+
+  console.log(periodData, "periodData");
   const { data: members, loading: isLoadingMembers } = useQueryHubMembers({
     skip: !hubData?.properties?.address,
     variables: {
@@ -65,9 +70,7 @@ const AutDashboardMain = () => {
   return (
     <>
       <AutContainer>
-        <SidebarDrawer
-          addonMenuItems={[]}
-        >
+        <SidebarDrawer addonMenuItems={[]}>
           <Suspense fallback={<AutLoading width="130px" height="130px" />}>
             <Routes>
               <Route index element={<Dashboard members={members} />} />
@@ -75,7 +78,10 @@ const AutDashboardMain = () => {
               <Route path="edit-hub" element={<HubEdit />} />
               <Route path="archetype" element={<Archetype />} />
               <Route path="modules/dAut" element={<DAut />} />
-              <Route path="discord-bot" element={<DiscordBot />}></Route>
+              <Route
+                path="discord-bot"
+                element={<DiscordBot data={data} />}
+              ></Route>
               <Route
                 path="members"
                 element={
@@ -92,8 +98,12 @@ const AutDashboardMain = () => {
                   />
                 }
               />
-              <Route path="contributions" element={<AllTasks />} />
+              <Route path="contributions/*" element={<Contributions />} />
               <Route path="create-open-task" element={<CreateOpenTask />} />
+              <Route
+                path="create-join-discord"
+                element={<CreateJoinDiscordTask />}
+              />
               <Route path="create-quiz" element={<CreateQuizTask />} />
               <Route
                 path="create-github-commit"

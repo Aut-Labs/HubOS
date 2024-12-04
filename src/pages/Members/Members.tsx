@@ -239,9 +239,6 @@ const Members = ({ members, isLoading }: { members: HubOSAutID<AutIDProperties>[
   }, [dispatch]);
 
   const hubData = useSelector(HubData);
-
-  console.log(members);
-
   const tabs = useMemo(() => {
     const roles = hubData.roles;
     const initializedTabs = roles.reduce((tab, role) => {

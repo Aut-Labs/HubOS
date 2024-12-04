@@ -29,16 +29,32 @@ const GridBox = styled(Box)(({ theme }) => {
 
 const AutTasksTab = ({ tasks, isLoading }) => {
   return (
-    <GridBox sx={{ flexGrow: 1, mt: 4 }}>
-      {/* @TODO - Iulia to redesign this */}
-      {tasks.map((taskType, index) => (
-        <ModuleDefinitionCard
-          key={`modules-plugin-${index}`}
-          isFetching={isLoading}
-          taskType={taskType}
-        />
-      ))}
-    </GridBox>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 4, mt: 4 }}>
+      <Box>
+        <Typography
+          variant="h4"
+          sx={{
+            color: "white",
+            fontWeight: 600,
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            pb: 1,
+            mb: 2
+          }}
+        >
+          Standard Tasks
+        </Typography>
+        <GridBox>
+          {tasks.map((taskType, index) => (
+            <ModuleDefinitionCard
+              key={`modules-plugin-${index}`}
+              isFetching={isLoading}
+              taskType={taskType}
+            />
+          ))}
+        </GridBox>
+      </Box>
+    </Box>
   );
 };
 
@@ -68,7 +84,7 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
               color: "white",
               fontWeight: 600,
               borderBottom: "1px solid",
-              borderColor: "grey.700",
+              borderColor: "divider",
               pb: 1,
               mb: 2
             }}
@@ -107,7 +123,7 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
               color: "white",
               fontWeight: 600,
               borderBottom: "1px solid",
-              borderColor: "grey.700",
+              borderColor: "divider",
               pb: 1,
               mb: 2
             }}
@@ -117,7 +133,7 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
           <GridBox>
             {socials.discord ? (
               discordTasks.map((taskType, index) => (
-                <ComingSoonCard
+                <ModuleDefinitionCard
                   key={`discord-task-${index}`}
                   isFetching={isLoading}
                   taskType={taskType}
@@ -138,7 +154,7 @@ const SocialTasksTab = ({ tasks, isLoading }) => {
               color: "white",
               fontWeight: 600,
               borderBottom: "1px solid",
-              borderColor: "grey.700",
+              borderColor: "divider",
               pb: 1,
               mb: 2
             }}
@@ -234,7 +250,6 @@ const TaskManager = ({ isLoading, data, refetch }) => {
     };
   }, [data]);
 
-  console.log(filteredTasks);
   const tabs = useMemo(() => {
     if (filteredTasks && filteredTasks.otherTasks.length) {
       return [
@@ -311,16 +326,16 @@ const TaskManager = ({ isLoading, data, refetch }) => {
         ) : (
           <>
             <HubOsTabs selectedTabIndex={selectedTabIndex} tabs={tabs} />
-            <GridBox sx={{ flexGrow: 1, mt: 4 }}>
-              {/* @TODO - Iulia to redesign this */}
-              {/* {filteredTasks.otherTasks.map((taskType, index) => (
+            {/* <GridBox sx={{ flexGrow: 1, mt: 4 }}> */}
+            {/* @TODO - Iulia to redesign this */}
+            {/* {filteredTasks.otherTasks.map((taskType, index) => (
                 <ModuleDefinitionCard
                   key={`modules-plugin-${index}`}
                   isFetching={isLoading}
                   taskType={taskType}
                 />
               ))} */}
-            </GridBox>
+            {/* </GridBox> */}
           </>
         )}
       </Container>

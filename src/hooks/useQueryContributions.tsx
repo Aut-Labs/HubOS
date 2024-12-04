@@ -1,9 +1,7 @@
-import AutSDK, {
+import {
   BaseNFTModel,
   fetchMetadata,
-  Hub,
-  TaskContributionNFT,
-  TaskFactoryContract
+  TaskContributionNFT
 } from "@aut-labs/sdk";
 import {
   gql,
@@ -28,22 +26,15 @@ const GET_HUB_CONTRIBUTIONS = gql`
       endDate
       points
       quantity
-      descriptionId
+      uri
     }
   }
 `;
 
-const contributionsMetadata = (
-  contributions: any[],
-  taskFactory: TaskFactoryContract,
-  taskTypes: TaskType[]
-) => {
+const contributionsMetadata = (contributions: any[], taskTypes: TaskType[]) => {
   return contributions.map(async (contribution) => {
-    const { uri } = await taskFactory.functions.getDescriptionById(
-      contribution?.descriptionId
-    );
     let metadata = await fetchMetadata<BaseNFTModel<any>>(
-      uri,
+      contribution.uri,
       environment.ipfsGatewayUrl
     );
     metadata = metadata || ({ properties: {} } as BaseNFTModel<any>);
@@ -63,25 +54,24 @@ const useQueryContributions = (props: QueryFunctionOptions<any, any> = {}) => {
         hubAddress: hubData.properties.address,
         ...(props.variables?.where || {})
       }
-    },
-    ...props
+    }
+    // ...props
   });
 
   const [contributions, setContributions] = useState<TaskContributionNFT[]>([]);
-  const [loadingMetadata, setLoadingMetadata] = useState(true);
+  const [loadingMetadata, setLoadingMetadata] = useState(false);
 
   useEffect(() => {
-    if (hubData?.properties?.address && data?.contributions?.length && taskTypes.length) {
+    if (
+      hubData?.properties?.address &&
+      data?.contributions?.length &&
+      taskTypes.length
+    ) {
+      setLoadingMetadata(true);
       const fetch = async () => {
-        const sdk = await AutSDK.getInstance();
-        const hubService: Hub = sdk.initService<Hub>(
-          Hub,
-          hubData.properties.address
-        );
-        const taskFactory = await hubService.getTaskFactory();
         setLoadingMetadata(true);
         const contributions = await Promise.all(
-          contributionsMetadata(data?.contributions, taskFactory, taskTypes)
+          contributionsMetadata(data?.contributions, taskTypes)
         );
         setLoadingMetadata(false);
         setContributions(contributions);

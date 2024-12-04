@@ -3,10 +3,10 @@ import { TaskType } from "./models/task-type";
 import { OpenTaskContribution } from "./contribution-types/open-task.model";
 import { DiscordGatheringContribution } from "./contribution-types/discord-gathering.model";
 import { RetweetContribution } from "./contribution-types/retweet.model";
-import { JoinDiscordContribution } from "./contribution-types/join-discord.model";
 import { QuizTaskContribution } from "./contribution-types/quiz.model.model";
 import { CommitContribution } from "./contribution-types/github-commit.model";
 import { PullRequestContribution } from "./contribution-types/github-pr.model";
+import { JoinDiscordContribution } from "./contribution-types/discord-join.model";
 
 export const ContributionFactory = (
   metadata: BaseNFTModel<any>,

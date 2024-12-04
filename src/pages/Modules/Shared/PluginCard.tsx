@@ -244,12 +244,14 @@ export const ModuleDefinitionCard = ({
       sx={{
         alignItems: "flex-start",
         justifyContent: "flex-start",
-        backdropFilter: "blur(50px)",
-        backgroundColor: "rgba(128, 128, 128, 0.05)",
-        border: `1px solid ${theme.palette.offWhite.dark}`,
-        borderRadius: "6px",
+        border: "1px solid",
+        borderColor: "divider",
+        backgroundColor: "rgba(128, 128, 128, 0.2)",
+        borderRadius: "16px",
+        boxShadow: 3,
         opacity: 1,
         WebkitBackdropFilter: "blur(6px)",
+        backdropFilter: "blur(6px)",
         padding: {
           xs: "24px 24px",
           md: "20px 20px",

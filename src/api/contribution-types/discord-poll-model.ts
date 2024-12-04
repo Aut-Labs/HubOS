@@ -4,28 +4,30 @@ import {
   TaskContributionProperties
 } from "@aut-labs/sdk";
 
-export class DiscordGatheringContributionProperties extends TaskContributionProperties {
+export class DiscordPollContributionProperties extends TaskContributionProperties {
   channelId: string;
-  duration: number;
+  duration: string;
   guildId: string;
+  options: { option: string; emoji: string }[];
   roles: string[];
 
-  constructor(data: DiscordGatheringContributionProperties) {
+  constructor(data: DiscordPollContributionProperties) {
     super(data);
     this.channelId = data.channelId;
     this.duration = data.duration;
     this.guildId = data.guildId;
+    this.options = data.options || [];
     this.roles = data.roles;
   }
 }
 
-export class DiscordGatheringContribution<
-  T = DiscordGatheringContributionProperties
+export class DiscordPollContribution<
+  T = DiscordPollContributionProperties
 > extends TaskContributionNFT<T> {
   static getContributionNFT(
-    contribution: DiscordGatheringContribution
+    contribution: DiscordPollContribution
   ): BaseNFTModel<any> {
-    const taskContribution = new DiscordGatheringContribution(contribution);
+    const taskContribution = new DiscordPollContribution(contribution);
     return {
       name: taskContribution.name,
       description: taskContribution.description,
@@ -33,19 +35,20 @@ export class DiscordGatheringContribution<
         duration: taskContribution.properties.duration,
         channelId: taskContribution.properties.channelId,
         guildId: taskContribution.properties.guildId,
+        options: taskContribution.properties.options,
         roles: taskContribution.properties.roles
       }
     } as BaseNFTModel<any>;
   }
 
   constructor(
-    data: DiscordGatheringContribution<T> = {} as DiscordGatheringContribution<T>
+    data: DiscordPollContribution<T> = {} as DiscordPollContribution<T>
   ) {
     super(data);
-    this.properties = new DiscordGatheringContributionProperties(
-      data.properties as DiscordGatheringContributionProperties
+    this.properties = new DiscordPollContributionProperties(
+      data.properties as DiscordPollContributionProperties
     ) as T;
   }
 
-  contributionType? = "Discord Gatherings";
+  contributionType? = "Discord Polls";
 }

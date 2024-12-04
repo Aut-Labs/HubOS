@@ -39,6 +39,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { DiscordGatheringContribution } from "@api/contribution-types/discord-gathering.model";
 import { useWalletConnector } from "@aut-labs/connector";
+import { environment } from "@api/environment";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -140,22 +141,29 @@ const CreateDiscordGathering = () => {
 
   const onSubmit = async () => {
     const values = getValues();
+    const endDate = new Date(
+      new Date(values.startDate).getTime() + values.duration * 60000
+    );
+    const joinedHub = autID.joinedHub(hubData.properties.address);
     const contribution = new DiscordGatheringContribution({
       name: values.title,
       description: values.description,
       image: "",
       properties: {
         taskId: searchParams.get("taskId"),
-        role: values.role,
+        role: +joinedHub.role,
+        roles: [values.role],
         duration: values.duration,
+        guildId,
         startDate: dateToUnix(values.startDate),
-        endDate: dateToUnix(values.endDate),
+        endDate: dateToUnix(endDate),
         channelId: values.channelId,
         points: values.weight,
         quantity: 1,
-        descriptionId: ""
+        uri: ""
       }
     });
+    debugger;
     createTask({ contribution, autSig: state.authSig });
   };
 
@@ -620,6 +628,9 @@ const CreateDiscordGathering = () => {
               >
                 <MenuItem key={`duration-2`} value={2}>
                   2m
+                </MenuItem>
+                <MenuItem key={`duration-2`} value={5}>
+                  5m
                 </MenuItem>
                 <MenuItem key={`duration-15`} value={15}>
                   15m

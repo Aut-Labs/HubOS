@@ -11,59 +11,7 @@ import { AutOsButton } from "@components/buttons";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AutLoading from "@components/AutLoading";
 import { ModuleDefinitionCard } from "../Modules/Shared/PluginCard";
-
-const data = [
-  {
-    id: "0x946ca60fb676445031cd90af9b77aca7bcf58dcf05e23350ffc55bbb8dd06e73",
-    metadataUri: "ipfs://QmQnvc22SuY6x7qg1ujLFCg3E3QvrgfEEjam7rAbd69Rgu",
-    taskId:
-      "0x946ca60fb676445031cd90af9b77aca7bcf58dcf05e23350ffc55bbb8dd06e73",
-    creator: "0x09ed23bb6f9ccc3fd9b3bc4c859d049bf4ab4d43",
-    metadata: {
-      name: "Aut Labs Plugin",
-      properties: {
-        shortDescription:
-          "A contribution to organize your Hub. Create a Discord Gathering and reward participation.",
-        longDescription:
-          "A contribution to organize your Hub. Create a Discord Gathering and reward participation.",
-        author: "Āut Labs",
-        tags: ["SocialAPI"],
-        contract: "TaskFactory",
-        module: {
-          type: "Default",
-          title: "Task Type"
-        },
-        title: "Discord Gathering",
-        type: "Default"
-      }
-    }
-  },
-  {
-    id: "0x9797e61c0188cfeec6d48bfb97f77a7e5e75394a211eb7e340f5fafdc5735458",
-    metadataUri: "ipfs://QmScDABgjA3MuiEDsLUDMpfe8cAKL1FgtSzLnGJVUF54Nx",
-    taskId:
-      "0x9797e61c0188cfeec6d48bfb97f77a7e5e75394a211eb7e340f5fafdc5735458",
-    creator: "0x09ed23bb6f9ccc3fd9b3bc4c859d049bf4ab4d43",
-    metadata: {
-      name: "Aut Labs Plugin",
-      properties: {
-        shortDescription:
-          "A contribution to organize your Hub. Create a Discord Poll and reward participation.",
-        longDescription:
-          "A contribution to organize your Hub. Create a Discord Poll and reward participation.",
-        author: "Āut Labs",
-        tags: ["Workflow"],
-        contract: "TaskFactory",
-        module: {
-          type: "Default",
-          title: "Task Type"
-        },
-        title: "Discord Poll",
-        type: "Default"
-      }
-    }
-  }
-];
+import { environment } from "@api/environment";
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -80,9 +28,28 @@ const GridBox = styled(Box)(({ theme }) => {
   };
 });
 
-function DiscordBot() {
+function DiscordBot({ data }) {
   const dispatch = useAppDispatch();
   const refetchIntervalRef = useRef(null);
+
+  const filteredTasks = useMemo(() => {
+    const discordTasks: any[] = [];
+
+    if (data) {
+      data.forEach((task) => {
+        const taskType = task.metadata.properties.type;
+
+        // Sort by specific task types
+        if (taskType === "DiscordGatherings" || taskType === "DiscordPolls") {
+          discordTasks.push(task);
+        }
+      });
+    }
+
+    return {
+      discordTasks
+    };
+  }, [data]);
 
   const { mutateAsync: activateBot } = useMutation({
     mutationFn: () => {
@@ -134,7 +101,6 @@ function DiscordBot() {
         clearInterval(refetchIntervalRef.current);
       } else if (attempts >= maxAttempts) {
         clearInterval(refetchIntervalRef.current);
-        console.log("Bot activation check timed out after 2 minutes");
       }
     };
 
@@ -229,7 +195,7 @@ function DiscordBot() {
             ) : (
               <>
                 <GridBox sx={{ flexGrow: 1, mt: 4 }}>
-                  {data.map((taskType, index) => (
+                  {filteredTasks.discordTasks.map((taskType, index) => (
                     <ModuleDefinitionCard
                       key={`modules-plugin-${index}`}
                       isFetching={false}

@@ -126,8 +126,6 @@ export const updateHub = createAsyncThunk(
     const uri = await sdk.client.sendJSONToIPFS(updatedHub as any);
     const hubService: Hub = sdk.initService<Hub>(Hub, body.properties.address);
     const result = await hubService.contract.metadata.setMetadataUri(uri);
-    console.log("New metadata: ->", ipfsCIDToHttpUrl(uri));
-
     if (result.isSuccess) {
       return body;
     }

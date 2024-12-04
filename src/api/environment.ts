@@ -26,9 +26,7 @@ export const swEnvVariables = {
   discordApiUrl: "VITE_DISCORD_API_URL",
   discordBotAddress: "VITE_DISCORD_BOT_ADDRESS",
   discordBotUrl: "VITE_DISCORD_BOT_API_URL",
-
   hubShowcaseUrl: "VITE_HUB_SHOWCASE_URL",
-
   twitterClientId: "VITE_TWITTER_CLIENT_ID",
   githubClientId: "VITE_GITHUB_CLIENT_ID"
 };
@@ -41,7 +39,7 @@ export const autUrls = () => {
     return {
       tryAut: "https://try-internal.aut.id/",
       hubDashboard: "https://hub-internal.aut.id/",
-      myAut: "https://my-internal.aut.id/",
+      myAut: "https://internal.os.aut.id/",
       showcase: "https://showcase-internal.aut.id/",
       leaderboard: "https://leaderboard-internal.aut.id/",
       expander: "https://expander-internal.aut.id/"

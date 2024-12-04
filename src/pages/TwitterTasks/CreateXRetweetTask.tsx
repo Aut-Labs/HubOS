@@ -101,7 +101,7 @@ const CreateXRetweetTask = () => {
         points: values.weight,
         tweetUrl: values.tweetUrl,
         quantity: values.quantity,
-        descriptionId: ""
+        uri: ""
       }
     });
     createTask({ contribution, autSig: state.authSig });

@@ -61,8 +61,6 @@ function HubOsTabs(props: HubOsParams) {
   const [value, setSelectedIndex] = useState(0);
   const theme = useTheme();
 
-  console.log("HubOsTabs", props);
-
   const handleChange = (event: SyntheticEvent, index: number) => {
     setSelectedIndex(index);
     props.selectedTab && props.selectedTab(index, event);
@@ -87,13 +85,11 @@ function HubOsTabs(props: HubOsParams) {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        // marginBottom: theme.spacing(4),
         ...props.tabStyles
       }}
     >
       <Box>
         <Tabs
-          // variant="fullWidth"
           value={value}
           onChange={handleChange}
           sx={{
@@ -111,10 +107,6 @@ function HubOsTabs(props: HubOsParams) {
               alignItems: "center",
               gap: "10px",
               borderRadius: "72px",
-              // width: {
-              //   xs: "100%",
-              //   md: "50%"
-              // },
               background: "rgba(240, 245, 255, 0.01)",
               backdropFilter: "blur(12px)"
             },
@@ -122,7 +114,7 @@ function HubOsTabs(props: HubOsParams) {
               height: {
                 xs: "45px"
               },
-              width: {
+              minWidth: {
                 xs: "unset",
                 md: "120px",
                 xxl: "180px"

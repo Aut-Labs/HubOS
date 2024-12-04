@@ -67,7 +67,7 @@ function extractObject(obj, prop) {
         nestedObj = nestedObj[keys[i]];
       }
     } catch (error) {
-      // console.log(error);
+      //p pass
     }
   }
 

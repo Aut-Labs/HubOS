@@ -53,7 +53,6 @@ export const useOAuth = () => {
       try {
         const type = message && message.data && message.data.type;
         if (type === "OAUTH_RESPONSE") {
-          console.log("RECEIVE MESSAGE");
           const error = message && message.data && message.data.error;
           if (error) {
             onFailure(error);

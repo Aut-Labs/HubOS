@@ -5,7 +5,7 @@ import { memo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
+// import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useOAuth } from "@components/Oauth2/oauth2";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";

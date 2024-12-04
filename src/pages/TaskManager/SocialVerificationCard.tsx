@@ -11,13 +11,14 @@ export const SocialVerificationCard = ({ socialType }) => {
         sx={{
           alignItems: "flex-start",
           justifyContent: "flex-start",
-          backdropFilter: "blur(50px)",
-          backgroundColor: "rgba(128, 128, 128, 0.05)",
+          backgroundColor: "rgba(128, 128, 128, 0.2)",
           border: "1px solid",
-          borderColor: "offWhite.dark",
-          borderRadius: "6px",
+          borderColor: "divider",
+          borderRadius: "16px",
+          boxShadow: 3,
           opacity: 1,
           WebkitBackdropFilter: "blur(6px)",
+          backdropFilter: "blur(6px)",
           padding: {
             xs: "24px 24px",
             md: "20px 20px",
@@ -48,7 +49,7 @@ export const SocialVerificationCard = ({ socialType }) => {
               lineHeight={1}
               variant="subtitle2"
             >
-              {`${socialType.charAt(0).toUpperCase() + socialType.slice(1)} Verifictaion Required`}
+              {`${socialType.charAt(0).toUpperCase() + socialType.slice(1)} Verification Required`}
             </Typography>
           </Box>
           <Typography
