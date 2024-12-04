@@ -1,9 +1,11 @@
-import addMinutes from "date-fns/addMinutes";
-import isBefore from "date-fns/isBefore";
-import setHours from "date-fns/setHours";
-import setMilliseconds from "date-fns/setMilliseconds";
-import setMinutes from "date-fns/setMinutes";
-import setSeconds from "date-fns/setSeconds";
+import {
+  setHours,
+  setMinutes,
+  setSeconds,
+  setMilliseconds,
+  addMinutes,
+  isBefore
+} from "date-fns";
 
 export const countWords = (value: string) =>
   (value || "").split(" ").filter((x) => !!x).length;

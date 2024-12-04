@@ -1,14 +1,8 @@
-import { DatePicker, DateTimePickerProps } from "@mui/lab";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import {
   Box,
   Button,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
   Select,
   SelectProps,
   TextField,
@@ -20,7 +14,7 @@ import { Breakpoint, styled } from "@mui/material/styles";
 import { pxToRem } from "@utils/text-size";
 import { Controller, FieldErrors } from "react-hook-form";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 // import "./ScrollbarStyles.scss";
 
 import {
@@ -29,10 +23,15 @@ import {
   pickersLayoutClasses,
   PickersLayoutContentWrapper
 } from "@mui/x-date-pickers/PickersLayout";
-import { PickersActionBarProps } from "@mui/x-date-pickers";
+import {
+  DatePicker,
+  DateTimePicker,
+  PickersActionBarProps
+} from "@mui/x-date-pickers";
 import theme from "@theme/theme";
 import { StepperButton } from "./Stepper";
 import { generateFieldColors } from "@theme/field-text-styles";
+import { AutOsButton } from "./buttons";
 
 interface FormHelperTextProps {
   errors: FieldErrors<any>;
@@ -68,7 +67,7 @@ function extractObject(obj, prop) {
         nestedObj = nestedObj[keys[i]];
       }
     } catch (error) {
-      // console.log(error);
+      //p pass
     }
   }
 
@@ -204,26 +203,34 @@ function ActionList(props: PickersActionBarProps) {
   const isDesktop = useMediaQuery(theme.breakpoints.up("sm"));
 
   return (
-    <Button
-      onClick={onAccept}
-      variant="outlined"
-      size="normal"
-      color="offWhite"
+    <Box
       sx={{
-        textAlign: "center",
-        textTransform: "uppercase",
-        width: "120px",
-        height: "40px",
-        margin: "8px auto 0 auto"
+        display: "flex",
+        justifyContent: "flex-end",
+        px: 2,
       }}
     >
-      Confirm
-    </Button>
+      <AutOsButton
+        onClick={onAccept}
+        variant="outlined"
+        color="primary"
+        sx={{
+          my: "10px",
+          "&.MuiButton-root": {
+            width: "100px",
+            height: "35px",
+          }
+        }}
+      >
+        Confirm
+      </AutOsButton>
+    </Box>
   );
 }
 
 export const AutDatepicker = ({ value, onChange, placeholder, ...props }) => {
   return (
+    //@ts-ignore
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <DateTimePicker
         value={value || ""}
@@ -233,44 +240,44 @@ export const AutDatepicker = ({ value, onChange, placeholder, ...props }) => {
         {...props}
         onAccept={(newValue) => onChange(newValue)}
         slots={{
-          layout: CustomLayout,
+          // layout: CustomLayout,
           actionBar: ActionList
         }}
         slotProps={{
-          popper: {
-            sx: {
-              ".MuiDateCalendar-root": {
-                borderRight: "1px white solid",
-                paddingRight: "10px"
-              },
-              ".MuiDivider-root": {
-                width: 0
-              },
-              ".MuiMultiSectionDigitalClock-root": {
-                ul: {
-                  borderLeft: 0
-                }
-              },
-              "div.MuiMultiSectionDigitalClock-root": {
-                marginLeft: "30px",
-                ul: {
-                  borderLeft: 0,
-                  "&:last-of-type": {
-                    display: "flex",
-                    flexDirection: "column"
-                  }
-                }
-              },
-              "MuiPickersCalendarHeader-label": {
-                fontSize: "18px"
-              }
-            }
-          },
+          // popper: {
+          //   sx: {
+          //     ".MuiDateCalendar-root": {
+          //       borderRight: "1px white solid",
+          //       paddingRight: "10px"
+          //     },
+          //     ".MuiDivider-root": {
+          //       width: 0
+          //     },
+          //     ".MuiMultiSectionDigitalClock-root": {
+          //       ul: {
+          //         borderLeft: 0
+          //       }
+          //     },
+          //     "div.MuiMultiSectionDigitalClock-root": {
+          //       marginLeft: "30px",
+          //       ul: {
+          //         borderLeft: 0,
+          //         "&:last-of-type": {
+          //           display: "flex",
+          //           flexDirection: "column"
+          //         }
+          //       }
+          //     },
+          //     "MuiPickersCalendarHeader-label": {
+          //       fontSize: "18px"
+          //     }
+          //   }
+          // },
           desktopPaper: {
             sx: {
-              svg: { color: theme.palette.offWhite.main },
-              span: { color: theme.palette.offWhite.main },
-              backgroundColor: theme.palette.background.default,
+              // svg: { color: theme.palette.offWhite.main },
+              // span: { color: theme.palette.offWhite.main },
+              backgroundColor: "#2F3746",
               color: theme.palette.offWhite.main,
               ".MuiPickersLayout-root": {
                 display: "flex",
@@ -283,44 +290,70 @@ export const AutDatepicker = ({ value, onChange, placeholder, ...props }) => {
           },
           mobilePaper: {
             sx: {
-              svg: { color: theme.palette.offWhite.main },
-              span: { color: theme.palette.offWhite.main },
-              backgroundColor: theme.palette.background.default,
+              // svg: { color: theme.palette.offWhite.main },
+              // span: { color: theme.palette.offWhite.main },
+              backgroundColor: "#2F3746",
               color: theme.palette.offWhite.main,
-              ".MuiPickersToolbarText-root.Mui-selected": {
-                color: theme.palette.primary.main
-              }
+              // ".MuiPickersToolbarText-root.Mui-selected": {
+              //   color: theme.palette.primary.main
+              // }
             }
           },
           textField: {
             placeholder,
-            variant: "standard",
             color: "offWhite",
-            sx: (theme) => {
-              const fontSize = {
-                xs: "16px",
-                sm: "16px",
-                md: "16px",
-                lg: "16px",
-                xxl: "24px"
-              };
-              const styles = generateFieldColors(
-                theme.palette["offWhite"],
-                theme.palette.offWhite
-              );
-              Object.keys(fontSize).forEach((key: Breakpoint) => {
-                styles.input[theme.breakpoints.up(key)] = {
-                  fontSize: fontSize[key]
-                };
-                styles.textarea[theme.breakpoints.up(key)] = {
-                  fontSize: fontSize[key]
-                };
-              });
-              return {
-                ...styles,
-                width: "100%"
-              };
+            sx: {
+              width: "100%",
+              ".MuiInputBase-input": {
+                fontSize: "16px",
+                color: theme.palette.offWhite.main,
+                "&::placeholder": {
+                  color: theme.palette.offWhite.main,
+                  opacity: 0.5
+                },
+                "&.Mui-disabled": {
+                  color: "#7C879D",
+                  textFillColor: "#7C879D"
+                }
+              },
+              ".MuiInputBase-root": {
+                caretColor: theme.palette.primary.main,
+                fieldset: {
+                  border: "1.5px solid #576176 !important",
+                  borderRadius: "6px"
+                },
+                borderRadius: "6px",
+                background: "#2F3746"
+              },
+              ".MuiInputLabel-root": {
+                color: "#7C879D"
+              }
             }
+            // sx: (theme) => {
+            //   const fontSize = {
+            //     xs: "16px",
+            //     sm: "16px",
+            //     md: "16px",
+            //     lg: "16px",
+            //     xxl: "16px"
+            //   };
+            //   const styles = generateFieldColors(
+            //     theme.palette["offWhite"],
+            //     theme.palette.offWhite
+            //   );
+            //   Object.keys(fontSize).forEach((key: Breakpoint) => {
+            //     styles.input[theme.breakpoints.up(key)] = {
+            //       fontSize: fontSize[key]
+            //     };
+            //     styles.textarea[theme.breakpoints.up(key)] = {
+            //       fontSize: fontSize[key]
+            //     };
+            //   });
+            //   return {
+            //     ...styles,
+            //     width: "100%"
+            //   };
+            // }
           },
           openPickerButton: {
             sx: {
@@ -347,64 +380,64 @@ export const AutDatepicker = ({ value, onChange, placeholder, ...props }) => {
   );
 };
 
-export const SwDatePicker = ({
-  control,
-  name,
-  minDate,
-  maxDate = null,
-  otherProps = {}
-}) => {
-  return (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field }) => {
-        return (
-          <DatePicker
-            inputFormat="dd/MM/yyyy"
-            minDate={minDate}
-            maxDate={maxDate}
-            PaperProps={{
-              sx: {
-                "&.MuiDateCalendar-root": {
-                  width: pxToRem(480),
-                  background: "red",
-                  'div[role="presentation"], .MuiButtonBase-root, .MuiTypography-root, .PrivatePickersYear-yearButton':
-                    {
-                      fontSize: pxToRem(18),
-                      color: "primary.main",
-                      "&.Mui-selected": {
-                        color: "text.primary"
-                      },
-                      "&[disabled]": {
-                        color: "text.disabled"
-                      }
-                    }
-                }
-              }
-            }}
-            value={field.value}
-            onChange={field.onChange}
-            renderInput={(params) => {
-              const v = params.inputProps.value;
-              delete params.inputProps.value;
-              return (
-                <TextField
-                  {...params}
-                  value={field.value ? v : ""}
-                  color="primary"
-                  name={field.name}
-                  required
-                />
-              );
-            }}
-            {...otherProps}
-          />
-        );
-      }}
-    />
-  );
-};
+// export const SwDatePicker = ({
+//   control,
+//   name,
+//   minDate,
+//   maxDate = null,
+//   otherProps = {}
+// }) => {
+//   return (
+//     <Controller
+//       name={name}
+//       control={control}
+//       render={({ field }) => {
+//         return (
+//           <DatePicker
+//             inputFormat="dd/MM/yyyy"
+//             minDate={minDate}
+//             maxDate={maxDate}
+//             PaperProps={{
+//               sx: {
+//                 "&.MuiDateCalendar-root": {
+//                   width: pxToRem(480),
+//                   background: "red",
+//                   'div[role="presentation"], .MuiButtonBase-root, .MuiTypography-root, .PrivatePickersYear-yearButton':
+//                     {
+//                       fontSize: pxToRem(18),
+//                       color: "primary.main",
+//                       "&.Mui-selected": {
+//                         color: "text.primary"
+//                       },
+//                       "&[disabled]": {
+//                         color: "text.disabled"
+//                       }
+//                     }
+//                 }
+//               }
+//             }}
+//             value={field.value}
+//             onChange={field.onChange}
+//             renderInput={(params) => {
+//               const v = params.inputProps.value;
+//               delete params.inputProps.value;
+//               return (
+//                 <TextField
+//                   {...params}
+//                   value={field.value ? v : ""}
+//                   color="primary"
+//                   name={field.name}
+//                   required
+//                 />
+//               );
+//             }}
+//             {...otherProps}
+//           />
+//         );
+//       }}
+//     />
+//   );
+// };
 
 export const SwCalendarPicker = ({
   control,
@@ -520,6 +553,10 @@ const StyledSelectField = styled((props: SelectProps & { width: string }) => {
     />
   );
 })(({ width }) => ({
+  ".MuiPopover-paper": {
+    backgroundColor: "rgba(255, 255, 255, 0.16)",
+    borderRadius: "8px"
+  },
   ".MuiFormHelperText-root": {
     marginRight: 0,
     marginLeft: 0,
@@ -541,15 +578,15 @@ const StyledSelectField = styled((props: SelectProps & { width: string }) => {
     },
     color: "#fff",
     padding: 0,
-    fontSize: pxToRem(18),
-    height: pxToRem(50),
+    fontSize: "16px",
+    height: "48px",
     ".MuiInputBase-input": {
       paddingTop: 0,
       paddingBottom: 0,
       color: "#fff !important"
     },
     ".MuiSvgIcon-root": {
-      fontSize: "20px",
+      fontSize: "16px",
       color: "#fff"
     },
     "&::placeholder": {
@@ -589,7 +626,7 @@ const SelectWrapper = styled("div")({
   }
 });
 
-interface AutSelectProps extends Partial<SelectProps> {
+interface AutSelectProps extends Partial<SelectProps & any> {
   width: string;
   helperText?: JSX.Element;
 }

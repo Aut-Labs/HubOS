@@ -1,13 +1,15 @@
-/* eslint-disable max-len */
+
 import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import { alpha, Badge, styled, SvgIcon } from "@mui/material";
-import { ReactComponent as ManageIcon } from "@assets/manage.svg";
-import { ReactComponent as DashboardIcon } from "@assets/dashboard.svg";
-import { ReactComponent as ArchertypeIcon } from "@assets/archetype.svg";
-import { ReactComponent as AdminIcon } from "@assets/admin.svg";
+import DashboardIcon from "@assets/dashboard.svg?react";
+import ArchertypeIcon from "@assets/archetype.svg?react";
+import MembersIcon from "@assets/hubos/users.svg?react";
+import TaskManagerIcon from "@assets/manage.svg?react";
+import ContributionsIcon from "@assets/aut/stack.svg?react";
+import AdminIcon from "@assets/admin.svg?react";
 import { NavLink as RouteNavLink } from "react-router-dom";
 import { forwardRef, Fragment } from "react";
 import { pxToRem } from "@utils/text-size";
@@ -22,22 +24,44 @@ export interface SidebarMenuItem {
   children?: SidebarMenuItem[];
 }
 
-const menuItems = (communityName: string): SidebarMenuItem[] => [
+const menuItems = (hubName: string): SidebarMenuItem[] => [
   {
     title: "Home",
-    route: `/${communityName}`,
+    route: `/${hubName}`,
     exact: true,
     icon: DashboardIcon
   },
-  {
-    title: "Your Archertype",
-    route: `/${communityName}/your-archetype`,
-    icon: ArchertypeIcon
-  },
+  // {
+  //   title: "Your Archertype",
+  //   route: `/${hubName}/archetype`,
+  //   icon: ArchertypeIcon
+  // },
   {
     title: "Admins",
-    route: `/${communityName}/admins`,
+    route: `/${hubName}/admins`,
     icon: AdminIcon
+  },
+  {
+    title: "Members",
+    route: `/${hubName}/members`,
+    icon: MembersIcon
+  },
+  {
+    title: "Discord Bot",
+    route: `/${hubName}/discord-bot`,
+    icon: AdminIcon
+  },
+  {
+    title: "Task Manager",
+    route: `/${hubName}/task-manager`,
+    icon: TaskManagerIcon,
+    children: [
+      {
+        title: "Contributions",
+        route: `/${hubName}/contributions`,
+        icon: ContributionsIcon
+      }
+    ]
   }
 ];
 
@@ -154,7 +178,7 @@ const childItems = (menu: SidebarMenuItem, level = 1) => {
   });
 };
 
-const MenuItems = ({ addonMenuItems = [], communityName }) => {
+const MenuItems = ({ addonMenuItems = [], hubName }) => {
   return (
     <List
       sx={{
@@ -167,7 +191,7 @@ const MenuItems = ({ addonMenuItems = [], communityName }) => {
       }}
       component="nav"
     >
-      {[...menuItems(communityName), ...addonMenuItems].map((menu, index) => {
+      {[...menuItems(hubName), ...addonMenuItems].map((menu, index) => {
         return (
           <Fragment key={`menu-item-${menu.title}-${index}`}>
             {autMenuItem(menu)}

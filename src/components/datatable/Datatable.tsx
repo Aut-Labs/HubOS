@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import { forwardRef, useCallback } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { useTheme } from "@mui/material";
 
@@ -32,7 +32,7 @@ const Datatable = ({
     <div
       className="sw-datatable"
       style={{
-        // border: `3px solid ${theme.palette.offWhite.main}`,DAO Members
+        border: `qpx solid ${theme.palette.offWhite.main}`,
         padding: "35px"
       }}
     >
@@ -56,12 +56,13 @@ const Datatable = ({
         density="compact"
         sx={{
           border: "none",
+          backgroundColor: "transparent",
           flexDirection: "column-reverse",
           color: "offWhite.main",
           ".MuiInputBase-input": {
-            color: "offWhite.contrastText",
+            color: "offWhite.main",
             fontSize: "16px",
-            textAlign: "center"
+            textAlign: "left"
           },
           ".MuiDataGrid-columnHeaders": {
             borderBottom: "2px solid",
@@ -72,12 +73,12 @@ const Datatable = ({
           },
           ".MuiDataGrid-cell": {
             fontSize: "16px",
-            textAlign: "center",
+            textAlign: "left",
             backgroundColor: "transparent !important"
           },
           ".MuiDataGrid-columnHeaderTitle": {
             width: "100%",
-            textAlign: "center"
+            textAlign: "left"
           },
           ".MuiDataGrid-columnHeader": {
             fontSize: "20px"
@@ -101,7 +102,7 @@ const Datatable = ({
   );
 };
 
-const AutDatatable = React.forwardRef((props: any, ref) => (
+const AutDatatable = forwardRef((props: any, ref) => (
   <Datatable innerRef={ref} {...props} />
 ));
 

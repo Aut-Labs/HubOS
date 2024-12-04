@@ -1,4 +1,4 @@
-import { fetchMember } from "@api/community.api";
+import { fetchMember } from "@api/hub.api";
 import AutLoading from "@components/AutLoading";
 import SwGrid from "@components/SwGrid";
 import { ResultState } from "@store/result-status";

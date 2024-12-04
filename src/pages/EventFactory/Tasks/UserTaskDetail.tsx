@@ -1,6 +1,6 @@
 import { FindTextCenter } from "@utils/text-size";
 
-/* eslint-disable max-len */
+ 
 const SVG_WIDTH = 284.5;
 const TEXT_OFFSET = 17;
 

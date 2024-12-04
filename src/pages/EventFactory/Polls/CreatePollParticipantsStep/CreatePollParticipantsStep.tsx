@@ -15,10 +15,10 @@ import { useSelector } from "react-redux";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { ResultState } from "@store/result-status";
-import { addPoll } from "@api/activities.api";
+// import { addPoll } from "@api/activities.api";
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
-import { allRoles } from "@store/Community/community.reducer";
+import { allRoles } from "@store/Hub/hub.reducer";
 import { AutSelectField } from "@components/Fields";
 import { useNavigation } from "react-router-dom";
 
@@ -70,10 +70,10 @@ const CreatePollParticipantsStep = () => {
     };
 
     await dispatch(pollUpdateData(values));
-    const result = await dispatch(addPoll(metadata));
-    if (result.meta.requestStatus === "fulfilled") {
-      // navigation.push("/aut-dashboard/event-factory/polls/success");
-    }
+    // const result = await dispatch(addPoll(metadata));
+    // if (result.meta.requestStatus === "fulfilled") {
+    //   // navigation.push("/aut-dashboard/event-factory/polls/success");
+    // }
   };
 
   useEffect(() => {
@@ -92,7 +92,7 @@ const CreatePollParticipantsStep = () => {
       <LoadingDialog
         handleClose={handleDialogClose}
         open={status === ResultState.Updating}
-        message="Creating community poll..."
+        message="Creating hub poll..."
       />
       <AutHeader
         title=" Polls"
@@ -101,7 +101,7 @@ const CreatePollParticipantsStep = () => {
         }}
         subtitle={
           <>
-            Decide whether this is a Poll for the entire Community, or for a
+            Decide whether this is a Poll for the entire Hub, or for a
             specific Role. <br /> Who will participate in this Poll?
           </>
         }
@@ -175,7 +175,7 @@ const CreatePollParticipantsStep = () => {
                   }
                 }}
               >
-                <Typography variant="body2">All of the Community</Typography>
+                <Typography variant="body2">All of the Hub</Typography>
               </AutButton>
             );
           }}

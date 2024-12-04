@@ -18,7 +18,7 @@ const GroupCall = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(setTitle(`Community Events - the lifeblood of your Community.`));
+    dispatch(setTitle(`Hub Events - the lifeblood of your Hub.`));
   }, [dispatch]);
 
   return (

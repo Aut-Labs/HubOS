@@ -42,7 +42,7 @@ export function CustomEditComponent(
   const { id, value, field, ...other } = props;
   const apiRef = useGridApiContext();
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value; // The new value entered by the user
     apiRef.current.setEditCellValue({ id, field, value: newValue });
   };

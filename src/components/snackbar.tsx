@@ -2,14 +2,13 @@ import { useDispatch, useSelector } from "react-redux";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import { closeSnackbar } from "@store/ui-reducer";
-import React from "react";
+import { forwardRef } from "react";
 
-const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
-  props,
-  ref
-) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+const Alert = forwardRef<HTMLDivElement, AlertProps>(
+  function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  }
+);
 
 export default function SWSnackbar() {
   const dispatch = useDispatch();

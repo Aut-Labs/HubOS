@@ -1,23 +1,18 @@
-import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
-import { CommunityMembershipDetails } from "@aut-labs/sdk/dist/models/holder";
-import { Community } from "./community.model";
-import { httpUrlToIpfsCID } from "./storage.api";
 
-/* eslint-disable no-shadow */
 export enum ActivityTypes {
   Polls = 1,
   Gatherings,
   Tasks
 }
 
-export enum CommunityEventTypes {
+export enum HubEventTypes {
   Ongoing,
   Upcoming,
   Past
 }
 
 export interface HolderData {
-  daos: CommunityMembershipDetails[];
+  daos: any[];
   address: string;
   tokenId: string;
   metadataUri: string;
@@ -26,6 +21,7 @@ export interface HolderData {
 export interface AutSocial {
   type: string;
   link: string;
+  metadata: any;
 }
 
 export interface ActivityTask {
@@ -66,7 +62,7 @@ export interface ActivityPollData {
   roleName?: string;
   allRoles: boolean;
 }
-export interface CommunityContractError {
+export interface HubContractError {
   code: number;
   message: string;
   data: {

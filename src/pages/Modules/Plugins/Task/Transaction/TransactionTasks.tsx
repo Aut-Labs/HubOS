@@ -1,6 +1,6 @@
-/* eslint-disable max-len */
+
 import { useCreateTaskMutation } from "@api/onboarding.api";
-import { PluginDefinition, Task } from "@aut-labs/sdk";
+import { TaskContributionNFT } from "@aut-labs/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { FormHelperText } from "@components/Fields";
@@ -12,7 +12,8 @@ import {
   InputAdornment,
   MenuItem,
   Stack,
-  Typography
+  Typography,
+  useTheme
 } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
@@ -27,10 +28,12 @@ import { AutSelectField } from "@theme/field-select-styles";
 import { InteractionNetworks } from "@utils/transaction-networks";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
-import { CommunityData, allRoles } from "@store/Community/community.reducer";
+import { HubData, allRoles } from "@store/Hub/hub.reducer";
 import { useSelector } from "react-redux";
-import addMinutes from "date-fns/addMinutes";
 import { useAccount } from "wagmi";
+import { addMinutes } from "date-fns";
+import { StyledTextField, TextFieldWrapper } from "../Shared/StyledFields";
+import { AutOsButton } from "@components/buttons";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -39,13 +42,13 @@ const errorTypes = {
 };
 
 interface PluginParams {
-  plugin: PluginDefinition;
+  plugin: any;
 }
 
 const TaskSuccess = ({ pluginId, reset }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const communityData = useSelector(CommunityData);
+  const hubData = useSelector(HubData);
 
   return (
     <Container
@@ -83,7 +86,7 @@ const TaskSuccess = ({ pluginId, reset }) => {
             }}
             size="medium"
             color="offWhite"
-            to={`/${communityData?.name}/modules/Task`}
+            to={`/${hubData?.name}/modules/Task`}
             preserveParams
             component={LinkWithQuery}
           >
@@ -120,10 +123,11 @@ addMinutes(endDatetime, 45);
 
 const TransactionTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
+  const theme = useTheme();
   const navigate = useNavigate();
   const roles = useSelector(allRoles);
   const { address: account } = useAccount();
-  const communityData = useSelector(CommunityData);
+  const hubData = useSelector(HubData);
   const { control, handleSubmit, getValues, formState } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -142,7 +146,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
   const onSubmit = async () => {
     const values = getValues();
     createTask({
-      novaAddress: communityData.properties.address,
+      hubAddress: hubData.properties.address,
       pluginTokenId: plugin.tokenId,
       pluginAddress: plugin.pluginAddress,
       task: {
@@ -159,17 +163,17 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
         },
         startDate: dateToUnix(new Date()),
         endDate: dateToUnix(endDatetime)
-      } as unknown as Task
+      } as unknown as TaskContributionNFT
     });
   };
 
   useEffect(() => {
     if (isSuccess) {
       navigate({
-        pathname: `/${communityData?.name}/tasks`
+        pathname: `/${hubData?.name}/tasks`
       });
     }
-  }, [isSuccess, communityData]);
+  }, [isSuccess, hubData]);
 
   const selectedRole = useMemo(() => {
     return roles.find(
@@ -178,6 +182,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
   }, [roles, searchParams]);
 
   return (
+    // @ts-ignore
     <Container
       sx={{ py: "20px", display: "flex", flexDirection: "column" }}
       maxWidth="lg"
@@ -200,45 +205,31 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
         }}
       >
         <Stack alignItems="center" justifyContent="center">
-          <Button
-            startIcon={<ArrowBackIosNewIcon />}
-            color="offWhite"
-            sx={{
-              position: {
-                sm: "absolute"
-              },
-              left: {
-                sm: "0"
-              }
+          <Typography
+            variant="subtitle1"
+            fontSize={{
+              xs: "14px",
+              md: "20px"
             }}
-            to={{
-              pathname: searchParams.get("returnUrl"),
-              search: searchParams.toString()
-            }}
-            component={Link}
+            color="offWhite.main"
+            fontWeight="bold"
           >
-            {/* {searchParams.get("returnUrlLinkName") || "Back"} */}
-            <Typography color="white" variant="body">
-              Back
-            </Typography>
-          </Button>
-          <Typography textAlign="center" color="white" variant="h3">
             Smart Contract Task for {selectedRole?.roleName}
           </Typography>
         </Stack>
         <Typography
-          mt={2}
           sx={{
             width: {
               xs: "100%",
-              sm: "700px",
-              xxl: "1000px"
+              sm: "500px",
+              xxl: "600px"
             }
           }}
+          mt={2}
           mx="auto"
           textAlign="center"
-          color="white"
-          variant="body"
+          color="offWhite.main"
+          fontSize="16px"
         >
           Create a task based on a Smart Contract Interaction. We will
           automatically validate the interaction on the chosen smart contract(s)
@@ -247,7 +238,7 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
       </Box>
       <Stack
         direction="column"
-        gap={8}
+        gap={4}
         sx={{
           margin: "0 auto",
           width: {
@@ -257,91 +248,117 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
           }
         }}
       >
-        <Controller
-          name="title"
-          control={control}
-          rules={{
-            required: true,
-            validate: {
-              maxWords: (v: string) => countWords(v) <= 6
-            }
-          }}
-          render={({ field: { name, value, onChange } }) => {
-            return (
-              <AutTextField
-                variant="standard"
-                color="offWhite"
-                required
-                autoFocus
-                name={name}
-                value={value || ""}
-                onChange={onChange}
-                placeholder="Title"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      {value ? (
-                        <></>
-                      ) : (
-                        <Typography variant="caption" color="offWhite.dark">
-                          e.g. Mint an NFT on Opensea
-                        </Typography>
-                      )}
-                    </InputAdornment>
-                  )
-                }}
-                helperText={
-                  <FormHelperText
-                    errorTypes={errorTypes}
-                    value={value}
-                    name={name}
-                    errors={formState.errors}
-                  >
-                    <Typography color="white" variant="caption">
-                      {6 - countWords(value)} Words left
-                    </Typography>
-                  </FormHelperText>
-                }
-              />
-            );
-          }}
-        />
+        <TextFieldWrapper>
+          <Typography
+            variant="caption"
+            color="offWhite.main"
+            mb={theme.spacing(1)}
+          >
+            Title
+          </Typography>
+          <Controller
+            name="title"
+            control={control}
+            rules={{
+              required: true,
+              validate: {
+                maxWords: (v: string) => countWords(v) <= 6
+              }
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <StyledTextField
+                  color="offWhite"
+                  required
+                  sx={{
+                    // ".MuiInputBase-input": {
+                    //   height: "48px"
+                    // },
+                    width: "100%",
+                    height: "48px"
+                  }}
+                  autoFocus
+                  name={name}
+                  value={value || ""}
+                  onChange={onChange}
+                  placeholder="Choose a title for your task"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        {value ? (
+                          <></>
+                        ) : (
+                          <Typography
+                            variant="caption"
+                            color="offWhite.main"
+                            sx={{ opacity: 0.5 }}
+                          >
+                            e.g. Mint an NFT on Opensea
+                          </Typography>
+                        )}
+                      </InputAdornment>
+                    )
+                  }}
+                  helperText={
+                    <FormHelperText
+                      errorTypes={errorTypes}
+                      value={value}
+                      name={name}
+                      errors={formState.errors}
+                    >
+                      <Typography variant="caption" color="white">
+                        {6 - countWords(value)} Words left
+                      </Typography>
+                    </FormHelperText>
+                  }
+                />
+              );
+            }}
+          />
+        </TextFieldWrapper>
 
-        <Controller
-          name="description"
-          control={control}
-          rules={{
-            required: true,
-            maxLength: 257
-          }}
-          render={({ field: { name, value, onChange } }) => {
-            return (
-              <AutTextField
-                name={name}
-                value={value || ""}
-                onChange={onChange}
-                variant="outlined"
-                color="offWhite"
-                required
-                multiline
-                rows={5}
-                placeholder="Write a description of the task for your community"
-                helperText={
-                  <FormHelperText
-                    errorTypes={errorTypes}
-                    value={value}
-                    name={name}
-                    errors={formState.errors}
-                  >
-                    <Typography color="white" variant="caption">
-                      {257 - (value?.length || 0)} of 257 characters left
-                    </Typography>
-                  </FormHelperText>
-                }
-              />
-            );
-          }}
-        />
+        <TextFieldWrapper>
+          <Typography
+            variant="caption"
+            color="offWhite.main"
+            mb={theme.spacing(1)}
+          >
+            Description
+          </Typography>
+          <Controller
+            name="description"
+            control={control}
+            rules={{
+              required: true,
+              maxLength: 257
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <StyledTextField
+                  name={name}
+                  value={value || ""}
+                  color="offWhite"
+                  rows="5"
+                  multiline
+                  onChange={onChange}
+                  placeholder="Write a description of the task for your hub"
+                  helperText={
+                    <FormHelperText
+                      errorTypes={errorTypes}
+                      value={value}
+                      name={name}
+                      errors={formState.errors}
+                    >
+                      <Typography variant="caption" color="white">
+                        {257 - (value?.length || 0)} of 257 characters left
+                      </Typography>
+                    </FormHelperText>
+                  }
+                />
+              );
+            }}
+          />
+        </TextFieldWrapper>
 
         <Controller
           name="network"
@@ -383,178 +400,204 @@ const TransactionTasks = ({ plugin }: PluginParams) => {
           }}
         />
 
-        <Controller
-          name="linkToInteractUrl"
-          control={control}
-          rules={{
-            required: true
-          }}
-          render={({ field: { name, value, onChange } }) => {
-            return (
-              <AutTextField
-                variant="standard"
-                color="offWhite"
-                required
-                name={name}
-                value={value || ""}
-                onChange={onChange}
-                placeholder="Your DApp's URL"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      {value ? (
-                        <></>
-                      ) : (
-                        <Typography variant="caption" color="offWhite.dark">
-                          e.g. https://opensea.io/
-                        </Typography>
-                      )}
-                    </InputAdornment>
-                  )
-                }}
-              />
-            );
-          }}
-        />
+        <TextFieldWrapper>
+          <Typography
+            variant="caption"
+            color="offWhite.main"
+            mb={theme.spacing(1)}
+          >
+            Your DApp's URL
+          </Typography>
+          <Controller
+            name="linkToInteractUrl"
+            control={control}
+            rules={{
+              required: true,
+              maxLength: 257
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <StyledTextField
+                  name={name}
+                  value={value || ""}
+                  sx={{
+                    width: "100%",
+                    height: "48px"
+                  }}
+                  color="offWhite"
+                  onChange={onChange}
+                  placeholder="e.g. https://opensea.io/"
+                  // InputProps={{
+                  //   endAdornment: (
+                  //     <InputAdornment position="end">
+                  //       {value ? (
+                  //         <></>
+                  //       ) : (
+                  //         <Typography
+                  //           variant="caption"
+                  //           color="offWhite.dark"
+                  //           sx={{ opacity: 0.5 }}
+                  //         >
+                  //           e.g. https://opensea.io/
+                  //         </Typography>
+                  //       )}
+                  //     </InputAdornment>
+                  //   )
+                  // }}
+                />
+              );
+            }}
+          />
+        </TextFieldWrapper>
 
-        <Controller
-          name="smartContractAddress"
-          control={control}
-          rules={{
-            required: true
-          }}
-          render={({ field: { name, value, onChange } }) => {
-            return (
-              <AutTextField
-                variant="standard"
-                color="offWhite"
-                required
-                name={name}
-                value={value || ""}
-                onChange={onChange}
-                placeholder="Smart Contract Address"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      {value ? (
-                        <></>
-                      ) : (
-                        <Typography variant="caption" color="offWhite.dark">
-                          0x…
-                        </Typography>
-                      )}
-                    </InputAdornment>
-                  )
-                }}
-                helperText={
-                  <FormHelperText
-                    errorTypes={errorTypes}
-                    value={value}
-                    name={name}
-                    errors={formState.errors}
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column"
-                      }}
+        <TextFieldWrapper>
+          <Typography
+            variant="caption"
+            color="offWhite.main"
+            mb={theme.spacing(1)}
+          >
+            Smart Contract Address
+          </Typography>
+          <Controller
+            name="smartContractAddress"
+            control={control}
+            rules={{
+              required: true
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <StyledTextField
+                  color="offWhite"
+                  required
+                  sx={{
+                    width: "100%",
+                    height: "48px"
+                  }}
+                  autoFocus
+                  name={name}
+                  value={value || ""}
+                  onChange={onChange}
+                  placeholder=" 0x…"
+                  helperText={
+                    <FormHelperText
+                      errorTypes={errorTypes}
+                      value={value}
+                      name={name}
+                      errors={formState.errors}
                     >
-                      <Typography
-                        color="white"
-                        variant="caption"
-                        textAlign="right"
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column"
+                        }}
                       >
-                        *Please remember that when using metatxs, you should use
-                        the contract address of your trusted forwarder instead
-                        of the address of your deployed contract.
-                      </Typography>
-                    </Box>
-                  </FormHelperText>
-                }
-              />
-            );
-          }}
-        />
+                        <Typography
+                          color="white"
+                          variant="caption"
+                          textAlign="right"
+                        >
+                          *Please remember that when using metatxs, you should
+                          use the contract address of your trusted forwarder
+                          instead of the address of your deployed contract.
+                        </Typography>
+                      </Box>
+                    </FormHelperText>
+                  }
+                />
+              );
+            }}
+          />
+        </TextFieldWrapper>
 
-        <Controller
-          name="functionName"
-          control={control}
-          render={({ field: { name, value, onChange } }) => {
-            return (
-              <AutTextField
-                variant="standard"
-                color="offWhite"
-                name={name}
-                value={value || ""}
-                onChange={onChange}
-                disabled
-                placeholder="Copy your Contract function"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      {value ? (
-                        <></>
-                      ) : (
-                        <Typography variant="caption" color="offWhite.dark">
-                          e.g. _Mint
-                        </Typography>
-                      )}
-                    </InputAdornment>
-                  )
-                }}
-                helperText={
-                  <FormHelperText
-                    errorTypes={errorTypes}
-                    value={value}
-                    name={name}
-                    errors={formState.errors}
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column"
-                      }}
-                    >
-                      <Typography
-                        color="white"
-                        variant="caption"
-                        textAlign="right"
-                      >
-                        *Only required if you’d like to specify the interaction
-                        function.
-                      </Typography>
-                      <Typography
-                        color="white"
-                        variant="caption"
-                        textAlign="right"
-                      >
-                        Not applicable to multiple contract tasks
-                      </Typography>
-                    </Box>
-                  </FormHelperText>
-                }
-              />
-            );
+        <TextFieldWrapper
+          sx={{
+            marginTop: theme.spacing(4)
           }}
-        />
+        >
+          <Typography
+            variant="caption"
+            color="offWhite.main"
+            mb={theme.spacing(1)}
+          >
+            Copy your Contract function
+          </Typography>
+          <Controller
+            name="functionName"
+            control={control}
+            rules={{
+              required: true
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <StyledTextField
+                  color="offWhite"
+                  required
+                  sx={{
+                    width: "100%",
+                    height: "48px"
+                  }}
+                  autoFocus
+                  disabled
+                  name={name}
+                  value={value || ""}
+                  onChange={onChange}
+                  placeholder="e.g. _Mint"
+                  helperText={
+                    <FormHelperText
+                      errorTypes={errorTypes}
+                      value={value}
+                      name={name}
+                      errors={formState.errors}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column"
+                        }}
+                      >
+                        <Typography
+                          color="white"
+                          variant="caption"
+                          textAlign="right"
+                        >
+                          *Please remember that when using metatxs, you should
+                          use the contract address of your trusted forwarder
+                          instead of the address of your deployed contract.
+                        </Typography>
+                      </Box>
+                    </FormHelperText>
+                  }
+                />
+              );
+            }}
+          />
+        </TextFieldWrapper>
 
         <Box
           sx={{
             width: "100%",
             display: "flex",
-            mt: 2,
             mb: 4,
+            mt: 6,
             justifyContent: {
               xs: "center",
               sm: "flex-end"
             }
           }}
         >
-          <StepperButton
-            label="Confirm"
+          <AutOsButton
+            type="button"
+            color="primary"
             disabled={!formState.isValid}
-            sx={{ width: "250px" }}
-          />
+            variant="outlined"
+            sx={{
+              width: "100px"
+            }}
+          >
+            <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
+              Confirm
+            </Typography>
+          </AutOsButton>
         </Box>
       </Stack>
     </Container>

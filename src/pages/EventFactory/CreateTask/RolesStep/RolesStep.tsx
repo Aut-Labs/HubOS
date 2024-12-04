@@ -2,8 +2,8 @@ import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "react-router-dom";
 import { TextField, Typography } from "@mui/material";
-import { ReactComponent as TagIcon } from "@assets/tag.svg";
-import { allRoles } from "@store/Community/community.reducer";
+import TagIcon from "@assets/tag.svg?react";
+import { allRoles } from "@store/Hub/hub.reducer";
 import { useForm, Controller } from "react-hook-form";
 import {
   ActivityCurrentStep,

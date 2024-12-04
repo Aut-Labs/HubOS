@@ -14,7 +14,7 @@ import {
 } from "@store/Activity/tasks.reducer";
 import { Task, TaskStatus } from "@store/model";
 import { useAppDispatch } from "@store/store.model";
-import { finalizeActivityTask, getTaskById } from "@api/activities.api";
+// import { finalizeActivityTask, getTaskById } from "@api/activities.api";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -33,11 +33,11 @@ const TaskDetails = () => {
   const errorMessage = useSelector(TaskErrorMessage);
 
   useEffect(() => {
-    dispatch(getTaskById(taskActivityId));
+    // dispatch(getTaskById(taskActivityId));
   }, [dispatch, taskActivityId]);
 
   const handleFinalizeClick = async () => {
-    await dispatch(finalizeActivityTask(selectedTask));
+    // await dispatch(finalizeActivityTask(selectedTask));
   };
 
   const handleDialogClose = () => {

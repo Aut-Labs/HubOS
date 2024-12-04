@@ -1,6 +1,6 @@
 import { Box, Container, styled, Typography } from "@mui/material";
 import { pxToRem } from "@utils/text-size";
-import { ReactComponent as CutLogo } from "@assets/aut/cut.svg";
+import CutLogo from "@assets/aut/cut.svg?react";
 import { AutButton } from "@components/buttons";
 import { Link, useParams } from "react-router-dom";
 

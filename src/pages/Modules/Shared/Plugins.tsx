@@ -15,10 +15,7 @@ import { memo, useMemo, useState } from "react";
 import PluginCard, { EmptyPluginCard } from "./PluginCard";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
-import { PluginDefinitionProperties } from "@aut-labs/sdk/dist/models/plugin";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { useSelector } from "react-redux";
-import { IsAdmin } from "@store/Community/community.reducer";
 import { Link, useSearchParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AutLoading from "@components/AutLoading";
@@ -41,11 +38,11 @@ const GridBox = styled(Box)(({ theme }) => {
 });
 
 interface StackParams {
-  definition: BaseNFTModel<PluginDefinitionProperties>;
+  definition: BaseNFTModel<any>;
 }
 
 const Plugins = ({ definition }: StackParams) => {
-  const isAdmin = useSelector(IsAdmin);
+  // const isAdmin = useSelector(IsAdmin);
   const [searchParams] = useSearchParams();
   const [showInstalled, setToggleInstalled] = useState(false);
   const { plugins, isLoading, isFetching, refetch } =
@@ -120,6 +117,7 @@ const Plugins = ({ definition }: StackParams) => {
             <Typography textAlign="center" color="white" variant="h3">
               {definition.properties.module.title}
               <Tooltip title="Refresh plugins">
+                {/* @ts-ignore */}
                 <IconButton
                   size="medium"
                   color="offWhite"
@@ -177,7 +175,7 @@ const Plugins = ({ definition }: StackParams) => {
               {filteredPlugins.map((plugin, index) => (
                 <PluginCard
                   isFetching={isFetching}
-                  isAdmin={isAdmin}
+                  isAdmin={false}
                   key={`modules-plugin-${index}`}
                   plugin={plugin}
                   hasCopyright={definition?.properties?.type === "Task"}

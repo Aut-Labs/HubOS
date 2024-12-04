@@ -95,8 +95,8 @@ export default (theme: Theme) =>
         return styles;
       }
     } as ComponentsOverrides<Theme>["MuiTextField"]
-  } as {
+  }) as {
     defaultProps?: ComponentsProps["MuiTextField"];
     styleOverrides?: ComponentsOverrides<Theme>["MuiTextField"];
     variants?: ComponentsVariants["MuiTextField"];
-  });
+  };

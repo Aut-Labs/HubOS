@@ -2,8 +2,8 @@
 
 declare namespace JSX {
   interface IntrinsicElements {
-    "sw-auth": React.HTMLAttributes;
-    "d-aut": React.HTMLAttributes;
+    "sw-auth": HTMLAttributes;
+    "d-aut": HTMLAttributes;
     StepWizard: any;
   }
 }

@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unstable-nested-components */
 import { Box, Typography } from "@mui/material";
 import { pxToRem } from "@utils/text-size";
 
@@ -24,7 +23,7 @@ const CallsList = () => {
             fontSize: pxToRem(30)
           }}
         >
-          No Community Gatherings yet!
+          No Hub Gatherings yet!
         </Typography>
       </Box>
     </div>

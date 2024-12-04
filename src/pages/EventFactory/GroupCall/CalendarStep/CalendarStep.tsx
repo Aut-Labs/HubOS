@@ -11,8 +11,7 @@ import { useAppDispatch } from "@store/store.model";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { SwCalendarPicker } from "@components/Fields";
 import { pxToRem } from "@utils/text-size";
 import { generateTimeSlots } from "@utils/helpers";
@@ -23,7 +22,8 @@ import {
 import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
 import { useNavigation } from "react-router-dom";
-import format from "date-fns/format";
+import { format } from "date-fns";
+import { LocalizationProvider } from "@mui/x-date-pickers";
 
 const StepWrapper = styled("form")({
   textAlign: "center",
@@ -68,7 +68,7 @@ const CalendarStep = () => {
         subtitle={
           <>
             Hello friend I’m your Web3 scheduling assistant <br />
-            Set a date and time for your Community Call & let’s make it
+            Set a date and time for your Hub Call & let’s make it
             official.
           </>
         }
@@ -92,7 +92,7 @@ const CalendarStep = () => {
                 justifyContent: "center"
               }}
             >
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
+              {/* <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <div className="sw-form-field">
                   <div className="sw-form-field-content">
                     <SwCalendarPicker
@@ -102,7 +102,7 @@ const CalendarStep = () => {
                     />
                   </div>
                 </div>
-              </LocalizationProvider>
+              </LocalizationProvider> */}
             </Box>
           </Box>
           <Divider

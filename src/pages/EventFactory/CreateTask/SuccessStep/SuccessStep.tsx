@@ -31,15 +31,13 @@ const SuccessStep = () => {
             variant="h2"
             component="div"
           >
-            Now just share it with your [Team/Community] to get things started!
+            Now just share it with your [Team/Hub] to get things started!
           </Typography>
 
           <Button
             sx={{
               my: "40px"
             }}
-            component={Link}
-            to="/aut-dashboard/tasks"
             size="small"
             color="primary"
           >

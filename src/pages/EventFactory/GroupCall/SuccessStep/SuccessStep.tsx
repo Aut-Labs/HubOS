@@ -22,7 +22,7 @@ const SuccessStep = () => {
             variant="h2"
             component="div"
           >
-            Success! Your Community call has been created and deployed on the
+            Success! Your Hub call has been created and deployed on the
             Blockchain 🎉
           </Typography>
           <Typography
@@ -31,7 +31,7 @@ const SuccessStep = () => {
             variant="h2"
             component="div"
           >
-            Now just share it with your [Team/Community] to get things started!
+            Now just share it with your [Team/Hub] to get things started!
           </Typography>
 
           <Button
@@ -44,7 +44,7 @@ const SuccessStep = () => {
             size="small"
             color="primary"
           >
-            See all Community Calls
+            See all Hub Calls
           </Button>
         </Box>
       </div>

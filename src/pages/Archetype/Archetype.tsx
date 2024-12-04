@@ -1,4 +1,3 @@
-import * as React from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
@@ -20,24 +19,26 @@ import {
   useTheme
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ArchetypePieChart, {
-  archetypeChartValues
-} from "../Dashboard/ArchetypePieChart";
-import { ReactComponent as EditIcon } from "@assets/actions/edit.svg";
+import ArchetypePieChart, { archetypeChartValues } from "./ArchetypePieChart";
+import EditIcon from "@assets/actions/edit.svg?react";
 import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
 import {
   useGetArchetypeAndStatsQuery,
   useSetArchetypeMutation
-} from "@api/community.api";
+} from "@api/hub.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
-import { NovaArchetypeParameters } from "@aut-labs/sdk/dist/models/dao";
-import { NovaArchetype } from "@aut-labs/sdk/dist/models/nova";
 import { calculateAV } from "@utils/av-calculator";
+import { HubArchetype, HubArchetypeParameters } from "@aut-labs/sdk";
+import { useState, useEffect, useMemo } from "react";
+import OverflowTooltip from "@components/OverflowTooltip";
+import { AutOsButton } from "@components/buttons";
+import { Link } from "react-router-dom";
 
 const GridCard = styled(Card)(({ theme }) => {
   return {
-    minHeight: "365px",
+    height: "310px",
     margin: "0 auto",
     transition: theme.transitions.create(["transform"]),
     "&:hover": {
@@ -67,11 +68,11 @@ const Title = styled(Typography, {
   position: "absolute",
   width: "100%",
   left: "0",
-  bottom: isHovered ? "110px" : "80px",
+  top: isHovered ? "100px" : "50px",
   textAlign: "center",
   textTransform: "uppercase",
   zIndex: 1,
-  transition: theme.transitions.create("bottom")
+  transition: theme.transitions.create("top")
 }));
 
 const Description = styled(Typography, {
@@ -98,7 +99,7 @@ const Overlay = styled("div", {
   transition: theme.transitions.create("background")
 }));
 
-const ArchetypeCard = ({
+export const ArchetypeCard = ({
   title,
   description,
   logo,
@@ -107,94 +108,194 @@ const ArchetypeCard = ({
   activeArchetype
 }) => {
   const theme = useTheme();
-  const [isHovered, setIsHovered] = React.useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   return (
-    <GridCard
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={() =>
-        onSelect({
-          title,
-          description,
-          logo,
-          type
-        })
-      }
+    // <GridCard
+    //   onMouseEnter={() => setIsHovered(true)}
+    //   onMouseLeave={() => setIsHovered(false)}
+    //   onClick={() =>
+    //     onSelect({
+    //       title,
+    //       description,
+    //       logo,
+    //       type
+    //     })
+    //   }
+    //   sx={{
+    //     ...(!activeArchetype
+    //       ? {
+    //           bgcolor: "nightBlack.main"
+    //         }
+    //       : {
+    //           bgcolor: alpha(theme.palette.primary.main, 0.3)
+    //         }),
+    //     display: "flex",
+    //     flexDirection: "column",
+    //     justifyContent: "space-between",
+    //     borderColor: "divider",
+    //     borderRadius: "16px",
+    //     minHeight: "300px",
+    //     position: "relative",
+    //     boxShadow: 7,
+    //     width: {
+    //       xs: "100%",
+    //       md: "250px",
+    //       lg: "300px",
+    //       xxl: "350px"
+    //     }
+    //   }}
+    //   variant="outlined"
+    // >
+    //   <Overlay isHovered={isHovered} />
+    //   <CardMedia
+    //     sx={{ height: "140px", width: "140px", margin: "0 auto", mt: 2, mb: 0 }}
+    //     image={logo}
+    //     title={title}
+    //   />
+    //   <CardContent
+    //     sx={{
+    //       pt: 0,
+    //       display: "flex",
+    //       flexDirection: "column"
+    //     }}
+    //   >
+    //     <Title
+    //       fontFamily={"FractulAltBold"}
+    //       fontWeight={900}
+    //       color="white"
+    //       variant="subtitle1"
+    //       isHovered={isHovered}
+    //     >
+    //       {title}
+    //     </Title>
+    //     <Description
+    //       isHovered={isHovered}
+    //       textAlign="center"
+    //       color="white"
+    //       variant="body"
+    //     >
+    //       {description}
+    //     </Description>
+    //     <ChooseArchetypeBtn
+    //       onClick={() => onSelect(type)}
+    //       color="offWhite"
+    //       variant="outlined"
+    //       sx={{
+    //         width: "80%"
+    //       }}
+    //       size="large"
+    //       isHovered={isHovered}
+    //     >
+    //       {activeArchetype ? "Change archetype" : "Choose Archetype"}
+    //     </ChooseArchetypeBtn>
+    //   </CardContent>
+    // </GridCard>
+
+    <Box
       sx={{
-        ...(!activeArchetype
-          ? {
-              bgcolor: "nightBlack.main"
-            }
-          : {
-              bgcolor: alpha(theme.palette.primary.main, 0.3)
-            }),
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
+        backdropFilter: "blur(50px)",
+        backgroundColor: "rgba(128, 128, 128, 0.05)",
+        border: `1px solid ${theme.palette.offWhite.dark}`,
+        ...(activeArchetype && {
+          backgroundColor: alpha(theme.palette.primary.main, 0.3),
+          border: `1px solid ${theme.palette.primary.main}`
+        }),
+        borderRadius: "6px",
+        opacity: 1,
+        WebkitBackdropFilter: "blur(6px)",
+        padding: {
+          xs: "24px 24px",
+          md: "20px 20px",
+          xxl: "36px 32px"
+        },
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
-        borderColor: "divider",
-        borderRadius: "16px",
-        minHeight: "300px",
-        position: "relative",
-        boxShadow: 7,
-        width: {
-          xs: "100%",
-          md: "250px",
-          lg: "300px",
-          xxl: "350px"
-        }
+        animation: "none"
       }}
-      variant="outlined"
     >
-      <Overlay isHovered={isHovered} />
-      <CardMedia
-        sx={{ height: "140px", width: "140px", margin: "0 auto", mt: 2, mb: 0 }}
-        image={logo}
-        title={title}
-      />
-      <CardContent
-        sx={{
-          pt: 0,
-          display: "flex",
-          flexDirection: "column"
-        }}
-      >
-        <Title
-          fontFamily={"FractulAltBold"}
-          fontWeight={900}
-          color="white"
-          variant="subtitle1"
-          isHovered={isHovered}
-        >
-          {title}
-        </Title>
-        <Description
-          isHovered={isHovered}
-          textAlign="center"
-          color="white"
-          variant="body"
-        >
-          {description}
-        </Description>
-        <ChooseArchetypeBtn
-          onClick={() => onSelect(type)}
-          color="offWhite"
-          variant="outlined"
-          sx={{
-            width: "80%"
+      <Stack direction="column" justifyContent="center" display="flex">
+        <Box
+          style={{
+            flex: "2",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px"
           }}
-          size="large"
-          isHovered={isHovered}
         >
-          {activeArchetype ? "Change archetype" : "Choose Archetype"}
-        </ChooseArchetypeBtn>
-      </CardContent>
-    </GridCard>
+          <Box
+            sx={{
+              height: {
+                xs: "60px",
+                sm: "60px",
+                md: "60px",
+                xxl: "60px"
+              },
+              width: {
+                xs: "60px",
+                sm: "60px",
+                md: "60px",
+                xxl: "60px"
+              },
+              "@media (max-width: 370px)": {
+                height: "60px",
+                width: "60px"
+              },
+              minWidth: "60px",
+              position: "relative"
+            }}
+          >
+            <Avatar
+              variant="square"
+              sx={{
+                width: "100%",
+                height: "100%",
+                borderRadius: "50%",
+                background: "transparent"
+              }}
+              aria-label="avatar"
+              component={logo}
+            />
+          </Box>
+          <Typography
+            color="offWhite.main"
+            textAlign="center"
+            lineHeight={1}
+            variant="subtitle2"
+          >
+            {title}
+          </Typography>
+        </Box>
+      </Stack>
+      <Stack sx={{ mt: 2, mb: 2 }}>
+        <OverflowTooltip
+          typography={{
+            variant: "caption",
+            fontWeight: "400",
+            letterSpacing: "0.66px"
+          }}
+          maxLine={5}
+          text={description}
+        />
+        <AutOsButton
+          type="button"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 2 }}
+          // onClick={() => onSelect(type)}
+        >
+          <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
+            {activeArchetype ? "Change archetype" : "Choose Archetype"}
+          </Typography>
+        </AutOsButton>
+      </Stack>
+    </Box>
   );
 };
 
 const ChooseYourArchetype = ({ setSelected, archetype }) => {
-  const [state, setState] = React.useState(archetypeChartValues(archetype));
-  console.log("state: ", state);
+  const [state, setState] = useState(archetypeChartValues(archetype));
   return (
     <>
       <Box
@@ -223,33 +324,32 @@ const ChooseYourArchetype = ({ setSelected, archetype }) => {
           }}
           variant="body"
         >
-          The archetype represents the KPI, the driver of your community. Set up
-          your community values, deliver, and thrive. The better you perform,
-          the more your community credibility will grow. Read more about
-          Archetypes
+          The archetype represents the KPI, the driver of your hub. Set up your
+          hub values, deliver, and thrive. The better you perform, the more your
+          hub credibility will grow. Read more about Archetypes
         </Typography>
       </Box>
       <Grid container spacing={3} sx={{ flexGrow: 1 }}>
         {/* Row 1 */}
         <Grid item xs={12} sm={6} md={4}>
           <ArchetypeCard
-            activeArchetype={archetype?.archetype === NovaArchetype.SIZE}
+            activeArchetype={archetype?.archetype === HubArchetype.SIZE}
             onSelect={setSelected}
-            {...state[NovaArchetype.SIZE]}
+            {...state[HubArchetype.SIZE]}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <ArchetypeCard
-            activeArchetype={archetype?.archetype === NovaArchetype.REPUTATION}
+            activeArchetype={archetype?.archetype === HubArchetype.REPUTATION}
             onSelect={setSelected}
-            {...state[NovaArchetype.REPUTATION]}
+            {...state[HubArchetype.REPUTATION]}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <ArchetypeCard
-            activeArchetype={archetype?.archetype === NovaArchetype.CONVICTION}
+            activeArchetype={archetype?.archetype === HubArchetype.CONVICTION}
             onSelect={setSelected}
-            {...state[NovaArchetype.CONVICTION]}
+            {...state[HubArchetype.CONVICTION]}
           />
         </Grid>
 
@@ -266,16 +366,16 @@ const ChooseYourArchetype = ({ setSelected, archetype }) => {
         />
         <Grid item xs={12} sm={6} md={4}>
           <ArchetypeCard
-            activeArchetype={archetype?.archetype === NovaArchetype.PERFORMANCE}
+            activeArchetype={archetype?.archetype === HubArchetype.PERFORMANCE}
             onSelect={setSelected}
-            {...state[NovaArchetype.PERFORMANCE]}
+            {...state[HubArchetype.PERFORMANCE]}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <ArchetypeCard
-            activeArchetype={archetype?.archetype === NovaArchetype.GROWTH}
+            activeArchetype={archetype?.archetype === HubArchetype.GROWTH}
             onSelect={setSelected}
-            {...state[NovaArchetype.GROWTH]}
+            {...state[HubArchetype.GROWTH]}
           />
         </Grid>
         <Grid
@@ -294,14 +394,14 @@ const ChooseYourArchetype = ({ setSelected, archetype }) => {
 };
 
 const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
-  const [editMode, setEditMode] = React.useState(
+  const [editMode, setEditMode] = useState(
     selectedArchetype?.type != archetype?.archetype
   );
 
-  const [initialValues, setInitialValues] = React.useState(true);
+  const [initialValues, setInitialValues] = useState(true);
 
   const theme = useTheme();
-  const [state, setState] = React.useState(archetypeChartValues(archetype));
+  const [state, setState] = useState(archetypeChartValues(archetype));
 
   const TOTAL_VALUE = 100;
 
@@ -327,8 +427,6 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
       max = activeState.min;
     }
 
-    console.log(min, max, sliderId, selectedArchetype, activeState);
-
     if (newValue >= min && newValue <= max) {
       setState((prevState) => ({
         ...prevState,
@@ -340,7 +438,7 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!initialValues) return;
 
     const activeState = state[selectedArchetype.type];
@@ -357,25 +455,24 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
         return prev;
       }, {} as any);
 
-      console.log(newState, "newState");
       setState(newState);
       setInitialValues(false);
     }
   }, [selectedArchetype, initialValues, state]);
 
-  const av = React.useMemo(() => {
+  const av = useMemo(() => {
     const updatedArchetype = {
-      size: state[NovaArchetype.SIZE].value,
-      reputation: state[NovaArchetype.REPUTATION].value,
-      conviction: state[NovaArchetype.CONVICTION].value,
-      performance: state[NovaArchetype.PERFORMANCE].value,
-      growth: state[NovaArchetype.GROWTH].value
+      size: state[HubArchetype.SIZE].value,
+      reputation: state[HubArchetype.REPUTATION].value,
+      conviction: state[HubArchetype.CONVICTION].value,
+      performance: state[HubArchetype.PERFORMANCE].value,
+      growth: state[HubArchetype.GROWTH].value
     };
 
     return calculateAV(updatedArchetype);
   }, [state]);
 
-  const actionName = React.useMemo(() => {
+  const actionName = useMemo(() => {
     if (!archetype?.archetype) {
       return "Set Archetype";
     }
@@ -391,13 +488,13 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
     useSetArchetypeMutation();
 
   const updateArchetype = () => {
-    const updatedArchetype: NovaArchetypeParameters = {
+    const updatedArchetype: HubArchetypeParameters = {
       archetype: selectedArchetype?.type,
-      size: state[NovaArchetype.SIZE].value,
-      growth: state[NovaArchetype.GROWTH].value,
-      conviction: state[NovaArchetype.CONVICTION].value,
-      performance: state[NovaArchetype.PERFORMANCE].value,
-      reputation: state[NovaArchetype.REPUTATION].value
+      size: state[HubArchetype.SIZE].value,
+      growth: state[HubArchetype.GROWTH].value,
+      conviction: state[HubArchetype.CONVICTION].value,
+      performance: state[HubArchetype.PERFORMANCE].value,
+      reputation: state[HubArchetype.REPUTATION].value
     };
     setArchetype(updatedArchetype);
   };
@@ -442,7 +539,7 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
               Back
             </Button>
 
-            <Typography textAlign="center" color="white" variant="h3">
+            <Typography variant="h3" color="offWhite.main" fontWeight="bold">
               Your Archetype
             </Typography>
           </Stack>
@@ -461,7 +558,7 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
           }}
           variant="body"
         >
-          The archetype represents the KPI, the driver of your community.
+          The archetype represents the KPI, the driver of your hub.
         </Typography>
       </Box>
       <Grid container spacing={4} mt={0}>
@@ -765,13 +862,13 @@ const Archetypes = () => {
       stats: data?.stats
     })
   });
-  const [selected, setSelected] = React.useState(null);
-  const archetypeData = React.useMemo(() => {
+  const [selected, setSelected] = useState(null);
+  const archetypeData = useMemo(() => {
     if (archetype?.archetype === selected?.type) {
       return archetype;
     }
     return {
-      archetype: NovaArchetype.NONE,
+      archetype: HubArchetype.NONE,
       size: 0,
       reputation: 0,
       conviction: 0,
@@ -780,10 +877,9 @@ const Archetypes = () => {
     };
   }, [archetype, selected]);
 
-  console.log("archetypeData: ", archetypeData, archetype, selected);
 
   return (
-    <Container maxWidth="lg" sx={{ py: "20px" }}>
+    <Container maxWidth="md" sx={{ py: "20px" }}>
       {selected && (
         <YourArchetype
           archetype={archetypeData}

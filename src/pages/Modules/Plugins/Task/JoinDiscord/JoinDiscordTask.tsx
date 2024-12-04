@@ -1,20 +1,11 @@
-import {
-  useGetAllTasksQuery,
-  useSubmitJoinDiscordTaskMutation
-} from "@api/onboarding.api";
-import { PluginDefinition } from "@aut-labs/sdk";
 import AutLoading from "@components/AutLoading";
 import { StepperButton } from "@components/Stepper";
 import { Container, Stack } from "@mui/material";
-import { IsAdmin } from "@store/Community/community.reducer";
 import { memo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { taskTypes } from "../Shared/Tasks";
-import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
-import { TaskStatus } from "@aut-labs/sdk/dist/models/task";
+// import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useOAuth } from "@components/Oauth2/oauth2";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
@@ -22,7 +13,7 @@ import IosShareIcon from "@mui/icons-material/IosShare";
 import { useAccount } from "wagmi";
 
 interface PluginParams {
-  plugin: PluginDefinition;
+  plugin: any;
 }
 
 const JoinDiscordTask = ({ plugin }: PluginParams) => {
@@ -30,52 +21,54 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
   const location = useLocation();
   const params = useParams();
   const { address: userAddress } = useAccount();
-  const isAdmin = useSelector(IsAdmin);
+  const isAdmin = true;
   const { getAuth } = useOAuth();
   const [joinClicked, setJoinClicked] = useState(false);
 
-  const { task } = useGetAllTasksQuery(
-    {
-      userAddress,
-      isAdmin
-    },
-    {
-      selectFromResult: ({ data, isLoading, isFetching }) => ({
-        isLoading: isLoading || isFetching,
-        task: (data?.tasks || []).find((t) => {
-          const [pluginType] = location.pathname.split("/").splice(-2);
-          return (
-            t.taskId === +params?.taskId &&
-            PluginDefinitionType[pluginType] ===
-              taskTypes[t.taskType].pluginType
-          );
-        })
-      })
-    }
-  );
+  // const { task } = useGetAllTasksQuery(
+  //   {
+  //     userAddress,
+  //     isAdmin
+  //   },
+  //   {
+  //     selectFromResult: ({ data, isLoading, isFetching }) => ({
+  //       isLoading: isLoading || isFetching,
+  //       task: (data?.tasks || []).find((t) => {
+  //         const [pluginType] = location.pathname.split("/").splice(-2);
+  //         return (
+  //           t.taskId === +params?.taskId
+  //           // PluginDefinitionType[pluginType] ===
+  //           //   taskTypes[t.taskType].pluginType
+  //         );
+  //       })
+  //     })
+  //   }
+  // );
 
-  const [submitJoinDiscordTask, { error, isError, isLoading, reset }] =
-    useSubmitJoinDiscordTaskMutation();
+  // const [submitJoinDiscordTask, { error, isError, isLoading, reset }] =
+  //   useSubmitJoinDiscordTaskMutation();
 
-  const onSubmit = async () => {
-    await getAuth(
-      async (data) => {
-        const { access_token } = data;
+  // const onSubmit = async () => {
+  //   await getAuth(
+  //     async (data) => {
+  //       const { access_token } = data;
 
-        submitJoinDiscordTask({
-          userAddress,
-          task,
-          bearerToken: access_token,
-          onboardingPluginAddress: searchParams.get(
-            RequiredQueryParams.OnboardingQuestAddress
-          )
-        });
-      },
-      () => {
-        setJoinClicked(false);
-      }
-    );
-  };
+  //       submitJoinDiscordTask({
+  //         userAddress,
+  //         task,
+  //         bearerToken: access_token,
+  //         onboardingPluginAddress: searchParams.get(
+  //           RequiredQueryParams.OnboardingQuestAddress
+  //         )
+  //       });
+  //     },
+  //     () => {
+  //       setJoinClicked(false);
+  //     }
+  //   );
+  // };
+
+  const task = null;
 
   return (
     <Container
@@ -89,8 +82,8 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
         position: "relative"
       }}
     >
-      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
-      <LoadingDialog open={isLoading} message="Submitting task..." />
+      {/* <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <LoadingDialog open={isLoading} message="Submitting task..." /> */}
 
       {task ? (
         <>
@@ -136,15 +129,15 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
               )}
               {!isAdmin && (
                 <>
-                  {joinClicked && (
+                  {/* {joinClicked && (
                     <StepperButton
                       label="Confirm"
                       disabled={task?.status !== TaskStatus.Created}
                       onClick={() => onSubmit()}
                       sx={{ width: "250px", margin: "0 auto" }}
                     />
-                  )}
-                  {!joinClicked && (
+                  )} */}
+                  {/* {!joinClicked && (
                     <StepperButton
                       label="Join"
                       disabled={task?.status !== TaskStatus.Created}
@@ -158,7 +151,7 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
                       }}
                       sx={{ width: "250px", margin: "0 auto" }}
                     />
-                  )}
+                  )} */}
                 </>
               )}
 

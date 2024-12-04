@@ -25,7 +25,7 @@ const SelectWrapper = styled("div")({
   }
 });
 
-interface AutSelectProps extends Partial<SelectProps> {
+interface AutSelectProps extends Partial<SelectProps & any> {
   helperText?: JSX.Element;
 }
 
@@ -34,7 +34,7 @@ const fontSize = {
   sm: "16px",
   md: "16px",
   lg: "16px",
-  xxl: "24px"
+  xxl: "18px"
 };
 
 export const AutSelectField = ({
@@ -42,7 +42,7 @@ export const AutSelectField = ({
   sx,
   className,
   ...props
-}: AutSelectProps) => {
+}: AutSelectProps & any) => {
   const theme = useTheme();
   return (
     <SelectWrapper sx={sx}>
@@ -63,7 +63,11 @@ export const AutSelectField = ({
           },
           PaperProps: {
             sx: {
-              borderColor: theme.palette[props.color].dark
+              color: theme.palette.offWhite.main,
+              borderColor: theme.palette[props.color].dark,
+              backgroundColor: "rgba(255, 255, 255, 0.25)",
+              backdropFilter: "blur(12px)",
+              borderRadius: "8px"
             }
           }
         }}
@@ -117,8 +121,8 @@ export default (theme: Theme) =>
         }, {})
       }
     } as ComponentsOverrides<Theme>["MuiSelect"]
-  } as {
+  }) as {
     defaultProps?: ComponentsProps["MuiSelect"];
     styleOverrides?: ComponentsOverrides<Theme>["MuiSelect"];
     variants?: ComponentsVariants["MuiSelect"];
-  });
+  };

@@ -1,4 +1,4 @@
-import { Task } from "@aut-labs/sdk";
+import { TaskContributionNFT } from "@aut-labs/sdk";
 import {
   Box,
   Stack,
@@ -15,24 +15,16 @@ import {
 import { memo, useMemo } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { TaskStatus } from "@store/model";
-import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
-import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
-import { TaskType } from "@aut-labs/sdk/dist/models/task";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useConfirmDialog } from "react-mui-confirm";
 import OverflowTooltip from "@components/OverflowTooltip";
 import AutLoading from "@components/AutLoading";
-import {
-  useRemoveTaskFromQuestMutation,
-  useRemoveTaskMutation
-} from "@api/onboarding.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import AddIcon from "@mui/icons-material/Add";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import differenceInDays from "date-fns/differenceInDays";
-import { CommunityData } from "@store/Community/community.reducer";
+import { HubData } from "@store/Hub/hub.reducer";
 import { useSelector } from "react-redux";
 import { useAccount } from "wagmi";
+import { differenceInDays } from "date-fns";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {
@@ -54,26 +46,26 @@ export const taskStatuses: any = {
 };
 
 export const taskTypes = {
-  [TaskType.Open]: {
-    pluginType: PluginDefinitionType.OnboardingOpenTaskPlugin,
-    label: "Open Task",
-    labelColor: "#FFC1A9"
-  },
-  // [TaskType.ContractInteraction]: {
-  //   pluginType: PluginDefinitionType.OnboardingTransactionTaskPlugin,
-  //   label: "Contract Interaction",
-  //   labelColor: "#FFECB3"
+  // [TaskType.Open]: {
+  //   pluginType: PluginDefinitionType.OnboardingOpenTaskPlugin,
+  //   label: "Open Task",
+  //   labelColor: "#FFC1A9"
   // },
-  [TaskType.Quiz]: {
-    pluginType: PluginDefinitionType.OnboardingQuizTaskPlugin,
-    label: "Multiple-Choice Quiz",
-    labelColor: "#C1FFC1 "
-  },
-  [TaskType.JoinDiscord]: {
-    pluginType: PluginDefinitionType.OnboardingJoinDiscordTaskPlugin,
-    label: "Join Discord",
-    labelColor: "#A5AAFF"
-  }
+  // // [TaskType.ContractInteraction]: {
+  // //   pluginType: PluginDefinitionType.OnboardingTransactionTaskPlugin,
+  // //   label: "Contract Interaction",
+  // //   labelColor: "#FFECB3"
+  // // },
+  // [TaskType.Quiz]: {
+  //   pluginType: PluginDefinitionType.OnboardingQuizTaskPlugin,
+  //   label: "Multiple-Choice Quiz",
+  //   labelColor: "#C1FFC1 "
+  // },
+  // [TaskType.JoinDiscord]: {
+  //   pluginType: PluginDefinitionType.OnboardingJoinDiscordTaskPlugin,
+  //   label: "Join Discord",
+  //   labelColor: "#A5AAFF"
+  // }
 };
 
 const TaskCard = ({
@@ -81,7 +73,7 @@ const TaskCard = ({
   isAdmin,
   canDelete
 }: {
-  row: Task;
+  row: TaskContributionNFT;
   isAdmin: boolean;
   canDelete: boolean;
 }) => {
@@ -89,44 +81,42 @@ const TaskCard = ({
   const navigate = useNavigate();
   const confirm = useConfirmDialog();
   const [searchParams] = useSearchParams();
-  const communityData = useSelector(CommunityData);
+  const hubData = useSelector(HubData);
   const { address: userAddress } = useAccount();
-  const [removeTask, { error, isError, isLoading, reset }] =
-    useRemoveTaskMutation();
+  // const [removeTask, { error, isError, isLoading, reset }] =
+  //   useRemoveTaskMutation();
 
-  const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
-    selectFromResult: ({ data }) => ({
-      plugin: (data || []).find(
-        (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
-      )
-    })
-  });
+  // const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
+  //   selectFromResult: ({ data }) => ({
+  //     plugin: (data || [])[0]
+  //   })
+  // });
 
-  const confimDelete = () =>
-    confirm({
-      title: "Are you sure you want to delete this task?",
-      onConfirm: () => {
-        removeTask({
-          userAddress,
-          task: row,
-          questId: +params.questId,
-          pluginTokenId: plugin.tokenId,
-          pluginAddress: plugin.pluginAddress,
-          novaAddress: searchParams.get(RequiredQueryParams.NovaAddress)
-        });
-      }
-    });
+  // const confimDelete = () =>
+  //   confirm({
+  //     title: "Are you sure you want to delete this task?",
+  //     onConfirm: () => {
+  //       removeTask({
+  //         userAddress,
+  //         task: row,
+  //         questId: +params.questId,
+  //         pluginTokenId: plugin.tokenId,
+  //         pluginAddress: plugin.pluginAddress,
+  //         hubAddress: searchParams.get(RequiredQueryParams.HubAddress)
+  //       });
+  //     }
+  //   });
 
-  const path = useMemo(() => {
-    if (!plugin) return;
-    const stackType = plugin.metadata.properties.module.type;
-    const stack = `modules/${stackType}`;
-    return `${stack}/${PluginDefinitionType[plugin.pluginDefinitionId]}`;
-  }, [plugin]);
+  // const path = useMemo(() => {
+  //   if (!plugin) return;
+  //   const stackType = plugin.metadata.properties.module.type;
+  //   const stack = `modules/${stackType}`;
+  //   // return `${stack}/${PluginDefinitionType[plugin.pluginDefinitionId]}`;
+  // }, [plugin]);
 
   return (
     <>
-      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      {/* <ErrorDialog handleClose={() => reset()} open={isError} message={error} /> */}
       <GridCard
         sx={{
           bgcolor: "nightBlack.main",
@@ -156,18 +146,18 @@ const TaskCard = ({
           subheaderTypographyProps={{
             color: "white"
           }}
-          action={
-            <IconButton
-              disabled={isLoading || !canDelete}
-              color="error"
-              onClick={() => {
-                confimDelete();
-              }}
-            >
-              <DeleteIcon />
-            </IconButton>
-          }
-          title={row?.metadata?.name}
+          // action={
+          //   <IconButton
+          //     disabled={isLoading || !canDelete}
+          //     color="error"
+          //     onClick={() => {
+          //       confimDelete();
+          //     }}
+          //   >
+          //     <DeleteIcon />
+          //   </IconButton>
+          // }
+          // title={row?.metadata?.name}
         />
         <CardContent
           sx={{
@@ -177,7 +167,7 @@ const TaskCard = ({
             flexDirection: "column"
           }}
         >
-          <Stack flex={1} direction="column" gap={2}>
+          {/* <Stack flex={1} direction="column" gap={2}>
             <Typography variant="body" color="white">
               Task type:{" "}
               <span
@@ -198,7 +188,7 @@ const TaskCard = ({
             </Typography>
 
             <OverflowTooltip maxLine={4} text={row.metadata?.description} />
-          </Stack>
+          </Stack> */}
 
           <Box
             sx={{
@@ -206,7 +196,7 @@ const TaskCard = ({
               display: "flex"
             }}
           >
-            {plugin.pluginDefinitionId ===
+            {/* {plugin.pluginDefinitionId ===
               PluginDefinitionType.OnboardingOpenTaskPlugin && (
               <Button
                 sx={{
@@ -216,7 +206,7 @@ const TaskCard = ({
                 }}
                 onClick={() => {
                   navigate({
-                    pathname: `/${communityData?.name}/modules/Task/OnboardingOpenTaskPlugin/${row.taskId}/submissions`
+                    pathname: `/${hubData?.name}/modules/Task/OnboardingOpenTaskPlugin/${row.taskId}/submissions`
                   });
                 }}
                 size="large"
@@ -225,7 +215,7 @@ const TaskCard = ({
               >
                 Submissions
               </Button>
-            )}
+            )} */}
           </Box>
         </CardContent>
         <CardActions
@@ -237,11 +227,11 @@ const TaskCard = ({
             color="offWhite"
             variant="outlined"
             size="small"
-            onClick={() => {
-              navigate({
-                pathname: `/${communityData?.name}/${path}/${row.taskId}`
-              });
-            }}
+            // onClick={() => {
+            //   navigate({
+            //     pathname: `/${hubData?.name}/${path}/${row.taskId}`
+            //   });
+            // }}
           >
             Go to task
           </Button>
@@ -279,7 +269,7 @@ const GridBox = styled(Box)(({ theme }) => {
 
 export const EmptyTaskCard = () => {
   const navigate = useNavigate();
-  const communityData = useSelector(CommunityData);
+  const hubData = useSelector(HubData);
 
   return (
     <GridCard
@@ -296,7 +286,7 @@ export const EmptyTaskCard = () => {
       <CardActionArea
         onClick={() => {
           navigate({
-            pathname: `/${communityData?.name}/modules/Task`
+            pathname: `/${hubData?.name}/modules/Task`
           });
         }}
         sx={{
@@ -332,7 +322,7 @@ export const EmptyTaskCard = () => {
 
 interface TasksParams {
   isLoading: boolean;
-  tasks: Task[];
+  tasks: TaskContributionNFT[];
   canDelete?: boolean;
   canAdd?: boolean;
   isAdmin: boolean;

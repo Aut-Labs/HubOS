@@ -21,7 +21,7 @@ import { ResultState } from "@store/result-status";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
-import { getTaskById, submitActivityTask } from "@api/activities.api";
+// import { getTaskById, submitActivityTask } from "@api/activities.api";
 import { Controller, useForm } from "react-hook-form";
 import "./Tasks.scss";
 import AutLoading from "@components/AutLoading";
@@ -42,7 +42,7 @@ const TaskSubmit = () => {
   const values = watch();
 
   const submitTask = () => {
-    dispatch(submitActivityTask({ task: selectedTask, values }));
+    // dispatch(submitActivityTask({ task: selectedTask, values }));
   };
 
   const handleDialogClose = () => {
@@ -50,7 +50,7 @@ const TaskSubmit = () => {
   };
 
   useEffect(() => {
-    dispatch(getTaskById(taskActivityId));
+    // dispatch(getTaskById(taskActivityId));
   }, [dispatch, taskActivityId]);
 
   return (

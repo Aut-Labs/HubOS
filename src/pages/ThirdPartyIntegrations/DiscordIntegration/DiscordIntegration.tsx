@@ -9,7 +9,6 @@ import { pxToRem } from "@utils/text-size";
 import { AutTextField } from "@components/Fields";
 import { AutButton } from "@components/buttons";
 import { AutHeader } from "@components/AutHeader";
-import { addDiscordToCommunity } from "@api/community.api";
 
 const DiscordIntegration = () => {
   const dispatch = useAppDispatch();
@@ -18,7 +17,7 @@ const DiscordIntegration = () => {
   const { status } = useSelector((state: any) => state.dashboard);
 
   const submit = async () => {
-    dispatch(addDiscordToCommunity(discordUrl));
+    // dispatch(addDiscordToHub(discordUrl));
   };
 
   const debouncedChangeHandler = useMemo(() => {
@@ -33,8 +32,8 @@ const DiscordIntegration = () => {
   }, [debouncedChangeHandler]);
 
   useEffect(() => {
-    // if (paCommunity.discordWebhookUrl && input.current) {
-    //   // input.current.value = paCommunity.discordWebhookUrl;
+    // if (paHub.discordWebhookUrl && input.current) {
+    //   // input.current.value = paHub.discordWebhookUrl;
     // }
   }, [input]);
 
@@ -53,10 +52,10 @@ const DiscordIntegration = () => {
         message="Adding webhook..."
       />
       <AutHeader
-        title="Your Community life, directly on your Server."
+        title="Your Hub life, directly on your Server."
         subtitle={
           <>
-            Create Tasks and let your community contribute - directly on
+            Create Tasks and let your hub contribute - directly on
             Discord!
             <br />
             Āut’s Discord Bot is a bridge between Web2 and Web3

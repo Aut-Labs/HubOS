@@ -1,22 +1,19 @@
 import { useGetAllTasksQuery } from "@api/onboarding.api";
-import { PluginDefinition } from "@aut-labs/sdk";
 import AutLoading from "@components/AutLoading";
 import { Button, Container, Stack } from "@mui/material";
-import { IsAdmin } from "@store/Community/community.reducer";
+import { IsAdmin } from "@store/Hub/hub.reducer";
 import { memo, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useSearchParams, useParams, Link } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
-import { TaskStatus } from "@aut-labs/sdk/dist/models/task";
 import { InteractionNetworks } from "@utils/transaction-networks";
 import { useAccount } from "wagmi";
+import { TaskStatus } from "@store/model";
 
 interface PluginParams {
-  plugin: PluginDefinition;
+  plugin: any;
 }
 
 const TransactionTask = ({ plugin }: PluginParams) => {
@@ -35,11 +32,7 @@ const TransactionTask = ({ plugin }: PluginParams) => {
         isLoading: isLoading || isFetching,
         task: (data?.tasks || []).find((t) => {
           const [pluginType] = location.pathname.split("/").splice(-2);
-          return (
-            t.taskId === +params?.taskId &&
-            PluginDefinitionType[pluginType] ===
-              taskTypes[t.taskType].pluginType
-          );
+          return t.taskId === +params?.taskId;
         })
       })
     }

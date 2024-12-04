@@ -7,29 +7,28 @@ export enum EnvMode {
 
 export const swEnvVariables = {
   // app config
-  rpcUrls: "REACT_APP_MATIC_RPC_URLS",
-  env: "REACT_APP_NODE_ENV",
-  hideDashboard: "REACT_APP_HIDE_DASHBOARD",
+  env: "VITE_NODE_ENV",
+  graphApiUrl: "VITE_GRAPH_API_URL",
+  apiUrl: "VITE_API_URL",
+  networkEnv: "VITE_NETWORK_ENV",
+  defaultChainId: "VITE_DEFAULT_CHAIN_ID",
 
-  // Aut
-  apiUrl: "REACT_APP_API_URL",
-  registryAdress: "REACT_APP_COMMUNITY_REGISTRY_ADDRESS",
-  autIDAddress: "REACT_APP_AUT_ID_ADDRESS",
-  // Networks
-  networkEnv: "REACT_APP_NETWORK_ENV",
-
-  // NFT storage
-  nftStorageKey: "REACT_APP_NFT_STORAGE_KEY",
-  nftStorageUrl: "REACT_APP_IPFS_URL",
+  // IPFS storage
+  ipfsApiKey: "VITE_IPFS_API_KEY",
+  ipfsApiSecret: "VITE_IPFS_API_SECRET",
+  ipfsGatewayUrl: "VITE_IPFS_GATEWAY_URL",
 
   // discord
-  discordClientId: "REACT_APP_DISCORD_CLIENT_ID",
-  discordClientSecret: "REACT_APP_DISCORD_CLIENT_SECRET",
-  discordGrandType: "REACT_APP_DISCORD_GRAND_TYPE",
-  discordRedirectUri: "REACT_APP_DISCORD_REDIRECT_URL",
-  discordApiUrl: "REACT_APP_DISCORD_API_URL",
-  discordBotAddress: "REACT_APP_DISCORD_BOT_ADDRESS",
-  discordBotUrl: "REACT_APP_DISCORD_BOT_API_URL"
+  discordClientId: "VITE_DISCORD_CLIENT_ID",
+  discordClientSecret: "VITE_DISCORD_CLIENT_SECRET",
+  discordGrandType: "VITE_DISCORD_GRAND_TYPE",
+  discordRedirectUri: "VITE_DISCORD_REDIRECT_URL",
+  discordApiUrl: "VITE_DISCORD_API_URL",
+  discordBotAddress: "VITE_DISCORD_BOT_ADDRESS",
+  discordBotUrl: "VITE_DISCORD_BOT_API_URL",
+  hubShowcaseUrl: "VITE_HUB_SHOWCASE_URL",
+  twitterClientId: "VITE_TWITTER_CLIENT_ID",
+  githubClientId: "VITE_GITHUB_CLIENT_ID"
 };
 
 export const environment: typeof swEnvVariables =
@@ -39,8 +38,8 @@ export const autUrls = () => {
   if (environment.env === EnvMode.Development) {
     return {
       tryAut: "https://try-internal.aut.id/",
-      novaDashboard: "https://nova-internal.aut.id/",
-      myAut: "https://my-internal.aut.id/",
+      hubDashboard: "https://hub-internal.aut.id/",
+      myAut: "https://internal.os.aut.id/",
       showcase: "https://showcase-internal.aut.id/",
       leaderboard: "https://leaderboard-internal.aut.id/",
       expander: "https://expander-internal.aut.id/"
@@ -49,7 +48,7 @@ export const autUrls = () => {
 
   return {
     tryAut: "https://try.aut.id/",
-    novaDashboard: "https://nova.aut.id/",
+    hubDashboard: "https://hub.aut.id/",
     myAut: "https://my.aut.id/",
     showcase: "https://showcase.aut.id/",
     leaderboard: "https://leaderboard.aut.id/",

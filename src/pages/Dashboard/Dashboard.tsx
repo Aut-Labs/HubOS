@@ -1,37 +1,27 @@
-/* eslint-disable max-len */
 import {
   Avatar,
   Box,
-  Card,
-  CardContent,
-  CardHeader,
   Container,
   Typography,
   Stack,
-  Grid,
-  IconButton,
   SvgIcon,
-  Badge,
-  Tooltip,
-  Button
+  styled,
+  useTheme
 } from "@mui/material";
-import { allRoles, CommunityData } from "@store/Community/community.reducer";
 import { useDispatch, useSelector } from "react-redux";
 import { setTitle } from "@store/ui-reducer";
-import { memo, useEffect } from "react";
-import { UserInfo } from "@auth/auth.reducer";
+import { memo, useEffect, useMemo } from "react";
 import CopyAddress from "@components/CopyAddress";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
-import {
-  useGetAllMembersQuery,
-  useGetArchetypeAndStatsQuery
-} from "@api/community.api";
-import LoadingProgressBar from "@components/LoadingProgressBar";
-import { ReactComponent as EditIcon } from "@assets/actions/edit.svg";
-import { Link } from "react-router-dom";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import ArchetypePieChart from "./ArchetypePieChart";
-import { NovaArchetype } from "@aut-labs/sdk/dist/models/nova";
+import { ArchetypeTypes } from "@api/hub.api";
+import AutIconLabel from "@components/AutIconLabel";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { AutIDData, HubData } from "@store/Hub/hub.reducer";
+import { ArchetypePie } from "../Archetype/ArchetypePie";
+import { AutIDProperties, HubArchetype } from "@aut-labs/sdk";
+import { ArchetypeCard } from "../Archetype/Archetype";
+import { archetypeChartValues } from "../Archetype/ArchetypePieChart";
+import { HubOSAutID } from "@api/aut.model";
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -43,314 +33,725 @@ const getGreeting = () => {
   return welcomeText;
 };
 
-const Dashboard = () => {
-  const dispatch = useDispatch();
-  const userInfo = useSelector(UserInfo);
-  const community = useSelector(CommunityData);
-  const roles = useSelector(allRoles);
+const FollowWrapper = styled("div")(() => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start",
+  width: "150px",
+  justifyContent: "center"
+}));
 
-  const { data, isLoading, isFetching } = useGetAllMembersQuery(null, {
-    refetchOnMountOrArgChange: true,
-    skip: false
-  });
-
-  const {
-    archetype,
-    isLoading: isLoadingArchetype,
-    isFetching: isFetchingArchetype
-  } = useGetArchetypeAndStatsQuery(null, {
-    selectFromResult: ({ data, isLoading, isFetching }) => ({
-      isLoading,
-      isFetching,
-      archetype: data?.archetype
-    })
-  });
-
-  const membersTableData = {
-    totalMembers: 0
-  };
-
-  let averageCommitment = 0;
-
-  if (data && roles && data?.length) {
-    membersTableData.totalMembers = data.length;
-    roles.forEach((role) => {
-      const membersByRole = data.reduce(function (n, member) {
-        return n + +(member?.properties?.role.id == role.id);
-      }, 0);
-
-      membersTableData[role.id] = membersByRole;
-    });
-
-    const commitmentSum = data.reduce(
-      (prev, curr) => prev + +curr.properties.commitment,
-      0
-    );
-
-    averageCommitment = Math.round(commitmentSum / data.length);
+const AutContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  height: "100%",
+  paddingTop: "32px",
+  gap: "30px",
+  flexDirection: "row",
+  [theme.breakpoints.down("md")]: {
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "20px",
+    width: "100%"
   }
+
+  // backgroundImage: `url(${backgroundImage})`,
+  // backgroundBlendMode: "hard-light",
+  // backgroundSize: "cover",
+  // backgroundRepeat: "repeat-y"
+}));
+
+const LeftWrapper = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  height: "80%",
+  width: "100%",
+  maxWidth: "480px",
+  backdropFilter: "blur(6px)",
+  // backgroundColor: "rgba(255, 255, 255, 0.12)",
+  backgroundColor: "rgba(128, 128, 128, 0.2)",
+  boxShadow: "0px 3px 6px #00000029",
+  borderRadius: "24px",
+  // padding: "32px 16px",
+  marginLeft: "24px",
+  marginTop: "auto",
+  marginBottom: "auto",
+  [theme.breakpoints.down("md")]: {
+    width: "90%",
+    maxWidth: "unset",
+    marginLeft: 0,
+    marginRight: 0
+  }
+}));
+
+const RightWrapper = styled(Box)(({ theme }) => ({
+  alignSelf: "flex-start",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "flex-start",
+  px: "30px",
+  marginRight: "25px",
+  marginLeft: "25px",
+  height: "100%",
+  position: "relative",
+  // width: "80%",
+  flex: 1,
+  [theme.breakpoints.down("md")]: {
+    width: "100%",
+    marginLeft: 0,
+    marginRight: 0
+  }
+}));
+const calculateFontSize = (name: string) => {
+  const words = name.split(" ");
+  const longestWordLength = Math.max(...words.map((word) => word.length));
+  if (longestWordLength >= 22) {
+    return "0.85rem !important";
+  } else if (longestWordLength >= 20) {
+    return "0.95rem !important";
+  } else if (longestWordLength >= 18) {
+    return "1.05rem !important";
+  } else if (longestWordLength >= 16) {
+    return "1.15rem !important";
+  } else if (longestWordLength >= 14) {
+    return "1.25rem !important";
+  } else if (longestWordLength >= 12) {
+    return "1.35rem !important";
+  } else if (longestWordLength >= 10) {
+    return "1.45rem !important";
+  } else {
+    return "";
+  }
+};
+
+function getScoreColor(prestige: number): string {
+  if (prestige <= 75) {
+    return "#BF1A2F"; // Red - Really Bad
+  } else if (prestige <= 99) {
+    return "#88498F"; // Purple - Bad
+  } else if (prestige <= 120) {
+    return "#2E90FA"; // Blue - OK
+  } else if (prestige <= 149) {
+    return "#20A4B2"; // Blue-Green - Good
+  } else {
+    return "#12B76A"; // Green - Excellent
+  }
+}
+
+const Dashboard = ({ members }: { members: HubOSAutID<AutIDProperties>[] }) => {
+  const dispatch = useDispatch();
+  const autIDData = useSelector(AutIDData);
+  const theme = useTheme();
+  const hubData = useSelector(HubData);
+
+  const selectedArchetype = useMemo(() => {
+    if (!hubData?.properties?.archetype?.default) {
+      return null;
+    }
+    return ArchetypeTypes[HubArchetype.SIZE];
+  }, [hubData]);
+
+  const archetypeState = useMemo(() => {
+    const states = archetypeChartValues(
+      hubData.properties.archetype.parameters
+    );
+    return states[hubData.properties.archetype.default];
+  }, [hubData]);
+
+  const prestige = useMemo(() => {
+    return (hubData?.properties as any)?.prestige ?? 100;
+  }, [hubData]);
+
+  const period = useMemo(() => {
+    return (hubData?.properties as any)?.period ?? 1;
+  }, [hubData]);
 
   useEffect(() => {
     dispatch(
       setTitle(
-        userInfo?.name
-          ? `${getGreeting()}, ${userInfo?.name}`
+        autIDData?.name
+          ? `${getGreeting()}, ${autIDData?.name}`
           : `${getGreeting()}`
       )
     );
-  }, [dispatch, userInfo]);
+  }, [dispatch, autIDData]);
 
   return (
     <Container
       sx={{
         flexGrow: 1,
         display: "flex",
-        alignItems: "center",
-        maxWidth: {
-          xs: "sm",
-          sm: "100%"
-        }
+        gap: "30px",
+        maxWidth: "md"
       }}
     >
-      <LoadingProgressBar isLoading={isFetching} />
-
-      <Grid container spacing={4} mt={0}>
-        <Grid item sm={12} md={6}>
-          <Card
-            sx={{
-              borderColor: "divider",
-              borderRadius: "16px",
-              boxShadow: 7,
-              width: "100%",
-              margin: "0 auto",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "flex-start",
-              background: "transparent",
-              maxWidth: {
-                xs: "100%",
-                sm: "90%",
-                md: "80%",
-                xxl: "65%"
-              }
-            }}
+      <LeftWrapper>
+        <Stack
+          sx={{
+            width: "100%",
+            maxWidth: "400px",
+            px: "24px",
+            height: "100%"
+          }}
+        >
+          <Typography
+            variant="h3"
+            color="offWhite.main"
+            textAlign="center"
+            mt={2}
           >
-            <CardHeader
-              avatar={
-                <Avatar
+            Your Hub
+          </Typography>
+
+          <AutContainer>
+            <Stack
+              sx={{
+                width: "100%",
+                maxWidth: "400px"
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "12px",
+                  justifyContent: "flex-start"
+                }}
+              >
+                <Box
                   sx={{
+                    flex: "1",
+                    height: {
+                      xs: "120px",
+                      sm: "120px",
+                      md: "120px",
+                      xxl: "130px"
+                    },
                     width: {
                       xs: "120px",
-                      xxl: "300px"
+                      sm: "120px",
+                      md: "120px",
+                      xxl: "130px"
                     },
-                    height: "100%"
+                    "@media (max-width: 370px)": {
+                      height: "100px",
+                      width: "100px"
+                    },
+                    minWidth: "120px",
+                    position: "relative"
                   }}
-                  variant="square"
-                  srcSet={ipfsCIDToHttpUrl(community?.image as string)}
-                />
-              }
-              sx={{
-                px: 4,
-                pt: 4,
-                alignItems: "flex-start",
-                flexDirection: {
-                  xs: "column",
-                  md: "row"
-                },
-                maxWidth: {
-                  xs: "100%",
-                  sm: "400px",
-                  md: "600px",
-                  xxl: "800px"
-                },
+                >
+                  <Avatar
+                    sx={{
+                      width: "unset",
+                      height: "100%",
+                      borderRadius: "0",
+                      background: "transparent"
+                    }}
+                    aria-label="avatar"
+                    src={ipfsCIDToHttpUrl(hubData?.image as string)}
+                  >
+                    {/* <img
+                      src={ipfsCIDToHttpUrl(hubData?.image as string)}
+                      style={{
+                        objectFit: "contain",
+                        width: "100%",
+                        height: "100%"
+                      }}
+                    /> */}
+                  </Avatar>
+                </Box>
 
-                ".MuiCardContent-root": {
-                  width: "100%",
-                  padding: "0px 16px"
-                },
-
-                width: "100%",
-                ".MuiAvatar-root": {
-                  backgroundColor: "transparent"
-                }
-              }}
-              title={
-                <>
+                <div
+                  style={{
+                    flex: "1",
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "column",
+                    justifyContent: "center"
+                  }}
+                >
+                  <Typography
+                    color="offWhite.main"
+                    textAlign="center"
+                    lineHeight={1}
+                    variant="h3"
+                    marginBottom={2}
+                    fontSize={calculateFontSize(hubData?.name as string)}
+                  >
+                    {hubData?.name}
+                    {hubData.properties.domain && (
+                      <SvgIcon
+                        component={CheckCircleIcon}
+                        sx={{
+                          fontSize: "0.8em",
+                          marginLeft: "4px",
+                          verticalAlign: "middle",
+                          color: theme.palette.success.main
+                        }}
+                      />
+                    )}
+                  </Typography>
+                  <CopyAddress address={hubData?.properties.address} />
+                  {/* Add domain information here */}
+                  <Typography
+                    color="offWhite.main"
+                    textAlign="center"
+                    variant="body2"
+                    marginTop={1}
+                  >
+                    {hubData.properties.domain
+                      ? hubData.properties.domain
+                      : "Domain not registered"}
+                  </Typography>
+                </div>
+              </Box>
+              <Stack
+                direction="row"
+                sx={{
+                  marginTop: 3
+                }}
+              >
+                <Stack
+                  width="100%"
+                  direction="column"
+                  justifyContent="space-around"
+                  sx={{
+                    marginTop: theme.spacing(2)
+                  }}
+                >
                   <Box
                     sx={{
                       display: "flex",
-                      gridGap: "4px"
+                      marginRight: "16px",
+                      mb: "8px",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center"
                     }}
                   >
-                    <Typography variant="subtitle1" color="white">
-                      {community.name}
-                    </Typography>
-                    <IconButton component={Link} to={`edit-community`}>
-                      <SvgIcon component={EditIcon} />
-                    </IconButton>
-                  </Box>
-                  <CopyAddress address={community.properties.address} />
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <Typography
-                      color="white"
-                      variant="body"
-                      sx={{ mb: "20px" }}
+                      fontWeight="bold"
+                      fontFamily="FractulAltBold"
+                      variant="subtitle1"
+                      sx={{
+                        mb: "0px",
+                        color: "#FFF"
+                      }}
                     >
-                      {community.properties.market}
+                      {members?.length}
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulRegular"
+                      variant="caption"
+                      sx={{
+                        mb: "0px",
+                        color: "#A7B1C4"
+                      }}
+                    >
+                      members
                     </Typography>
                   </Box>
-                </>
-              }
-            />
-            <CardContent
-              sx={{
-                pt: 0,
-                flex: 1,
-                px: 4,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between"
-              }}
-            >
-              <Typography color="white" variant="body">
-                {community.description}
-              </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      marginRight: "16px",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center"
+                    }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulAltBold"
+                      variant="subtitle1"
+                      sx={{
+                        mb: "0px",
+                        color: getScoreColor(prestige)
+                      }}
+                    >
+                      {prestige}
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulRegular"
+                      variant="caption"
+                      sx={{
+                        mb: "0px",
+                        color: "#A7B1C4"
+                      }}
+                    >
+                      prestige
+                    </Typography>
+                  </Box>
+                </Stack>
 
-              <Stack mt={4} gap={2}>
-                <Box display="flex" gap={2}>
-                  <Typography color="primary" variant="subtitle2">
-                    Market:
-                  </Typography>
-                  <Typography color="primary" variant="subtitle2">
-                    {community.properties.market}
-                  </Typography>
-                </Box>
-                <Box display="flex" gap={2}>
-                  <Typography color="primary" variant="subtitle2">
-                    Your AV:
-                  </Typography>
-                  <Typography color="primary" variant="subtitle2">
-                    1.0
-                  </Typography>
-                </Box>
-                <Box display="flex" gap={2} flexDirection="column">
-                  <Typography color="primary" variant="subtitle2">
-                    Your Roles:
-                  </Typography>
-                  <Stack ml={4} gap={2}>
-                    <Box display="flex" gap={2}>
-                      <Typography color="white" variant="subtitle2">
-                        Role 1:
-                      </Typography>
-                      <Typography color="white" variant="subtitle2">
-                        60%
-                      </Typography>
-                    </Box>
-                    <Box display="flex" gap={2}>
-                      <Typography color="white" variant="subtitle2">
-                        Role 2:
-                      </Typography>
-                      <Typography color="white" variant="subtitle2">
-                        30%
-                      </Typography>
-                    </Box>
-                    <Box display="flex" gap={2}>
-                      <Typography color="white" variant="subtitle2">
-                        Role 3:
-                      </Typography>
-                      <Typography color="white" variant="subtitle2">
-                        10%
-                      </Typography>
-                    </Box>
-                  </Stack>
-                </Box>
-                <Box display="flex" gap={2}>
-                  <Typography color="primary" variant="subtitle2">
-                    Health balance:
-                  </Typography>
-                  <Typography color="primary" variant="subtitle2">
-                    30%
-                  </Typography>
-                </Box>
+                <Stack
+                  width="100%"
+                  justifyContent="space-around"
+                  sx={{
+                    marginTop: theme.spacing(2),
+                    gap: 2
+                  }}
+                >
+                  <AutIconLabel
+                    textColor="#FFF"
+                    sx={{
+                      border: "1px solid #707070",
+                      minHeight: "42px",
+                      minWidth: "165px"
+                    }}
+                    icon={
+                      <SvgIcon
+                        sx={{
+                          width: "16px"
+                        }}
+                        inheritViewBox
+                        component={hubData.marketTemplate?.icon}
+                      ></SvgIcon>
+                    }
+                    label={hubData.marketTemplate?.title}
+                  ></AutIconLabel>
+                  <AutIconLabel
+                    textColor="#FFF"
+                    sx={{
+                      border: "1px solid #707070",
+                      minHeight: "42px",
+                      minWidth: "165px",
+                      ...(!selectedArchetype && {
+                        ".MuiSvgIcon-root": {
+                          display: "none"
+                        }
+                      })
+                      // flex: "1"
+                      // marginTop: theme.spacing(2)
+                    }}
+                    icon={
+                      <SvgIcon
+                        sx={{
+                          width: "16px"
+                        }}
+                        inheritViewBox
+                        component={selectedArchetype?.logo}
+                      ></SvgIcon>
+                    }
+                    label={selectedArchetype?.title ?? "N/A"}
+                  ></AutIconLabel>
+                </Stack>
               </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item sm={12} md={6}>
-          <Box
-            sx={{
-              p: 4,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              margin: "0 auto"
-            }}
-          >
-            <Box mb={4} textAlign="center">
-              <Badge
-                badgeContent={
-                  <Tooltip title="During beta there is a maximum of 3 quests, one for each role.">
-                    <HelpOutlineIcon
-                      sx={{ width: "16px", ml: 1, color: "white" }}
-                    />
-                  </Tooltip>
-                }
+              <Box
+                sx={{
+                  marginTop: theme.spacing(2)
+                }}
               >
-                <Typography variant="subtitle1" color="white">
-                  Your Archetype:
-                </Typography>
-              </Badge>
-            </Box>
-            <Box
+                <Box sx={{ padding: "8px 0px" }}>
+                  <Typography
+                    sx={{ flex: "1" }}
+                    color="offWhite.main"
+                    textAlign="left"
+                    variant="body"
+                  >
+                    {hubData?.description || "No description yet..."}
+                  </Typography>
+                </Box>
+              </Box>
+              <Box
+                marginTop={theme.spacing(2)}
+                sx={{
+                  display: "flex",
+                  marginTop: theme.spacing(2),
+                  flexDirection: "row",
+                  gap: "12px",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              ></Box>
+            </Stack>
+          </AutContainer>
+        </Stack>
+      </LeftWrapper>
+      <LeftWrapper>
+        {/* <ArchetypePie archetype={hubData?.properties?.archetype} /> */}
+        {/* <ArchetypeCard {...archetypeState} /> */}
+        <Stack
+          sx={{
+            width: "100%",
+            maxWidth: "400px",
+            px: "24px",
+            height: "100%"
+          }}
+        >
+          <Typography
+            variant="h3"
+            color="offWhite.main"
+            textAlign="center"
+            mt={2}
+          >
+            Your Archetype
+          </Typography>
+          <AutContainer>
+            <Stack
               sx={{
                 width: "100%",
-                position: "relative",
-                height: "400px"
+                maxWidth: "400px"
               }}
             >
-              <ArchetypePieChart archetype={archetype} />
-              {/* @ts-ignore */}
-              {archetype?.archetype === NovaArchetype.NONE && (
-                <>
-                  <Button
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "12px",
+                  justifyContent: "flex-start"
+                }}
+              >
+                <Box
+                  sx={{
+                    flex: "1",
+                    height: {
+                      xs: "120px",
+                      sm: "120px",
+                      md: "120px",
+                      xxl: "130px"
+                    },
+                    width: {
+                      xs: "120px",
+                      sm: "120px",
+                      md: "120px",
+                      xxl: "130px"
+                    },
+                    "@media (max-width: 370px)": {
+                      height: "100px",
+                      width: "100px"
+                    },
+                    minWidth: "120px",
+                    position: "relative"
+                  }}
+                >
+                  <Avatar
                     sx={{
-                      zIndex: 1,
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      width: "200px",
-                      height: "80px",
-                      textAlign: "center"
+                      width: "unset",
+                      height: "100px",
+                      borderRadius: "0",
+                      background: "transparent"
                     }}
-                    component={Link}
-                    to={`your-archetype`}
-                    type="button"
-                    color="secondary"
-                    variant="contained"
-                    size="medium"
-                  >
-                    Set your <br /> archetype
-                  </Button>
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      backgroundColor: "transparent",
-                      backdropFilter: "blur(25px)"
-                    }}
+                    aria-label="avatar"
+                    component={archetypeState.logo}
                   />
-                </>
-              )}
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
+                </Box>
+
+                <div
+                  style={{
+                    flex: "1",
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "column",
+                    justifyContent: "center"
+                  }}
+                >
+                  <Typography
+                    color="offWhite.main"
+                    textAlign="center"
+                    lineHeight={1}
+                    variant="h3"
+                    marginBottom={2}
+                    fontSize={calculateFontSize(archetypeState.title as string)}
+                  >
+                    {archetypeState.title}
+                  </Typography>
+                </div>
+              </Box>
+
+              <Box
+                sx={{
+                  marginTop: theme.spacing(2)
+                }}
+              >
+                <Box sx={{ padding: "8px 0px" }}>
+                  <Typography
+                    sx={{ flex: "1" }}
+                    color="offWhite.main"
+                    textAlign="left"
+                    variant="body"
+                  >
+                    {hubData?.description || "No description yet..."}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Stack
+                direction="row"
+                sx={{
+                  marginTop: 3
+                }}
+              >
+                <Stack
+                  width="100%"
+                  direction="column"
+                  justifyContent="space-around"
+                  sx={{
+                    marginTop: theme.spacing(2)
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      marginRight: "16px",
+                      mb: "8px",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center"
+                    }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulAltBold"
+                      variant="subtitle1"
+                      sx={{
+                        mb: "0px",
+                        color: "#FFF"
+                      }}
+                    >
+                      1
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulRegular"
+                      variant="caption"
+                      sx={{
+                        mb: "0px",
+                        color: "#A7B1C4"
+                      }}
+                    >
+                      Your Av:
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      marginRight: "16px",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center"
+                    }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulAltBold"
+                      variant="subtitle1"
+                      sx={{
+                        mb: "0px",
+                        color: "#FFF"
+                      }}
+                    >
+                      {`#${period}`}
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulRegular"
+                      variant="caption"
+                      sx={{
+                        mb: "0px",
+                        color: "#A7B1C4"
+                      }}
+                    >
+                      Period no.
+                    </Typography>
+                  </Box>
+                </Stack>
+                <Stack
+                  width="100%"
+                  direction="column"
+                  justifyContent="space-around"
+                  sx={{
+                    marginTop: theme.spacing(2)
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      marginRight: "16px",
+                      mb: "8px",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center"
+                    }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulAltBold"
+                      variant="subtitle1"
+                      sx={{
+                        mb: "0px",
+                        color: "#FFF"
+                      }}
+                    >
+                      n+1
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulRegular"
+                      variant="caption"
+                      sx={{
+                        mb: "0px",
+                        color: "#A7B1C4"
+                      }}
+                    >
+                      exp. AV in period:
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      marginRight: "16px",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center"
+                    }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulAltBold"
+                      variant="subtitle1"
+                      sx={{
+                        mb: "0px",
+                        color: "#FFF"
+                      }}
+                    >
+                      0%
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      fontFamily="FractulRegular"
+                      variant="caption"
+                      sx={{
+                        mb: "0px",
+                        color: "#A7B1C4"
+                      }}
+                    >
+                      how you’re doing:
+                    </Typography>
+                  </Box>
+                </Stack>
+              </Stack>
+
+              <Box
+                marginTop={theme.spacing(2)}
+                sx={{
+                  display: "flex",
+                  marginTop: theme.spacing(2),
+                  flexDirection: "row",
+                  gap: "12px",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              ></Box>
+            </Stack>
+          </AutContainer>
+        </Stack>
+      </LeftWrapper>
     </Container>
   );
 };

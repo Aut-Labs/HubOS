@@ -9,25 +9,25 @@ import {
   styled
 } from "@mui/material";
 import { pxToRem } from "@utils/text-size";
-import { ReactComponent as DiscordIcon } from "@assets/SocialIcons/DiscordIcon.svg";
-import { ReactComponent as GitHubIcon } from "@assets/SocialIcons/GitHubIcon.svg";
-import { ReactComponent as LeafIcon } from "@assets/SocialIcons/LeafIcon.svg";
-import { ReactComponent as TelegramIcon } from "@assets/SocialIcons/TelegramIcon.svg";
-import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.svg";
-import { AutID } from "@api/aut.model";
+import DiscordIcon from "@assets/SocialIcons/DiscordIcon.svg?react";
+import GitHubIcon from "@assets/SocialIcons/GitHubIcon.svg?react";
+import LeafIcon from "@assets/SocialIcons/LeafIcon.svg?react";
+import TelegramIcon from "@assets/SocialIcons/TelegramIcon.svg?react";
+import TwitterIcon from "@assets/SocialIcons/TwitterIcon.svg?react";
 import { AutButton } from "@components/buttons";
 import { useAppDispatch } from "@store/store.model";
-import { setAsCoreTeam, removeAsCoreTeam } from "@api/community.api";
+import { setAsCoreTeam, removeAsCoreTeam } from "@api/hub.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import {
-  CommunityStatus,
-  communityUpdateState
-} from "@store/Community/community.reducer";
+  HubStatus,
+  hubUpdateState
+} from "@store/Hub/hub.reducer";
 import { ResultState } from "@store/result-status";
 import { useSelector } from "react-redux";
 import CopyAddress from "@components/CopyAddress";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
+import { DAutAutID } from "@aut-labs/d-aut";
 
 const IconContainer = styled("div")(({ theme }) => ({
   paddingTop: pxToRem(40),
@@ -89,21 +89,21 @@ const AutCard = styled(Card)(({ theme }) => ({
   }
 }));
 
-const LeftProfile = ({ member }: { member: AutID }) => {
+const LeftProfile = ({ member }: { member: DAutAutID }) => {
   const dispatch = useAppDispatch();
-  const status = useSelector(CommunityStatus);
+  const status = useSelector(HubStatus);
 
   const addOrRemoveAsCoreTeam = () => {
-    if (member.properties.isAdmin) {
-      dispatch(removeAsCoreTeam(member.properties.address));
-    } else {
-      dispatch(setAsCoreTeam(member.properties.address));
-    }
+    // if (member.properties.isAdmin) {
+    //   dispatch(removeAsCoreTeam(member.properties.address));
+    // } else {
+    //   dispatch(setAsCoreTeam(member.properties.address));
+    // }
   };
 
   const handleDialogClose = () => {
     dispatch(
-      communityUpdateState({
+      hubUpdateState({
         status: ResultState.Idle
       })
     );
@@ -270,7 +270,7 @@ const LeftProfile = ({ member }: { member: AutID }) => {
             color="primary"
             variant="outlined"
           >
-            {member?.properties?.isAdmin ? "Remove as Admin" : "Set as Admin"}
+            {/* {member?.properties?.isAdmin ? "Remove as Admin" : "Set as Admin"} */}
           </AutButton>
         )}
       </Box>

@@ -62,7 +62,7 @@ const CreatePollInfoStep = () => {
           m: 0
         }}
         subtitle={
-          <>Add Title, Description and Duration for your Community Proposal.</>
+          <>Add Title, Description and Duration for your Hub Proposal.</>
         }
       />
       <StepWrapper autoComplete="off" onSubmit={handleSubmit(onSubmit)}>

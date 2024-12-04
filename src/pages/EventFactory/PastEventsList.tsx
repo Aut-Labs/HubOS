@@ -4,7 +4,7 @@ import { PollStatus } from "@store/Activity/poll.reducer";
 import { PastEvents } from "@store/Activity/upcoming.reducer";
 import { ResultState } from "@store/result-status";
 import { pxToRem } from "@utils/text-size";
-import format from "date-fns/format";
+import { format } from "date-fns";
 import { useSelector } from "react-redux";
 
 const PastEventsList = () => {

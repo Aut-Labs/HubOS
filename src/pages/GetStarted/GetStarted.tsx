@@ -1,55 +1,7 @@
 import { Box, Container, styled, Typography } from "@mui/material";
-import AppTitle from "@components/AppTitle";
 import { DautPlaceholder } from "@api/ProviderFactory/web3-daut-connect";
-import BubbleTopRight from "@assets/bubble.svg";
-import BubbleBottomLeft from "@assets/bubble2.svg";
-import TryFoldImage from "@assets/tryfold.png";
-
-const Grid = styled("div")(({ theme }) => {
-  return {
-    display: "flex",
-    alignItems: "space-between",
-    gridTemplateColumns: "1fr 1fr",
-    flex: 1,
-    flexDirection: "column",
-    gridGap: "100px",
-    height: "100%",
-    [theme.breakpoints.up("md")]: {
-      flexDirection: "row"
-    }
-  };
-});
-
-const BottomLeftBubble = styled("img")(({ theme }) => ({
-  position: "fixed",
-  width: "400px",
-  height: "400px",
-  left: "-200px",
-  bottom: "-200px",
-  filter: "blur(50px)",
-  transform: "rotate(-50deg)",
-  [theme.breakpoints.up("md")]: {
-    width: "700px",
-    height: "700px",
-    left: "-350px",
-    bottom: "-350px"
-  }
-}));
-
-const TopRightBubble = styled("img")(({ theme }) => ({
-  position: "fixed",
-  width: "400px",
-  height: "400px",
-  top: "-200px",
-  right: "-200px",
-  filter: "blur(50px)",
-  [theme.breakpoints.up("md")]: {
-    width: "700px",
-    height: "700px",
-    top: "-350px",
-    right: "-350px"
-  }
-}));
+import backgroundImage from "@assets/hubos/bg-aut-blue-web.png";
+import HubOsLogo from "@assets/hubos/hubos-logo.svg?react";
 
 const Content = styled("div")(({ theme }) => {
   return {
@@ -62,60 +14,57 @@ const Content = styled("div")(({ theme }) => {
   };
 });
 
-const StyledTrifold = styled("img")(({ theme }) => {
-  return {
-    maxWidth: "500px",
-    [theme.breakpoints.up("xxl")]: {
-      maxWidth: "700px"
-    }
-  };
-});
-
-const ImageWrapper = styled("div")(({ theme }) => {
-  return {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    display: "flex",
-    width: "50%",
-    [theme.breakpoints.down("md")]: {
-      display: "none",
-      width: "unset"
-    }
-  };
-});
+const AutContainer = styled("div")(() => ({
+  display: "flex",
+  height: "100%",
+  backgroundImage: `url(${backgroundImage})`,
+  backgroundBlendMode: "hard-light",
+  backgroundSize: "cover",
+  backgroundRepeat: "repeat-y"
+}));
 
 const GetStarted = () => {
   return (
-    <Container maxWidth="lg" sx={{ flexGrow: 1, height: "100%" }}>
-      <BottomLeftBubble loading="lazy" src={BubbleBottomLeft} />
-      <TopRightBubble loading="lazy" src={BubbleTopRight} />
-      <Grid>
-        <Content>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row"
-            }}
-            mb={{
-              xs: "25px",
-              md: "50px"
-            }}
-          >
-            <AppTitle />
-          </Box>
+    <AutContainer>
+      {/* <BottomLeftBubble loading="lazy" src={BubbleBottomLeft} />
+      <TopRightBubble loading="lazy" src={BubbleTopRight} /> */}
+
+      <Content>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column"
+          }}
+          mb={{
+            xs: "25px",
+            md: "50px"
+          }}
+        >
+          <HubOsLogo height="110px" width="300px"></HubOsLogo>
           <Typography
             mb={{
               xs: "10px",
               md: "20px"
             }}
+            mt="-15px"
             color="white"
             variant="subtitle2"
-            fontWeight="bold"
+            fontWeight="normal"
+            textAlign="center"
+            letterSpacing="1.33px"
           >
-            Do more with your DAO.
+            There is no hub like yours - create your own Standard. <br />
+            Do more with your Hub.
           </Typography>
-          <Typography
+
+          <Box sx={{ marginTop: "20px" }}>
+            <DautPlaceholder />
+          </Box>
+        </Box>
+
+        {/* <Typography
             mb={{
               xs: "10px",
               md: "20px"
@@ -124,11 +73,11 @@ const GetStarted = () => {
             variant="subtitle2"
             fontWeight="normal"
           >
-            Use your Dashboard to Manage your Nova. Experiment with
+            Use your Dashboard to Manage your Hub. Experiment with
             Integrations, and add custom Modules - such as Role-sets &
             on-boarding strategies.
-          </Typography>
-          <Typography
+          </Typography> */}
+        {/* <Typography
             mb={{
               xs: "10px",
               md: "20px"
@@ -138,8 +87,8 @@ const GetStarted = () => {
             fontWeight="normal"
           >
             Coordinate, Coordinate, Coordinate.
-          </Typography>
-          <Typography
+          </Typography> */}
+        {/* <Typography
             mb={{
               xs: "25px",
               md: "50px"
@@ -148,15 +97,13 @@ const GetStarted = () => {
             variant="subtitle2"
             fontWeight="normal"
           >
-            There is no community like yours - create your own Standard.
-          </Typography>
-          <DautPlaceholder />
-        </Content>
-        <ImageWrapper>
+            There is no hub like yours - create your own Standard.
+          </Typography> */}
+      </Content>
+      {/* <ImageWrapper>
           <StyledTrifold loading="lazy" src={TryFoldImage}></StyledTrifold>
-        </ImageWrapper>
-      </Grid>
-    </Container>
+        </ImageWrapper> */}
+    </AutContainer>
   );
 };
 

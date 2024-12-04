@@ -1,5 +1,3 @@
-import { useGetAllTasksQuery } from "@api/onboarding.api";
-import { PluginDefinition } from "@aut-labs/sdk";
 import AutLoading from "@components/AutLoading";
 import {
   Box,
@@ -12,21 +10,19 @@ import {
   styled,
   Typography
 } from "@mui/material";
-import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
+import { HubData } from "@store/Hub/hub.reducer";
 import { memo, useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
 import { GridBox } from "./QuestionsAndAnswers";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import { getQestions } from "@api/tasks.api";
 import { useAccount } from "wagmi";
 
 interface PluginParams {
-  plugin: PluginDefinition;
+  plugin: any;
 }
 
 const GridRow = styled(Box)({
@@ -104,30 +100,9 @@ const Answers = memo(({ control, questionIndex, answers, isDisabled }: any) => {
 });
 
 const QuizTask = ({ plugin }: PluginParams) => {
-  const isAdmin = useSelector(IsAdmin);
   const { address: userAddress } = useAccount();
   const params = useParams();
   const [initialized, setInitialized] = useState(false);
-
-  const { task } = useGetAllTasksQuery(
-    {
-      userAddress,
-      isAdmin
-    },
-    {
-      selectFromResult: ({ data, isLoading, isFetching }) => ({
-        isLoading: isLoading || isFetching,
-        task: (data?.tasks || []).find((t) => {
-          const [pluginType] = location.pathname.split("/").splice(-2);
-          return (
-            t.taskId === +params?.taskId &&
-            PluginDefinitionType[pluginType] ===
-              taskTypes[t.taskType].pluginType
-          );
-        })
-      })
-    }
-  );
 
   const { control, setValue, watch } = useForm({
     mode: "onChange",

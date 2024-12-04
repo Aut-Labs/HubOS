@@ -1,5 +1,3 @@
-import { useAddPluginToDAOMutation } from "@api/plugin-registry.api";
-import { PluginDefinition } from "@aut-labs/sdk";
 import {
   Box,
   Button,
@@ -12,21 +10,22 @@ import {
   Stack,
   Tooltip,
   Typography,
-  styled
+  styled,
+  useTheme
 } from "@mui/material";
 import { memo, useMemo } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddIcon from "@mui/icons-material/Add";
-import LoadingButton from "@mui/lab/LoadingButton";
 import { useSelector } from "react-redux";
 import { SelectedNetwork } from "@store/WalletProvider/WalletProvider";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
-import {
-  ModuleDefinition,
-  PluginDefinitionType
-} from "@aut-labs/sdk/dist/models/plugin";
 import LinkWithQuery from "@components/LinkWithQuery";
-import { useActivateModuleMutation } from "@api/module-registry.api";
+import { LoadingButton } from "@mui/lab";
+import { Link } from "react-router-dom";
+import { TaskType } from "@api/models/task-type";
+import { HubData } from "@store/Hub/hub.reducer";
+import OverflowTooltip from "@components/OverflowTooltip";
+import { AutOsButton } from "@components/buttons";
 
 const GridCard = styled(Card)(({ theme }) => {
   return {
@@ -46,22 +45,14 @@ const PluginCard = ({
   hasCopyright
 }: {
   isAdmin: boolean;
-  plugin: PluginDefinition;
+  plugin: any;
   isFetching: boolean;
   hasCopyright: boolean;
 }) => {
   const selectedNetwork = useSelector(SelectedNetwork);
-  const [addPlugin, { error, isLoading, isError, reset }] =
-    useAddPluginToDAOMutation();
-
-  const exploreAddressUrl = useMemo(() => {
-    if (!selectedNetwork) return;
-    const [exploreUrl] = selectedNetwork.explorerUrls;
-    return `${exploreUrl}address/${plugin?.pluginAddress}`;
-  }, [selectedNetwork?.explorerUrls, plugin?.pluginAddress]);
 
   const path = useMemo(() => {
-    return `${PluginDefinitionType[plugin.pluginDefinitionId]}`;
+    return ``;
   }, []);
 
   const actionName = useMemo(() => {
@@ -77,7 +68,6 @@ const PluginCard = ({
 
   return (
     <>
-      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
       <GridCard
         sx={{
           bgcolor: "nightBlack.main",
@@ -148,48 +138,6 @@ const PluginCard = ({
             )}
           </Stack> */}
 
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex"
-            }}
-          >
-            <LoadingButton
-              loading={isLoading}
-              sx={{
-                width: "80%",
-                my: 6,
-                mx: "auto"
-              }}
-              size="large"
-              disabled={
-                isFetching || !path || (!plugin.pluginAddress && !isAdmin)
-              }
-              variant="outlined"
-              loadingIndicator={
-                <Stack direction="row" gap={1} alignItems="center">
-                  <Typography className="text-secondary">
-                    Installing...
-                  </Typography>
-                  <CircularProgress
-                    size="20px"
-                    color={plugin.pluginAddress ? "offWhite" : "primary"}
-                  />
-                </Stack>
-              }
-              {...(!!plugin.pluginAddress && {
-                to: path,
-                preserveParams: true,
-                component: LinkWithQuery
-              })}
-              {...(!plugin.pluginAddress && {
-                onClick: () => addPlugin(plugin)
-              })}
-              color="offWhite"
-            >
-              {actionName}
-            </LoadingButton>
-          </Box>
           {hasCopyright && (
             <Box
               sx={{
@@ -276,119 +224,91 @@ export const EmptyPluginCard = ({ type, typeformLink }) => {
 };
 
 export const ModuleDefinitionCard = ({
-  pluginModule,
+  taskType,
   isFetching
 }: {
   isFetching: boolean;
-  pluginModule: ModuleDefinition;
+  taskType: TaskType;
 }) => {
-  const [activateOnboarding, { isLoading }] = useActivateModuleMutation();
+  const theme = useTheme();
+  const hubData = useSelector(HubData);
+  const path = useMemo(() => {
+    const titleAsType = taskType?.metadata?.properties?.title
+      ?.toLowerCase()
+      ?.replace(/\s/g, "-");
+    return `/${hubData?.name}/create-${titleAsType}`;
+  }, [hubData]);
 
   return (
-    <GridCard
+    <Box
       sx={{
-        bgcolor: "nightBlack.main",
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
+        border: "1px solid",
         borderColor: "divider",
+        backgroundColor: "rgba(128, 128, 128, 0.2)",
         borderRadius: "16px",
-        minHeight: "300px",
-        boxShadow: 7,
+        boxShadow: 3,
+        opacity: 1,
+        WebkitBackdropFilter: "blur(6px)",
+        backdropFilter: "blur(6px)",
+        padding: {
+          xs: "24px 24px",
+          md: "20px 20px",
+          xxl: "36px 32px"
+        },
         display: "flex",
-        flexDirection: "column"
+        flexDirection: "column",
+        animation: "none"
       }}
-      variant="outlined"
     >
-      <CardHeader
-        sx={{
-          alignItems: "center",
-          ".MuiCardHeader-action": {
-            mt: "3px"
-          },
-          display: "flex",
-          flexDirection: "column"
-        }}
-        titleTypographyProps={{
-          fontFamily: "FractulAltBold",
-          mb: 2,
-          fontWeight: 900,
-          color: "white",
-          variant: "subtitle1"
-        }}
-        title={`${pluginModule?.metadata?.properties?.title}`}
-      />
-      <CardContent
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column"
-        }}
-      >
-        <Stack flex={1} maxWidth="80%" mx="auto">
-          <Typography variant="body" textAlign="center" color="white">
-            {pluginModule?.metadata?.properties?.shortDescription}
-          </Typography>
-        </Stack>
-        <LoadingButton
-          loading={isLoading}
-          sx={{
-            width: "80%",
-            mx: "auto",
-            my: 6
+      <Stack direction="column" justifyContent="center" display="flex">
+        <Box
+          style={{
+            flex: "2",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px"
           }}
-          disabled={isLoading || isFetching}
-          variant="outlined"
-          size="large"
-          loadingIndicator={
-            <Stack direction="row" gap={1} alignItems="center">
-              <Typography className="text-secondary">Activating...</Typography>
-              <CircularProgress
-                size="20px"
-                color={pluginModule.isActivated ? "offWhite" : "primary"}
-              />
-            </Stack>
-          }
-          {...(pluginModule.isActivated && {
-            to: pluginModule?.metadata?.properties?.type,
-            preserveParams: true,
-            component: LinkWithQuery
-          })}
-          {...(!pluginModule.isActivated && {
-            onClick: () =>
-              activateOnboarding({
-                moduleId: pluginModule.id
-              })
-          })}
-          color="offWhite"
         >
-          {/* @ts-ignore */}
-          {pluginModule?.metadata?.properties?.buttonName && (
-            <>
-              {/* @ts-ignore */}
-              {pluginModule?.metadata?.properties?.buttonName}
-            </>
-          )}
-          {/* @ts-ignore */}
-          {!pluginModule?.metadata?.properties?.buttonName
-            ? pluginModule.isActivated
-              ? "Go to plugins"
-              : "Activate"
-            : ""}
-        </LoadingButton>
-
-        {/* <Stack direction="row" justifyContent="flex-end">
           <Typography
-            className="text-secondary"
-            sx={{
-              mr: "2px",
-              fontWeight: "bold",
-              fontFamily: "FractulAltBold",
-              fontSize: "12px"
-            }}
+            color="offWhite.main"
+            textAlign="center"
+            lineHeight={1}
+            variant="subtitle2"
           >
-            {plugin?.metadata?.name}
+            {taskType?.metadata?.properties?.title}
           </Typography>
-        </Stack> */}
-      </CardContent>
-    </GridCard>
+        </Box>
+      </Stack>
+      <Stack sx={{ mt: 2, mb: 2 }}>
+        <OverflowTooltip
+          typography={{
+            variant: "caption",
+            fontWeight: "400",
+            letterSpacing: "0.66px"
+          }}
+          maxLine={5}
+          text={taskType?.metadata?.properties?.shortDescription}
+        />
+        <AutOsButton
+          type="button"
+          color="primary"
+          variant="outlined"
+          sx={{ mt: 2 }}
+          component={Link}
+          startIcon={<AddIcon />}
+          to={{
+            pathname: path,
+            search: `?taskId=${taskType?.taskId}`
+          }}
+        >
+          <Typography fontWeight="bold" fontSize="16px" lineHeight="26px">
+            Contribution
+          </Typography>
+        </AutOsButton>
+      </Stack>
+    </Box>
   );
 };
 

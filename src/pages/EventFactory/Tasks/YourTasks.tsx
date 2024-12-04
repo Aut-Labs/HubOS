@@ -10,7 +10,7 @@ import {
   tasksUpdateStatus
 } from "@store/Activity/tasks.reducer";
 import { pxToRem } from "@utils/text-size";
-import { getAllTasks, takeActivityTask } from "@api/activities.api";
+// import { getAllTasks, takeActivityTask } from "@api/activities.api";
 import { Task, TaskTypes } from "@store/model";
 import { ActivityTypes } from "@api/api.model";
 import { useAppDispatch } from "@store/store.model";
@@ -34,7 +34,7 @@ const YourTasks = () => {
     switch (s) {
       case TaskTypes.Open:
         setLoadingMessage("Claiming task...");
-        await dispatch(takeActivityTask(task));
+        // await dispatch(takeActivityTask(task));
         break;
       default:
         break;
@@ -42,7 +42,7 @@ const YourTasks = () => {
   };
 
   useEffect(() => {
-    dispatch(getAllTasks(ActivityTypes.Tasks));
+    // dispatch(getAllTasks(ActivityTypes.Tasks));
     return () => {
       dispatch(resetActivityTaskState());
     };

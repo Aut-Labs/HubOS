@@ -15,7 +15,7 @@ import {
   activityUpdateTaskStatus
 } from "@store/Activity/task.reducer";
 import "./DescriptionStep.scss";
-import { addActivityTask } from "@api/activities.api";
+// import { addActivityTask } from "@api/activities.api";
 import { countWords } from "@utils/helpers";
 import { pxToRem } from "@utils/text-size";
 import { DiscordWebHookUrl } from "@store/AutDashboard/aut-dashboard.reducer";
@@ -47,20 +47,20 @@ const DescriptionStep = () => {
 
   const onSubmit = async (data: any) => {
     await dispatch(activityUpdateTask(data));
-    const result = await dispatch(
-      addActivityTask({
-        role,
-        isCoreTeamMembersOnly,
-        allParticipants,
-        participants,
-        description: values.description,
-        title: values.title
-      })
-    );
+    // const result = await dispatch(
+    //   addActivityTask({
+    //     role,
+    //     isCoreTeamMembersOnly,
+    //     allParticipants,
+    //     participants,
+    //     description: values.description,
+    //     title: values.title
+    //   })
+    // );
 
-    if (result.meta.requestStatus === "fulfilled") {
-      // history.push("/aut-dashboard/event-factory/create-task-success");
-    }
+    // if (result.meta.requestStatus === "fulfilled") {
+    //   // history.push("/aut-dashboard/event-factory/create-task-success");
+    // }
   };
 
   const handleDialogClose = () => {

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ReactComponent as CoreTeam } from "@assets/core-team.svg";
-import { ReactComponent as Community } from "@assets/community.svg";
+import CoreTeam from "@assets/core-team.svg?react";
+import Hub from "@assets/hub.svg?react";
 import {
   ActivityCurrentStep,
   ActivityCurrentTask,
@@ -68,7 +68,7 @@ const CategoryStep = () => {
           component="div"
         >
           This is an Open Task that lets you assign work, creative competitions
-          and daily tasks to other Members of your DAO.
+          and daily tasks to other Members of your Hub.
         </Typography>
         <Typography
           sx={{
@@ -107,9 +107,9 @@ const CategoryStep = () => {
                   name={name}
                   onClick={() => onChange(false)}
                   className={!value ? "active-link" : ""}
-                  endIcon={<Community />}
+                  endIcon={<Hub />}
                 >
-                  Community
+                  Hub
                 </AutButton>
               );
             }}

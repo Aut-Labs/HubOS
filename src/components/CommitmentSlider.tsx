@@ -4,7 +4,7 @@ import { FieldErrors } from "react-hook-form";
 import { CommitmentMessages } from "@utils/misc";
 import { FormHelperText } from "./Fields";
 
-/* eslint-disable max-len */
+ 
 export function CommitmentMessage({ value, children = null }) {
   const message = CommitmentMessages(value);
   return (

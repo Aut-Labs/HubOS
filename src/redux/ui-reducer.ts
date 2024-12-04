@@ -1,4 +1,3 @@
-import { Community } from "@api/community.model";
 import {
   DiscordMessage,
   DiscordPollInput,
@@ -6,6 +5,7 @@ import {
   postDiscordNotification as sendNotification,
   postDiscordPoll
 } from "@api/discord.api";
+import { DAutHub } from "@aut-labs/d-aut";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export const sendDiscordNotification = createAsyncThunk(
@@ -13,11 +13,11 @@ export const sendDiscordNotification = createAsyncThunk(
   async (message: DiscordMessage, { dispatch, getState }) => {
     try {
       const state: any = getState();
-      const communities = state.community.communities as Community[];
-      const communityAddress = state.community
-        .selectedCommunityAddress as string;
-      const community = communities.find(
-        (c) => c.properties.address === communityAddress
+      const communities = state.hub.communities as DAutHub[];
+      const hubAddress = state.hub
+        .selectedHubAddress as string;
+      const hub = communities.find(
+        (c) => c.properties.address === hubAddress
       );
       const { userInfo } = state.auth;
       const discordMsg = new MessageEmbed({
@@ -27,14 +27,14 @@ export const sendDiscordNotification = createAsyncThunk(
         },
         message,
         footer: {
-          text: `${community.name}@Āut`,
-          image: community.image as string
+          text: `${hub.name}@Āut`,
+          image: hub.image as string
         }
       });
-      // return await sendNotification(community.discordWebhookUrl, discordMsg);
+      // return await sendNotification(hub.discordWebhookUrl, discordMsg);
     } catch (error) {
       const message = "Could not send notification to discord";
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+
       dispatch(openSnackbar({ message, severity: "error" }));
     }
   }
@@ -45,11 +45,11 @@ export const sendDiscordPoll = createAsyncThunk(
   async (input: DiscordPollInput, { dispatch, getState }) => {
     try {
       const state = getState() as any;
-      const communities = state.community.communities as Community[];
-      const communityAddress = state.community
-        .selectedCommunityAddress as string;
-      const community = communities.find(
-        (c) => c.properties.address === communityAddress
+      const communities = state.hub.communities as DAutHub[];
+      const hubAddress = state.hub
+        .selectedHubAddress as string;
+      const hub = communities.find(
+        (c) => c.properties.address === hubAddress
       );
       const { userInfo } = state.auth;
 
@@ -60,11 +60,11 @@ export const sendDiscordPoll = createAsyncThunk(
         },
         message: input.message,
         footer: {
-          text: `${community.name}@Āut`,
-          image: community.image as string
+          text: `${hub.name}@Āut`,
+          image: hub.image as string
         }
       });
-      return await postDiscordPoll("https://dev-api.olympics.community/poll", {
+      return await postDiscordPoll("https://dev-api.olympics.hub/poll", {
         input: discordMsg,
         emojis: input.emojis,
         activitiesContractAddress: input.activitiesContractAddress,
@@ -72,7 +72,7 @@ export const sendDiscordPoll = createAsyncThunk(
       });
     } catch (error) {
       const message = "Could not send notification to discord";
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+
       dispatch(openSnackbar({ message, severity: "error" }));
     }
   }

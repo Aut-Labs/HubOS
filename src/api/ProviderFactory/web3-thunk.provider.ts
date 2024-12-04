@@ -2,16 +2,16 @@ import { AsyncThunk, createAsyncThunk } from "@reduxjs/toolkit";
 import { ParseSWErrorMessage } from "@utils/error-parser";
 import { updateTransactionState } from "@store/ui-reducer";
 import { EnableAndChangeNetwork } from "./web3.network";
-import {
-  BaseThunkArgs,
-  ThunkArgs,
-  GetThunkAPI,
-  AsyncThunkConfig,
-  ProviderEvent,
-  AsyncThunkPayloadCreator
-} from "./web3.thunk.type";
+// import {
+//   BaseThunkArgs,
+//   ThunkArgs,
+//   GetThunkAPI,
+//   AsyncThunkConfig,
+//   ProviderEvent,
+//   AsyncThunkPayloadCreator
+// } from "./web3.thunk.type";
 
-const DefaultProviders: Partial<BaseThunkArgs<any, any>> = {
+const DefaultProviders = {
   updateTransactionStateAction: (state: string, dispatch) => {
     dispatch(updateTransactionState(state));
   }
@@ -22,26 +22,19 @@ export const Web3ThunkProviderFactory = <
   SWContractEventTypes = any
 >(
   type: string,
-  stateActions: BaseThunkArgs<SWContractFunctions, SWContractEventTypes>
+  stateActions: any
 ) => {
   return <Returned, ThunkArg = any>(
-    args: ThunkArgs<SWContractEventTypes>,
-    contractAddress: (
-      thunkAPI: GetThunkAPI<AsyncThunkConfig>
-    ) => Promise<string>,
-    thunk: AsyncThunkPayloadCreator<
-      SWContractFunctions,
-      Returned,
-      ThunkArg,
-      AsyncThunkConfig
-    >
-  ): AsyncThunk<Returned, ThunkArg, AsyncThunkConfig> => {
+    args: any,
+    contractAddress: (thunkAPI: any) => Promise<string>,
+    thunk: any
+  ): AsyncThunk<Returned, ThunkArg, any> => {
     stateActions = {
       ...DefaultProviders,
       ...stateActions
     };
     const typeName = `[${type}] ${args.type}`;
-    return createAsyncThunk<Returned, ThunkArg, AsyncThunkConfig>(
+    return createAsyncThunk<Returned, ThunkArg, any>(
       typeName,
       // @ts-ignore
       async (arg, thunkAPI) => {
@@ -53,7 +46,7 @@ export const Web3ThunkProviderFactory = <
             throw new Error(`Could not find addressOrName for ${type}`);
           }
           const contractProvider = await stateActions.provider(addressOrName, {
-            event: (args as ProviderEvent<SWContractEventTypes>).event,
+            event: (args as any).event,
             // @ts-ignore
             beforeRequest: () => EnableAndChangeNetwork(),
             transactionState: (state) => {

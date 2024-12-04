@@ -25,8 +25,8 @@ import {
   activityUpdateGroupCallData,
   activityUpdateGroupCallStatus
 } from "@store/Activity/call.reducer";
-import { allRoles } from "@store/Community/community.reducer";
-import { addGroupCall } from "@api/activities.api";
+import { allRoles } from "@store/Hub/hub.reducer";
+// import { addGroupCall } from "@api/activities.api";
 import { ResultState } from "@store/result-status";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
@@ -34,7 +34,7 @@ import { AutHeader } from "@components/AutHeader";
 import { AutButton } from "@components/buttons";
 import { AutSelectField, AutTextField } from "@components/Fields";
 import { useNavigation } from "react-router-dom";
-import format from "date-fns/format";
+import { format } from "date-fns";
 
 const StepWrapper = styled("form")({
   textAlign: "center",
@@ -79,11 +79,11 @@ const CallInformationStep = () => {
       startTime,
       ...values
     };
-    await dispatch(activityUpdateGroupCallData(values));
-    const result = await dispatch(addGroupCall(metadata));
-    if (result.meta.requestStatus === "fulfilled") {
-      // navigate.push("/aut-dashboard/event-factory/group-call/success");
-    }
+    // await dispatch(activityUpdateGroupCallData(values));
+    // // const result = await dispatch(addGroupCall(metadata));
+    // if (result.meta.requestStatus === "fulfilled") {
+    //   // navigate.push("/aut-dashboard/event-factory/group-call/success");
+    // }
   };
 
   const handleDialogClose = () => {
@@ -100,7 +100,7 @@ const CallInformationStep = () => {
       <LoadingDialog
         handleClose={handleDialogClose}
         open={status === ResultState.Updating}
-        message="Creating community call activity..."
+        message="Creating hub call activity..."
       />
 
       <AutHeader
@@ -111,7 +111,7 @@ const CallInformationStep = () => {
         subtitle={
           <>
             Almost there 🙌 Now just pick a duration ⌚ <br /> And decide
-            whether the Call is for the entire Community, or a specific Role.
+            whether the Call is for the entire Hub, or a specific Role.
           </>
         }
       />
@@ -267,7 +267,7 @@ const CallInformationStep = () => {
                         }}
                         value={false}
                         control={<Radio />}
-                        label="Community"
+                        label="Hub"
                       />
                     </RadioGroup>
                   )}

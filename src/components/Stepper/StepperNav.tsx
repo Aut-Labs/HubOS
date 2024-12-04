@@ -1,6 +1,6 @@
 import { pxToRem } from "@utils/text-size";
 import { Fragment } from "react";
-import { ReactComponent as SmCircle } from "@assets/aut/small-icon.svg";
+import SmCircle from "@assets/aut/small-icon.svg?react";
 import LgCircle from "@assets/aut/icon.png";
 import { SvgIcon, Typography, styled } from "@mui/material";
 import { StepperNavProps } from "./model";
